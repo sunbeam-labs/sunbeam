@@ -15,8 +15,9 @@ Cfg_default = {
     'data_fp': '~/ext/100_SCID/103_Virome/data_files',
     'output_fp': '~/my_data/output',
     'filename_fmt': '{sample}_{rp}.fastq.gz',
-    'subthreads': 4,
-    'genomes_fp': '~/ext/genomes'
+    'subcores': 4,
+    'genomes_fp': '~/ext/genomes',
+    'bt2_index_fp': '~/ext/genomes/bowtie2_indices'
 }
 
 # These keys in the config file must point to valid paths
@@ -24,7 +25,7 @@ required_paths = ['data_fp', 'genomes_fp']
 
 if Path('config.yaml').exists():
     configfile: 'config.yaml'
-    Cfg_default.update_config(config)
+    update_config(Cfg_default, config)
 else:
     print("No config.yaml found; using defaults")
 
@@ -51,19 +52,24 @@ for f in _all_files:
         Samples[f[1]['sample']]['file'] = f[0]
         Samples[f[1]['sample']]['paired'] = False
 
-## ==== Rule List ==== ##
+## ==== Function definitions
+
+include: "functions.snakefile"
+
+## ==== Rules
         
 rule all:
     input: expand(str(Cfg['output_fp']/'paired'/'{sample}.assembled.fastq'), sample = Samples.keys())
 
-rule pair_reads:
-    """Pairs reads with pear."""
-    input:
-        r1 = lambda wc: Samples[wc.sample]['R1'],
-        r2 = lambda wc: Samples[wc.sample]['R2']
-    output:
-        str(Cfg['output_fp']/'paired'/'{sample}.assembled.fastq')
-    params:
-        out = str(Cfg['data_fp']/'paired'/'{sample}')
-    shell:
-        "pear -j {Cfg[subthreads]} -f {input.r1} -r {input.r2} -o {params.out}"
+# ---- Quality control rules
+
+include: "qc.rules"
+
+# ---- Read pairing rules
+
+include: "pairing.rules"
+    
+# ---- Bowtie mapping rules
+
+include: "bowtie.rules"
+    

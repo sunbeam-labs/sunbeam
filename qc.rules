@@ -1,0 +1,61 @@
+# -*- mode: Snakemake -*-
+#
+# Illumina quality control rules
+#
+# Config file resources:
+{
+    'output_fp': 'path/to/output',
+    'trimmomatic_fp': 'path/to/trimmomatic.jar',
+    'java_heapsize': '512M',
+    'adapter_fp': '',
+    'leading': 3,
+    'trailing': 3,
+    'slidingwindow': (4,15),
+    'minlen': 36,
+    'fastqc_fp': 'fastqc'
+}
+
+rule qc_all:
+    input:
+        expand(
+            "{output_fp}/qc/paired/{sample}_{rp}_fastqc.zip",
+            output_fp = Cfg['output_fp'],
+            sample = Samples.keys(),
+            rp = ['R1', 'R2']
+        )
+
+rule trimmomatic:
+    input:
+        r1 = lambda wildcards: Samples[wildcards.sample]['R1'],
+        r2 = lambda wildcards: Samples[wildcards.sample]['R2']
+    output:
+        pair_r1 = str(Cfg['output_fp']/'qc'/'paired'/'{sample}_R1.fastq.gz'),
+        pair_r2 = str(Cfg['output_fp']/'qc'/'paired'/'{sample}_R2.fastq.gz'),
+        unpair_r1 = str(Cfg['output_fp']/'qc'/'unpaired'/'{sample}_R1_unpaired.fastq.gz'),
+        unpair_r2 = str(Cfg['output_fp']/'qc'/'unpaired'/'{sample}_R2_unpaired.fastq.gz')
+    params:
+        sw_start = Cfg['slidingwindow'][0],
+        sw_end = Cfg['slidingwindow'][1]
+    shell: """\
+           java -Xmx{Cfg[java_heapsize]} -jar {Cfg[trimmomatic_fp]} \
+           PE {Cfg[subcores]} -phred33 \
+           {input.r1} {input.r2} \
+           {output.pair_r1} {output.unpair_r1} \
+           {output.pair_r2} {output.unpair_r2} \
+           ILLUMINACLIP:{Cfg[adapter_fp]}:2:30:10:8:true \
+           LEADING:{Cfg[leading]} \
+           TRAILING:{Cfg[trailing]} \
+           SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
+           MINLEN:{Cfg[minlen]} \
+           """
+
+rule fastqc:
+    input:
+        r1 = str(Cfg['output_fp']/'qc'/'paired'/'{sample}_R1.fastq.gz'),
+        r2 = str(Cfg['output_fp']/'qc'/'paired'/'{sample}_R2.fastq.gz')
+    output:
+        expand(
+            str(Cfg['output_fp']/'qc'/'paired'/'{{sample}}_{rp}_fastqc.zip'),
+            rp=['R1', 'R2'])
+    shell: "{Cfg[fastqc_fp]} {input.r1} {input.r2}"
+

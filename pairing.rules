@@ -1,0 +1,11 @@
+rule pair_reads:
+    """Pairs reads with pear."""
+    input:
+        r1 = lambda wc: Samples[wc.sample]['R1'],
+        r2 = lambda wc: Samples[wc.sample]['R2']
+    output:
+        str(Cfg['output_fp']/'paired'/'{sample}.assembled.fastq')
+    params:
+        out = str(Cfg['data_fp']/'paired'/'{sample}')
+    shell:
+        "pear -j {Cfg[subcores]} -f {input.r1} -r {input.r2} -o {params.out}"
