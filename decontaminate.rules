@@ -1,0 +1,34 @@
+# -*- mode: Snakemake -*-
+#
+# Decontamination rules
+#
+# Requires PennChopMicrobiomeProgram/decontam
+
+rule decontam_all:
+    input:
+        expand(
+            "{output_fp}/qc/decontam/{sample}_summary.txt",
+            output_fp = Cfg['output_fp'],
+            sample = Samples.keys()
+        )
+
+rule gunzip:
+    input: "{filename}.fastq.gz"
+    output: temp("{filename}.fastq")
+    shell: "gunzip -c {input} > {output}"
+
+rule decontam:
+    input:
+        r1 = str(Cfg['output_fp']/'qc'/'paired'/'{sample}_R1.fastq'),
+        r2 = str(Cfg['output_fp']/'qc'/'paired'/'{sample}_R2.fastq')
+    output:
+        str(Cfg['output_fp']/'qc'/'decontam'/'{sample}_summary.txt')
+    params:
+        out_fp = str(Cfg['output_fp']/'qc'/'decontam')
+    shell:
+        """ 
+        decontaminate.py --forward {input.r1} --reverse {input.r2} \
+        --organism {Cfg[host]} --summary-file {output} \
+        --output-dir {params.out_fp} --config-file {Cfg[decontam_cfg_fp]} \
+        """
+

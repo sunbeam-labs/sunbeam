@@ -65,6 +65,10 @@ rule all:
 
 include: "qc.rules"
 
+# ---- Host filtering rules
+
+include: "decontaminate.rules"
+
 # ---- Read pairing rules
 
 include: "pairing.rules"
