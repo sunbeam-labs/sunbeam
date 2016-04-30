@@ -11,11 +11,11 @@
     'leading': 3,
     'trailing': 3,
     'slidingwindow': (4,15),
-    'minlen': 36,
-    'fastqc_fp': 'fastqc'
+    'minlen': 36
 }
 
 rule qc_all:
+    """Runs trimmomatic and fastqc on all input files."""
     input:
         expand(
             "{output_fp}/qc/paired/{sample}_{rp}_fastqc.zip",
@@ -57,5 +57,5 @@ rule fastqc:
         expand(
             str(Cfg['output_fp']/'qc'/'paired'/'{{sample}}_{rp}_fastqc.zip'),
             rp=['R1', 'R2'])
-    shell: "{Cfg[fastqc_fp]} {input.r1} {input.r2}"
+    shell: "fastqc {input.r1} {input.r2}"
 
