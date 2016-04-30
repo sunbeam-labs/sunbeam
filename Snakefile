@@ -63,15 +63,15 @@ rule all:
 
 # ---- Quality control rules
 
-include: "qc.rules"
+include: "qc/qc.rules"
 
 # ---- Host filtering rules
 
-include: "decontaminate.rules"
+include: "qc/decontaminate.rules"
 
 # ---- Read pairing rules
 
-include: "pairing.rules"
+include: "assembly/pairing.rules"
     
 # ---- Bowtie mapping rules
 
