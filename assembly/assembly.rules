@@ -41,7 +41,7 @@ rule minimo:
         unblock = str(Cfg['output_fp']/'contigs'/'{sample}_assembly'/'minimo-contigs.fa')
     shell:
         """
-        {Cfg[minimo_fp]} {input} -D FASTA_EXP=1; \
+        {Cfg[minimo_fp]} {input} -D FASTA_EXP=1 && \
         perl unblock_fasta.pl {output.block} > {output.unblock}
         """
 
