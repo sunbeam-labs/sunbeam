@@ -9,8 +9,7 @@ import csv
 
 from Bio import SeqIO
 from Bio import SearchIO
-
-
+from xml.etree.ElementTree import ParseError
 
 rule tmp_filter_all:
     input:
@@ -41,45 +40,48 @@ rule filter_fasta:
         print(results)
                 
 
-rule run_blastn:
+rule run_blast:
     input:
         contigs=str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
         db=lambda wildcard: Cfg['nucleotide_dbs'][wildcard.db]
     output:
-        str(ANNOTATION_FP/'blastn'/'{db}'/'{sample}.xml')
+        str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'{sample}.xml')
     shell:
         """
-        blastn -query {input.contigs} -db {input.db} \
+        {wildcards.blast_prog} -query {input.contigs} -db {input.db} \
         -outfmt 5 \
         -num_threads {Cfg[subcores]} -evalue 1e-10 -max_target_seqs 1 \
         -out {output} \
         """
 
-rule report:
+rule blast_report:
     input:
         expand(
-            str(ANNOTATION_FP/'blastn'/'{{db}}'/'{sample}.xml'),
-            sample=['Pulm1BALd_S1', 'Pulm12BALd_S2'])
+            str(ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{sample}.xml'),
+            sample=Samples.keys())
     output:
-        str(ANNOTATION_FP/'blastn'/'{db}'/'report.tsv')
+        str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'report.tsv')
     run:
         with open(output[0], 'w') as out:
             writer = csv.DictWriter(out, fieldnames=['sample','contig','hit'], delimiter='\t')
             writer.writeheader()
             for infile in input:
                 sample = Path(infile).stem
-                results = [
-                    {'sample':sample,
-                     'contig':result.id,
-                     'hit':result.hits[0].id}
-                    for result in SearchIO.parse(infile, 'blast-xml')
-                    if len(result.hits) > 0
-                ]
-                writer.writerows(results)
+                try:
+                    results = [
+                        {'sample': sample,
+                         'contig': result.id,
+                         'hit':result.hits[0].id}
+                        for result in SearchIO.parse(infile, 'blast-xml')
+                        if len(result.hits) > 0]
+                    writer.writerows(results)
+                except ParseError:
+                    print("Skipping empty/malformed %s" % infile)
+                    continue
 
 rule test_report:
     input:
-        str(ANNOTATION_FP/'blastn'/'bacteria'/'report.tsv')
+        str(ANNOTATION_FP/'blastn'/'viral'/'report.tsv')
 
 
 

@@ -30,7 +30,7 @@ rule build_contigs:
         out_fp = str(ASSEMBLY_FP/'{sample}_assembly')
     shell:
         """
-        {Cfg[idba_fp]} -r {input} -o {params.out_fp} \
+        {Cfg[idba_fp]} -l {input} -o {params.out_fp} \
         --num_threads {Cfg[subcores]} --pre_correction \
         """
 

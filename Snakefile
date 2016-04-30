@@ -20,8 +20,9 @@ ASSEMBLY_FP = Cfg['output_fp']/Cfg['assembly_suffix']
 ANNOTATION_FP = Cfg['output_fp']/Cfg['annotation_suffix']
 
 # Create sample list from parameters in config file
-Samples = build_sample_list(Cfg['data_fp'], Cfg['filename_fmt'])
+Samples = build_sample_list(Cfg['data_fp'], Cfg['filename_fmt'], Cfg['exclude'])
 
+print(Samples.keys())
 
 rule all:
     run:
