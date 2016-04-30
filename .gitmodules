@@ -1,3 +1,0 @@
-[submodule "decontam"]
-	path = decontam
-	url = git@github.com:eclarke/decontam

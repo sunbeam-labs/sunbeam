@@ -1,0 +1,23 @@
+# General config
+data_fp: "~/data_files"
+output_fp: "~/output"
+filename_fmt: "{sample}_L001_{rp}_001.fastq.gz"
+subcores: 4
+# Bowtie config
+genomes_fp: "~/genomes"
+bt2_index_fp: "~/genomes/bowtie2_indices"
+# QC config
+trimmomatic_fp: '~/Trimmomatic-0.33/trimmomatic-0.33.jar'
+java_heapsize: '512M'
+adapter_fp: '~/Trimmomatic-0.33/adapters/NexteraPE-PE.fa'
+leading: 3
+trailing: 3
+slidingwindow: [4,15]
+minlen: 36
+fastqc_fp: 'fastqc'
+# Decontaminate config
+decontam_cfg_fp: '~/.decontam_human.json'
+host: 'human'
+pct_id: 0.5 # percent identity
+frac: 0.6   # fraction of alignment len
+keep_sam: True
