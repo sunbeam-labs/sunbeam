@@ -7,7 +7,6 @@
 
 import re
 from pathlib import Path
-from pprint import pprint
 
 from snakemake.utils import update_config, listfiles
 
@@ -69,11 +68,14 @@ include: "qc/qc.rules"
 
 include: "qc/decontaminate.rules"
 
-# ---- Read pairing rules
+# ---- Assembly rules
 
 include: "assembly/pairing.rules"
+include: "assembly/assembly.rules"
     
 # ---- Bowtie mapping rules
 
 include: "bowtie.rules"
+
+
     

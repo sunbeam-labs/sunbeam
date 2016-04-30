@@ -1,0 +1,48 @@
+# -*- mode: Snakemake -*-
+#
+# Contig building and other assembly rules
+#
+# Requires IDBA_UD and AMOS.
+
+rule build_all:
+    input:
+        expand(
+            str(Cfg['output_fp']/'contigs'/'{sample}_assembly'/'minimo-contigs.fa'),
+            sample=Samples.keys()
+        )
+
+rule merge_fq:
+    input:
+        r1 = str(Cfg['output_fp']/'qc'/'decontam'/'{sample}_R1.fastq'),
+        r2 = str(Cfg['output_fp']/'qc'/'decontam'/'{sample}_R2.fastq')
+    output:
+        str(Cfg['output_fp']/'contigs'/'merged_reads'/'{sample}_merged.fasta')
+    shell: "fq2fa --merge --filter {input.r1} {input.r2} {output}"
+
+
+rule build_contigs:
+    input:
+        str(Cfg['output_fp']/'contigs'/'merged_reads'/'{sample}_merged.fasta')
+    output:
+        str(Cfg['output_fp']/'contigs'/'{sample}_assembly'/'contig.fa')
+    params:
+        out_fp = str(Cfg['output_fp']/'contigs'/'{sample}_assembly')
+    shell:
+        """
+        {Cfg[idba_fp]} -r {input} -o {params.out_fp} \
+        --num_threads {Cfg[subcores]} --pre_correction \
+        """
+
+rule minimo:
+    input:
+        str(Cfg['output_fp']/'contigs'/'{sample}_assembly'/'contig.fa')
+    output:
+        block = temp(str(Cfg['output_fp']/'contigs'/'{sample}_assembly'/'contig-contigs.fa')),
+        unblock = str(Cfg['output_fp']/'contigs'/'{sample}_assembly'/'minimo-contigs.fa')
+    shell:
+        """
+        {Cfg[minimo_fp]} {input} -D FASTA_EXP=1; \
+        perl unblock_fasta.pl {output.block} > {output.unblock}
+        """
+
+        

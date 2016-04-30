@@ -2,7 +2,7 @@
 #
 # Decontamination rules
 #
-# Requires PennChopMicrobiomeProgram/decontam
+# Requires eclarke/decontam (fork for py3+ compatibility)
 
 rule decontam_all:
     input:
@@ -22,13 +22,15 @@ rule decontam:
         r1 = str(Cfg['output_fp']/'qc'/'paired'/'{sample}_R1.fastq'),
         r2 = str(Cfg['output_fp']/'qc'/'paired'/'{sample}_R2.fastq')
     output:
-        str(Cfg['output_fp']/'qc'/'decontam'/'{sample}_summary.txt')
+        r1 = str(Cfg['output_fp']/'qc'/'decontam'/'{sample}_R1.fastq'),
+        r2 = str(Cfg['output_fp']/'qc'/'decontam'/'{sample}_R2.fastq'),
+        summary = str(Cfg['output_fp']/'qc'/'decontam'/'{sample}_summary.txt')
     params:
         out_fp = str(Cfg['output_fp']/'qc'/'decontam')
     shell:
         """ 
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
-        --organism {Cfg[host]} --summary-file {output} \
+        --organism {Cfg[host]} --summary-file {output.summary} \
         --output-dir {params.out_fp} --config-file {Cfg[decontam_cfg_fp]} \
         """
 
