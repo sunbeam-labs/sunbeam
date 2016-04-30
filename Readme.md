@@ -1,4 +1,4 @@
-# Xenopeltis: an iridescent HTS pipeline
+# Sunbeam: an iridescent HTS pipeline
 
 ![xenopeltis unicolor](https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Sunbeam_Snake_%28Xenopeltis_unicolor%29_%287121228691%29.jpg/320px-Sunbeam_Snake_%28Xenopeltis_unicolor%29_%287121228691%29.jpg) 
 
@@ -6,7 +6,7 @@ Named after the iridescent scales of the sunbeam snake, _Xenopeltis unicolor_, t
 
 ## Installation
 
-Xenopeltis uses conda; follow the installation instructions for Miniconda3. Then:
+Sunbeam uses conda; follow the installation instructions for Miniconda3. Then:
 
 ```sh
 conda config --add channel r
