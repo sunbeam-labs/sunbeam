@@ -37,8 +37,8 @@ include: "qc/decontaminate.rules"
 include: "assembly/pairing.rules"
 include: "assembly/assembly.rules"
 
-# ---- Viral annotation rules
-include: "virome/annotation.rules"
+# ---- Annotation rules
+include: "annotation/annotation.rules"
     
 # ---- Bowtie mapping rules
 include: "bowtie.rules"
