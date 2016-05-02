@@ -26,12 +26,14 @@ rule build_contigs:
         str(ASSEMBLY_FP/'merged_reads'/'{sample}_merged.fasta')
     output:
         str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa')
+    log:
+        str(ASSEMBLY_FP/'log'/'idba_ud'/'{sample}.out')
     params:
         out_fp = str(ASSEMBLY_FP/'{sample}_assembly')
     shell:
         """
         {Cfg[idba_fp]}/idba_ud -r {input} -o {params.out_fp} \
-        --num_threads {Cfg[subcores]} --pre_correction \
+        --num_threads {Cfg[subcores]} --pre_correction &> {log} \
         """
 
 rule minimo:
@@ -40,9 +42,12 @@ rule minimo:
     output:
         block = temp(str(ASSEMBLY_FP/'{sample}_assembly'/'contig-contigs.fa')),
         unblock = str(ASSEMBLY_FP/'{sample}_assembly'/'minimo-contigs.fa')
+    log:
+        str(ASSEMBLY_FP/'log'/'minimo'/'{sample}.out')
+
     shell:
         """
-        {Cfg[minimo_fp]} {input} -D FASTA_EXP=1 && \
+        {Cfg[minimo_fp]} {input} -D FASTA_EXP=1 &> {log} && \
         perl unblock_fasta.pl {output.block} > {output.unblock}
         """
 

@@ -23,13 +23,14 @@ rule decontam:
     output:
         r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq'),
-        summary = str(QC_FP/'decontam'/'{sample}_summary.txt')
+    log:
+        str(QC_FP/'log'/'decontam'/'{sample}_summary.json')
     params:
         out_fp = str(QC_FP/'decontam')
     shell:
         """ 
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
-        --organism {Cfg[host]} --summary-file {output.summary} \
+        --organism {Cfg[host]} --summary-file {log} \
         --output-dir {params.out_fp} --config-file {Cfg[decontam_cfg_fp]} \
         """
 

@@ -32,6 +32,8 @@ rule trimmomatic:
         pair_r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),
         unpair_r1 = str(QC_FP/'unpaired'/'{sample}_R1_unpaired.fastq.gz'),
         unpair_r2 = str(QC_FP/'unpaired'/'{sample}_R2_unpaired.fastq.gz')
+    log:
+        str(QC_FP/'log'/'trimmomatic'/'{sample}.out')
     params:
         sw_start = Cfg['slidingwindow'][0],
         sw_end = Cfg['slidingwindow'][1]
@@ -45,7 +47,7 @@ rule trimmomatic:
            LEADING:{Cfg[leading]} \
            TRAILING:{Cfg[trailing]} \
            SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
-           MINLEN:{Cfg[minlen]} \
+           MINLEN:{Cfg[minlen]} &> {log}\
            """
 
 rule fastqc:
