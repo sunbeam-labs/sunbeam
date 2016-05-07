@@ -22,8 +22,6 @@ ANNOTATION_FP = Cfg['output_fp']/Cfg['annotation_suffix']
 # Create sample list from parameters in config file
 Samples = build_sample_list(Cfg['data_fp'], Cfg['filename_fmt'], Cfg['exclude'])
 
-print(Samples.keys())
-
 rule all:
     run:
         print("Xenopeltis: an iridescent HTS pipeline")
