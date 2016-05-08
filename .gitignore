@@ -4,3 +4,4 @@ config.yaml
 \#*
 *.fastq.gz
 output
+__pycache__

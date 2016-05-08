@@ -8,21 +8,11 @@ from pathlib import Path
 import csv
 
 from Bio import SeqIO
-from Bio import SearchIO
-from xml.etree.ElementTree import ParseError
 
-rule tmp_filter_all:
-    input:
-        expand(
-            str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
-            sample=Samples.keys()
-        )
-
-rule tmp_blast:
-    input:
-        str(ANNOTATION_FP/'blastn'/'bacteria'/'Pulm1BALd_S1.xml')
 
 rule filter_fasta:
+    """Filter contigs by size."""
+    
     input:
         str(ASSEMBLY_FP/'{sample}_assembly'/'minimo-contigs.fa')
     output:
@@ -38,50 +28,7 @@ rule filter_fasta:
                     SeqIO.write(record, out, 'fasta')
         results = "%s: %d of %d contigs kept" % (wildcards.sample, n_kept, n_contigs)
         print(results)
-                
 
-rule run_blast:
-    input:
-        contigs=str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
-        db=lambda wildcard: Cfg['nucleotide_dbs'][wildcard.db]
-    output:
-        str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'{sample}.xml')
-    shell:
-        """
-        {wildcards.blast_prog} -query {input.contigs} -db {input.db} \
-        -outfmt 5 \
-        -num_threads {Cfg[subcores]} -evalue 1e-10 -max_target_seqs 1 \
-        -out {output} \
-        """
-
-rule blast_report:
-    input:
-        expand(
-            str(ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{sample}.xml'),
-            sample=Samples.keys())
-    output:
-        str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'report.tsv')
-    run:
-        with open(output[0], 'w') as out:
-            writer = csv.DictWriter(out, fieldnames=['sample','contig','hit'], delimiter='\t')
-            writer.writeheader()
-            for infile in input:
-                sample = Path(infile).stem
-                try:
-                    results = [
-                        {'sample': sample,
-                         'contig': result.id,
-                         'hit':result.hits[0].id}
-                        for result in SearchIO.parse(infile, 'blast-xml')
-                        if len(result.hits) > 0]
-                    writer.writerows(results)
-                except ParseError:
-                    print("Skipping empty/malformed %s" % infile)
-                    continue
-
-rule test_report:
-    input:
-        str(ANNOTATION_FP/'blastn'/'viral'/'report.tsv')
 
 
 

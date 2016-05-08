@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-class ContigAnnotation(object):
+class MetaGeneAnnotation(object):
 
     def __init__(self, contig_id, model):
         self.id = contig_id
@@ -39,7 +39,7 @@ class ContigAnnotation(object):
             else:
                 # No comment region, now parsing gene calls
                 if contig is None:
-                    contig = ContigAnnotation(contig_id, model)
+                    contig = MetaGeneAnnotation(contig_id, model)
                 gene = PutativeGene(*line.strip("\n").split("\t"))
                 contig.genes.append(gene)
     
@@ -52,9 +52,9 @@ class PutativeGene(object):
         '10':'start',
         '00':'neither'}
 
-    def __init__(self, geneid, start, end, strand, frame, complete, score, model,
+    def __init__(self, id, start, end, strand, frame, complete, score, model,
                  rbs_start, rbs_end, rbs_score):
-        self.geneid = geneid
+        self.id = id
         self.start = int(start)
         self.end = int(end)
         self.length = self.end - self.start

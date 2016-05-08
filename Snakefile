@@ -9,6 +9,8 @@ import re
 from pathlib import Path
 from snakemake.utils import update_config, listfiles
 
+from lib.parsers import MetaGeneAnnotation
+
 include: 'functions.snakefile'
 configfile: 'config.yaml'
 
@@ -21,6 +23,8 @@ ANNOTATION_FP = Cfg['output_fp']/Cfg['annotation_suffix']
 
 # Create sample list from parameters in config file
 Samples = build_sample_list(Cfg['data_fp'], Cfg['filename_fmt'], Cfg['exclude'])
+
+print(list(Samples.keys()))
 
 rule all:
     run:
@@ -37,6 +41,8 @@ include: "assembly/assembly.rules"
 
 # ---- Annotation rules
 include: "annotation/annotation.rules"
+include: "annotation/blast.rules"
+include: "annotation/orf.rules"
     
 # ---- Bowtie mapping rules
 include: "bowtie.rules"

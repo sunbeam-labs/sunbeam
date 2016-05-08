@@ -1,0 +1,70 @@
+# -*- mode: Snakemake -*-
+#
+# Viral contig annotation:
+# 	Rules for finding and extracting ORFs.
+#
+# See Readme.md
+
+
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import IUPAC
+
+
+rule _test_genes_mga:
+    input:
+        expand(str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_nucl.fa'),
+        sample=Samples.keys())
+
+
+rule find_genes_mga:
+    """Use MetaGene Annotator to find genes in contigs."""
+    input:
+        str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa')
+    output:
+        str(ANNOTATION_FP/'genes'/'mga'/'{sample}_contigs.genes')
+    shell:
+        """{Cfg[mga_fp]} -m {input} > {output}"""
+
+rule parse_genes_mga:
+    """Parse output from MetaGene Annotator into a set of genes."""
+    input:
+        contigs=str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
+        genes=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_contigs.genes')
+    output:
+        nucl=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_nucl.fa'),
+        prot01=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_prot01.fa'),
+        prot11=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_prot11.fa')
+    run:
+        contig_seqs = SeqIO.parse(input.contigs, 'fasta')
+        contigs = {r.description: r.seq for r in contig_seqs}
+        genes = []
+        # Enumerate the genes in a sample across all contigs
+        gene_no = 0
+        with open(input.genes) as mga_infile:
+            annotations = MetaGeneAnnotation.parse(mga_infile)
+            for anno in annotations:
+                contig_seq = contigs[anno.id]
+                # Gather putative genes and create SeqRecords for them
+                for pgene in anno.genes:
+                    gene_seq = contig_seq[pgene.start:pgene.end]
+                    if pgene.strand == '-':
+                        gene_seq = gene_seq.reverse_complement()
+                    gene = SeqRecord(
+                        gene_seq,
+                        id="{}:{}".format(wildcards.sample, gene_no),
+                        description=anno.id)
+                    genes.append(gene)
+                    gene_no += 1
+        SeqIO.write(genes, output.nucl, 'fasta')
+        # Write proteins using standard translation table
+        SeqIO.write(
+            [SeqRecord(r.seq.translate(), r.id, description=r.description) for r in genes],
+            output.prot01, 'fasta')
+        # Write proteins using bacterial/archaeal/prok. phage translation table
+        SeqIO.write(
+            [SeqRecord(r.seq.translate(table=11), r.id, description=r.description) for r in genes],
+            output.prot11, 'fasta')
+        
+                
+        
