@@ -4,30 +4,24 @@
 # 	Rules for BLASTing against databases
 #
 # See Readme.md
+import csv
 
 from Bio import SearchIO
 from xml.etree.ElementTree import ParseError
 
-def pick_db(wildcard):
-    print(wildcard.db)
-    print(Cfg['protein_dbs'][wildcard.db])
-    return Cfg['protein_dbs'][wildcard.db]
-    
-    
-
 rule run_blastn:
-    """Run BLASTn against a given database and write the results to XML."""
-    
+    """Run BLASTn against a given database and write the results to XML."""    
     input:
         contigs=str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
-        db=lambda wildcard: Cfg['nucleotide_dbs'][wildcard.db]
     output:
         str(ANNOTATION_FP/'blastn'/'{db}'/'{contigs}'/'{sample}.xml')
+    params:
+        db=lambda wildcard: blastdbs['nucl'][wildcard.db] 
     shell:
         """
         blastn \
         -query {input.contigs} \
-        -db {input.db} \
+        -db {params.db} \
         -outfmt 5 \
         -num_threads {Cfg[subcores]} \
         -evalue 1e-10 \
@@ -36,12 +30,10 @@ rule run_blastn:
         """
 
 rule run_blastp:
-    """
-    Run BLASTp on translated genes against a target db and write to XML.
-    """
+    """Run BLASTp on translated genes against a target db and write to XML."""
     input:
         genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_prot11.fa'),
-        db=lambda wildcard: Cfg['protein_dbs'][wildcard.db]
+        db=lambda wildcard: blastdbs['prot'][wildcard.db]
     output:
         str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.xml')
     shell:
@@ -57,13 +49,11 @@ rule run_blastp:
         """
 
 rule run_blastx:
-    """
-    Run BLASTx on untranslated genes against a target db and write to XML.
-    """
+    """Run BLASTx on untranslated genes against a target db and write to XML."""
     input:
         # output/virome/genes/mga/HUP3D03BALc_S92_genes_nucl.fa
         genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_nucl.fa'),
-        db=pick_db
+        db=lambda wildcard: blastdbs['prot'][wildcard.db]
     output:
         # output/virome/blastx/aclame/mga/HUP3D03balc_S92.xml
         str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.xml')
@@ -80,7 +70,7 @@ rule run_blastx:
         """
         
 rule blast_report:
-    """Create a summary of results from a BLAST call."""    
+    """Create a summary of results from a BLAST call."""
     input:
         expand(
             str(ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{{query}}'/'{sample}.xml'),
@@ -89,7 +79,13 @@ rule blast_report:
         str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'{query}'/'report.tsv')
     run:
         with open(output[0], 'w') as out:
-            blast_summary(input, out)
+            writer = csv.DictWriter(
+	        out,
+	        fieldnames=['sample','query','hit'],
+                delimiter='\t')
+            writer.writeheader()
+            list(writer.writerow(result) for result in blast_summary(input))
+
 
 rule _test_blastx:
     input:

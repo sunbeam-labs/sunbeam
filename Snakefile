@@ -7,6 +7,7 @@
 
 import re
 import yaml
+from pprint import pprint
 from pathlib import Path
 
 from snakemake.utils import update_config, listfiles
@@ -25,6 +26,8 @@ Samples = build_sample_list(Cfg['data_fp'], Cfg['filename_fmt'], Cfg['exclude'])
 # ---- Rule all: show intro message
 rule all:
     run:
+        print("Samples found:")
+        pprint(list(Samples.keys()))
         print("For available commands, type `snakemake --list`")
 
 # ---- Quality control rules

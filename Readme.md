@@ -47,7 +47,9 @@ to work on.
 - data_fp: the path to the raw files, usually in *.fastq or *.fastq.gz format
 - output_fp: the top directory under which the results will be stored
 - filename_fmt: how the filenames are stored in `data_fp`
+  
   For instance, if you have a list of samples like such:
+
 	- `HUP3D01_L001_R1.fastq.gz`
 	- `HUP3D01_L001_R2.fastq.gz`
 	- `HUP3D02_L001_R1.fastq.gz`
@@ -55,6 +57,6 @@ to work on.
 	- ...  
 	
 	The sample would be the part defined `HUP3D01`, `HUP3D02`, etc; the segment
-  defining the read pair would be `R1` and `R2`, and the intermediate part
-  `L001` doesn't change between samples. Thus, the way you'd specify the
-  `filename_fmt` parameter would be '{sample}_L001_{rp}.fastq.gz`.
+	defining the read pair would be `R1` and `R2`, and the intermediate part
+	`L001` doesn't change between samples. Thus, the way you'd specify the
+	`filename_fmt` parameter would be `{sample}_L001_{rp}.fastq.gz`.

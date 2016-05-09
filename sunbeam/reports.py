@@ -1,33 +1,34 @@
 import csv
+from pathlib import Path
+from collections import Counter, defaultdict
 
 from Bio import SeqIO
 from Bio import SearchIO
+from Bio.SeqRecord import SeqRecord
 
 from .parsers import MetaGeneAnnotation
 
-def blast_summary(blast_xml_files, out_handle):
-    """Create a summary of BLAST results from an set of XML files."""
-    writer = csv.DictWriter(
-	out_handle,
-	fieldnames=['sample','contig','hit'], delimiter='\t')
-    writer.writeheader()
+def blast_summary(blast_xml_files):
+    """Summarize BLAST results from an set of XML files."""
     for infile in blast_xml_files:
         sample = Path(infile).stem
         try:
-            results = [
-                {
-                    'sample': sample,
-                    'query': result.id,
-                    'hit':result.hits[0].id
-                }
-                for result in SearchIO.parse(infile, 'blast-xml')
-                if len(result.hits) > 0
-            ]
-            writer.writerows(results)
+            for result in SearchIO.parse(infile, 'blast-xml'):
+                if len(result.hits) > 0:
+                    yield {
+                        'sample': sample,
+                        'query': result.id,
+                        'hit':result.hits[0].id}
         except ParseError:
             print("Skipping empty/malformed %s" % infile)
             continue
 
+def blast_contig_summary(xml_files):
+    return {r['query']: r['hit'] for r in blast_summary(xml_files)}
+
+def blast_hits(blast_xml_files):
+    return Counter(c['query'] for c in blast_summary(blast_xml_files))
+    
 def mga_summary(orf_fp, contigs_fp, sample_id):
     """Summarizes results from MetaGene Annotator."""
     genes = []
@@ -36,7 +37,7 @@ def mga_summary(orf_fp, contigs_fp, sample_id):
     contig_seqs = {r.description: r.seq for r in contigs}
     annotations = MetaGeneAnnotation.parse(open(orf_fp))
     for anno in annotations:
-        contig_seq = contigs[anno.id]
+        contig_seq = contig_seqs[anno.id]
         # Gather putative genes and create SeqRecords for them
         for pgene in anno.genes:
             gene_seq = contig_seq[pgene.start:pgene.end]
@@ -44,8 +45,8 @@ def mga_summary(orf_fp, contigs_fp, sample_id):
                 gene_seq = gene_seq.reverse_complement()
             gene = SeqRecord(
                 gene_seq,
-                id="{}:{}".format(sample_id, gene_no),
-                description=anno.id)
+                id=anno.id,
+                description="{}:{}".format(sample_id, gene_no))
             genes.append(gene)
             gene_no += 1
     return genes

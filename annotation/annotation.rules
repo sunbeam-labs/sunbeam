@@ -4,8 +4,9 @@
 #
 # See Readme.md
 
-from pathlib import Path
 import csv
+from collections import Counter
+from pathlib import Path
 
 from Bio import SeqIO
 
@@ -25,7 +26,7 @@ rule filter_fasta:
         with open(output.fp, 'w') as out:
             for record in SeqIO.parse(input[0], 'fasta'):
                 n_contigs += 1
-                if len(record) >= Cfg['min_contig_len']:
+                if len(record) >= Cfg['annotation']['min_contig_len']:
                     n_kept += 1
                     SeqIO.write(record, out, 'fasta')
         results = "%s: %d of %d contigs kept" % (wildcards.sample, n_kept, n_contigs)
@@ -33,10 +34,66 @@ rule filter_fasta:
 
 rule aggregate_results:
     input:
-        expand(
-            str(ANNOTATION_FP/'{blast_prog}'/'{{db}}'/'{{query}}'/'{{sample}}.xml'),
-            blast_prog=['blastp','blastn','blastx'])
+        contigs=str(ASSEMBLY_FP/'{sample}_assembly'/'minimo-contigs.fa'),
+        contig_results=expand(
+            str(ANNOTATION_FP/'blastn'/'{db}'/'contig'/'{{sample}}.xml'),
+            db=blastdbs['nucl']),
+        gene_results=expand(
+            str(ANNOTATION_FP/'{blastpx}'/'{db}'/'{orf_finder}'/'{{sample}}.xml'),
+            blastpx=['blastp','blastx'],
+            db=blastdbs['prot'],
+            orf_finder=['mga'])
+    output:
+        str(ANNOTATION_FP/'summary'/'{sample}.tsv')
+    params:
+        dbs=list(blastdbs['nucl'].keys()) + list(blastdbs['prot'].keys())
+    run:
+        contigs = {r.id: r.seq for r in SeqIO.parse(input.contigs, 'fasta')}
+        # Separate each set of result files by the database it was blasted against
+        contig_results = {
+            db: blast_contig_summary(f for f in input.contig_results if db in f)
+            for db in blastdbs['nucl']
+        }
+        # We only care about the number of hits for the protein database
+        gene_hits = {
+            db: blast_hits(f for f in input.gene_results if db in f)
+            for db in blastdbs['prot']
+        }
+        with open(output[0], 'w') as out:
+            writer = csv.DictWriter(
+                out,
+                fieldnames=['sample', 'contig', 'length', 'circular'] + params.dbs,
+                delimiter='\t')
+            writer.writeheader()
+            for contig, contig_seq in contigs.items():
+                results = {
+                    'sample':wildcards.sample,
+                    'contig':contig,
+                    'length':len(contig_seq),
+                    'circular':False
+                }
+                for db in blastdbs['nucl']:                
+                    results[db] = contig_results[db].get(contig, "NA")
+                for db in blastdbs['prot']:
+                    results[db] = gene_hits[db].get(contig, 0)
+                writer.writerow(results)
 
-        
-        
-        
+rule aggregate_all:
+    input:
+        expand(
+            str(ANNOTATION_FP/'summary'/'{sample}.tsv'),
+            sample=Samples.keys())
+    output:
+        str(ANNOTATION_FP/'all_samples.tsv')
+    run:
+        R("""
+        df = Reduce(
+          lapply({input}, function(fp) read.table(fp, header=TRUE)),
+          f = rbind)
+        write.csv(df, {output})
+        """)
+
+                
+rule _test_aggregate:
+    input:
+        str(ANNOTATION_FP/'summary'/'HUP3D04BALc_S93.tsv')
