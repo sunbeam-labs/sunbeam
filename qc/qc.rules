@@ -1,27 +1,18 @@
 # -*- mode: Snakemake -*-
 #
 # Illumina quality control rules
-#
-# Config file resources:
-{
-    'output_fp': 'path/to/output',
-    'trimmomatic_fp': 'path/to/trimmomatic.jar',
-    'java_heapsize': '512M',
-    'adapter_fp': '',
-    'leading': 3,
-    'trailing': 3,
-    'slidingwindow': (4,15),
-    'minlen': 36
-}
 
-rule qc_all:
+Cfg['qc'] = validate_paths(yaml.load(open("qc/config.yml")))
+
+QC_FP = Cfg['output_fp']/Cfg['qc']['suffix']
+
+rule _qc_all:
     """Runs trimmomatic and fastqc on all input files."""
     input:
         expand(
             str(QC_FP/'paired'/'{sample}_{rp}_fastqc.zip'),
             sample = Samples.keys(),
-            rp = ['R1', 'R2']
-        )
+            rp = ['R1', 'R2'])
 
 rule trimmomatic:
     input:
@@ -35,19 +26,19 @@ rule trimmomatic:
     log:
         str(QC_FP/'log'/'trimmomatic'/'{sample}.out')
     params:
-        sw_start = Cfg['slidingwindow'][0],
-        sw_end = Cfg['slidingwindow'][1]
+        sw_start = Cfg['qc']['slidingwindow'][0],
+        sw_end = Cfg['qc']['slidingwindow'][1]
     shell: """\
-           java -Xmx{Cfg[java_heapsize]} -jar {Cfg[trimmomatic_fp]} \
-           PE -threads {Cfg[subcores]} -phred33 \
+           java -Xmx{Cfg[qc][java_heapsize]} -jar {Cfg[qc][trimmomatic_fp]} \
+           PE -threads {Cfg[qc][subcores]} -phred33 \
            {input.r1} {input.r2} \
            {output.pair_r1} {output.unpair_r1} \
            {output.pair_r2} {output.unpair_r2} \
-           ILLUMINACLIP:{Cfg[adapter_fp]}:2:30:10:8:true \
-           LEADING:{Cfg[leading]} \
-           TRAILING:{Cfg[trailing]} \
+           ILLUMINACLIP:{Cfg[qc][adapter_fp]}:2:30:10:8:true \
+           LEADING:{Cfg[qc][leading]} \
+           TRAILING:{Cfg[qc][trailing]} \
            SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
-           MINLEN:{Cfg[minlen]} &> {log}\
+           MINLEN:{Cfg[qc][minlen]} &> {log}\
            """
 
 rule fastqc:

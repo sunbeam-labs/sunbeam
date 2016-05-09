@@ -1,0 +1,23 @@
+# List of BLAST databases to use.
+#
+# All databases are expected to have the same root folder; the sub-paths
+# under each name are appended to the root filepath specified.
+
+root_fp:
+  /media/8TB_PLAYGROUND/home/ecl/THING1/local/genomeIndexes/blast/
+
+nucleotide:
+  bacteria:
+    BacterialGenomes/ncbi_bacteria.fa
+  viral:
+    viral.1.1.genomic.fna
+  nt:
+    nt/nt
+
+protein:
+  integrase:
+    UniprotPhageIntegrase.fasta
+  aclame:
+    ACLAME/aclame_proteins_viruses_prophages_0.4.fasta
+  vfdb:
+    VFDB/VFs.faa

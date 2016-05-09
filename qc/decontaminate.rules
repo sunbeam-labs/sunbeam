@@ -4,12 +4,12 @@
 #
 # Requires eclarke/decontam (fork for py3+ compatibility)
 
-rule decontam_all:
+rule _decontam_all:
+    """Decontaminate all samples."""
     input:
         expand(
             str(QC_FP/'decontam'/'{sample}_{rp}.fastq'),
-            sample=Samples.keys(), rp=['R1', 'R2']
-        )
+            sample=Samples.keys(), rp=['R1', 'R2'])
 
 rule gunzip:
     input: "{filename}.fastq.gz"
@@ -30,7 +30,7 @@ rule decontam:
     shell:
         """ 
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
-        --organism {Cfg[host]} --summary-file {log} \
-        --output-dir {params.out_fp} --config-file {Cfg[decontam_cfg_fp]} \
+        --organism {Cfg[qc][host]} --summary-file {log} \
+        --output-dir {params.out_fp} --config-file {Cfg[qc][decontam_cfg_fp]} \
         """
 

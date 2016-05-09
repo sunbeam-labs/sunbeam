@@ -9,6 +9,8 @@ import csv
 
 from Bio import SeqIO
 
+Cfg['annotation'] = validate_paths(yaml.load(open('annotation/config.yml')))
+ANNOTATION_FP = Cfg['output_fp']/Cfg['annotation']['suffix']
 
 rule filter_fasta:
     """Filter contigs by size."""
@@ -29,8 +31,11 @@ rule filter_fasta:
         results = "%s: %d of %d contigs kept" % (wildcards.sample, n_kept, n_contigs)
         print(results)
 
-
-
+rule aggregate_results:
+    input:
+        expand(
+            str(ANNOTATION_FP/'{blast_prog}'/'{{db}}'/'{{query}}'/'{{sample}}.xml'),
+            blast_prog=['blastp','blastn','blastx'])
 
         
         

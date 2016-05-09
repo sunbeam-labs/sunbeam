@@ -1,0 +1,4 @@
+suffix: annotation
+min_contig_len: 500
+mga_fp:
+  "/media/8TB_PLAYGROUND/home/ecl/ext/downloads/mga/mga_linux_ia64"

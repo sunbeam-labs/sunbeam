@@ -80,8 +80,7 @@ rule run_blastx:
         """
         
 rule blast_report:
-    """Create a summary of results from a BLAST call."""
-    
+    """Create a summary of results from a BLAST call."""    
     input:
         expand(
             str(ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{{query}}'/'{sample}.xml'),
@@ -90,24 +89,7 @@ rule blast_report:
         str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'{query}'/'report.tsv')
     run:
         with open(output[0], 'w') as out:
-            writer = csv.DictWriter(
-	    	out,
-		fieldnames=['sample','contig','hit'], delimiter='\t')
-            writer.writeheader()
-            for infile in input:
-                sample = Path(infile).stem
-                try:
-                    results = [
-                        {'sample': sample,
-                         'contig': result.id,
-                         'hit':result.hits[0].id}
-                        for result in SearchIO.parse(infile, 'blast-xml')
-                        if len(result.hits) > 0]
-                    writer.writerows(results)
-                except ParseError:
-                    print("Skipping empty/malformed %s" % infile)
-                    continue
-
+            blast_summary(input, out)
 
 rule _test_blastx:
     input:

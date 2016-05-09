@@ -1,0 +1,18 @@
+# General
+data_fp:
+  "test_data"
+output_fp:
+  "output"
+filename_fmt:
+  "{sample}_L001_{rp}_001.fastq.gz"
+subcores: 4
+# Samples to exclude, if any
+exclude: ["Psarc108BALc_S63"]
+
+# Bowtie 
+genomes_fp:
+  "/media/8TB_PLAYGROUND/home/ecl/ext/genomes"
+bt2_index_fp:
+  "/media/8TB_PLAYGROUND/home/ecl/ext/genomes/bowtie2_indices"
+
+# Annotations

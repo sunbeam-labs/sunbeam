@@ -36,26 +36,7 @@ rule parse_genes_mga:
         prot01=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_prot01.fa'),
         prot11=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_prot11.fa')
     run:
-        contig_seqs = SeqIO.parse(input.contigs, 'fasta')
-        contigs = {r.description: r.seq for r in contig_seqs}
-        genes = []
-        # Enumerate the genes in a sample across all contigs
-        gene_no = 0
-        with open(input.genes) as mga_infile:
-            annotations = MetaGeneAnnotation.parse(mga_infile)
-            for anno in annotations:
-                contig_seq = contigs[anno.id]
-                # Gather putative genes and create SeqRecords for them
-                for pgene in anno.genes:
-                    gene_seq = contig_seq[pgene.start:pgene.end]
-                    if pgene.strand == '-':
-                        gene_seq = gene_seq.reverse_complement()
-                    gene = SeqRecord(
-                        gene_seq,
-                        id="{}:{}".format(wildcards.sample, gene_no),
-                        description=anno.id)
-                    genes.append(gene)
-                    gene_no += 1
+        genes = mga_summary(input.genes, input.contigs, wildcards.sample)
         SeqIO.write(genes, output.nucl, 'fasta')
         # Write proteins using standard translation table
         SeqIO.write(
