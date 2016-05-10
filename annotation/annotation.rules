@@ -12,6 +12,8 @@ from Bio import SeqIO
 
 from snakemake.utils import R
 
+from sunbeam import circular
+
 Cfg['annotation'] = validate_paths(yaml.load(open('annotation/config.yml')))
 ANNOTATION_FP = Cfg['output_fp']/Cfg['annotation']['suffix']
 
@@ -68,11 +70,16 @@ rule aggregate_results:
                 delimiter='\t')
             writer.writeheader()
             for contig, contig_seq in contigs.items():
+                is_circular = circular(
+                    contig_seq,
+                    Cfg['annotation']['circular_kmin'],
+                    Cfg['annotation']['circular_kmax'],
+                    Cfg['annotation']['circular_min_len'])
                 results = {
                     'sample':wildcards.sample,
                     'contig':contig,
                     'length':len(contig_seq),
-                    'circular':False
+                    'circular':is_circular
                 }
                 for db in blastdbs['nucl']:                
                     results[db] = contig_results[db].get(contig, "NA")

@@ -49,3 +49,22 @@ def index_files(genome):
             index=range(1,3))
     )
     return fwd + rev
+
+def circular(seq, kmin, kmax, min_len):
+    """Determine if a sequence is circular.
+
+    Checks for repeated k-mer at beginning and end of a sequence for a given
+    range of values for k.
+    :param seq: a character sequence
+    :param kmin: the smallest value of k to check
+    :param kmax: the largest value of k to check
+    :return: True if any overlapping k-mers found, False otherwise
+    """
+    if len(seq) < min_len:
+        return False
+    # Short-circuit checking: returns True for the first kmer that matches
+    for k in range(kmin, kmax+1):
+        if seq[0:k] == seq[len(seq)-k:]:
+            return True
+    return False
+
