@@ -13,7 +13,7 @@ from pathlib import Path
 from snakemake.utils import update_config, listfiles
 
 from sunbeam import build_sample_list
-from sunbeam.config import validate_paths, process_databases
+from sunbeam.config import *
 from sunbeam.reports import *
 
 configfile: 'config.yml'
@@ -40,11 +40,14 @@ include: "assembly/pairing.rules"
 include: "assembly/assembly.rules"
 
 
-# ---- Annotation rules
+# ---- Contig annotation rules
 include: "annotation/annotation.rules"
 include: "annotation/blast.rules"
 include: "annotation/orf.rules"
-assert 'annotation' in Cfg    
+
+
+# ---- Classifier rules
+include: "classify/classify.rules"
 
 
 # ---- Bowtie mapping rules

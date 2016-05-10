@@ -1,0 +1,8 @@
+suffix: classifications
+clark_fp:
+  /media/8TB_PLAYGROUND/home/ecl/ext/downloads/CLARKSCV1.2.3
+clark_opts: "-m 2 --light"
+clark_db_fp:
+  /media/8TB_PLAYGROUND/home/ecl/ext/databases
+
+  

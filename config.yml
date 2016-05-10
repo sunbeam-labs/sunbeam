@@ -1,8 +1,6 @@
 # General
-data_fp:
-  "test_data"
-output_fp:
-  "output"
+data_fp: /media/8TB_PLAYGROUND/home/ecl/ext/dev/sunbeam/test_data
+output_fp: /media/8TB_PLAYGROUND/home/ecl/ext/dev/sunbeam/output
 filename_fmt:
   "{sample}_L001_{rp}_001.fastq.gz"
 subcores: 4

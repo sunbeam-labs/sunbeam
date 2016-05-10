@@ -1,0 +1,53 @@
+# -*- mode: Snakemake -*-
+#
+# Short read classifiers:
+# 	Rules for running the kmer classifiers
+# 
+
+Cfg['classify'] = load_subconfig('classify/config.yml')
+CLASSIFY_FP = Cfg['output_fp']/Cfg['classify']['suffix']
+
+rule _test_CLARK:
+    input:
+        str(CLASSIFY_FP/'CLARK'/'HUP3D04BALc_S93-taxa.csv')
+
+rule CLARK_set_targets:
+    output:
+        str(Cfg['classify']['clark_fp']/'.DBDirectory')
+    shell:
+        """
+        cd {params.clark_fp} &&
+        ./set_targets.sh \
+        {Cfg[classify][clark_db_fp]} bacteria viruses human
+        """
+        
+rule CLARK_raw:
+    input:
+        r1=str(QC_FP/'paired'/'{sample}_R1.fastq'),
+        r2=str(QC_FP/'paired'/'{sample}_R2.fastq'),
+        dbdir=str(Cfg['classify']['clark_fp']/'.DBDirectory')
+    output:
+        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv')
+    params:
+        out=str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw'),
+        clark_fp=Cfg['classify']['clark_fp']
+    shell:
+        """
+        cd {params.clark_fp} &&
+        ./classify_metagenome.sh \
+        {Cfg[classify][clark_opts]} \
+        -P {input.r1} {input.r2} \
+        -R {params.out} 
+        """
+
+rule CLARK_est_abundance:
+    input: str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv')
+    output: str(CLASSIFY_FP/'CLARK'/'{sample}-taxa.csv')
+    shell:
+        """
+        cd {Cfg[classify][clark_fp]} &&
+        ./estimate_abundance.sh \
+        -D {Cfg[classify][clark_db_fp]} \
+        -F {input} > {output}
+        """
+    
