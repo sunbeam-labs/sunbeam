@@ -10,6 +10,8 @@ from pathlib import Path
 
 from Bio import SeqIO
 
+from snakemake.utils import R
+
 Cfg['annotation'] = validate_paths(yaml.load(open('annotation/config.yml')))
 ANNOTATION_FP = Cfg['output_fp']/Cfg['annotation']['suffix']
 
@@ -34,7 +36,7 @@ rule filter_fasta:
 
 rule aggregate_results:
     input:
-        contigs=str(ASSEMBLY_FP/'{sample}_assembly'/'minimo-contigs.fa'),
+        contigs=str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
         contig_results=expand(
             str(ANNOTATION_FP/'blastn'/'{db}'/'contig'/'{{sample}}.xml'),
             db=blastdbs['nucl']),
@@ -86,13 +88,10 @@ rule aggregate_all:
     output:
         str(ANNOTATION_FP/'all_samples.tsv')
     run:
-        R("""
-        df = Reduce(
-          lapply({input}, function(fp) read.table(fp, header=TRUE)),
-          f = rbind)
-        write.csv(df, {output})
-        """)
-
+        with open(output[0], 'w') as out:
+            out.writelines(open(input[0]).readlines())
+            for infile in input[1:]:
+                out.writelines(l for i,l in enumerate(open(infile)) if i > 0)
                 
 rule _test_aggregate:
     input:
