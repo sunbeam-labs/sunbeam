@@ -9,13 +9,7 @@ from collections import Counter
 from pathlib import Path
 
 from Bio import SeqIO
-
-from snakemake.utils import R
-
 from sunbeam import circular
-
-Cfg['annotation'] = validate_paths(yaml.load(open('annotation/config.yml')))
-ANNOTATION_FP = Cfg['output_fp']/Cfg['annotation']['suffix']
 
 rule filter_fasta:
     """Filter contigs by size."""

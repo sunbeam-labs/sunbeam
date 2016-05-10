@@ -15,6 +15,7 @@ def verify(path):
     else:
         raise ValueError("Path %s does not exist" % path)
 
+    
 def validate_paths(cfg):
     """Process paths in config file.
 
@@ -38,11 +39,16 @@ def validate_paths(cfg):
         new_cfg[k] = v
     return new_cfg
 
+
+def output_subdir(cfg, section):
+    return Cfg['output_fp']/Cfg[section]['suffix']
+
 def load_subconfig(fp, verify=True):
     if verify:
         return validate_paths(yaml.load(open(fp)))
     else:
         return yaml.load(open(fp))
+
 
 def process_databases(db_dict):
     """Process the list of databases.

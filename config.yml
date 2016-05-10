@@ -1,16 +1,56 @@
 # General
-data_fp: /media/8TB_PLAYGROUND/home/ecl/ext/dev/sunbeam/test_data
-output_fp: /media/8TB_PLAYGROUND/home/ecl/ext/dev/sunbeam/output
-filename_fmt:
-  "{sample}_L001_{rp}_001.fastq.gz"
+data_fp:
+  "/media/8TB_PLAYGROUND/home/ecl/ext/dev/sunbeam/test_data"
+output_fp:
+  "/media/8TB_PLAYGROUND/home/ecl/ext/dev/sunbeam/output"
+filename_fmt: "{sample}_L001_{rp}_001.fastq.gz"
 subcores: 4
-# Samples to exclude, if any
 exclude: ["Psarc108BALc_S63"]
 
-# Bowtie 
-genomes_fp:
-  "/media/8TB_PLAYGROUND/home/ecl/ext/genomes"
-bt2_index_fp:
-  "/media/8TB_PLAYGROUND/home/ecl/ext/genomes/bowtie2_indices"
+# Quality control
+qc:
+  suffix: qc
+  trimmomatic_fp:
+    "/media/8TB_PLAYGROUND/home/tanesc/software/Trimmomatic-0.33/trimmomatic-0.33.jar"
+  adapter_fp:
+    "/media/8TB_PLAYGROUND/home/tanesc/software/Trimmomatic-0.33/adapters/NexteraPE-PE.fa"
+  java_heapsize: 512M
+  leading: 3
+  trailing: 3
+  slidingwindow: [4,15]
+  minlen: 36
+  decontam_cfg_fp:
+    "/media/8TB_PLAYGROUND/home/tanesc/.decontam_human.json"
+  host: human
+  pct_id: 0.5 # percent identity
+  frac: 0.6   # fraction of alignment len
+  keep_sam: True
 
-# Annotations
+
+# Taxonomic classifications
+classify:
+  suffix: classifications
+  clark_fp:
+    "/media/8TB_PLAYGROUND/home/ecl/ext/downloads/CLARKSCV1.2.3"
+  clark_opts: "-m 2 --light"
+  clark_db_fp:
+    "/media/8TB_PLAYGROUND/home/ecl/ext/databases"
+
+# Contig assembly
+assembly:
+  suffix: contigs
+  idba_fp:
+    "/media/8TB_PLAYGROUND/home/ecl/ext/dev/idba/bin/"
+  minimo_fp:
+    "/media/8TB_PLAYGROUND/home/ecl/ext/dev/amos/bin/Minimo"
+
+# Contig annotation
+annotation:
+  suffix: annotation
+  min_contig_len: 500
+  circular_kmin: 10
+  circular_kmax: 1000
+  circular_min_len: 3500
+  mga_fp:
+    "/media/8TB_PLAYGROUND/home/ecl/ext/downloads/mga/mga_linux_ia64"
+

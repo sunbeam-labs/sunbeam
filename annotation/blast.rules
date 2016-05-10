@@ -16,7 +16,7 @@ rule run_blastn:
     output:
         str(ANNOTATION_FP/'blastn'/'{db}'/'{contigs}'/'{sample}.xml')
     params:
-        db=lambda wildcard: blastdbs['nucl'][wildcard.db] 
+        db=lambda wildcard: Blastdbs['nucl'][wildcard.db] 
     shell:
         """
         blastn \
@@ -33,7 +33,7 @@ rule run_blastp:
     """Run BLASTp on translated genes against a target db and write to XML."""
     input:
         genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_prot11.fa'),
-        db=lambda wildcard: blastdbs['prot'][wildcard.db]
+        db=lambda wildcard: Blastdbs['prot'][wildcard.db]
     output:
         str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.xml')
     shell:
@@ -53,7 +53,7 @@ rule run_blastx:
     input:
         # output/virome/genes/mga/HUP3D03BALc_S92_genes_nucl.fa
         genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_nucl.fa'),
-        db=lambda wildcard: blastdbs['prot'][wildcard.db]
+        db=lambda wildcard: Blastdbs['prot'][wildcard.db]
     output:
         # output/virome/blastx/aclame/mga/HUP3D03balc_S92.xml
         str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.xml')

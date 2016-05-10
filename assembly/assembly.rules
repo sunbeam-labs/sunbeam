@@ -4,9 +4,6 @@
 #
 # Requires IDBA_UD and AMOS.
 
-Cfg['assembly'] = validate_paths(yaml.load(open('assembly/config.yml')))
-ASSEMBLY_FP = Cfg['output_fp']/Cfg['assembly']['suffix']
-
 rule _assemble_all:
     """Build contigs for all samples."""
     input:

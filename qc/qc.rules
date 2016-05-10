@@ -2,10 +2,6 @@
 #
 # Illumina quality control rules
 
-Cfg['qc'] = validate_paths(yaml.load(open("qc/config.yml")))
-
-QC_FP = Cfg['output_fp']/Cfg['qc']['suffix']
-
 rule _qc_all:
     """Runs trimmomatic and fastqc on all input files."""
     input:

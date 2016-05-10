@@ -13,6 +13,7 @@ from pathlib import Path
 from snakemake.utils import update_config, listfiles
 
 from sunbeam import build_sample_list
+from sunbeam import config
 from sunbeam.config import *
 from sunbeam.reports import *
 
@@ -20,8 +21,14 @@ configfile: 'config.yml'
 
 # ---- Setting up config files and samples
 Cfg = validate_paths(config)
-blastdbs = process_databases(yaml.load(open('databases.yml')))
+Blastdbs = process_databases(yaml.load(open('databases.yml')))
 Samples = build_sample_list(Cfg['data_fp'], Cfg['filename_fmt'], Cfg['exclude'])
+
+# ---- Set up output paths for the various steps
+QC_FP = config.output_subdir(Cfg, 'qc')
+ASSEMBLY_FP = config.output_subdir(Cfg, 'assembly')
+ANNOTATION_FP = config.output_subdir(Cfg, 'annotation')
+CLASSIFY_FP = config.output_subdir(Cfg, 'classify')
 
 # ---- Rule all: show intro message
 rule all:
@@ -48,7 +55,3 @@ include: "annotation/orf.rules"
 
 # ---- Classifier rules
 include: "classify/classify.rules"
-
-
-# ---- Bowtie mapping rules
-# include: "bowtie.rules"

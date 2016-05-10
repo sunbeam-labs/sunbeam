@@ -2,10 +2,6 @@
 #
 # Short read classifiers:
 # 	Rules for running the kmer classifiers
-# 
-
-Cfg['classify'] = load_subconfig('classify/config.yml')
-CLASSIFY_FP = Cfg['output_fp']/Cfg['classify']['suffix']
 
 rule _test_CLARK:
     input:
