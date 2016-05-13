@@ -6,3 +6,4 @@ config.yaml
 output
 __pycache__
 local
+tests/sunbeam-data
