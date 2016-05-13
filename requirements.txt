@@ -1,0 +1,10 @@
+snakemake
+biopython
+trimmomatic
+fastqc
+blast
+CLARK
+kraken
+idba
+amos
+mga
