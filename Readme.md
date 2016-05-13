@@ -16,31 +16,23 @@ Right now, the pipeline handles:
 
 ## Installation
 
-Sunbeam uses conda; follow the installation instructions for Miniconda3. Then:
-
-```sh
-conda config --add channel r
-conda config --add channel biopython
-conda env create -f xenopeltis_env.yaml
-```
-
-### External dependencies
-
-The growing list of external dependencies that need to be installed
-because they are unavailable through Conda:
-
-- Trimmomatic
-- idba_ud, modified to handle longer reads
-- minimo
-- MetaGene Annotator (mga)
+Sunbeam uses [conda](http://conda.pydata.org/miniconda.html). To deploy
+automatically, run `install.sh`. The script will download and install Miniconda3
+to the home folder automatically if it does not exist, and builds an environment
+with the needed dependencies.
 
 ## High-level overview
 
-The pipeline is separated into three sections: quality control (qc), read
-assembly, and read/contig annotation. Each section has Snakemake rules defined
-in the relevant folder, along with section-specific config files. The main
-Snakefile on the root folder loads these rules and assembles the list of samples
-to work on.
+The pipeline is separated into sections: 
+
+- quality control
+- read classification
+- contig assembly 
+- contig annotation
+
+Each section has Snakemake rules defined in the relevant `rules/` subfolder. The
+main Snakefile on the root folder loads these rules and assembles the list of
+samples to work on.
 
 ### Defining samples to work on
 
@@ -48,13 +40,13 @@ to work on.
 - output_fp: the top directory under which the results will be stored
 - filename_fmt: how the filenames are stored in `data_fp`
   
-  For instance, if you have a list of samples like such:
+    For instance, if you have a list of samples like such:
 
 	- `HUP3D01_L001_R1.fastq.gz`
 	- `HUP3D01_L001_R2.fastq.gz`
 	- `HUP3D02_L001_R1.fastq.gz`
 	- `HUP3D02_L001_R2.fastq.gz`
-	- ...  
+	- `...`
 	
 	The sample would be the part defined `HUP3D01`, `HUP3D02`, etc; the segment
 	defining the read pair would be `R1` and `R2`, and the intermediate part
