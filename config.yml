@@ -1,19 +1,37 @@
-# General
-data_fp:
-  "/media/8TB_PLAYGROUND/home/ecl/ext/dev/sunbeam/test_data"
-output_fp:
-  "/media/8TB_PLAYGROUND/home/ecl/ext/dev/sunbeam/output"
-filename_fmt: "{sample}_L001_{rp}_001.fastq.gz"
-subcores: 4
-exclude: ["Psarc108BALc_S63"]
+# 
+# Sunbeam configuration file
+#
+# Paths:
+#   Paths are resolved through the following rules:
+#     1. If the path is absolute, the path is parsed as-is
+#     2. If the path is not absolute, the path at 'root' is appended to it
+#     3. If the path is not 'output_fp', the path is checked to ensure it exists
+#
+# Suffixes:
+#   Each subsection contains a 'suffix' key that defines the folder under
+#   'output_fp' where the results of that section are put.
+#
+
+# General options
+all:
+  root:
+    "/media/8TB_PLAYGROUND/home/ecl/ext/dev/sunbeam"
+  data_fp:
+    "test/test_data"
+  output_fp:
+    "test/output"
+  filename_fmt: "{sample}_L001_{rp}_001.fastq.gz"
+  subcores: 4
+  exclude: []
+
 
 # Quality control
 qc:
   suffix: qc
   trimmomatic_fp:
-    "/media/8TB_PLAYGROUND/home/tanesc/software/Trimmomatic-0.33/trimmomatic-0.33.jar"
+    "local/bin/Trimmomatic-0.33/trimmomatic-0.33.jar"
   adapter_fp:
-    "/media/8TB_PLAYGROUND/home/tanesc/software/Trimmomatic-0.33/adapters/NexteraPE-PE.fa"
+    "local/bin/Trimmomatic-0.33/adapters/NexteraPE-PE.fa"
   java_heapsize: 512M
   leading: 3
   trailing: 3
@@ -22,8 +40,8 @@ qc:
   decontam_cfg_fp:
     "/media/8TB_PLAYGROUND/home/tanesc/.decontam_human.json"
   host: human
-  pct_id: 0.5 # percent identity
-  frac: 0.6   # fraction of alignment len
+  pct_id: 0.5
+  frac: 0.6
   keep_sam: True
 
 
@@ -31,18 +49,20 @@ qc:
 classify:
   suffix: classifications
   clark_fp:
-    "/media/8TB_PLAYGROUND/home/ecl/ext/downloads/CLARKSCV1.2.3"
+    "local/bin/CLARKSCV1.2.3"
   clark_opts: "-m 2 --light"
   clark_db_fp:
-    "/media/8TB_PLAYGROUND/home/ecl/ext/databases"
+    "local/db"
+
 
 # Contig assembly
 assembly:
   suffix: contigs
   idba_fp:
-    "/media/8TB_PLAYGROUND/home/ecl/ext/dev/idba/bin/"
+    "local/bin/idba/bin/"
   minimo_fp:
-    "/media/8TB_PLAYGROUND/home/ecl/ext/dev/amos/bin/Minimo"
+    "local/bin/amos/bin/Minimo"
+
 
 # Contig annotation
 annotation:
@@ -52,5 +72,5 @@ annotation:
   circular_kmax: 1000
   circular_min_len: 3500
   mga_fp:
-    "/media/8TB_PLAYGROUND/home/ecl/ext/downloads/mga/mga_linux_ia64"
+    "local/bin/mga/mga_linux_ia64"
 

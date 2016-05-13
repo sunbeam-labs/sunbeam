@@ -3,6 +3,8 @@
 # Short read classifiers:
 # 	Rules for running the kmer classifiers
 
+CLARK_FP = Cfg['classify']['clark_fp']
+
 rule _test_CLARK:
     input:
         str(CLASSIFY_FP/'CLARK'/'HUP3D04BALc_S93-taxa.csv')
@@ -12,7 +14,7 @@ rule CLARK_set_targets:
         str(Cfg['classify']['clark_fp']/'.DBDirectory')
     shell:
         """
-        cd {params.clark_fp} &&
+        cd {CLARK_FP} &&
         ./set_targets.sh \
         {Cfg[classify][clark_db_fp]} bacteria viruses human
         """
@@ -25,11 +27,10 @@ rule CLARK_raw:
     output:
         str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv')
     params:
-        out=str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw'),
-        clark_fp=Cfg['classify']['clark_fp']
+        out=str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw')
     shell:
         """
-        cd {params.clark_fp} &&
+        cd {CLARK_FP} &&
         ./classify_metagenome.sh \
         {Cfg[classify][clark_opts]} \
         -P {input.r1} {input.r2} \
@@ -41,7 +42,7 @@ rule CLARK_est_abundance:
     output: str(CLASSIFY_FP/'CLARK'/'{sample}-taxa.csv')
     shell:
         """
-        cd {Cfg[classify][clark_fp]} &&
+        cd {CLARK_FP} &&
         ./estimate_abundance.sh \
         -D {Cfg[classify][clark_db_fp]} \
         -F {input} > {output}

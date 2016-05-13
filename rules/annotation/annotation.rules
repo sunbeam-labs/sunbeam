@@ -35,27 +35,27 @@ rule aggregate_results:
         contigs=str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
         contig_results=expand(
             str(ANNOTATION_FP/'blastn'/'{db}'/'contig'/'{{sample}}.xml'),
-            db=blastdbs['nucl']),
+            db=Blastdbs['nucl']),
         gene_results=expand(
             str(ANNOTATION_FP/'{blastpx}'/'{db}'/'{orf_finder}'/'{{sample}}.xml'),
             blastpx=['blastp','blastx'],
-            db=blastdbs['prot'],
+            db=Blastdbs['prot'],
             orf_finder=['mga'])
     output:
         str(ANNOTATION_FP/'summary'/'{sample}.tsv')
     params:
-        dbs=list(blastdbs['nucl'].keys()) + list(blastdbs['prot'].keys())
+        dbs=list(Blastdbs['nucl'].keys()) + list(Blastdbs['prot'].keys())
     run:
         contigs = {r.id: r.seq for r in SeqIO.parse(input.contigs, 'fasta')}
         # Separate each set of result files by the database it was blasted against
         contig_results = {
             db: blast_contig_summary(f for f in input.contig_results if db in f)
-            for db in blastdbs['nucl']
+            for db in Blastdbs['nucl']
         }
         # We only care about the number of hits for the protein database
         gene_hits = {
             db: blast_hits(f for f in input.gene_results if db in f)
-            for db in blastdbs['prot']
+            for db in Blastdbs['prot']
         }
         with open(output[0], 'w') as out:
             writer = csv.DictWriter(
@@ -75,9 +75,9 @@ rule aggregate_results:
                     'length':len(contig_seq),
                     'circular':is_circular
                 }
-                for db in blastdbs['nucl']:                
+                for db in Blastdbs['nucl']:                
                     results[db] = contig_results[db].get(contig, "NA")
-                for db in blastdbs['prot']:
+                for db in Blastdbs['prot']:
                     results[db] = gene_hits[db].get(contig, 0)
                 writer.writerow(results)
 

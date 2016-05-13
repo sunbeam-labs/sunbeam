@@ -13,22 +13,22 @@ from pathlib import Path
 from snakemake.utils import update_config, listfiles
 
 from sunbeam import build_sample_list
-from sunbeam import config
 from sunbeam.config import *
 from sunbeam.reports import *
 
 configfile: 'config.yml'
 
 # ---- Setting up config files and samples
-Cfg = validate_paths(config)
+Cfg = check_config(config)
+print(Cfg['all']['data_fp'].exists())
 Blastdbs = process_databases(yaml.load(open('databases.yml')))
-Samples = build_sample_list(Cfg['data_fp'], Cfg['filename_fmt'], Cfg['exclude'])
+Samples = build_sample_list(Cfg['all']['data_fp'], Cfg['all']['filename_fmt'], Cfg['all']['exclude'])
 
 # ---- Set up output paths for the various steps
-QC_FP = config.output_subdir(Cfg, 'qc')
-ASSEMBLY_FP = config.output_subdir(Cfg, 'assembly')
-ANNOTATION_FP = config.output_subdir(Cfg, 'annotation')
-CLASSIFY_FP = config.output_subdir(Cfg, 'classify')
+QC_FP = output_subdir(Cfg, 'qc')
+ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
+ANNOTATION_FP = output_subdir(Cfg, 'annotation')
+CLASSIFY_FP = output_subdir(Cfg, 'classify')
 
 # ---- Rule all: show intro message
 rule all:
@@ -38,20 +38,19 @@ rule all:
         print("For available commands, type `snakemake --list`")
 
 # ---- Quality control rules
-include: "qc/qc.rules"
-include: "qc/decontaminate.rules"
+include: "rules/qc/qc.rules"
+include: "rules/qc/decontaminate.rules"
 
 
 # ---- Assembly rules
-include: "assembly/pairing.rules"
-include: "assembly/assembly.rules"
+include: "rules/assembly/assembly.rules"
 
 
 # ---- Contig annotation rules
-include: "annotation/annotation.rules"
-include: "annotation/blast.rules"
-include: "annotation/orf.rules"
+include: "rules/annotation/annotation.rules"
+include: "rules/annotation/blast.rules"
+include: "rules/annotation/orf.rules"
 
 
 # ---- Classifier rules
-include: "classify/classify.rules"
+include: "rules/classify/classify.rules"

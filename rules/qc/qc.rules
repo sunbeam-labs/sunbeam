@@ -26,7 +26,7 @@ rule trimmomatic:
         sw_end = Cfg['qc']['slidingwindow'][1]
     shell: """\
            java -Xmx{Cfg[qc][java_heapsize]} -jar {Cfg[qc][trimmomatic_fp]} \
-           PE -threads {Cfg[qc][subcores]} -phred33 \
+           PE -threads {Cfg[all][subcores]} -phred33 \
            {input.r1} {input.r2} \
            {output.pair_r1} {output.unpair_r1} \
            {output.pair_r2} {output.unpair_r2} \

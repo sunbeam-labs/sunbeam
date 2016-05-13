@@ -10,38 +10,53 @@ def makepath(path):
 
 
 def verify(path):
+    path = Path(path)
     if path.exists():
         return path.resolve()
     else:
         raise ValueError("Path %s does not exist" % path)
-
     
-def validate_paths(cfg):
-    """Process paths in config file.
-
-    Any keys ending in _fp are converted to Paths, any ~ are expanded,
-    and all paths except for `output_fp` are checked to make sure they
-    exist.
     
-    :param cfg: a config file
+def validate_paths(cfg, root):
+    """Process paths in config file subsection.
+
+    For each key ending in _fp, the value is:
+    - converted to a pathlib.Path
+    - ensured to be an absolute path, by appending `root` if needed
+    - ensured to exist, if it is not the value from `output_fp`
+    - expanded home directory ~
+    
+    :param cfg: a config file subsection
     :returns: an updated copy of cfg
     """
     new_cfg = dict()
     for k, v in cfg.items():
         if k.endswith('_fp'):
             v = makepath(v)
-            print(v)
             if not v.is_absolute():
-                raise ValueError("All paths must be absolute: %s:%s" %
-                                 (k, str(v)))
+                v = root/v
             if k != 'output_fp':
-                verify(v)
+                v = verify(v)
         new_cfg[k] = v
     return new_cfg
 
 
+def check_config(cfg):
+    """Resolve root in config file, then validate paths."""
+    if 'root' in cfg['all']:
+        root = verify(cfg['all']['root'])
+    else:
+        root = Path.cwd()
+    # Iteratively check paths for each subsection
+    new_cfg = dict()
+    for section, values in cfg.items():
+        new_cfg[section] = validate_paths(values, root)
+    return new_cfg
+
+
 def output_subdir(cfg, section):
-    return Cfg['output_fp']/Cfg[section]['suffix']
+    return cfg['all']['output_fp']/cfg[section]['suffix']
+
 
 def load_subconfig(fp, verify=True):
     if verify:
