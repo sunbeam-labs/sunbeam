@@ -16,12 +16,12 @@ from sunbeam import build_sample_list
 from sunbeam.config import *
 from sunbeam.reports import *
 
-configfile: 'config.yml'
-
+#configfile: 'config.yml'
+print(list(config['all'].keys()))
 # ---- Setting up config files and samples
 Cfg = check_config(config)
 print(Cfg['all']['data_fp'].exists())
-Blastdbs = process_databases(yaml.load(open('databases.yml')))
+Blastdbs = process_databases(Cfg['blastdbs'])
 Samples = build_sample_list(Cfg['all']['data_fp'], Cfg['all']['filename_fmt'], Cfg['all']['exclude'])
 
 # ---- Set up output paths for the various steps

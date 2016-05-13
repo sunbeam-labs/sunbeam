@@ -24,18 +24,19 @@ rule trimmomatic:
     params:
         sw_start = Cfg['qc']['slidingwindow'][0],
         sw_end = Cfg['qc']['slidingwindow'][1]
-    shell: """\
-           java -Xmx{Cfg[qc][java_heapsize]} -jar {Cfg[qc][trimmomatic_fp]} \
-           PE -threads {Cfg[all][subcores]} -phred33 \
-           {input.r1} {input.r2} \
-           {output.pair_r1} {output.unpair_r1} \
-           {output.pair_r2} {output.unpair_r2} \
-           ILLUMINACLIP:{Cfg[qc][adapter_fp]}:2:30:10:8:true \
-           LEADING:{Cfg[qc][leading]} \
-           TRAILING:{Cfg[qc][trailing]} \
-           SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
-           MINLEN:{Cfg[qc][minlen]} &> {log}\
-           """
+    shell:
+        """
+        trimmomatic \
+        PE -threads {Cfg[all][subcores]} -phred33 \
+        {input.r1} {input.r2} \
+        {output.pair_r1} {output.unpair_r1} \
+        {output.pair_r2} {output.unpair_r2} \
+        ILLUMINACLIP:$CONDA_ENV_PATH/share/trimmomatic/NexteraPE-PE.fa:2:30:10:8:true \
+        LEADING:{Cfg[qc][leading]} \
+        TRAILING:{Cfg[qc][trailing]} \
+        SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
+        MINLEN:{Cfg[qc][minlen]} &> {log}\
+        """
 
 rule fastqc:
     input:
