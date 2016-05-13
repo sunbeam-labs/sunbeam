@@ -1,6 +1,9 @@
-# Sunbeam: an iridescent virome pipeline
+# Sunbeam: an iridescent virome pipeline 
+<img src="http://i.imgur.com/VW3pvQM.jpg" width=240> 
 
-<img src="http://i.imgur.com/VW3pvQM.jpg" width=320>
+[![Build Status](https://travis-ci.org/eclarke/sunbeam.svg?branch=master)](https://travis-ci.org/eclarke/sunbeam) 
+[![Snakemake](https://img.shields.io/badge/snakemake-≥3.5.2-brightgreen.svg?style=flat)](http://snakemake.bitbucket.org)
+
 
 Named after the iridescent scales of the sunbeam snake, _Xenopeltis unicolor_, this is a [Snakemake](https://bitbucket.org/snakemake/snakemake/)-based pipeline for identifying viral artifacts from high-throughput sequencing reads. 
 
