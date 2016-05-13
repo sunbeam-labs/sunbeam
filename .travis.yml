@@ -1,5 +1,5 @@
 language: python
 python:
   - "3.5"
-install: "bash install.sh"
-test: "bash tests/test.sh"
+install: bash install.sh
+script: bash tests/test.sh
