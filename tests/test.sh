@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
 set -x
-
+source deactivate 
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
-source deactivate 
 source activate sunbeam
 command -v snakemake
 
