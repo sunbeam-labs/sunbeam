@@ -16,8 +16,7 @@ from sunbeam import build_sample_list
 from sunbeam.config import *
 from sunbeam.reports import *
 
-#configfile: 'config.yml'
-print(list(config['all'].keys()))
+
 # ---- Setting up config files and samples
 Cfg = check_config(config)
 print(Cfg['all']['data_fp'].exists())
@@ -34,7 +33,7 @@ CLASSIFY_FP = output_subdir(Cfg, 'classify')
 rule all:
     run:
         print("Samples found:")
-        pprint(list(Samples.keys()))
+        pprint(sorted(list(Samples.keys())))
         print("For available commands, type `snakemake --list`")
 
 # ---- Quality control rules
