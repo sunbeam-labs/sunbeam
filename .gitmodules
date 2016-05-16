@@ -1,0 +1,3 @@
+[submodule "local/clark"]
+	path = local/clark
+	url = git@github.com:eclarke/clark_scripts

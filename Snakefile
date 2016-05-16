@@ -29,6 +29,7 @@ ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
 ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
 
+
 # ---- Rule all: show intro message
 rule all:
     run:

@@ -5,5 +5,4 @@ config.yaml
 *.fastq.gz
 output
 __pycache__
-local
 tests/sunbeam-data
