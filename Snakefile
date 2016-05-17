@@ -54,3 +54,5 @@ include: "rules/annotation/orf.rules"
 
 # ---- Classifier rules
 include: "rules/classify/classify.rules"
+include: "rules/classify/clark.rules"
+include: "rules/classify/kraken.rules"

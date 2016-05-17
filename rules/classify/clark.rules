@@ -1,0 +1,64 @@
+# -*- mode: Snakemake -*-
+#
+# Rules for running CLARK
+
+CLARK_DB = Cfg['classify']['clark_db_fp']
+
+rule CLARK_set_targets:
+    output:
+        temp(str(CLARK_DB/'targets.txt'))
+    shell:
+        """
+        cd $CONDA_ENV_PATH/opt/clark &&
+        ./set_targets.sh {CLARK_DB} {Cfg[classify][clark_targets]}
+        """
+
+rule CLARK_classify:
+    input:
+        r1=str(QC_FP/'paired'/'{sample}_R1.fastq'),
+        r2=str(QC_FP/'paired'/'{sample}_R2.fastq'),
+        targets=str(CLARK_DB/'targets.txt')
+    output:
+        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv')
+    params:
+        out=str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw')
+    shell:
+        """
+        {Cfg[classify][clark_version]} \
+        {Cfg[classify][clark_opts]} \
+        -T {input.targets} \
+        -D {CLARK_DB} \
+        -P {input.r1} {input.r2} \
+        -n {Cfg[all][subcores]} \
+        -R {params.out} 
+        """
+
+rule CLARK_est_abundance:
+    input: str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv')
+    output: str(CLASSIFY_FP/'CLARK'/'{sample}-taxa.csv')
+    shell:
+        """
+        getAbundance \
+        -D {CLARK_DB} \
+        -F {input} > {output}
+        """
+
+rule CLARK_krona:
+    input:
+        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv'),
+        str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
+    output:
+        temp(str(CLASSIFY_FP/'CLARK'/'krona'/'{sample}.krn'))
+    shell:
+        """
+        getAbundance \
+        --krona \
+        -F {input} | tr "," "\\t" > {output}
+        """
+
+rule _krona_test:
+    input:
+        expand(str(CLASSIFY_FP/'CLARK'/'krona'/'{sample}-krona.html'),
+               sample=Samples.keys())
+
+    

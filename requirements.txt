@@ -5,6 +5,7 @@ fastqc
 blast
 CLARK
 kraken
+krona
 idba
 amos
 mga

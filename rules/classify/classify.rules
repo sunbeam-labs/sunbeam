@@ -5,42 +5,32 @@
 
 rule _test_CLARK:
     input:
-        str(CLASSIFY_FP/'CLARK'/'HUP3D04BALc_S93-taxa.csv')
+        str(CLASSIFY_FP/'CLARK'/'Sample11c_S34-taxa.csv')
 
-# rule CLARK_set_targets:
-#     output:
-#         str(Cfg['classify']['clark_fp']/'.DBDirectory')
-#     shell:
-#         """
-#         cd {CLARK_FP} &&
-#         ./set_targets.sh \
-#         {Cfg[classify][clark_db_fp]} bacteria viruses human
-#         """
-        
-rule CLARK_raw:
+rule classify_all:
     input:
-        r1=str(QC_FP/'paired'/'{sample}_R1.fastq'),
-        r2=str(QC_FP/'paired'/'{sample}_R2.fastq')
+        expand(str(CLASSIFY_FP/'CLARK'/'{sample}-taxa.csv'),
+        sample=Samples.keys())
+
+rule krona:
+    input:
+        "{sample}.krn"
     output:
-        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv')
-    params:
-        out=str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw')
+        "{sample}-krona.html"
     shell:
         """
-        CLARK \
-        {Cfg[classify][clark_opts]} \
-        -D {Cfg[classify][clark_db_fp] \
-        -P {input.r1} {input.r2} \
-        -R {params.out} 
+        ktImportTaxonomy \
+        -o {output} \
+        -m 3 \
+        -k \
+        -tax {Cfg[classify][taxa_db_fp]} \
+        {input}
         """
 
-rule CLARK_est_abundance:
-    input: str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv')
-    output: str(CLASSIFY_FP/'CLARK'/'{sample}-taxa.csv')
-    shell:
-        """
-        getAbundance \
-        -D {Cfg[classify][clark_db_fp]} \
-        -F {input} > {output}
-        """
     
+rule krona_taxonomy:
+    """Uses Krona's updateTaxonomy.sh to build the local NCBI taxa db."""
+    output:
+        str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
+    shell:
+        "ktUpdateTaxonomy.sh {Cfg[classify][taxa_db_fp]}"
