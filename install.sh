@@ -24,3 +24,4 @@ conda env list | grep -q sunbeam || {
 }
 
 echo "To get started, ensure ${PREFIX}/bin is in your path and run 'source activate sunbeam'"
+

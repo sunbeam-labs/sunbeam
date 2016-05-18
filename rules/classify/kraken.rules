@@ -73,5 +73,5 @@ rule kraken_krona:
 rule _test_kraken:
     input:
         expand(str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html'),
-        sample="Sample5c_S33")
+               sample=Samples.keys())
     
