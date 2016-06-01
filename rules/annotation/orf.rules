@@ -24,7 +24,7 @@ rule find_genes_mga:
     output:
         str(ANNOTATION_FP/'genes'/'mga'/'{sample}_contigs.genes')
     shell:
-        """{Cfg[annotation][mga_fp]} -m {input} > {output}"""
+        """mga -m {input} > {output}"""
 
 rule parse_genes_mga:
     """Parse output from MetaGene Annotator into a set of genes."""

@@ -15,11 +15,11 @@
 # General options
 all:
   data_fp:
-    "tests/sunbeam-data/data_files"
+    "TTV_plasma"
   output_fp:
-    "tests/output"
+    "output"
   filename_fmt: "{sample}_L001_{rp}_001.fastq.gz"
-  subcores: 1
+  subcores: 4
   exclude: []
 
 
@@ -35,13 +35,18 @@ qc:
   pct_id: 0.5
   frac: 0.6
   keep_sam: True
+  decontam_cfg_fp: decontam_human.json
 
 
 # Taxonomic classifications
 classify:
   suffix: classifications
-  clark_opts: "-m 2 --light"
+  taxa_db_fp: "local/db"
+  clark_opts: "-m 0"
   clark_db_fp: "local/db"
+  clark_targets: "bacteria viruses human"
+  clark_version: "CLARK-l"
+  kraken_db_fp: "local/db"
 
 
 # Contig assembly
@@ -61,7 +66,7 @@ annotation:
 # Blast databases
 blastdbs:
   root_fp:
-    local/db
+    /media/THING1/local/genomeIndexes/blast
   nucleotide:
     bacteria:
       BacterialGenomes/ncbi_bacteria.fa

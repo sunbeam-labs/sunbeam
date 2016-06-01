@@ -17,7 +17,7 @@ rule merge_fq:
         r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq')
     output:
         str(ASSEMBLY_FP/'merged_reads'/'{sample}_merged.fasta')
-    shell: "{Cfg[assembly][idba_fp]}/fq2fa --merge --filter {input.r1} {input.r2} {output}"
+    shell: "fq2fa --merge --filter {input.r1} {input.r2} {output}"
 
 
 rule build_contigs:
@@ -31,8 +31,8 @@ rule build_contigs:
         out_fp = str(ASSEMBLY_FP/'{sample}_assembly')
     shell:
         """
-        {Cfg[assembly][idba_fp]}/idba_ud -r {input} -o {params.out_fp} \
-        --num_threads {Cfg[subcores]} --pre_correction &> {log} \
+        idba_ud -r {input} -o {params.out_fp} \
+        --num_threads {Cfg[all][subcores]} --pre_correction &> {log} \
         """
 
 rule minimo:
@@ -43,11 +43,10 @@ rule minimo:
         unblock = str(ASSEMBLY_FP/'{sample}_assembly'/'minimo-contigs.fa')
     log:
         str(ASSEMBLY_FP/'log'/'minimo'/'{sample}.out')
-
     shell:
         """
-        {Cfg[assembly][minimo_fp]} {input} -D FASTA_EXP=1 &> {log} && \
-        perl unblock_fasta.pl {output.block} > {output.unblock}
+        Minimo {input} -D FASTA_EXP=1 &> {log} && \
+        perl local/bin/unblock_fasta.pl {output.block} > {output.unblock}
         """
 
         

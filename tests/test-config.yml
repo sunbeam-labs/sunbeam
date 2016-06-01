@@ -15,9 +15,9 @@
 # General options
 all:
   data_fp:
-    "tests/sunbeam-data/data_files"
+    "TTV_plasma"
   output_fp:
-    "tests/output"
+    "output"
   filename_fmt: "{sample}_L001_{rp}_001.fastq.gz"
   subcores: 1
   exclude: []
