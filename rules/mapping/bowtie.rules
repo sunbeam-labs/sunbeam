@@ -1,0 +1,66 @@
+# -*- mode: Snakemake -*-
+
+def bt2_index_files(genome, idx_fp):
+    fwd = expand('{idx_fp}/{genome}.{index}.bt2',
+                 genome=genome,
+                 idx_fp=idx_fp,
+                 index=range(1,5))
+    rev = expand('{idx_fp}/{genome}.rev.{index}.bt2',
+                 genome=genome,
+                 idx_fp=idx_fp,
+                 index=range(1,3))
+    return fwd + rev
+
+rule bt2_index:
+    output:
+        bt2_index_files('{genome}', Cfg['mapping']['genomes_fp'])
+    params:
+        idx_fp = str(Cfg['mapping']['genomes_fp'])
+    shell:
+        "bowtie2-build {params.idx_fp}/{wildcards.genome}.fa {params.idx_fp}/{wildcards.genome}"
+
+rule bt2_map_contigs:
+    input:
+        lambda wildcards: bt2_index_files(wildcards.genome, Cfg['mapping']['genomes_fp']),
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq')
+    output:
+        temp(str(MAPPING_FP/'{genome}'/'{sample}/reads.sam'))
+    params:
+        idx=str(Cfg['mapping']['genomes_fp']/'{genome}')
+    shell:
+        "bowtie2 -x {params.idx} -1 {input.r1} -2 {input.r2} -S {output} -p {Cfg[all][subcores]}"
+
+rule sam_to_bam:
+    input: "{fname}.sam"
+    output: temp("{fname}.bam")
+    shell: "samtools view -bS {input} > {output}"
+
+rule sort_bam:
+    input: "{fname}.bam"
+    output: "{fname}.sorted.bam"
+    shell: "samtools sort -o {output} {input}"
+
+rule index_bam:
+    input: "{fname}.sorted.bam"
+    output: "{fname}.sorted.bam.bai"
+    shell: "samtools index {input}"
+
+rule bam_stats:
+    input:
+        bam="{fname}.sorted.bam",
+        bai="{fname}.sorted.bam.bai"
+    output: "{fname}.stats"
+    shell: "samtools stats {input.bam} > {output}"
+
+
+rule _map_all:
+    input:
+        expand(
+            str(MAPPING_FP/'t_gondii'/'{sample}'/'reads.stats'),
+            sample=Samples.keys())
+           
+rule _test_bt2:
+    input:
+        expand(str(MAPPING_FP/'t_gondii_COUG'/'{sample}/reads.stats'),
+               sample='Sample2c_S30')
