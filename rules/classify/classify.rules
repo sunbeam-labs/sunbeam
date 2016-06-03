@@ -14,9 +14,9 @@ rule classify_all:
 
 rule krona:
     input:
-        "{sample}.krn"
+        "{fname}.krn"
     output:
-        "{sample}-krona.html"
+        "{fname}-krona.html"
     shell:
         """
         ktImportTaxonomy \

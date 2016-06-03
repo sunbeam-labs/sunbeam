@@ -4,13 +4,21 @@
 
 CLARK_DB = Cfg['classify']['clark_db_fp']
 
+
+rule testtest:
+    input:
+        expand(str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}.csv'),
+               sample="Coxsackiec_S44",
+               level="genus")
+
 rule CLARK_set_targets:
     output:
         temp(str(CLARK_DB/'targets.txt'))
+#        temp(str(CLARK_DB/'{level}.tmp'))
     shell:
         """
         cd $CONDA_ENV_PATH/opt/clark &&
-        ./set_targets.sh {CLARK_DB} {Cfg[classify][clark_targets]}
+        ./set_targets.sh {CLARK_DB} {Cfg[classify][clark_targets]} --{Cfg[classify][clark_level]}
         """
 
 rule CLARK_classify:
@@ -18,10 +26,11 @@ rule CLARK_classify:
         r1=str(QC_FP/'paired'/'{sample}_R1.fastq'),
         r2=str(QC_FP/'paired'/'{sample}_R2.fastq'),
         targets=str(CLARK_DB/'targets.txt')
+#        level=str(CLARK_DB/'{level}.tmp')
     output:
-        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv')
+        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}.csv')
     params:
-        out=str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw')
+        out=str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}')
     shell:
         """
         {Cfg[classify][clark_version]} \
@@ -34,8 +43,8 @@ rule CLARK_classify:
         """
 
 rule CLARK_est_abundance:
-    input: str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv')
-    output: str(CLASSIFY_FP/'CLARK'/'{sample}-taxa.csv')
+    input: str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}.csv')
+    output: str(CLASSIFY_FP/'CLARK'/'{sample}-{level}-taxa.csv')
     shell:
         """
         getAbundance \
@@ -45,10 +54,10 @@ rule CLARK_est_abundance:
 
 rule CLARK_krona:
     input:
-        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-raw.csv'),
+        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}.csv'),
         str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
     output:
-        temp(str(CLASSIFY_FP/'CLARK'/'krona'/'{sample}.krn'))
+        temp(str(CLASSIFY_FP/'CLARK'/'krona'/'{sample}-{level}.krn'))
     shell:
         """
         getAbundance \
@@ -58,7 +67,8 @@ rule CLARK_krona:
 
 rule _krona_test:
     input:
-        expand(str(CLASSIFY_FP/'CLARK'/'krona'/'{sample}-krona.html'),
-               sample=Samples.keys())
+        expand(str(CLASSIFY_FP/'CLARK'/'krona'/'{sample}-{level}-krona.html'),
+               sample="Sample5c_S33",
+               level=Cfg['classify']['clark_level'])
 
     

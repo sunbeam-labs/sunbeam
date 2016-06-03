@@ -1,6 +1,6 @@
-from pathlib import Path
-
+import warnings
 import yaml
+from pathlib import Path
 
 from snakemake.workflow import expand
 from snakemake.utils import listfiles
@@ -36,7 +36,10 @@ def validate_paths(cfg, root):
             if not v.is_absolute():
                 v = root/v
             if k != 'output_fp':
-                v = verify(v)
+                try: v = verify(v)
+                except ValueError:
+                    raise ValueError(
+                        "For key '%s': path '%s' does not exist" % (k,v))
         new_cfg[k] = v
     return new_cfg
 
