@@ -23,7 +23,7 @@ rule run_blastn:
         -query {input.contigs} \
         -db {params.db} \
         -outfmt 5 \
-        -num_threads {Cfg[subcores]} \
+        -num_threads {Cfg[all][subcores]} \
         -evalue 1e-10 \
         -max_target_seqs 1 \
         -out {output} \
@@ -42,7 +42,7 @@ rule run_blastp:
         -query {input.genes} \
         -db {input.db} \
         -outfmt 5 \
-        -num_threads {Cfg[subcores]} \
+        -num_threads {Cfg[all][subcores]} \
         -evalue 1e-10 \
         -max_target_seqs 1 \
         -out {output} \
@@ -63,7 +63,7 @@ rule run_blastx:
         -query {input.genes} \
         -db {input.db} \
         -outfmt 5 \
-        -num_threads {Cfg[subcores]} \
+        -num_threads {Cfg[all][subcores]} \
         -evalue 1e-10 \
         -max_target_seqs 1 \
         -out {output} \

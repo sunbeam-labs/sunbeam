@@ -96,4 +96,6 @@ rule aggregate_all:
                 
 rule _test_aggregate:
     input:
-        str(ANNOTATION_FP/'summary'/'HUP3D04BALc_S93.tsv')
+        expand(
+            str(ANNOTATION_FP/'summary'/'{sample}.tsv'),
+            sample=Samples.keys())

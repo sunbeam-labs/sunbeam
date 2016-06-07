@@ -16,10 +16,30 @@ rule gunzip:
     output: temp("{filename}.fastq")
     shell: "gunzip -c {input} > {output}"
 
-rule decontam:
+rule decontam_human:
     input:
         r1 = str(QC_FP/'paired'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'paired'/'{sample}_R2.fastq')
+    output:
+        r1 = str(QC_FP/'decontam-human'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'decontam-human'/'{sample}_R2.fastq'),
+    log:
+        str(QC_FP/'log'/'decontam-human'/'{sample}_summary.json')
+    params:
+        out_fp = str(QC_FP/'decontam-human')
+    shell:
+        """ 
+        decontaminate.py --forward {input.r1} --reverse {input.r2} \
+        --organism human \
+        --config-file decontam_human.json \
+        --summary-file {log} \
+        --output-dir {params.out_fp} \
+        """
+
+rule decontam_phix:
+    input:
+        r1 = str(QC_FP/'decontam-human'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'decontam-human'/'{sample}_R2.fastq')
     output:
         r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq'),
@@ -30,7 +50,8 @@ rule decontam:
     shell:
         """ 
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
-        --organism {Cfg[qc][host]} --summary-file {log} \
-        --output-dir {params.out_fp} --config-file {Cfg[qc][decontam_cfg_fp]} \
+        --organism phix \
+        --config-file decontam_phix.json \
+        --summary-file {log} \
+        --output-dir {params.out_fp} \
         """
-
