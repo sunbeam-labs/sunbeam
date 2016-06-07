@@ -14,11 +14,10 @@
 
 # General options
 all:
-  root: "/home/ecl/500_ViromePipeline/PosCtrl"
-  data_fp: "data/run3"
-  output_fp: "output"
-  filename_fmt: "PCMP_{sample}_{rp}.fastq.gz"
-  subcores: 16
+  data_fp:
+  output_fp:
+  filename_fmt: "{sample}_L001_{rp}_001.fastq.gz"
+  subcores: 4
   exclude: []
 
 
@@ -39,13 +38,13 @@ qc:
 # Taxonomic classifications
 classify:
   suffix: classifications
-  taxa_db_fp: "/home/common/taxonomy"
+  taxa_db_fp: ""
   clark_opts: "-m 0"
-  clark_db_fp: "/home/common/clark"
-  clark_targets: "bacteria viruses human custom"
+  clark_db_fp: ""
+  clark_targets: "bacteria viruses human"
   clark_level: "species"
   clark_version: "CLARK-l"
-  kraken_db_fp: "/home/common/kraken/standard"
+  kraken_db_fp: ""
 
 
 # Contig assembly
@@ -64,7 +63,7 @@ annotation:
   
 # Blast databases
 blastdbs:
-  root_fp: ""
+  root_fp:
   nucleotide:
     bacteria:
       BacterialGenomes/ncbi_bacteria.fa

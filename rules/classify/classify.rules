@@ -14,9 +14,10 @@ rule classify_all:
 
 rule krona:
     input:
-        "{sample}.krn"
+        "{fname}.krn",
+	str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
     output:
-        "{sample}-krona.html"
+        "{fname}-krona.html"
     shell:
         """
         ktImportTaxonomy \
@@ -26,7 +27,6 @@ rule krona:
         -tax {Cfg[classify][taxa_db_fp]} \
         {input}
         """
-
     
 rule krona_taxonomy:
     """Uses Krona's updateTaxonomy.sh to build the local NCBI taxa db."""

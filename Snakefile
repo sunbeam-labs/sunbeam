@@ -6,20 +6,23 @@
 #
 
 import re
+import sys
 import yaml
 from pprint import pprint
 from pathlib import Path
 
 from snakemake.utils import update_config, listfiles
+from snakemake.exceptions import WorkflowError
 
 from sunbeam import build_sample_list
 from sunbeam.config import *
 from sunbeam.reports import *
 
+if not config:
+    raise SystemExit("\nNo config file specified; specify a config file using --configfile\n")
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)
-print(Cfg['all']['data_fp'].exists())
 Blastdbs = process_databases(Cfg['blastdbs'])
 Samples = build_sample_list(Cfg['all']['data_fp'], Cfg['all']['filename_fmt'], Cfg['all']['exclude'])
 
@@ -28,14 +31,13 @@ QC_FP = output_subdir(Cfg, 'qc')
 ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
 ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
-
+MAPPING_FP = output_subdir(Cfg, 'mapping')
 
 # ---- Rule all: show intro message
 rule all:
     run:
         print("Samples found:")
         pprint(sorted(list(Samples.keys())))
-        print("For available commands, type `snakemake --list`")
 
 # ---- Quality control rules
 include: "rules/qc/qc.rules"
@@ -56,3 +58,8 @@ include: "rules/annotation/orf.rules"
 include: "rules/classify/classify.rules"
 include: "rules/classify/clark.rules"
 include: "rules/classify/kraken.rules"
+
+
+# ---- Mapping rules
+include: "rules/mapping/bowtie.rules"
+#include: "rules/mapping/snap.rules"

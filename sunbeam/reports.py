@@ -1,8 +1,11 @@
+import warnings
+warnings.filterwarnings('ignore', '.*experimental.*')
 import csv
 from pathlib import Path
 from collections import Counter, defaultdict
 
 from Bio import SeqIO
+
 from Bio import SearchIO
 from Bio.SeqRecord import SeqRecord
 
