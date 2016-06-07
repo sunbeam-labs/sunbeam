@@ -57,7 +57,8 @@ rule kraken_aggregate_report:
         
 rule kraken_krona:
     input:
-        str(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv')
+        str(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv'),
+	str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')		
     output:
         str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html')
     shell:

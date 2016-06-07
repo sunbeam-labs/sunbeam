@@ -14,12 +14,11 @@
 
 # General options
 all:
-  data_fp:
-    "tests/sunbeam-data/data_files"
-  output_fp:
-    "tests/output"
-  filename_fmt: "{sample}_L001_{rp}_001.fastq.gz"
-  subcores: 1
+  root: "/home/ecl/500_ViromePipeline/PosCtrl"
+  data_fp: "data/run3"
+  output_fp: "output"
+  filename_fmt: "PCMP_{sample}_{rp}.fastq.gz"
+  subcores: 16
   exclude: []
 
 
@@ -40,8 +39,13 @@ qc:
 # Taxonomic classifications
 classify:
   suffix: classifications
-  clark_opts: "-m 2 --light"
-  clark_db_fp: "local/db"
+  taxa_db_fp: "/home/common/taxonomy"
+  clark_opts: "-m 0"
+  clark_db_fp: "/home/common/clark"
+  clark_targets: "bacteria viruses human custom"
+  clark_level: "species"
+  clark_version: "CLARK-l"
+  kraken_db_fp: "/home/common/kraken/standard"
 
 
 # Contig assembly
@@ -60,8 +64,7 @@ annotation:
   
 # Blast databases
 blastdbs:
-  root_fp:
-    local/db
+  root_fp: ""
   nucleotide:
     bacteria:
       BacterialGenomes/ncbi_bacteria.fa
@@ -76,3 +79,8 @@ blastdbs:
       ACLAME/aclame_proteins_viruses_prophages_0.4.fasta
     vfdb:
       VFDB/VFs.faa
+
+mapping:
+  suffix: mapping
+  genomes_fp: ""
+      

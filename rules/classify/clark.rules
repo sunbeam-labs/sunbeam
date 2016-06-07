@@ -3,11 +3,11 @@
 # Rules for running CLARK
 
 CLARK_DB = Cfg['classify']['clark_db_fp']
-
+CLARK = Cfg['classify']['clark_version']
 
 rule testtest:
     input:
-        expand(str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}.csv'),
+        expand(str(CLASSIFY_FP/CLARK/'raw'/'{sample}-{level}.csv'),
                sample="Coxsackiec_S44",
                level="genus")
 
@@ -28,9 +28,9 @@ rule CLARK_classify:
         targets=str(CLARK_DB/'targets.txt')
 #        level=str(CLARK_DB/'{level}.tmp')
     output:
-        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}.csv')
+        str(CLASSIFY_FP/CLARK/'raw'/'{sample}-{level}.csv')
     params:
-        out=str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}')
+        out=str(CLASSIFY_FP/CLARK/'raw'/'{sample}-{level}')
     shell:
         """
         {Cfg[classify][clark_version]} \
@@ -43,8 +43,8 @@ rule CLARK_classify:
         """
 
 rule CLARK_est_abundance:
-    input: str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}.csv')
-    output: str(CLASSIFY_FP/'CLARK'/'{sample}-{level}-taxa.csv')
+    input: str(CLASSIFY_FP/CLARK/'raw'/'{sample}-{level}.csv')
+    output: str(CLASSIFY_FP/CLARK/'{sample}-{level}-taxa.csv')
     shell:
         """
         getAbundance \
@@ -54,10 +54,10 @@ rule CLARK_est_abundance:
 
 rule CLARK_krona:
     input:
-        str(CLASSIFY_FP/'CLARK'/'raw'/'{sample}-{level}.csv'),
+        str(CLASSIFY_FP/CLARK/'raw'/'{sample}-{level}.csv'),
         str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
     output:
-        temp(str(CLASSIFY_FP/'CLARK'/'krona'/'{sample}-{level}.krn'))
+        str(CLASSIFY_FP/CLARK/'krona'/'{sample}-{level}.krn')
     shell:
         """
         getAbundance \
@@ -65,10 +65,10 @@ rule CLARK_krona:
         -F {input} | tr "," "\\t" > {output}
         """
 
-rule _krona_test:
+rule _CLARK_all:
     input:
-        expand(str(CLASSIFY_FP/'CLARK'/'krona'/'{sample}-{level}-krona.html'),
-               sample="Sample5c_S33",
+        expand(str(CLASSIFY_FP/CLARK/'krona'/'{sample}-{level}-krona.html'),
+               sample=Samples.keys(),
                level=Cfg['classify']['clark_level'])
 
     
