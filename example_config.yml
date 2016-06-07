@@ -63,7 +63,7 @@ annotation:
   
 # Blast databases
 blastdbs:
-  root_fp:
+  root_fp: ""
   nucleotide:
     bacteria:
       BacterialGenomes/ncbi_bacteria.fa
@@ -78,6 +78,8 @@ blastdbs:
       ACLAME/aclame_proteins_viruses_prophages_0.4.fasta
     vfdb:
       VFDB/VFs.faa
+    card:
+      card/nucl_homolog.fasta
 
 mapping:
   suffix: mapping
