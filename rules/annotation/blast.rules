@@ -95,3 +95,7 @@ rule _test_blastx:
 rule _test_blast_report:
     input:
         str(ANNOTATION_FP/'blastx'/'aclame'/'mga'/'report.tsv')
+
+rule _test_blast_card:
+    input:
+        str(ANNOTATION_FP/'blastx'/'card'/'mga'/'report.tsv')
