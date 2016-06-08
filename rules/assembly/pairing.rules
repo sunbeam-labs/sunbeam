@@ -8,4 +8,9 @@ rule pair_reads:
     params:
         out = str(Cfg['data_fp']/'paired'/'{sample}')
     shell:
-        "pear -j {Cfg[subcores]} -f {input.r1} -r {input.r2} -o {params.out}"
+        "pear -j {Cfg[all][subcores]} -f {input.r1} -r {input.r2} -o {params.out}"
+
+rule _pair_all:
+    input:
+        expand(str(Cfg['output_fp']/'paired'/'{sample}.assembled.fastq'),
+               sample=Samples.keys())
