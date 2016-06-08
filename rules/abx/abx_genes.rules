@@ -1,0 +1,39 @@
+rule tblastx:
+    input:
+        str(ASSEMBLY_FP/'merged_reads'/'{sample}_merged.fasta')
+    output:
+        str(ANNOTATION_FP/'tblastx'/'{db}'/'{sample}.xml')
+    params:
+        db = lambda wildcard: Blastdbs['prot'][wildcard.db]
+    shell:
+        """
+        tblastx \
+        -query {input} \
+        -db {params.db} \
+        -outfmt 5 \
+        -num_threads {Cfg[all][subcores]} \
+        -evalue 1e-10 \
+        -max_target_seqs 1 \
+        -out {output}
+        """
+
+rule blast_summary:
+    """Create a summary of results from a BLAST call."""
+    input:
+        expand(
+            str(ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{sample}.xml'),
+            sample=Samples.keys())
+    output:
+        str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'report.tsv')
+    run:
+        with open(output[0], 'w') as out:
+            writer = csv.DictWriter(
+	        out,
+	        fieldnames=['sample','query','hit'],
+                delimiter='\t')
+            writer.writeheader()
+            list(writer.writerow(result) for result in blast_summary(input))
+
+rule _abx_all:
+    input:
+        str(ANNOTATION_FP/'tblastx'/'card'/'report.tsv')
