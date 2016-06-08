@@ -47,6 +47,8 @@ include: "rules/qc/decontaminate.rules"
 # ---- Assembly rules
 include: "rules/assembly/assembly.rules"
 
+# ---- Antibiotic resistance gene rules
+include: "rules/abx/abx_genes.rules"
 
 # ---- Contig annotation rules
 include: "rules/annotation/annotation.rules"
