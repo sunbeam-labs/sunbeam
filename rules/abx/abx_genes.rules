@@ -42,12 +42,38 @@ rule blastx:
         -max_target_seqs 1 > {output}
         """
 
+rule diamond:
+    input:
+        str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fasta')
+    output:
+        temp(str(ANNOTATION_FP/'diamond'/'{db}'/'{sample}.daa'))
+    params:
+        out = str(ANNOTATION_FP/'diamond'/'{db}'/'{sample}'),
+        db = lambda wildcard: Blastdbs['prot'][wildcard.db]
+    shell:
+        """
+        diamond blastx \
+        --db {params.db} \
+        --query {input} \
+        --daa {params.out} \
+        --threads {Cfg[all][subcores]}
+        """
+
+rule daa_to_fmt6:
+    input:
+        '{fname}.daa'
+    output:
+        '{fname}.txt'
+    shell:
+        "diamond view --daa {input} > {output}"
+
 rule blast_summary:
     """Create a summary of results from a BLAST call."""
     input:
         expand(
             str(ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{sample}.txt'),
-            sample=['PCMP_SCID00001.ST.2.4', 'PCMP_SCID00001.ST.4.4', 'PCMP_SCID00001.ST.5.2', 'PCMP_SCID00001.ST.8.1'])
+            sample=Samples.keys())
+#            sample=['PCMP_SCID00001.ST.2.4', 'PCMP_SCID00001.ST.4.4', 'PCMP_SCID00001.ST.5.2', 'PCMP_SCID00001.ST.8.1'])
     output:
         str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'report.tsv')
     run:
@@ -68,4 +94,4 @@ rule gene_summary:
 
 rule _abx_all:
     input:
-        str(ANNOTATION_FP/'blastx'/'card'/'gene_summary.tsv')
+        str(ANNOTATION_FP/'diamond'/'card'/'gene_summary.tsv')

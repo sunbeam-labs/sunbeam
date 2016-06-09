@@ -11,17 +11,18 @@ from Bio.SeqRecord import SeqRecord
 
 from .parsers import MetaGeneAnnotation
 
-def blast_summary(blast_xml_files):
-    """Summarize BLAST results from an set of XML files."""
-    for infile in blast_xml_files:
+def blast_summary(blast_files, blast_format="blast-xml"):
+    """Summarize BLAST results from an set of BLAST output files."""
+    for infile in blast_files:
         sample = Path(infile).stem
         try:
-            for result in SearchIO.parse(infile, 'blast-xml'):
+            for result in SearchIO.parse(infile, blast_format):
                 if len(result.hits) > 0:
                     yield {
                         'sample': sample,
                         'query': result.id,
-                        'hit':result.hits[0].id}
+                        'hit':result.hits[0].id
+                    }
         except ParseError:
             print("Skipping empty/malformed %s" % infile)
             continue

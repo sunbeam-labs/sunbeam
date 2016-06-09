@@ -4,13 +4,13 @@ rule pair_reads:
         r1 = lambda wc: Samples[wc.sample]['R1'],
         r2 = lambda wc: Samples[wc.sample]['R2']
     output:
-        str(Cfg['output_fp']/'paired'/'{sample}.assembled.fastq')
+        str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq')
     params:
-        out = str(Cfg['data_fp']/'paired'/'{sample}')
+        out = str(ASSEMBLY_FP/'paired'/'{sample}')
     shell:
         "pear -j {Cfg[all][subcores]} -f {input.r1} -r {input.r2} -o {params.out}"
 
 rule _pair_all:
     input:
-        expand(str(Cfg['output_fp']/'paired'/'{sample}.assembled.fastq'),
+        expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'),
                sample=Samples.keys())
