@@ -1,8 +1,8 @@
 rule pair_reads:
     """Pairs reads with pear."""
     input:
-        r1 = lambda wc: Samples[wc.sample]['R1'],
-        r2 = lambda wc: Samples[wc.sample]['R2']
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq')
     output:
         str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq')
     params:

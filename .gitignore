@@ -1,5 +1,6 @@
 .decontam_human.json
 config.yaml
+config.yml
 .snakemake
 \#*
 *.fastq.gz
