@@ -46,7 +46,7 @@ rule decontam_phix:
     log:
         str(QC_FP/'log'/'decontam'/'{sample}_summary.json')
     params:
-        out_fp = str(QC_FP/'decontam')
+        out_fp = str(QC_FP/'decontam-phix')
     shell:
         """ 
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
@@ -56,15 +56,15 @@ rule decontam_phix:
         --output-dir {params.out_fp}
         """
 
-# rule decontam:
-#     input:
-#         r1 = str(QC_FP/'decontam-phix'/'{sample}_R1.fastq'),
-#         r2 = str(QC_FP/'decontam-phix'/'{sample}_R2.fastq'),
-#     output:
-#         r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
-#         r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq'),
-#     shell:
-#         """
-#         ln -s {input.r1} {output.r1}
-#         ln -s {input.r2} {output.r2}
-#         """
+rule decontam:
+    input:
+        r1 = str(QC_FP/'decontam-phix'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'decontam-phix'/'{sample}_R2.fastq'),
+    output:
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq'),
+    shell:
+        """
+        ln -s {input.r1} {output.r1}
+        ln -s {input.r2} {output.r2}
+        """

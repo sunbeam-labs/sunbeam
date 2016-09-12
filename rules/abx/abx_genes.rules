@@ -94,4 +94,4 @@ rule gene_summary:
 
 rule _abx_all:
     input:
-        str(ANNOTATION_FP/'diamond'/'card'/'gene_summary.tsv')
+        str(ANNOTATION_FP/'blastx'/'card'/'gene_summary.tsv')
