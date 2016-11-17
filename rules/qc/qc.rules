@@ -31,7 +31,7 @@ rule trimmomatic:
         {input.r1} {input.r2} \
         {output.pair_r1} {output.unpair_r1} \
         {output.pair_r2} {output.unpair_r2} \
-        ILLUMINACLIP:$CONDA_ENV_PATH/share/trimmomatic/NexteraPE-PE.fa:2:30:10:8:true \
+        ILLUMINACLIP:{Cfg[qc][adapter_fp]}:2:30:10:8:true \
         LEADING:{Cfg[qc][leading]} \
         TRAILING:{Cfg[qc][trailing]} \
         SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \

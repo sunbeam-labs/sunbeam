@@ -67,23 +67,23 @@ rule daa_to_fmt6:
     shell:
         "diamond view --daa {input} > {output}"
 
-rule blast_summary:
-    """Create a summary of results from a BLAST call."""
-    input:
-        expand(
-            str(ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{sample}.txt'),
-            sample=Samples.keys())
-#            sample=['PCMP_SCID00001.ST.2.4', 'PCMP_SCID00001.ST.4.4', 'PCMP_SCID00001.ST.5.2', 'PCMP_SCID00001.ST.8.1'])
-    output:
-        str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'report.tsv')
-    run:
-        with open(output[0], 'w') as out:
-            writer = csv.DictWriter(
-	        out,
-	        fieldnames=['sample','query','hit'],
-                delimiter='\t')
-            writer.writeheader()
-            list(writer.writerow(result) for result in blast_summary(input, "blast-tab"))
+# rule blast_summary:
+#     """Create a summary of results from a BLAST call."""
+#     input:
+#         expand(
+#             str(ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{sample}.txt'),
+#             sample=Samples.keys())
+# #            sample=['PCMP_SCID00001.ST.2.4', 'PCMP_SCID00001.ST.4.4', 'PCMP_SCID00001.ST.5.2', 'PCMP_SCID00001.ST.8.1'])
+#     output:
+#         str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'report.tsv')
+#     run:
+#         with open(output[0], 'w') as out:
+#             writer = csv.DictWriter(
+# 	        out,
+# 	        fieldnames=['sample','query','hit'],
+#                 delimiter='\t')
+#             writer.writeheader()
+#             list(writer.writerow(result) for result in blast_summary(input, "blast-tab"))
 
 rule gene_summary:
     input: str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'report.tsv')
