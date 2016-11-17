@@ -19,12 +19,12 @@ rule custom_removal:
         r2 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq')
     params:
         fwd_adapters = " ".join(expand(
-            "-a {adapter}", adapter=Cfg['qc']['fwd_adapters']))
+            "-b {adapter}", adapter=Cfg['qc']['fwd_adapters'])),
         rev_adapters = " ".join(expand(
-            "-A {adapter}", adapter=Cfg['qc']['rev_adapters']))
+            "-B {adapter}", adapter=Cfg['qc']['rev_adapters']))
     shell:
         """
-        cutadapt --discard-trimmed \
+        cutadapt --discard-trimmed\
         {params.fwd_adapters} {params.rev_adapters} \
         -o {output.r1} -p {output.r2} \
         {input.r1} {input.r2}
