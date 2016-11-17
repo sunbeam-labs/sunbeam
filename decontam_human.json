@@ -1,1 +1,1 @@
-{"method": "bwa", "index": "/home/common/indexes/GCA_000001405.15_GRCh38_genomic.fna"}
+{"method": "bwa", "index": "/home/common/indexes/GCA_000001405.15_GRCh38_genomic.fna", "num_threads":36}
