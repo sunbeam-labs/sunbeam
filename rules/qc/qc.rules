@@ -10,10 +10,30 @@ rule _qc_all:
             sample = Samples.keys(),
             rp = ['R1', 'R2'])
 
-rule trimmomatic:
+rule custom_removal:
     input:
         r1 = lambda wildcards: Samples[wildcards.sample]['R1'],
         r2 = lambda wildcards: Samples[wildcards.sample]['R2']
+    output:
+        r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq')
+    params:
+        fwd_adapters = " ".join(expand(
+            "-a {adapter}", adapter=Cfg['qc']['fwd_adapters']))
+        rev_adapters = " ".join(expand(
+            "-A {adapter}", adapter=Cfg['qc']['rev_adapters']))
+    shell:
+        """
+        cutadapt --discard-trimmed \
+        {params.fwd_adapters} {params.rev_adapters} \
+        -o {output.r1} -p {output.r2} \
+        {input.r1} {input.r2}
+        """
+        
+rule trimmomatic:
+    input:
+        r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq')
     output:
         pair_r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
         pair_r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),
