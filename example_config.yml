@@ -14,9 +14,10 @@
 
 # General options
 all:
-  data_fp:
-  output_fp:
-  filename_fmt: "{sample}_L001_{rp}_001.fastq.gz"
+  root: "/home/ecl/sunbeam_demo"
+  data_fp: "data_files"
+  output_fp: "sunbeam_output"
+  filename_fmt: "PCMP_{sample}_{rp}.fastq.gz"
   subcores: 4
   exclude: []
 
@@ -33,6 +34,9 @@ qc:
   pct_id: 0.5
   frac: 0.6
   keep_sam: True
+  adapter_fp: "/home/ecl/miniconda3/envs/sunbeam-test/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
+  rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
 
 
 # Taxonomic classifications
@@ -44,7 +48,7 @@ classify:
   clark_targets: "bacteria viruses human"
   clark_level: "species"
   clark_version: "CLARK-l"
-  kraken_db_fp: ""
+  kraken_db_fp: "/home/common/kraken/standard"
 
 
 # Contig assembly
@@ -63,7 +67,7 @@ annotation:
   
 # Blast databases
 blastdbs:
-  root_fp: ""
+  root_fp: "/media/THING1-RO/local/genomeIndexes/blast"
   nucleotide:
     bacteria:
       BacterialGenomes/ncbi_bacteria.fa
@@ -78,8 +82,8 @@ blastdbs:
       ACLAME/aclame_proteins_viruses_prophages_0.4.fasta
     vfdb:
       VFDB/VFs.faa
-    card:
-      card/nucl_homolog.fasta
+#    card:
+#      card/nucl_homolog.fasta
 
 mapping:
   suffix: mapping
