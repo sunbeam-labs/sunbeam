@@ -33,4 +33,4 @@ rule krona_taxonomy:
     output:
         str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
     shell:
-        "{Cfg[classify][krona_fp]} {Cfg[classify][taxa_db_fp]}"
+        "{Cfg[classify][krona_fp]}/updateTaxonomy.sh {Cfg[classify][taxa_db_fp]}"

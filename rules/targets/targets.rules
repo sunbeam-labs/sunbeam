@@ -22,11 +22,19 @@ TARGET_DECONTAM = expand(
 
 ### _kraken_all
 TARGET_KRAKEN = expand(str(CLASSIFY_FP/'kraken'/'{sample}-{type}.tsv'),
-				sample=Samples.keys(), type=['taxa','mpa'])
+				sample = Samples.keys(), type=['taxa','mpa'])
 TARGET_KRONA = expand(str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html'),
-        		sample=Samples.keys())
+				sample = Samples.keys())
 TARGET_CLASSIFY = TARGET_KRAKEN + TARGET_KRONA
 
+####################
+## assembly
+####################
+
+### _assembly_all
+TARGET_ASSEMBLY = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'), sample = Samples.keys())
+### _pair_all
+TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sample=Samples.keys())
 
 
 TARGET_FP = TARGET_CLASSIFY

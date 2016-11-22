@@ -1,0 +1,16 @@
+cap3: the executable code of CAP3 program. Type cap3 for usage.
+
+formcon: the executable code of FORMCON program
+         for generating a constraint file for CAP3. Type formcon for usage.
+
+doc: document for CAP3 and FORMCON
+
+aceform: a specification of the ace file format
+
+example: a directory with a small data set
+
+Note that CAP3 can be used in a similar way as Phrap, where
+Phred is used for base calls, CAP3 for assembly, and Consed for
+viewing ace format output of CAP3.
+
+For questions on CAP3, please contact Xiaoqiu Huang at xqhuang@cs.iastate.edu

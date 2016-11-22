@@ -1,0 +1,453 @@
+CAP3 Sequence Assembly Program
+
+Citation of the paper would be appreciated:
+Huang, X. and Madan, A.  (1999)
+CAP3: A DNA Sequence Assembly Program,
+Genome Research, 9: 868-877.
+
+Introduction
+
+We have made the following improvements to the CAP sequence assembly program.
+
+1. Use of forward-reverse constraints to correct assembly errors and link contigs.
+
+2. Use of base quality values in alignment of sequence reads.
+
+3. Automatic clipping of 5' and 3' poor regions of reads.
+
+4. Generation of assembly results in ace file format for Consed.
+
+5. CAP3 can be used in GAP4 of the Staden package.
+
+The improved program is named CAP3.
+These improvements allow CAP3 to take longer sequences
+of higher errors and produce more accurate consensus sequences.
+
+Use of constraints in layout generation
+
+A forward-reverse constraint is often produced by
+sequencing both ends of a subclone.
+A forward-reverse constraint specifies that
+the two reads should be on the opposite strands of the DNA molecule within
+a specified range of distance.
+
+CAP3 makes use of a large number of forward-reverse constraints
+to locate and correct errors in layout of sequence reads.
+This capability allows CAP3 to address assembly errors due
+to repeats.
+
+CAP3 also uses constraints to link contigs separated by a gap.
+This feature provides useful information to sequence finishers.
+
+The algorithm used in CAP3 is designed to tolerate wrong constraints,
+which are due to errors in naming and lane tracking.
+
+Use of quality values in alignment
+
+CAP3 makes use of base quality values in constructing
+an alignment of sequence reads and generating a consensus sequence
+for each contig.
+
+This allows the program to use both base quality values and the depth of coverage
+at a position to improve the accuracy in generating a consensus
+base at the position.
+
+The alignment method in CAP3 is very tolerable of reads
+of high sequencing errors.
+
+Automatic clipping of 5' and 3' poor regions
+
+CAP3 clips 5' and 3' poor regions of reads and uses
+only good regions of reads in assembly. Thus there is no need
+to perform clipping in advance. Note that
+vector sequences in reads must be masked before using CAP3.
+
+Input to CAP3
+
+CAP3 takes as input a file of sequence reads in FASTA format.
+If the names of reads contain a dot ('.'), CAP3 requres that
+the names of reads sequenced from the same subclone contain
+the same substring up to the first dot.
+CAP3 takes two optional files: a file of quality values
+in FASTA format and a file of forward-reverse constraints.
+
+The file of quality values must be named "xyz.qual", and
+the file of forward-reverse constraints must be named "xyz.con",
+where "xyz" is the name of the sequence file.
+CAP3 uses the same format of a quality file as Phrap.
+
+Each line of the constraint file specifies one forward-reverse constraint
+of the form:
+
+ReadA   ReadB    MinDistance    MaxDistance
+
+where ReadA and ReadB are names of two reads, and
+MinDistance and MaxDistance are distances (integers) in base pairs.
+The constraint is satisfied if ReadA in forward orientation occurs
+in a contig before ReadB in reverse orientation, or
+ReadB in forward orientation occurs in a contig before ReadA
+in reverse orientation, and their distance is between MinDistance
+and MaxDistance.
+CAP3 works better if a lot more constraints are used.
+
+We have a separate program named "formcon" to generate
+a constraint file from the sequence file.
+The program takes an input file of fragments in FASTA format
+and two integers (minimum distance and maximum distance in bp).
+The minimum distance and maximum distances specify a lower and
+a upper limit on the subclone length, respectively.
+It produces a file of forward-reverse constraints for CAP3.
+It is assumed that a pair of forward and reverse reads must
+contain a dot in their names and a pair of forward and reverse reads
+have a common name up to the first dot.
+Because CAP3 uses reads whose ends are clipped, instead of raw reads,
+to measure their distance, the distance seen by CAP3 could be different
+from the insert size by 1000 to 1500 bp. For example,
+if the insert size is 2000 to 3000 bp,  we recommend that you use
+500 for the minimum distance and 4000 for the maximum distance.
+The results are in the file with name ending in ".con".
+
+Output from CAP3
+
+Assembly results in CAP format go to the standard output and
+need to be directed to a file. Note that
+clipped 5' and 3' sequences of reads are not shown in CAP3 format output.
+
+CAP3 also produces assembly results in ace file format (".ace").
+This allows CAP3 output to be viewed in Consed.
+Note that clipped 5' and 3' sequences of reads are shown in
+ace format output.
+
+CAP3 saves consensus sequences in file ".contigs" and
+their quality values in file ".contigs.qual".
+Reads that are not used in assembly are put in file ".singlets".
+Additional information about assembly is given in file ".info".
+
+The CAP3 program reports whether each constraint
+is satisfied or not. The report is in file ".results".
+A sample report file is given here:
+
+CPBKY55.F   CPBKY55.R    500   6000    3210  satisfied
+CPBKY92.F   CPBKY92.R    500   6000    497   unsatisfied in distance
+CPBKY28.F   CPBKY28.R    500   6000     unsatisfied
+CPBKY56.F   CPBKY56.R    500   6000     10th link between CPBKI23.F+ and CPBKT37.R-
+CPBKY70.F   CPBKY70.R    500   6000     4th overlap between CPBKM47.F+ and CPBKN28.R-
+
+The first four columns are simply taken from the constraint file.
+Line 1 indicates that the constraint is satisfied,
+where the actual distance between the two reads is given on
+the fifth column.
+Line 2 indicates that the constraint is not satisfied in distance, that is,
+the two reads in opposite orientation occur in the same contig, but their
+distance (given on the fifth column) is out of the given range.
+Line 3 indicates that the constraint is not satisfied.
+Line 4 indicates that this constraint is a 10th one that
+links two contigs, where the 3' read of one contig is "CPBKI23.F"
+in plus orientation and the 5' read of the other is "CPBKT37.R" in
+minus orientation. The information suggests that the two contigs
+should go together in the gap closure phase.
+Line 5 indicates that the constraint is a 4th constraint
+supporting an overlap between CPBKM47.F and CPBKN28.R.
+The overlap is not implemented in the current the assembly.
+
+CAP3 takes 20 to 60 minutes to assemble a cosmid or BAC data set
+on a Sun Ultra1 workstation.
+
+Availability
+
+The CAP3 program is available upon request from Xiaoqiu Huang at xqhuang@cs.iastate.edu
+
+Documentation on CAP3 is available at
+
+http://genome.cs.mtu.edu/sas.html
+
+A detailed documentation on CAP3 usage.
+
+Usage: cap3 File_of_reads [options]
+
+File_of_reads is a file of DNA reads in FASTA format
+
+If the file of reads is named 'xyz', then
+the file of quality values must be named 'xyz.qual',
+and the file of constraints named 'xyz.con'.
+
+Options (default values):
+
+  -a  N  specify band expansion size N > 10 (20)
+  -b  N  specify base quality cutoff for differences N > 15 (20)
+  -c  N  specify base quality cutoff for clipping N > 5 (12)
+  -d  N  specify max qscore sum at differences N > 100 (200)
+  -e  N  specify extra number of differences N > 10 (20)
+  -f  N  specify max gap length in any overlap N > 10 (300)
+  -g  N  specify gap penalty factor N > 0 (6)
+  -h  N  specify max overhang percent length N > 5 (20)
+  -i  N  specify segment pair score cutoff N > 20 (40)
+  -j  N  specify chain score cutoff N > 30 (80)
+  -k  N  specify end clipping flag N >= 0 (1)
+  -m  N  specify match score factor N > 0 (2)
+  -n  N  specify mismatch score factor N < 0 (-5)
+  -o  N  specify overlap length cutoff > 15 (40)
+  -p  N  specify overlap percent identity cutoff N > 65 (90)
+  -r  N  specify reverse orientation value N >= 0 (1)
+  -s  N  specify overlap similarity score cutoff N > 250 (900)
+  -t  N  specify max number of word occurrences N > 30 (500)
+  -u  N  specify min number of constraints for correction N > 0 (4)
+  -v  N  specify min number of constraints for linking N > 0 (2)
+  -w  N  specify file name for clipping information (none)
+  -x  N  specify prefix string for output file names (cap)
+  -y  N  specify clipping range N > 5 (100)
+  -z  N  specify min no. of good reads at clip pos N > 0 (2)
+
+If no quality file is given, then a default quality value of 10 is
+used for each base.
+
+The following sections explain the parameters of CAP3.
+
+Clipping of poor regions
+
+If the option -k 0 is given, then no read end is clipped and
+the whole read is used in assembly. Otherwise, the following procedure
+is used to determine and clip poor read ends.
+
+CAP3 computes clipping positions of each read using both base quality
+values and similarity information. Clipping of a poor end region of
+a read f is controlled by three parameters: quality value cutoff
+qualcut, clipping range crange, and depth of good coverage gdepth.
+The value for qualcut can specified with the "-c" option,
+the value for crange with the "-y" option, and
+the value for gdepth with the "-z" option.
+
+If there are quality values, CAP3 computes two positions qualpos5 and
+qualpos3 of read f such that the region of read f from position qualpos5
+to position qualpos3 consists mostly of quality values greater than qualcut.
+If there are no quality values, then qualpos5 is set to 1 and qualpos3 is set
+the length of read f.
+The range for the left clipping position of read f is from 1 to qualpos5 + crange.
+The range for the right clipping position of read f is from qualpos3 - crange
+to the end of read f. The minimum depth of good coverage at
+the left and right clipping positions of read f is expected to be gdepth.
+
+Let realdepth5 be the maximum real depth of coverage for the initial region of
+read f ending at position qualpos5 + crange. Let depth5 be
+the smaller of realdepth5 and gdepth. If depth5 is 0, then
+left clipping position of read f is set to qualpos5 by CAP3.
+The given value for the parameter crange may be too small for read f.
+CAP3 reports at the start of a .info file that
+"No overlap is found in the given 5' clipping range for read f."
+If there are overlaps beyond the given 5' clipping range for read f,
+CAP3 reports a new clipping range for each overlap. One of the reported
+range values can be used as a new value for the parameter crange for read f.
+If CAP3 reports "No overlap is found ... for read f", then 
+read f is not used in assembly. A larger clipping range has to be given
+to use read f in assembly.
+
+If depth5 is greater than 0, the left clipping position of read f is the smallest position
+x such that x is less than qualpos5 + crange and the region of read f beginning at position x
+is similar to depth5 other reads. The right clipping position of read f
+is computed similarly by CAP3. Larger values for the parameters
+crange and gdepth result in more aggressive clipping of poor end regions.
+A larger value for crange allows CAP3 to search for the left clipping position
+in a larger area. A larger value for gdepth may cause CAP3 to clip more bases
+so that the resulting good portion of read f is similar to more reads.
+
+The user may provide specific values for the parameters crange and gdepth
+for individual reads in a file. Each line in the file has the following format:
+
+ReadName   crange5  gdepth5   crange3   gdepth3
+
+where ReadName is the name of a read, crange5 & gdepth5 are values for the 5' end, 
+and crange3 & gdepth3 are for the 3' end.
+The file is given to CAP3 with the "-w" option.
+
+
+Band of diagonals
+
+The program determines a minimum band of diagonals for an overlapping
+alignment between two sequence reads. The band is expanded
+by a number of bases specified by the user with option "-a".
+
+Quality difference score of an overlap
+
+Overlaps between reads are evaluated by many measures.
+The first measure is based on base quality.
+If an overlap contains lots of differences at
+bases of high quality, then the overlap is removed. Specifically,
+let b be the base quality cutoff value and let d be the maximum
+difference score. The values for the two parameters can be set
+using the "-b" and "-d" options. If the overlap contains a difference
+at bases of quality values q1 and q2, then the score at
+the difference is max(0, min(q1, q2) - b). The difference score
+of an overlap is the sum of scores at each difference.
+For example, an overlap contains two differences,
+one at bases of quality values 15 and 30 and the other
+at bases of quality values 40 and 50. With b = 20, the difference score
+of the overlap is 0 + 20 = 20. If the difference score of an overlap
+exceeds d, then the overlap is removed. With b = 20,
+an overlap with 15 differences at bases of quality values
+40 or higher has a difference score of at least 300 and is
+removed if d = 250.
+
+Number of differences in an overlap
+
+The second measure looks at the number of differences in an overlap.
+If the number of differences in an overlap is higher than
+expected, than the overlap is removed.
+Let an integer e be the maximum number of extra differences.
+Consider an overlap between reads f and g.
+Let d1 be the estimated number of sequencing errors for the region of
+f involved in the overlap and let r2 be that for
+the region of g involved in the overlap.
+If the observed number of differences in the overlap is greater than
+r1 + r2 + e, then the overlap is removed.
+The value for the parameter e can be changed using the "-e" option.
+The expected number of differences in the overlap is about r1 + r2.
+Giving a smaller value to e causes more overlaps to be removed.
+
+Similarity score of an overlap
+
+The third measure is based on overlap similarity score.
+The similarity score of an overlapping alignment is defined using
+base quality values. Let m be the match score factor, let n be
+the mismatch score factor, and let g be the gap penalty factor.
+Values for these parameters can be set with the "-m", "-n", and "-g" options.
+A match at bases of quality values q1 and q2 is given a score of m * min(q1,q2).
+A mismatch at bases of quality values q1 and q2 is given a score of n * min(q1,q2).
+A base of quality value q1 in a gap is given a score of -g * min(q1,q2),
+where q2 is the quality value of the base in the other sequence right before
+the gap. The score of a gap is the sum of scores of each base in the gap
+minus a gap open penalty. The similarity score of an overlapping alignment
+is the sum of scores of each match, each mismatch, and each gap. 
+With m = 2, an overlap that consists of 25 matches at bases of quality value
+10 has a score of 500. If the similarity score of an overlap is less
+than the overlap similarity score cutoff s, then the overlap is removed.
+
+Length and percent identity of an overlap
+
+The fourth requirement for an overlap is that the length in bp of the overlap
+is no less than the value of the minimum overlap length cutoff parameter.
+The value for this parameter can be changed with the "-o" option.
+The fifth requirement for an overlap is that the percent identity of
+the overlap is no less than the minimum percent identity cutoff.
+The value for this parameter can be changed with the "-p" option.
+A value of 75 for p means 0.75 or 75%.
+
+Maximum length of gaps in an overlap
+
+The program provides a parameter (-f option) for the user to 
+reject overlaps with a long gap. Let an integer f be the maximum
+length of gaps allowed in any overlap. Then any overlap with
+a gap longer than f is rejected by the program. The value
+for this parameter can be changed using the "-f" option.
+Note that a small value for this parameter may cause the program to
+remove true overlaps and to produce incorrect results.
+The "-f" option may be used by the user to split reads from
+alternative splicing forms into separate contigs.
+Geo Pertea at TIGR suggested that this option be added to the program.
+
+Overhang percent length of an overlap
+
+The total length of the different overhang regions in an overlap 
+is controlled with the -h option. An overhang region in an overlap
+is a different terminal region before or after the overlap.
+The overhang percent length of an overlap
+is 100 times the total length of the different overhang regions in the overlap
+divided by the length of the overlap. Overlaps with an overhang percent length
+greater than the maximum cutoff are rejected.
+
+Short reads
+
+The default values for some of the parameters are selected for
+assembly of regular reads of lengths 500 to 1000 bp.
+For assembly of short reads of lengths 20 bp, the following options
+should be used to change the values for those parameters accordingly.
+
+   -i 30  -j 31  -o 18  -s 300
+
+Note that using short reads increases the likelihood of producing assemblies
+with false joins. Below we explain the options for short reads.
+Overlaps between reads are quickly computed by finding segment pairs
+(ungapped alignments) and combining segment pairs into chains.
+The -i option is used to specify a score cutoff on segment pairs.
+The score of a segment pair with 19 base matches and 1 base mismatch
+is 2 * 19 + (-5) * 1 = 33, where each base match is given a score of 2
+and each mismatch is given a score of -5.
+The -j option is used to specify a score cutoff on chains of segment pairs,
+where the score of a chain is the sum of scores of each segment pair
+minus penalties for gaps between segment pairs.
+The score of a chain consisting of one segment pair is simply the score of
+the segment pair.
+
+After a high scoring chain of segment pairs between two reads is computed,
+an overlap between the reads is computed as an optimal local alignment
+between the reads, where the chain is used to limit the
+computation to a small area of the dynamic programming matrix.
+Unlike the scores of segment pairs and chains, the score of an overlap
+is weighted by base quality values. Thus, an overlap
+with 19 base matches, 1 base mismatch, and 0 gap has a score
+of 10 * [2 * 19 + (-5) * 1] = 330, assuming that each base
+has a quality value of 10.
+The -o option is used to specify a length cutoff on overlaps,
+whereas the -s option is used to specify a score cutoff on overlaps.
+
+Assembly of reads in forward orientation only
+
+The "-r" option is used to let CAP3 know whether to consider reads
+in reverse orientation for assembly.
+The default value for the option is 1, meaning that reads in
+reverse orientation are also considered for assembly.
+Specifying zero as "-r  0" instructs CAP3 to
+perform assembly of reads in forward orientation only.
+This option was suggested by Patrick Schnable's lab.
+
+Max number of word matches
+
+This parameter (option -t) allows the user to trade off the efficiency of the
+program for its accuracy. For a read f, the program computes overlaps between
+read f and other reads by considering short word matches between
+read f and other reads. A word match is examined to see if it can be
+extended into a long overlap. If read f has overlaps with many other reads,
+then read f has many short word matches with many other reads.
+This parameter gives an upper limit, for any word, on the number of word matches
+between read f and other reads that are considered by the program.
+Using a large value for this parameter allows the program
+to consider more word matches between read f and other reads, which can find
+more overlaps for read f, but slows down the program.
+Using a small vlaue for this parameter has the opposite effect.
+A large value may be used if the depth of coverage is high for the data set.
+For example, a value of 150 is used for a data set with a maximum depth of
+coverage of 30, and a value of 500 for a data set with a maximum depth of
+coverage of 100. Using a very large value may cause the program to run forever
+or run out of memory.
+
+Forward-reverse constraints
+
+Corrections to an assembly are made using forward-reverse constraints.
+Let an integer u be the minimum number of constraints for correction.
+Consider an alternative overlap between two reads f and g.
+Assume that f is in contig C1 and that g is in contig C2.
+If the number of unsatisfied constraints that support the overlap
+between f and g is greater than the value of the u parameter plus
+the number of satisfied constraints that support the current joins involving f and g,
+then the current joins involving f and g are disconnected and
+the overlap between f and g is implemented.
+The value for this parameter can be changed with the "-u" option.
+
+Contigs that are linked by forward-reverse constraints are reported.
+The minimum number of constraints for reporting a link between two contigs
+is specified with the "-v" option.
+
+Output file names
+
+The names of all output files contain a substring "cap".
+A different substring can be specified with the "-x" option.
+This feature was suggested by Harley Gorrell.
+
+Acknowledgments
+
+I thank John Quackenbush, Geo Pertea, and Feng Liang for many suggestions to improve CAP3,
+Jun Qian for producing output in ace format and other help,
+Kathryn Beal for incorporating CAP3 in GAP4,
+Tim Hunkapiller and Granger Sutton for discussion,
+Bruce Roe and Granger Sutton for providing sequence data sets,
+Sanzhen Liu and Pat Schnable for suggesting the options -i, -j, -k.
+This project was supported by NIH Grant R01HG01502-02 from NHGRI.

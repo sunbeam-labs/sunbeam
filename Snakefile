@@ -26,6 +26,7 @@ configfile: "example_config.yml"
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)
+print(Cfg['assembly']['cap3'])
 Blastdbs = process_databases(Cfg['blastdbs'])
 Samples = build_sample_list(Cfg['all']['data_fp'], Cfg['all']['filename_fmt'], Cfg['all']['exclude'])
 
