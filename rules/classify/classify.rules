@@ -7,15 +7,15 @@ rule _test_CLARK:
     input:
         str(CLASSIFY_FP/'CLARK'/'Sample11c_S34-taxa.csv')
 
-rule classify_all:
+rule _classify_all:
     input:
         expand(str(CLASSIFY_FP/'CLARK'/'{sample}-taxa.csv'),
         sample=Samples.keys())
 
 rule krona:
     input:
-        "{fname}.krn",
-	str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
+        "{fname}.krn", 
+        str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
     output:
         "{fname}-krona.html"
     shell:
@@ -33,4 +33,4 @@ rule krona_taxonomy:
     output:
         str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
     shell:
-        "ktUpdateTaxonomy.sh {Cfg[classify][taxa_db_fp]}"
+        "{Cfg[classify][krona_fp]} {Cfg[classify][taxa_db_fp]}"

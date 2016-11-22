@@ -14,7 +14,7 @@
 
 # General options
 all:
-  root: "/home/ecl/sunbeam_demo"
+  root: "/home/chunyu/sunbeam-test" 
   data_fp: "data_files"
   output_fp: "sunbeam_output"
   filename_fmt: "PCMP_{sample}_{rp}.fastq.gz"
@@ -25,6 +25,7 @@ all:
 # Quality control
 qc:
   suffix: qc
+  threads: 4
   java_heapsize: 512M
   leading: 3
   trailing: 3
@@ -34,26 +35,28 @@ qc:
   pct_id: 0.5
   frac: 0.6
   keep_sam: True
-  adapter_fp: "/home/ecl/miniconda3/envs/sunbeam-test/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  adapter_fp: "/home/chunyu/miniconda3/envs/sunbeam-test/share/trimmomatic/adapters/NexteraPE-PE.fa"
   fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
 
 
 # Taxonomic classifications
 classify:
-  suffix: classifications
-  taxa_db_fp: ""
+  suffix: classify
+  threads: 4
+  taxa_db_fp: "/home/common/taxonomy"
   clark_opts: "-m 0"
   clark_db_fp: ""
   clark_targets: "bacteria viruses human"
   clark_level: "species"
   clark_version: "CLARK-l"
   kraken_db_fp: "/home/common/kraken/standard"
+  krona_fp: "/home/chunyu/miniconda3/envs/sunbeam-test/opt/krona/updateTaxonomy.sh"
 
 
 # Contig assembly
 assembly:
-  suffix: contigs
+  suffix: assembly
 
 
 # Contig annotation
@@ -88,4 +91,5 @@ blastdbs:
 mapping:
   suffix: mapping
   genomes_fp: ""
-      
+
+

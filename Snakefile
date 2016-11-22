@@ -8,6 +8,7 @@
 import re
 import sys
 import yaml
+import configparser
 from pprint import pprint
 from pathlib import Path
 
@@ -18,8 +19,10 @@ from sunbeam import build_sample_list
 from sunbeam.config import *
 from sunbeam.reports import *
 
-if not config:
-    raise SystemExit("\nNo config file specified; specify a config file using --configfile\n")
+#if not config:
+#    raise SystemExit("\nNo config file specified; specify a config file using --configfile\n")
+
+configfile: "example_config.yml"
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)
@@ -33,8 +36,12 @@ ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
 
+# ---- Targets ruls
+include: "rules/targets.rules"
+
 # ---- Rule all: show intro message
 rule all:
+    input: TARGET_FP
     run:
         print("Samples found:")
         pprint(sorted(list(Samples.keys())))
