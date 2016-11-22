@@ -51,14 +51,14 @@ classify:
   clark_level: "species"
   clark_version: "CLARK-l"
   kraken_db_fp: "/home/common/kraken/standard"
-  krona_fp: /home/chunyu/miniconda3/envs/sunbeam-test/opt/krona
+  krona_fp: "/home/chunyu/miniconda3/envs/sunbeam-test/opt/krona"
 
 
 # Contig assembly
 assembly:
   suffix: assembly
   threads: 4
-  cap3_fp: /home/chunyu/sunbeam/local/CAP3
+  cap3_fp: "/home/chunyu/sunbeam/local/CAP3"
 
 
 # Contig annotation
