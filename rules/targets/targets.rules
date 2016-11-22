@@ -1,0 +1,40 @@
+# -*- mode: Snakemake -*-
+#
+# list the all input files for each step
+
+####################
+## qc
+####################
+
+### _qc_all
+TARGET_QC = expand(
+					str(QC_FP/'paired'/'{sample}_{rp}_fastqc.zip'),
+					sample = Samples.keys(), rp = ['R1','R2'])
+
+### _decontam_all
+TARGET_DECONTAM = expand(
+					str(QC_FP/'decontam'/'{sample}_{rp}.fastq'),
+					sample = Samples.keys(), rp = ['R1', 'R2'])
+
+####################
+## classify
+####################
+
+### _kraken_all
+TARGET_KRAKEN = expand(str(CLASSIFY_FP/'kraken'/'{sample}-{type}.tsv'),
+				sample = Samples.keys(), type=['taxa','mpa'])
+TARGET_KRONA = expand(str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html'),
+				sample = Samples.keys())
+TARGET_CLASSIFY = TARGET_KRAKEN + TARGET_KRONA
+
+####################
+## assembly
+####################
+
+### _assembly_all
+TARGET_ASSEMBLY = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'), sample = Samples.keys())
+### _pair_all
+TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sample=Samples.keys())
+
+
+TARGET_FP = TARGET_CLASSIFY + TARGET_ASSEMBLY

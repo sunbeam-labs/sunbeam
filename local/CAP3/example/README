@@ -1,0 +1,3 @@
+The command for running cap3 on data set xyz
+
+   cap3   xyz  >  xyz.out &
