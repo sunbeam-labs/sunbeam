@@ -33,15 +33,16 @@ rule build_contigs:
 
 rule cap3:
     input:
-        str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa')
+        contig = str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa'),
+        cap3 = str(Cfg['assembly']['cap3_fp']/'cap3')
     output:
         str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa')
     log:
         str(ASSEMBLY_FP/'log'/'cap3'/'{sample}.out')
     shell:
         """
-        Cfg[assembly][cap3_fp]/cap3 {input} &> {log} && \
-        cat {input}.cap.singlets {input}.cap.contigs > {output}
+        {input.cap3} {input.contig} &> {log} && \
+        cat {input.contig}.cap.singlets {input.contig}.cap.contigs > {output}
         """
 
 rule minimo:

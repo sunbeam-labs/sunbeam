@@ -30,7 +30,9 @@ rule krona:
     
 rule krona_taxonomy:
     """Uses Krona's updateTaxonomy.sh to build the local NCBI taxa db."""
+    input:
+	krona = str(Cfg['classify']['krona_fp'])
     output:
         str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
     shell:
-        "{Cfg[classify][krona_fp]}/updateTaxonomy.sh {Cfg[classify][taxa_db_fp]}"
+        "{input.krona}/updateTaxonomy.sh {Cfg[classify][taxa_db_fp]}"
