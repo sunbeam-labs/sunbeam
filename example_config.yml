@@ -57,6 +57,7 @@ classify:
 # Contig assembly
 assembly:
   suffix: assembly
+  threads: 8
 
 
 # Contig annotation
