@@ -4,15 +4,17 @@
 
 rule kraken_classify:
     input:
-        r1=str(QC_FP/'paired'/'{sample}_R1.fastq'),
-        r2=str(QC_FP/'paired'/'{sample}_R2.fastq')
+        r1=str(QC_FP/'decontam'/'{sample}_R1.fastq'),
+        r2=str(QC_FP/'decontam'/'{sample}_R2.fastq')
     output:
         str(CLASSIFY_FP/'kraken'/'raw'/'{sample}-raw.tsv')
+    threads:
+        Cfg['classify']['threads']
     shell:
         """
         kraken \
         --db {Cfg[classify][kraken_db_fp]} \
-        --threads {Cfg[all][subcores]} \
+        --threads {threads} \
         --paired \
         --fastq-input \
         {input.r1} {input.r2} > {output}
@@ -41,24 +43,11 @@ rule kraken_mpa_report:
         --db {Cfg[classify][kraken_db_fp]} \
         {input} > {output}
         """
-
-rule kraken_aggregate_report:
-    input:
-        expand(str(CLASSIFY_FP/'kraken'/'raw'/'{sample}-raw.tsv'),
-        sample=Samples.keys())
-    output:
-        str(CLASSIFY_FP/'kraken'/'{sample}-mpa.tsv')
-    shell:
-        """
-        kraken-mpa-report \
-        --db {Cfg[classify][kraken_db_fp]} \
-        {' '.join(s for s in input)} > {output}
-        """
         
 rule kraken_krona:
     input:
         str(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv'),
-	str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')		
+        str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')		
     output:
         str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html')
     shell:
@@ -71,8 +60,9 @@ rule kraken_krona:
         {input}
         """
 
-rule _test_kraken:
+rule _kraken_all:
     input:
+        expand(str(CLASSIFY_FP/'kraken'/'{sample}-{type}.tsv'),
+        sample=Samples.keys(), type=['taxa','mpa']),
         expand(str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html'),
                sample=Samples.keys())
-    

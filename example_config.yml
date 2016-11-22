@@ -43,7 +43,8 @@ qc:
 # Taxonomic classifications
 classify:
   suffix: classify
-  taxa_db_fp: ""
+  threads: 4
+  taxa_db_fp: "/home/common/taxonomy"
   clark_opts: "-m 0"
   clark_db_fp: ""
   clark_targets: "bacteria viruses human"
