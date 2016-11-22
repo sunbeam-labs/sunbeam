@@ -33,8 +33,12 @@ ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
 
+# ---- Targets ruls
+include: "rules/targets.rules"
+
 # ---- Rule all: show intro message
 rule all:
+    input: TARGET_FP
     run:
         print("Samples found:")
         pprint(sorted(list(Samples.keys())))

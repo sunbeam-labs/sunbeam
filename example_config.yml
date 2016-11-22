@@ -25,6 +25,7 @@ all:
 # Quality control
 qc:
   suffix: qc
+  threads: 4
   java_heapsize: 512M
   leading: 3
   trailing: 3
@@ -35,6 +36,8 @@ qc:
   frac: 0.6
   keep_sam: True
   adapter_fp: "/home/chunyu/miniconda3/envs/sunbeam-test/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
+  rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
 
 
 # Taxonomic classifications

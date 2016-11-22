@@ -1,0 +1,15 @@
+# -*- mode: Snakemake -*-
+#
+# list the all input files for each step
+
+### _qc_all
+TARGET_QC = expand(
+					str(QC_FP/'paired'/'{sample}_{rp}_fastqc.zip'),
+					sample = Samples.keys(), rp = ['R1','R2'])
+
+### _decontam_all
+TARGET_DECONTAM = expand(
+					str(QC_FP/'decontam'/'{sample}_{rp}.fastq'),
+					sample=Samples.keys(), rp=['R1', 'R2'])
+
+TARGET_FP = TARGET_DECONTAM
