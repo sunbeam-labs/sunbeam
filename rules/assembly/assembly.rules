@@ -4,6 +4,13 @@
 #
 # Requires IDBA_UD and CAP3.
 
+rule _assembly_all:
+    """Build contigs for all samples."""
+    input:
+        expand(
+            str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
+            sample=Samples.keys())
+
 rule merge_fq:
     input:
         r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
@@ -58,10 +65,3 @@ rule minimo:
         Minimo {input} -D FASTA_EXP=1 &> {log} && \
         perl local/bin/unblock_fasta.pl {output.block} > {output.unblock}
         """
-
-rule _assembly_all:
-    """Build contigs for all samples."""
-    input:
-        expand(
-            str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
-            sample=Samples.keys())
