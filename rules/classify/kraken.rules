@@ -2,6 +2,13 @@
 #
 # Rules for running Kraken
 
+rule _kraken_all:
+    input:
+        expand(str(CLASSIFY_FP/'kraken'/'{sample}-{type}.tsv'),
+        sample=Samples.keys(), type=['taxa','mpa']),
+        expand(str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html'),
+               sample=Samples.keys())
+
 rule kraken_classify:
     input:
         r1=str(QC_FP/'decontam'/'{sample}_R1.fastq'),
@@ -59,10 +66,3 @@ rule kraken_krona:
         -tax {Cfg[classify][taxa_db_fp]} \
         {input}
         """
-
-rule _kraken_all:
-    input:
-        expand(str(CLASSIFY_FP/'kraken'/'{sample}-{type}.tsv'),
-        sample=Samples.keys(), type=['taxa','mpa']),
-        expand(str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html'),
-               sample=Samples.keys())
