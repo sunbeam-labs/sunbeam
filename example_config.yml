@@ -71,6 +71,9 @@ annotation:
 
   
 # Blast databases
+blast:
+  threads: 4
+
 blastdbs:
   root_fp: "/media/THING1-RO/local/genomeIndexes/blast"
   nucleotide:
