@@ -44,10 +44,12 @@ rule trimmomatic:
     params:
         sw_start = Cfg['qc']['slidingwindow'][0],
         sw_end = Cfg['qc']['slidingwindow'][1]
+    threads:
+        Cfg['qc']['threads']
     shell:
         """
         trimmomatic \
-        PE -threads {Cfg[all][subcores]} -phred33 \
+        PE -threads {threads} -phred33 \
         {input.r1} {input.r2} \
         {output.pair_r1} {output.unpair_r1} \
         {output.pair_r2} {output.unpair_r2} \
@@ -67,4 +69,3 @@ rule fastqc:
             str(QC_FP/'paired'/'{{sample}}_{rp}_fastqc.zip'),
             rp=['R1', 'R2'])
     shell: "fastqc {input.r1} {input.r2}"
-

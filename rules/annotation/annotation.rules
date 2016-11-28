@@ -11,11 +11,17 @@ from pathlib import Path
 from Bio import SeqIO
 from sunbeam import circular
 
-rule filter_fasta:
-    """Filter contigs by size."""
-    
+
+rule _aggregate_all:
     input:
-        str(ASSEMBLY_FP/'{sample}_assembly'/'minimo-contigs.fa')
+        expand(
+            str(ANNOTATION_FP/'summary'/'{sample}.tsv'),
+            sample=Samples.keys())
+
+rule filter_fasta:
+    """Filter contigs by size."""    
+    input:
+        str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa')
     output:
         fp = str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa')
     run:
@@ -93,9 +99,3 @@ rule aggregate_all:
             out.writelines(open(input[0]).readlines())
             for infile in input[1:]:
                 out.writelines(l for i,l in enumerate(open(infile)) if i > 0)
-                
-rule _test_aggregate:
-    input:
-        expand(
-            str(ANNOTATION_FP/'summary'/'{sample}.tsv'),
-            sample=Samples.keys())

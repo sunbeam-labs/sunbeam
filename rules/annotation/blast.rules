@@ -17,13 +17,15 @@ rule run_blastn:
         str(ANNOTATION_FP/'blastn'/'{db}'/'{contigs}'/'{sample}.xml')
     params:
         db=lambda wildcard: Blastdbs['nucl'][wildcard.db] 
+    threads: 
+        Cfg['blast']['threads']
     shell:
         """
         blastn \
         -query {input.contigs} \
         -db {params.db} \
         -outfmt 5 \
-        -num_threads {Cfg[all][subcores]} \
+        -num_threads {threads} \
         -evalue 1e-10 \
         -max_target_seqs 1 \
         -out {output} \
@@ -36,13 +38,15 @@ rule run_blastp:
         db=lambda wildcard: Blastdbs['prot'][wildcard.db]
     output:
         str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.xml')
+    threads:
+        Cfg['blast']['threads']
     shell:
         """
         blastp \
         -query {input.genes} \
         -db {input.db} \
         -outfmt 5 \
-        -num_threads {Cfg[all][subcores]} \
+        -num_threads {threads} \
         -evalue 1e-10 \
         -max_target_seqs 1 \
         -out {output} \
@@ -57,13 +61,15 @@ rule run_blastx:
     output:
         # output/virome/blastx/aclame/mga/HUP3D03balc_S92.xml
         str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.xml')
+    threads:
+        Cfg['blast']['threads']
     shell:
         """
         blastx \
         -query {input.genes} \
         -db {input.db} \
         -outfmt 5 \
-        -num_threads {Cfg[all][subcores]} \
+        -num_threads {threads} \
         -evalue 1e-10 \
         -max_target_seqs 1 \
         -out {output} \

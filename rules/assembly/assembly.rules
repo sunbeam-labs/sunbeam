@@ -2,13 +2,13 @@
 #
 # Contig building and other assembly rules
 #
-# Requires IDBA_UD and AMOS.
+# Requires IDBA_UD and CAP3.
 
-rule _assemble_all:
+rule _assembly_all:
     """Build contigs for all samples."""
     input:
         expand(
-            str(ASSEMBLY_FP/'{sample}_assembly'/'minimo-contigs.fa'),
+            str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
             sample=Samples.keys())
 
 rule merge_fq:
@@ -29,10 +29,27 @@ rule build_contigs:
         str(ASSEMBLY_FP/'log'/'idba_ud'/'{sample}.out')
     params:
         out_fp = str(ASSEMBLY_FP/'{sample}_assembly')
+    threads:
+        Cfg['assembly']['threads']
     shell:
         """
-        idba_ud -r {input} -o {params.out_fp} \
-        --num_threads {Cfg[all][subcores]} --pre_correction &> {log} \
+        idba_ud -l {input} -o {params.out_fp} \
+        --num_threads {threads} --pre_correction &> {log} || \
+        if [ ! -a {output} ]; then cp {params.out_fp}/contig-100.fa {output}; fi
+        """
+
+rule cap3:
+    input:
+        contig = str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa'),
+        cap3 = str(Cfg['assembly']['cap3_fp']/'cap3')
+    output:
+        str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa')
+    log:
+        str(ASSEMBLY_FP/'log'/'cap3'/'{sample}.out')
+    shell:
+        """
+        {input.cap3} {input.contig} &> {log} && \
+        cat {input.contig}.cap.singlets {input.contig}.cap.contigs > {output}
         """
 
 rule minimo:
@@ -48,5 +65,3 @@ rule minimo:
         Minimo {input} -D FASTA_EXP=1 &> {log} && \
         perl local/bin/unblock_fasta.pl {output.block} > {output.unblock}
         """
-
-        
