@@ -1,0 +1,44 @@
+{
+    "__default__" :
+    {
+        "h_vmem" : "4G",
+        "mem_free" : "3G",
+        "m_mem_free" : "2G"
+    },
+    "demultiplex" :
+    {
+        "h_vmem" : "12G",
+        "mem_free" : "10G",
+        "m_mem_free" : "8G"
+    },
+    "fastqc" :
+    {
+        "h_vmem" : "10G",
+        "mem_free" : "8G",
+        "m_mem_free" : "7G"
+    },
+    "decontam_human" :
+    {
+        "h_vmem" : "12G",
+        "mem_free" : "10G",
+        "m_mem_free" : "8G"
+    },
+    "kraken_classify" :
+    {
+        "h_vmem" : "15G",
+        "mem_free" : "12G",
+        "m_mem_free" : "10G"
+    },
+     "build_contigs" :
+    {
+        "h_vmem" : "100G",
+        "mem_free" : "90G",
+        "m_mem_free" : "50G"
+    },
+    "cap3" :
+    {
+        "h_vmem" : "16G",
+        "mem_free" : "15G",
+        "m_mem_free" : "12G"
+    }
+}
