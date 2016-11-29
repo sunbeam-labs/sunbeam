@@ -16,7 +16,7 @@ rule custom_removal:
         r2 = lambda wildcards: Samples[wildcards.sample]['R2']
     output:
         r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq')
+        r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq')
     params:
         fwd_adapters = " ".join(expand(
             "-b {adapter}", adapter=Cfg['qc']['fwd_adapters'])),
@@ -33,7 +33,7 @@ rule custom_removal:
 rule trimmomatic:
     input:
         r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq')
+        r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq')
     output:
         pair_r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
         pair_r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),

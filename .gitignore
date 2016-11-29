@@ -1,3 +1,4 @@
+.DS_Store
 .decontam_human.json
 config.yaml
 config.yml
@@ -7,3 +8,5 @@ config.yml
 output
 __pycache__
 tests/sunbeam-data
+configs/respublica_config.yml
+configs/example_config.yml
