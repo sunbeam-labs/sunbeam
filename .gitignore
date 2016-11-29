@@ -9,3 +9,4 @@ output
 __pycache__
 tests/sunbeam-data
 configs/respublica_config.yml
+configs/example_config.yml
