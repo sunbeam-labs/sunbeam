@@ -18,10 +18,10 @@ conda config --add channels bioconda
 conda config --add channels eclarke
 
 # Don't create the enviroment if it already exists
-conda env list | grep -q sunbeam-test || {
-    conda create --name=sunbeam-test --file=requirements.txt --yes;
+conda env list | grep -Fxq sunbeam || {
+    conda create --name=sunbeam --file=requirements.txt --yes;
     echo "Sunbeam successfully installed.";
 }
 
-echo "To get started, ensure ${PREFIX}/bin is in your path and run 'source activate sunbeam-test'"
+echo "To get started, ensure ${PREFIX}/bin is in your path and run 'source activate sunbeam'"
 
