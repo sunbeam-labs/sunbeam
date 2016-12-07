@@ -19,10 +19,10 @@ from sunbeam import build_sample_list
 from sunbeam.config import *
 from sunbeam.reports import *
 
-#if not config:
-#    raise SystemExit("\nNo config file specified; specify a config file using --configfile\n")
 
-configfile: "example_config.yml"
+if not config:
+	configfile: "configs/example_config.yml"
+
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)
@@ -39,12 +39,6 @@ MAPPING_FP = output_subdir(Cfg, 'mapping')
 # ---- Targets rules
 include: "rules/targets/targets.rules"
 
-# ---- Rule all: show intro message
-rule all:
-    input: TARGET_FP
-    run:
-        print("Samples found:")
-        pprint(sorted(list(Samples.keys())))
 
 # ---- Quality control rules
 include: "rules/qc/qc.rules"
@@ -74,3 +68,10 @@ include: "rules/classify/kraken.rules"
 # ---- Mapping rules
 include: "rules/mapping/bowtie.rules"
 #include: "rules/mapping/snap.rules"
+
+# ---- Rule all: show intro message
+rule all:
+    input: TARGET_FP
+    run:
+        print("Samples found:")
+        pprint(sorted(list(Samples.keys())))
