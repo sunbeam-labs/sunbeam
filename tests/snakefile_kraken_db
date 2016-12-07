@@ -1,0 +1,138 @@
+import re
+import csv
+from pathlib import Path
+from snakemake.utils import update_config
+
+
+default_config = {
+    'group': 'bacteria',
+    'kraken_db': '/home/chunyu/sunbeam/tests/local/db/bacteria'
+}
+
+
+def convert_to_genome_path(ftp_path):
+    path = re.match(
+        r'(ftp://ftp.ncbi.nlm.nih.gov/genomes/all/.*/)(GCF_.+)', ftp_path)
+    if path:
+        ftp, name = path.groups()
+        return "{ftp}{name}/{name}_genomic.fna.gz".format(
+            ftp=ftp, name=name)
+
+def generate_list(genome_urls_fp):
+    if not Path(genome_urls_fp).exists():
+        return []
+    urls = csv.DictReader(open(genome_urls_fp), fieldnames=['taxid','url'], delimiter='\t')
+    return [r['taxid'] for r in urls]
+
+
+update_config(default_config, config)
+config = default_config
+
+
+rule all:
+    input:
+        config['group']+"/genome_urls_small.txt",
+        expand(
+            "{group}/{taxid}/{taxid}.fna.gz",
+            group=config['group'],
+            taxid=generate_list(config['group']+'/genome_urls_small.txt'))
+
+
+
+rule assembly_summary:
+    output:
+        temp("{group}/assembly_summary.txt")
+    shell:
+        """
+        mkdir -p {wildcards.group}
+        curl 'ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/{wildcards.group}/assembly_summary.txt' > {output}
+        """
+
+rule genome_urls:
+    input:
+        "{group}/assembly_summary.txt"
+    output:
+        "{group}/genome_urls.txt"
+    run:
+        header = []
+        with open(input[0]) as infile:
+            infile.readline() # skip garbage line
+            header = infile.readline().strip().split('\t')
+            csvfile = csv.DictReader(infile, fieldnames=header, delimiter='\t')
+            with open(output[0], 'w') as out:
+                writer = csv.DictWriter(
+                    out, fieldnames=['taxid', 'url'], delimiter='\t')
+                for row in csvfile:
+                    if row.get('ftp_path'):
+                        genome_url = convert_to_genome_path(row['ftp_path'])
+                        writer.writerow(
+                            {'taxid': row['taxid'], 'url':genome_url})
+
+rule genome_urls_small:
+    input:
+        "{group}/genome_urls.txt"
+    output:
+        "{group}/genome_urls_small.txt"
+    shell:
+        """
+        grep '000009925.1\|000005845.2' {input} > {output}
+        """
+
+
+
+rule download_genome:
+    input:
+        "{group}/genome_urls_small.txt"
+    output:
+        "{group}/{taxid}/{taxid}.fna.gz"
+    run:
+        urls = csv.DictReader(open(input[0]), fieldnames=['taxid','url'], delimiter='\t')
+        for row in urls:
+            if row['taxid'] == wildcards.taxid:
+                shell("curl {row[url]} > {output}")
+                break
+
+rule download_group:
+    input:
+        config['group']+"/genome_urls_small.txt",
+        expand(
+            "{group}/{taxid}/{taxid}.fna.gz",
+            group=config['group'],
+            taxid=generate_list(config['group']+'/genome_urls_small.txt'))
+
+
+
+rule gunzip:
+    input:
+        "{fname}.gz"
+    output:
+        "{fname}"
+    shell:
+        "gunzip {input}"
+
+rule insert_kraken_taxid:
+    input:
+        "{group}/{taxid}/{taxid}.fna"
+    output:
+        temp("{group}/{taxid}/{taxid}.kraken.fna")
+    shell:
+        "sed -r 's/(>[^ ]*)/\\1|kraken:taxid|{wildcards.taxid} /' {input} > {output}"
+
+rule mask_lowercase:
+    input:
+        "{filename}.fna"
+    output:
+        "{filename}.masked.fna"
+    shell:
+        "dustmasker -in {input} -infmt fasta -outfmt fasta | sed -e '/>/!s/a\\|c\\|g\\|t/N/g' > {output}"
+
+rule add_group_to_kraken_db:
+    input:
+        expand(
+            "{group}/{taxid}/{taxid}.kraken.masked.fna",
+            group=config['group'],
+            taxid=generate_list(config['group']+'/genome_urls_small.txt'))
+    run:
+        for infile in input:
+            print(infile)
+            shell("kraken-build --add-to-library {infile} --db {config[kraken_db]}")
