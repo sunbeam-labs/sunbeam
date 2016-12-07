@@ -17,9 +17,9 @@ TARGET_DECONTAM = expand(str(QC_FP/'decontam'/'{sample}_{rp}.fastq'), sample = S
 ####################
 
 ### _kraken_all
-TARGET_KRAKEN = expand(str(CLASSIFY_FP/'kraken'/'{sample}-{type}.tsv'), sample = Samples.keys(), type=['taxa','mpa'])
+TARGET_KRAKEN = str(CLASSIFY_FP/'kraken'/'all_samples.tsv')
 TARGET_KRONA = expand(str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html'), sample = Samples.keys())
-TARGET_CLASSIFY = TARGET_KRAKEN + TARGET_KRONA
+TARGET_CLASSIFY = TARGET_KRAKEN
 
 ####################
 ## assembly
