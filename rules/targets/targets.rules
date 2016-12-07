@@ -31,7 +31,7 @@ TARGET_ASSEMBLY = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
 TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sample=Samples.keys())
 
 ### vsearch filter
-TARGET_TEST = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'), sample = Samples.keys())
+TARGET_VSEARCH = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'), sample = Samples.keys())
 
 ####################
 ## annotation
