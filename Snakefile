@@ -19,10 +19,13 @@ from sunbeam import build_sample_list
 from sunbeam.config import *
 from sunbeam.reports import *
 
+from util.varsub import varsub
 
 if not config:
 	configfile: "configs/example_config.yml"
 
+# ---- Substitute $HOME_DIR variable
+varsub(config)
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)
