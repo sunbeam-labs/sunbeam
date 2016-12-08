@@ -7,9 +7,10 @@
 rule _assembly_all:
     """Build contigs for all samples."""
     input:
-        expand(
-            str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
-            sample=Samples.keys())
+        expand(str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
+        	sample=Samples.keys()),
+        expand(str(ASSEMBLY_FP/'{sample}_assembly'/'.save'),
+        	sample=Samples.keys())
 
 rule merge_fq:
     input:
@@ -20,15 +21,15 @@ rule merge_fq:
     shell: "fq2fa --merge --filter {input.r1} {input.r2} {output}"
 
 
-rule build_contigs:
+rule idba_ud:
     input:
         str(ASSEMBLY_FP/'merged_reads'/'{sample}_merged.fasta')
     output:
-        str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa')
+    	str(ASSEMBLY_FP/'idba_ud'/'{sample}'/'contig.fa')
     log:
         str(ASSEMBLY_FP/'log'/'idba_ud'/'{sample}.out')
     params:
-        out_fp = str(ASSEMBLY_FP/'{sample}_assembly')
+        out_fp = str(ASSEMBLY_FP/'idba_ud'/'{sample}')
     threads:
         Cfg['assembly']['threads']
     shell:
@@ -40,10 +41,10 @@ rule build_contigs:
 
 rule cap3:
     input:
-        contig = str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa'),
+        contig = str(ASSEMBLY_FP/'idba_ud'/'{sample}'/'contig.fa'),
         cap3 = str(Cfg['assembly']['cap3_fp']/'cap3')
     output:
-        str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa')
+        str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
     log:
         str(ASSEMBLY_FP/'log'/'cap3'/'{sample}.out')
     shell:
@@ -51,6 +52,56 @@ rule cap3:
         {input.cap3} {input.contig} &> {log} && \
         cat {input.contig}.cap.singlets {input.contig}.cap.contigs > {output}
         """
+
+rule save_intermediates:
+    input:
+        I = str(ASSEMBLY_FP/'idba_ud'/'{sample}'/'contig.fa'),
+        C = str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
+    output:
+        I = str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa'),
+        C = str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
+        sentinel = str(ASSEMBLY_FP/'{sample}_assembly'/'.save')
+    shell:
+        """
+        cp {input.I} {output.I} && cp {input.C} {output.C} && \
+        touch {output.sentinel}
+        """
+
+rule final_filter:
+    input:
+        str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
+    output:
+        str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa')
+    params:
+        len = 300
+    log:
+        str(ASSEMBLY_FP/'log'/'vsearch'/'{sample}.log')
+    run:
+        filename = os.path.basename(input[0])
+        shell(
+        """
+        vsearch --sortbylength {input} \
+        --relabel {filename} --minseqlength {params.len} \
+        --output {input}.{params.len}f &> {log} && \
+        cp {input}.{params.len}f {output}
+        """)
+
+rule clean_up:
+    input:
+        I = str(ASSEMBLY_FP/'idba_ud'),
+        C = str(ASSEMBLY_FP/'cap3'),
+        M = str(ASSEMBLY_FP/'merged_reads')
+    shell:
+        """
+        rm -rf {input.I} && \
+        rm -rf {input.C} && \
+        rm -rf {input.M} && \
+        echo "Cleanup assembly finished."
+        """
+
+rule clean_logs:
+    shell:
+        "rm -rf logs && echo 'Logs deleted'"
 
 rule minimo:
     input:
