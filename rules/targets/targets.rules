@@ -26,7 +26,7 @@ TARGET_CLASSIFY = TARGET_KRAKEN
 ####################
 
 ### _assembly_all
-TARGET_ASSEMBLY = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'), sample = Samples.keys())
+TARGET_ASSEMBLY = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'), sample = Samples.keys()) + expand(str(ASSEMBLY_FP/'{sample}_assembly'/'.save'), sample = Samples.keys())
 ### _pair_all
 TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sample=Samples.keys())
 

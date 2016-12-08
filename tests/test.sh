@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-set -x
+#set -x
 
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
@@ -9,21 +9,29 @@ export PATH=$PATH:$HOME/miniconda3/bin
 source activate sunbeam
 command -v snakemake
 
-mkdir local
-mkdir data_files
+if [ ! local ]; then
+	mkdir local
+fi
 
 # Generate testing data: data_files
-python generate_dummy_data.py
+if [ ! -d data_files ]; then
+	mkdir data_files
+	python generate_dummy_data.py
+fi
 
 # Deploy kranken and blast databases
-bash deploy_kraken_db.sh
-bash deploy_blast_db.sh 
+if [ ! -d local/db/bacteria ]; then
+	bash deploy_kraken_db.sh
+fi
 
+if [ ! -d local/blast ]; then
+	bash deploy_blast_db.sh
+fi
 
 # Running snakemake
-echo $"Go to the top folder and run the following: "
-echo $"snakemake --configfile=tests/test_config.yml"
+echo "Go to the top folder and run the following: "
+echo "snakemake --configfile=tests/test_config.yml"
 
 # Here we just check to ensure it hits the expected genome
-cat tests/sunbeam_output/annotation/summary/dummybfragilis.tsv | grep "NC_006347.1" && return 0 || return 1
-
+echo "To check whether we hit the expected genome, run the following command:"
+echo "cat tests/sunbeam_output/annotation/summary/dummybfragilis.tsv | grep 'NC_006347.1' "
