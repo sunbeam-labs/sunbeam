@@ -50,7 +50,7 @@ classify:
   clark_targets: "bacteria viruses human"
   clark_level: "species"
   clark_version: "CLARK-l"
-  kraken_db_fp: "local/db/bacteriasmall"
+  kraken_db_fp: "local/db/bacterias"
   krona_fp: "/home/chunyu/miniconda3/envs/sunbeam-test/opt/krona"
 
 
