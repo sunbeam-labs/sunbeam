@@ -14,7 +14,7 @@
 
 # General options
 all:
-  root: "/home/chunyu/sunbeam-test" 
+  root: "/home/chunyu/sunbeam" 
   data_fp: "data_files"
   output_fp: "sunbeam_output"
   filename_fmt: "PCMP_{sample}_{rp}.fastq.gz"
