@@ -10,3 +10,5 @@ idba
 amos
 mga
 kraken-biom
+pear
+vsearch

@@ -35,7 +35,7 @@ qc:
   pct_id: 0.5
   frac: 0.6
   keep_sam: True
-  adapter_fp: "/home/chunyu/miniconda3/envs/sunbeam-test/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  adapter_fp: "/home/chunyu/miniconda3/envs/sunbeam/share/trimmomatic/adapters/NexteraPE-PE.fa"
   fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
 
@@ -51,7 +51,7 @@ classify:
   clark_level: "species"
   clark_version: "CLARK-l"
   kraken_db_fp: "/home/common/kraken/standard"
-  krona_fp: "/home/chunyu/miniconda3/envs/sunbeam-test/opt/krona"
+  krona_fp: "/home/chunyu/miniconda3/envs/sunbeam/opt/krona"
 
 
 # Contig assembly
