@@ -4,16 +4,26 @@ set -x
 
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
+
+# Activate the sunbeam environment
 source activate sunbeam
 command -v snakemake
 
-if [ ! -d tests/sunbeam-data ]; then
-    git clone --depth=1 https://github.com/eclarke/sunbeam-data tests/sunbeam-data
-fi
+mkdir local
+mkdir data_files
 
-mkdir local/db
+# Generate testing data: data_files
+python generate_dummy_data.py
 
-# Running snakemake without options should give a list of samples
-# Here we just check to ensure it outputted a sample name
-snakemake --configfile=tests/test-config.yml | grep HUP3D04 && return 0 || return 1
+# Deploy kranken and blast databases
+bash deploy_kraken_db.sh
+bash deploy_blast_db.sh 
+
+
+# Running snakemake
+echo $"Go to the top folder and run the following: "
+echo $"snakemake --configfile=tests/test_config.yml"
+
+# Here we just check to ensure it hits the expected genome
+cat tests/sunbeam_output/annotation/summary/dummybfragilis.tsv | grep "NC_006347.1" && return 0 || return 1
 
