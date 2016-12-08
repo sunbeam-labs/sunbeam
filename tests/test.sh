@@ -9,9 +9,10 @@ export PATH=$PATH:$HOME/miniconda3/bin
 source activate sunbeam
 command -v snakemake
 
-if [ ! local ]; then
-	mkdir local
-fi
+# Temporary
+pip install git+https://github.com/zhaoc1/decontam.git
+
+mkdir -p local
 
 # Generate testing data: data_files
 if [ ! -d data_files ]; then
