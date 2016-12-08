@@ -13,8 +13,10 @@
 #
 
 # General options
+HOME_DIR: /home/chunyu
+
 all:
-  root: "/home/chunyu/sunbeam/tests" 
+  root: "$HOME_DIR/sunbeam/tests"
   data_fp: "data_files"
   output_fp: "sunbeam_output"
   filename_fmt: "PCMP_{sample}_{rp}.fastq"
@@ -35,7 +37,7 @@ qc:
   pct_id: 0.5
   frac: 0.6
   keep_sam: True
-  adapter_fp: "/home/chunyu/miniconda3/envs/sunbeam-test/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  adapter_fp: "$HOME_DIR/miniconda3/envs/sunbeam/share/trimmomatic/adapters/NexteraPE-PE.fa"
   fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
 
@@ -51,14 +53,14 @@ classify:
   clark_level: "species"
   clark_version: "CLARK-l"
   kraken_db_fp: "local/db/bacteria"
-  krona_fp: "/home/chunyu/miniconda3/envs/sunbeam-test/opt/krona"
+  krona_fp: "$HOME_DIR/miniconda3/envs/sunbeam/opt/krona"
 
 
 # Contig assembly
 assembly:
   suffix: assembly
   threads: 4
-  cap3_fp: "/home/chunyu/sunbeam/local/CAP3"
+  cap3_fp: "$HOME_DIR/sunbeam/local/CAP3"
 
 
 # Contig annotation
