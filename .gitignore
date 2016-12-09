@@ -7,6 +7,8 @@ config.yml
 *.fastq.gz
 output
 __pycache__
-tests/sunbeam-data
+tests/sunbeam_output
+tests/bacteria
+tests/local
+tests/data_files
 configs/respublica_config.yml
-configs/example_config.yml
