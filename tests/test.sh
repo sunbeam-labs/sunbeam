@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+#set -e
 #set -x
 
 # Ensure we can activate the environment
@@ -11,6 +11,8 @@ command -v snakemake
 
 # Temporary
 pip install git+https://github.com/zhaoc1/decontam.git
+
+pushd tests
 
 mkdir -p local
 
@@ -29,10 +31,12 @@ if [ ! -d local/blast ]; then
 	bash deploy_blast_db.sh
 fi
 
+popd
+
 # Running snakemake
-echo "Go to the top folder and run the following: "
-echo "snakemake --configfile=tests/test_config.yml"
+echo "Now testing the snakemake: "
+snakemake --configfile=tests/test_config.yml
 
 # Here we just check to ensure it hits the expected genome
-echo "To check whether we hit the expected genome, run the following command:"
-echo "cat tests/sunbeam_output/annotation/summary/dummybfragilis.tsv | grep 'NC_006347.1' "
+echo "Now checking whether we hit the expected genome:"
+grep 'NC_006347.1' tests/sunbeam_output/annotation/summary/dummybfragilis.tsv  && return 0 || return 1
