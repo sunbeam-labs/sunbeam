@@ -25,7 +25,7 @@ if not config:
 	configfile: "configs/example_config.yml"
 
 # ---- Substitute $HOME_DIR variable
-varsub(config)
+#varsub(config)
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)
@@ -63,8 +63,8 @@ include: "rules/annotation/orf.rules"
 
 
 # ---- Classifier rules
-include: "rules/classify/classify.rules"
-include: "rules/classify/clark.rules"
+#include: "rules/classify/classify.rules"
+#include: "rules/classify/clark.rules"
 include: "rules/classify/kraken.rules"
 
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash flags: Do not commit to repo with these commented out
 set -e # Stop on errors
-set -x # Echo commands
+#set -x # Echo commands
 
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
@@ -29,36 +29,40 @@ trap cleanup EXIT
 
 pushd tests
 # Copy data into the temporary directory
+cp -r ../local $TEMPDIR/local
+cp -r indexes $TEMPDIR
 cp -r raw $TEMPDIR
 cp -r truncated_taxonomy $TEMPDIR
 cp -r indexes $TEMPDIR
+cp deploy_blast_db.sh $TEMPDIR
 python generate_dummy_data.py $TEMPDIR
 
 # Create a version of the config file customized for this tempdir
 sed "s|TEMPDIR|$TEMPDIR|g" test_config.yml > $TEMPDIR/tmp_config.yml
-sed -i "s|HOME|$HOME|g" $TEMPDIR/tmp_config.yml
+sed -i "s|HOMEDIR|$HOME|g" $TEMPDIR/tmp_config.yml
 popd
 
 
 pushd $TEMPDIR
 
-pwd
-ls -ahl
-# Generate testing data: data_files
-# mkdir -p data_files
-# python generate_dummy_data.py
+# Build fake kraken data
+kraken-build --db mindb --add-to-library raw/GCF_Bfragilis_10k_genomic.fna
+kraken-build --db mindb --add-to-library raw/GCF_Ecoli_10k_genomic.fna
+mv truncated_taxonomy mindb/taxonomy
+kraken-build --db mindb --build --kmer-len 16 --minimizer-len 1
+kraken-build --db mindb --clean
 
-# # Deploy kranken and blast databases
-# bash deploy_kraken_db.sh
-
-# bash deploy_blast_db.sh
+# Build fake blast database
+mkdir -p local/blast
+cat raw/*.fna > local/blast/bacteria.fa
+makeblastdb -dbtype nucl -in local/blast/bacteria.fa
 
 popd
 
 # Running snakemake
 echo "Now testing snakemake: "
-#snakemake --configfile=tests/test_config.yml
+snakemake --configfile=$TEMPDIR/tmp_config.yml
 
 # Here we just check to ensure it hits the expected genome
 echo "Now checking whether we hit the expected genome:"
-#grep 'NC_006347.1' tests/sunbeam_output/annotation/summary/dummybfragilis.tsv  && return 0 || return 1
+grep 'NC_006347.1' $TEMPDIR/sunbeam_output/annotation/summary/dummybfragilis.tsv

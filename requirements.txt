@@ -12,3 +12,4 @@ mga
 kraken-biom
 pear
 vsearch
+bwa

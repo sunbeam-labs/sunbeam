@@ -14,10 +14,8 @@
 
 # General options
 
-HOME_DIR: "HOME"
-
 all:
-  root: TEMPDIR
+  root: "TEMPDIR"
   data_fp: "data_files"
   output_fp: "sunbeam_output"
   filename_fmt: "PCMP_{sample}_{rp}.fastq"
@@ -28,19 +26,24 @@ all:
 # Quality control
 qc:
   suffix: qc
+  # Trimmomatic
   threads: 4
   java_heapsize: 512M
   leading: 3
   trailing: 3
   slidingwindow: [4,15]
   minlen: 36
-  host: human
-  pct_id: 0.5
-  frac: 0.6
-  keep_sam: True
-  adapter_fp: "$HOME_DIR/miniconda3/envs/sunbeam/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  adapter_fp: "HOMEDIR/miniconda3/envs/sunbeam/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  # Cutadapt
   fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
+  # Decontam.py
+  pct_id: 0.5
+  frac: 0.6
+  keep_sam: False
+  method: bwa
+  human_index_fp: "indexes/human.fasta"
+  phix_index_fp: "indexes/phix174.fasta"
 
 
 # Taxonomic classifications
@@ -48,7 +51,7 @@ classify:
   suffix: classify
   threads: 4
   kraken_db_fp: "mindb"
-
+  taxa_db_fp: ""
 
 # Contig assembly
 assembly:
