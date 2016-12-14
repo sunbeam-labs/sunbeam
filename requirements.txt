@@ -13,3 +13,4 @@ kraken-biom
 pear
 vsearch
 bwa
+jellyfish=1
