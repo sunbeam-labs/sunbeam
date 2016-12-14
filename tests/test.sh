@@ -27,6 +27,7 @@ function cleanup {
 # Calls cleanup when the script exits
 trap cleanup EXIT
 
+pushd tests
 # Copy data into the temporary directory
 cp -r raw $TEMPDIR
 cp -r truncated_taxonomy $TEMPDIR
@@ -36,6 +37,8 @@ python generate_dummy_data.py $TEMPDIR
 # Create a version of the config file customized for this tempdir
 sed "s|TEMPDIR|$TEMPDIR|g" test_config.yml > $TEMPDIR/tmp_config.yml
 sed -i "s|HOME|$HOME|g" $TEMPDIR/tmp_config.yml
+popd
+
 
 pushd $TEMPDIR
 
