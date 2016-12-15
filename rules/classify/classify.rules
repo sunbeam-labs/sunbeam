@@ -3,36 +3,36 @@
 # Short read classifiers:
 # 	Rules for running the kmer classifiers
 
-rule _test_CLARK:
-    input:
-        str(CLASSIFY_FP/'CLARK'/'Sample11c_S34-taxa.csv')
+# rule _test_CLARK:
+#     input:
+#         str(CLASSIFY_FP/'CLARK'/'Sample11c_S34-taxa.csv')
 
-rule _classify_all:
-    input:
-        expand(str(CLASSIFY_FP/'CLARK'/'{sample}-taxa.csv'),
-        sample=Samples.keys())
+# rule _classify_all:
+#     input:
+#         expand(str(CLASSIFY_FP/'CLARK'/'{sample}-taxa.csv'),
+#         sample=Samples.keys())
 
-rule krona:
-    input:
-        "{fname}.krn", 
-        str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
-    output:
-        "{fname}-krona.html"
-    shell:
-        """
-        ktImportTaxonomy \
-        -o {output} \
-        -m 3 \
-        -k \
-        -tax {Cfg[classify][taxa_db_fp]} \
-        {input}
-        """
+# rule krona:
+#     input:
+#         "{fname}.krn", 
+#         str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
+#     output:
+#         "{fname}-krona.html"
+#     shell:
+#         """
+#         ktImportTaxonomy \
+#         -o {output} \
+#         -m 3 \
+#         -k \
+#         -tax {Cfg[classify][taxa_db_fp]} \
+#         {input}
+#         """
     
-rule krona_taxonomy:
-    """Uses Krona's updateTaxonomy.sh to build the local NCBI taxa db."""
-    input:
-        str(Cfg['classify']['krona_fp']/'updateTaxonomy.sh')
-    output:
-        str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
-    shell:
-        """{input} {Cfg[classify][taxa_db_fp]}"""
+# rule krona_taxonomy:
+#     """Uses Krona's updateTaxonomy.sh to build the local NCBI taxa db."""
+#     input:
+#         str(Cfg['classify']['krona_fp']/'updateTaxonomy.sh')
+#     output:
+#         str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')
+#     shell:
+#         """{input} {Cfg[classify][taxa_db_fp]}"""

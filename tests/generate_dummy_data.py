@@ -79,7 +79,6 @@ if __name__ == '__main__':
 	if len(sys.argv) == 2:
 		rootpath = sys.argv[1]
 	else:
-		print("Use the same root path in test_config.yml; Update me when needed.")
-		rootpath = "/home/chunyu/sunbeam/tests"
+                raise SystemExit("Must specify an output directory")
 
 	generate_dummyfastq(rootpath)

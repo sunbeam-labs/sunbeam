@@ -12,3 +12,7 @@ mga
 kraken-biom
 pear
 vsearch
+bwa
+jellyfish=1.1.11=1
+cutadapt
+pysam
