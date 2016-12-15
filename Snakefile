@@ -19,8 +19,6 @@ from sunbeam import build_sample_list
 from sunbeam.config import *
 from sunbeam.reports import *
 
-from util.varsub import varsub
-
 if not config:
 	configfile: "configs/example_config.yml"
 
