@@ -1,4 +1,4 @@
-import warnings
+import pkg_resources
 import yaml
 from pathlib import Path
 
@@ -85,6 +85,12 @@ def process_databases(db_dict):
     if prot:
         dbs['prot'] = {db: str(root/path) for db, path in prot.items()}
     return dbs
-    
+
+
+def create_blank_config(conda_fp, project_fp):
         
-    
+    template = pkg_resources.resource_stream(
+        "sunbeamlib", "data/config_template.yml")
+
+    return template.read().decode().format(
+        CONDA_FP=conda_fp, PROJECT_FP=project_fp)

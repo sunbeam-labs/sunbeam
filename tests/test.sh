@@ -10,9 +10,6 @@ export PATH=$PATH:$HOME/miniconda3/bin
 source activate sunbeam
 command -v snakemake
 
-# Temporary
-pip install git+https://github.com/eclarke/decontam.git
-
 # Set up paths
 ROOT=`pwd`
 TEMPDIR=`mktemp -d`
@@ -38,8 +35,8 @@ cp deploy_blast_db.sh $TEMPDIR
 python generate_dummy_data.py $TEMPDIR
 
 # Create a version of the config file customized for this tempdir
-sed "s|TEMPDIR|$TEMPDIR|g" test_config.yml > $TEMPDIR/tmp_config.yml
-sed -i "s|HOMEDIR|$HOME|g" $TEMPDIR/tmp_config.yml
+sunbeam_init $TEMPDIR | python prep_config_file.py > $TEMPDIR/tmp_config.yml
+
 popd
 
 

@@ -20,6 +20,9 @@ conda config --add channels eclarke
 # Don't create the enviroment if it already exists
 conda env list | grep -Fxq sunbeam || {
     conda create --name=sunbeam --file=requirements.txt --yes;
+    source activate sunbeam
+    pip install .
+    pip install git+https://github.com/eclarke/decontam.git
     echo "Sunbeam successfully installed.";
 }
 
