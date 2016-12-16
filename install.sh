@@ -4,6 +4,8 @@ set -e
 
 PREFIX=$HOME/miniconda3
 
+SUNBEAM_ENV_NAME=${1-sunbeam}
+
 install_conda () {
     wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash Miniconda3-latest-Linux-x86_64.sh -b -p $PREFIX
@@ -18,13 +20,13 @@ conda config --add channels bioconda
 conda config --add channels eclarke
 
 # Don't create the enviroment if it already exists
-conda env list | grep -Fxq sunbeam || {
-    conda create --name=sunbeam --file=requirements.txt --yes;
-    source activate sunbeam
+conda env list | grep -Fxq $SUNBEAM_ENV_NAME || {
+    conda create --name=$SUNBEAM_ENV_NAME --file=requirements.txt --yes;
+    source activate $SUNBEAM_ENV_NAME
     pip install .
     pip install git+https://github.com/eclarke/decontam.git
     echo "Sunbeam successfully installed.";
 }
 
-echo "To get started, ensure ${PREFIX}/bin is in your path and run 'source activate sunbeam'"
+echo "To get started, ensure ${PREFIX}/bin is in your path and run 'source activate $SUNBEAM_ENV_NAME'"
 
