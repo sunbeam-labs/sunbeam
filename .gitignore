@@ -14,3 +14,4 @@ tests/data_files
 configs/respublica_config.yml
 *.yml
 *.yaml
+*.egg-*
