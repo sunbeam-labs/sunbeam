@@ -10,9 +10,9 @@ def _find_conda_fp():
     """Try to detect conda install in the path."""
     try:
         path = os.environ["PATH"].split(":")
-        conda_fp = Path([dir for dir in path if "conda" in dir][0]).parent
+        conda_fp = Path([p for p in path if "conda" in p][0]).parent
         return conda_fp
-    except (KeyError, IndexError) as e:
+    except (KeyError, IndexError):
         pass
 
     

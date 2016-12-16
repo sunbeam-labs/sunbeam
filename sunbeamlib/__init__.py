@@ -32,19 +32,19 @@ def build_sample_list(data_fp, filename_fmt, excluded):
     return Samples
 
 
-def index_files(genome):
+def index_files(genome, index_fp):
     """
     Return the bowtie index files for a file.
     """
     fwd, rev = (
         expand(
             "{index_fp}/{genome}.{index}.bt2",
-            index_fp=Cfg['bt2_index_fp'],
+            index_fp=index_fp,
             genome=genome,
             index=range(1,5)),
         expand(
             "{index_fp}/{genome}.rev.{index}.bt2",
-            index_fp=Cfg['bt2_index_fp'],
+            index_fp=index_fp,
             genome=genome,
             index=range(1,3))
     )

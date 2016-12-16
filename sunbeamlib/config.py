@@ -2,8 +2,6 @@ import pkg_resources
 import yaml
 from pathlib import Path
 
-from snakemake.workflow import expand
-from snakemake.utils import listfiles
 
 def makepath(path):
     return Path(path).expanduser()
@@ -46,9 +44,6 @@ def validate_paths(cfg, root):
 
 def check_config(cfg):
     """Resolve root in config file, then validate paths."""
-    # Remove HOME_DIR from further path validation 
-    cfg.pop("HOME_DIR", None)
-
     if 'root' in cfg['all']:
         root = verify(cfg['all']['root'])
     else:
