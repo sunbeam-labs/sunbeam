@@ -1,13 +1,14 @@
 import warnings
 warnings.filterwarnings('ignore', '.*experimental.*')
-import csv
 from pathlib import Path
-from collections import Counter, defaultdict
+from collections import Counter
 
 from Bio import SeqIO
 
 from Bio import SearchIO
 from Bio.SeqRecord import SeqRecord
+
+from xml.etree.ElementTree import ParseError
 
 from .parsers import MetaGeneAnnotation
 

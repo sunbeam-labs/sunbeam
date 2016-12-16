@@ -69,11 +69,11 @@ rule save_intermediates:
 
 rule final_filter:
     input:
-        str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
+        str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa')
     output:
         str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa')
     params:
-        len = 300
+        len = Cfg['assembly']['min_length']
     log:
         str(ASSEMBLY_FP/'log'/'vsearch'/'{sample}.log')
     run:
@@ -86,7 +86,7 @@ rule final_filter:
         cp {input}.{params.len}f {output}
         """)
 
-rule clean_up:
+rule clean_assembly:
     input:
         I = str(ASSEMBLY_FP/'idba_ud'),
         C = str(ASSEMBLY_FP/'cap3'),

@@ -9,7 +9,7 @@ from collections import Counter
 from pathlib import Path
 
 from Bio import SeqIO
-from sunbeam import circular
+from sunbeamlib import circular
 
 
 rule _aggregate_all:

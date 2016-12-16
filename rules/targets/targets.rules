@@ -41,5 +41,5 @@ TARGET_VSEARCH = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'),
 TARGET_ANNO = expand(str(ANNOTATION_FP/'summary'/'{sample}.tsv'), sample=Samples.keys())
 
 
-TARGET_FP = TARGET_CLASSIFY + TARGET_ASSEMBLY + TARGET_ANNO
+TARGET_FP = TARGET_CLASSIFY + TARGET_VSEARCH + TARGET_ANNO
 

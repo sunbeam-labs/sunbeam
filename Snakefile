@@ -15,11 +15,9 @@ from pathlib import Path
 from snakemake.utils import update_config, listfiles
 from snakemake.exceptions import WorkflowError
 
-from sunbeam import build_sample_list
-from sunbeam.config import *
-from sunbeam.reports import *
-
-from util.varsub import varsub
+from sunbeamlib import build_sample_list
+from sunbeamlib.config import *
+from sunbeamlib.reports import *
 
 if not config:
 	configfile: "configs/example_config.yml"

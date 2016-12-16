@@ -15,10 +15,10 @@
 # General options
 
 all:
-  root: "TEMPDIR"
+  root: "{PROJECT_FP}"
   data_fp: "data_files"
   output_fp: "sunbeam_output"
-  filename_fmt: "PCMP_{sample}_{rp}.fastq"
+  filename_fmt: "{{sample}}_{{rp}}.fastq"
   subcores: 4
   exclude: []
 
@@ -33,7 +33,7 @@ qc:
   trailing: 3
   slidingwindow: [4,15]
   minlen: 36
-  adapter_fp: "HOMEDIR/miniconda3/envs/sunbeam/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  adapter_fp: "{CONDA_FP}/share/trimmomatic/adapters/NexteraPE-PE.fa"
   # Cutadapt
   fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
@@ -56,6 +56,7 @@ classify:
 # Contig assembly
 assembly:
   suffix: assembly
+  min_length: 300
   threads: 4
   cap3_fp: "local/CAP3"
 

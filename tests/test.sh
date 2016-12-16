@@ -10,9 +10,6 @@ export PATH=$PATH:$HOME/miniconda3/bin
 source activate sunbeam
 command -v snakemake
 
-# Temporary
-pip install git+https://github.com/eclarke/decontam.git
-
 # Set up paths
 ROOT=`pwd`
 TEMPDIR=`mktemp -d`
@@ -25,7 +22,7 @@ function cleanup {
 }
 
 # Calls cleanup when the script exits
-trap cleanup EXIT
+#trap cleanup EXIT
 
 pushd tests
 # Copy data into the temporary directory
@@ -34,17 +31,14 @@ cp -r indexes $TEMPDIR
 cp -r raw $TEMPDIR
 cp -r truncated_taxonomy $TEMPDIR
 cp -r indexes $TEMPDIR
-cp deploy_blast_db.sh $TEMPDIR
 python generate_dummy_data.py $TEMPDIR
 
 # Create a version of the config file customized for this tempdir
-sed "s|TEMPDIR|$TEMPDIR|g" test_config.yml > $TEMPDIR/tmp_config.yml
-sed -i "s|HOMEDIR|$HOME|g" $TEMPDIR/tmp_config.yml
+sunbeam_init $TEMPDIR | python prep_config_file.py > $TEMPDIR/tmp_config.yml
+
 popd
 
-
 pushd $TEMPDIR
-
 # Build fake kraken data
 kraken-build --db mindb --add-to-library raw/GCF_Bfragilis_10k_genomic.fna
 kraken-build --db mindb --add-to-library raw/GCF_Ecoli_10k_genomic.fna
@@ -56,13 +50,16 @@ kraken-build --db mindb --clean
 mkdir -p local/blast
 cat raw/*.fna > local/blast/bacteria.fa
 makeblastdb -dbtype nucl -in local/blast/bacteria.fa
-
 popd
 
 # Running snakemake
 echo "Now testing snakemake: "
 snakemake --configfile=$TEMPDIR/tmp_config.yml
+snakemake --configfile=$TEMPDIR/tmp_config.yml clean_assembly
 
-# Here we just check to ensure it hits the expected genome
+# Check contents
 echo "Now checking whether we hit the expected genome:"
 grep 'NC_006347.1' $TEMPDIR/sunbeam_output/annotation/summary/dummybfragilis.tsv
+
+# Check targets
+python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt 

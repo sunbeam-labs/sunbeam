@@ -1,4 +1,3 @@
-from collections import namedtuple
 
 class MetaGeneAnnotation(object):
 
@@ -15,7 +14,6 @@ class MetaGeneAnnotation(object):
         contig_id = ''
         model = ''
         contig = None
-        in_record = True
         for line in lines:
             if line.startswith("# gc ="):
                 # I don't care about this stuff

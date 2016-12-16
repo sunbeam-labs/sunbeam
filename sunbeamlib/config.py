@@ -1,9 +1,7 @@
-import warnings
+import pkg_resources
 import yaml
 from pathlib import Path
 
-from snakemake.workflow import expand
-from snakemake.utils import listfiles
 
 def makepath(path):
     return Path(path).expanduser()
@@ -46,9 +44,6 @@ def validate_paths(cfg, root):
 
 def check_config(cfg):
     """Resolve root in config file, then validate paths."""
-    # Remove HOME_DIR from further path validation 
-    cfg.pop("HOME_DIR", None)
-
     if 'root' in cfg['all']:
         root = verify(cfg['all']['root'])
     else:
@@ -85,6 +80,12 @@ def process_databases(db_dict):
     if prot:
         dbs['prot'] = {db: str(root/path) for db, path in prot.items()}
     return dbs
-    
+
+
+def create_blank_config(conda_fp, project_fp):
         
-    
+    template = pkg_resources.resource_stream(
+        "sunbeamlib", "data/config_template.yml")
+
+    return template.read().decode().format(
+        CONDA_FP=conda_fp, PROJECT_FP=project_fp)
