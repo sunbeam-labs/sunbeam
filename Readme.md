@@ -44,10 +44,23 @@ samples to work on.
 
 ## Using sunbeam
 
-To get started, make a copy of the `tests/test-config.yml` file in the same
-directory as the `Snakefile` and name it something like `my-config.yml`.
+Before you get started, you just need to have a folder in mind that will be your
+'project folder'. This should contain a subfolder with your sequence data
+in it.
 
-Next, edit the config file to point to the various paths for your data and
+To get started, activate the sunbeam environment via `source activate sunbeam` 
+and then run the following command, with the name of your folder instead of
+`{path_to_project_folder}` and a custom name instead of `{project_config.yml}`.
+
+```
+sunbeam_init {path_to_project_folder} > {project_config.yml}
+```
+
+For example, if I have a project about ocean viruses, I would run this:
+
+`sunbeam_init /home/erik/OceanVirome > ocean_virome_config.yml`
+
+Next, edit the resulting config file to point to the various paths for your data and
 output directories, as shown below:
 
 ### Defining samples to work on
