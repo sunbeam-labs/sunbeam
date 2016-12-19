@@ -1,4 +1,4 @@
-# Sunbeam: an iridescent virome pipeline 
+# Sunbeam: an iridescent high-throughput sequencing pipeline 
 <img src="http://i.imgur.com/VW3pvQM.jpg" width=240> 
 
 [![Build Status](https://travis-ci.org/eclarke/sunbeam.svg?branch=master)](https://travis-ci.org/eclarke/sunbeam) 
@@ -8,15 +8,14 @@
 
 Named after the iridescent scales of the sunbeam snake, _Xenopeltis unicolor_,
 this is a [Snakemake](https://bitbucket.org/snakemake/snakemake/)-based pipeline
-for identifying viral artifacts from high-throughput sequencing reads.
+for creating various products from high-throughput sequencing reads.
 
 Right now, the pipeline handles:
 
 - quality control (Trimmomatic, fastqc)
 - host read filtering (PMCP _decontam_)
-- kmer classification (kraken, CLARK)
-- visualization (krona)
-- contig assembly (idba_ud, minimo)
+- kmer classification (kraken)
+- contig assembly (idba_ud + CAP3)
 - nucleotide search and alignment (blastn, bowtie2)
 - ORF prediction (MetaGene Annotator)
 - protein blast on predicted genes (blastp, blastx)
@@ -86,7 +85,7 @@ parameter would be `{sample}_L001_{rp}.fastq.gz`.
 
 Currently, a number of the annotation and classification rules require specific
 copies of their databases to be accessible. If you are not ready to use them,
-you can leave their paths as blank and the automated checker will not complain
+you can leave their paths blank and the automated checker will not complain
 about them being invalid. 
 
 ### Running sunbeam
