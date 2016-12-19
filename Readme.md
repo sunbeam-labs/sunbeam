@@ -91,9 +91,26 @@ about them being invalid.
 ### Running sunbeam
 
 ```sh
-snakemake --configfile=<my-config.yml>
+snakemake --configfile=<my-config.yml> [optional rule]
 ```
 
-will print out a list of samples that it found according to your specified
-config file and invites you to peruse the list of rules by executing 
-`snakemake --configfile=<my-config.yml> --list`.
+Running sunbeam without specifying a rule will perform, by default:
+
+- quality control
+- host read filtering
+- read-level classification from given Kraken database
+- contig assembly
+- gene detection
+- blasting of genes and contigs against given databases
+
+Each step of this can be run piecemeal by using the rules starting with "all", such as:
+
+- all_qc: quality control on all reads
+- all_decontam: remove all host reads
+- all_classify: classify all reads
+- all_assembly: build contigs
+- all_annotate: annotate all contigs
+
+Example: decontaminate all host reads with ```snakemake --configfile=my_config.yml all_decontam```
+
+You can also see what samples Sunbeam detected by running ```snakemake --configfile=my_config.yml samples```.
