@@ -4,13 +4,10 @@
 #
 # Requires IDBA_UD and CAP3.
 
-rule _assembly_all:
+rule all_assembly:
     """Build contigs for all samples."""
     input:
-        expand(str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
-        	sample=Samples.keys()),
-        expand(str(ASSEMBLY_FP/'{sample}_assembly'/'.save'),
-        	sample=Samples.keys())
+        TARGET_ASSEMBLY
 
 rule merge_fq:
     input:
@@ -97,22 +94,4 @@ rule clean_assembly:
         rm -rf {input.C} && \
         rm -rf {input.M} && \
         echo "Cleanup assembly finished."
-        """
-
-rule clean_logs:
-    shell:
-        "rm -rf logs && echo 'Logs deleted'"
-
-rule minimo:
-    input:
-        str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa')
-    output:
-        block = temp(str(ASSEMBLY_FP/'{sample}_assembly'/'contig-contigs.fa')),
-        unblock = str(ASSEMBLY_FP/'{sample}_assembly'/'minimo-contigs.fa')
-    log:
-        str(ASSEMBLY_FP/'log'/'minimo'/'{sample}.out')
-    shell:
-        """
-        Minimo {input} -D FASTA_EXP=1 &> {log} && \
-        perl local/bin/unblock_fasta.pl {output.block} > {output.unblock}
         """

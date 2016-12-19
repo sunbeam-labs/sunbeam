@@ -2,13 +2,10 @@
 #
 # Illumina quality control rules
 
-rule _qc_all:
+rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
     input:
-        expand(
-            str(QC_FP/'paired'/'{sample}_{rp}_fastqc.zip'),
-            sample = Samples.keys(),
-            rp = ['R1', 'R2'])
+        TARGET_QC
 
 rule custom_removal:
     input:

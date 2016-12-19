@@ -6,40 +6,39 @@
 ## qc
 ####################
 
-### _qc_all
+### Quality-control reads
 TARGET_QC = expand(str(QC_FP/'paired'/'{sample}_{rp}_fastqc.zip'), sample = Samples.keys(), rp = ['R1','R2'])
 
-### _decontam_all
+### Remove host reads
 TARGET_DECONTAM = expand(str(QC_FP/'decontam'/'{sample}_{rp}.fastq'), sample = Samples.keys(), rp = ['R1', 'R2'])
 
 ####################
 ## classify
 ####################
 
-### _kraken_all
+### Classify all reads
 TARGET_KRAKEN = [str(CLASSIFY_FP/'kraken'/'all_samples.tsv')]
-TARGET_KRONA = expand(str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html'), sample = Samples.keys())
 TARGET_CLASSIFY = TARGET_KRAKEN
 
 ####################
 ## assembly
 ####################
 
-### _assembly_all
-TARGET_ASSEMBLY = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'), sample = Samples.keys()) + expand(str(ASSEMBLY_FP/'{sample}_assembly'/'.save'), sample = Samples.keys())
-### _pair_all
+### Assemble contigs
+TARGET_ASSEMBLY = (
+    expand(str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'),
+           sample = Samples.keys()) +
+    expand(str(ASSEMBLY_FP/'{sample}_assembly'/'.save'),
+           sample = Samples.keys()))
+## Pair reads
 TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sample=Samples.keys())
-
-### vsearch filter
-TARGET_VSEARCH = expand(str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'), sample = Samples.keys())
 
 ####################
 ## annotation
 ####################
 
-## _annotation_all
-TARGET_ANNO = expand(str(ANNOTATION_FP/'summary'/'{sample}.tsv'), sample=Samples.keys())
+## Annotate all contigs
+TARGET_ANNOTATE = expand(str(ANNOTATION_FP/'summary'/'{sample}.tsv'), sample=Samples.keys())
 
-
-TARGET_FP = TARGET_CLASSIFY + TARGET_VSEARCH + TARGET_ANNO
+TARGET_ALL = TARGET_CLASSIFY + TARGET_ASSEMBLY + TARGET_ANNOTATE
 

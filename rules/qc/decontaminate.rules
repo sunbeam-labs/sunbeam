@@ -4,12 +4,10 @@
 #
 # Requires eclarke/decontam (fork for py3+ compatibility)
 
-rule _decontam_all:
+rule all_decontam:
     """Decontaminate all samples."""
     input:
-        expand(
-            str(QC_FP/'decontam'/'{sample}_{rp}.fastq'),
-            sample=Samples.keys(), rp=['R1', 'R2'])
+        TARGET_DECONTAM
 
 rule gunzip:
     input: "{filename}.fastq.gz"
