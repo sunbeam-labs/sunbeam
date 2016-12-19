@@ -20,7 +20,9 @@ from sunbeamlib.config import *
 from sunbeamlib.reports import *
 
 if not config:
-	configfile: "configs/example_config.yml"
+        raise SystemExit(
+                "No config file specified. Run `sunbeam_init` to generate a "
+                "config file, and specify with --configfile")
 
 # ---- Substitute $HOME_DIR variable
 #varsub(config)
@@ -71,8 +73,7 @@ include: "rules/mapping/bowtie.rules"
 #include: "rules/mapping/snap.rules"
 
 # ---- Rule all: show intro message
-rule all:
-    input: TARGET_FP
+rule samples:
     run:
         print("Samples found:")
         pprint(sorted(list(Samples.keys())))
