@@ -12,33 +12,31 @@ from Bio import SeqIO
 from sunbeamlib import circular
 
 
-rule _aggregate_all:
+rule all_annotate:
     input:
-        expand(
-            str(ANNOTATION_FP/'summary'/'{sample}.tsv'),
-            sample=Samples.keys())
+        TARGET_ANNOTATE
 
-rule filter_fasta:
-    """Filter contigs by size."""    
-    input:
-        str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa')
-    output:
-        fp = str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa')
-    run:
-        n_contigs = 0
-        n_kept = 0
-        with open(output.fp, 'w') as out:
-            for record in SeqIO.parse(input[0], 'fasta'):
-                n_contigs += 1
-                if len(record) >= Cfg['annotation']['min_contig_len']:
-                    n_kept += 1
-                    SeqIO.write(record, out, 'fasta')
-        results = "%s: %d of %d contigs kept" % (wildcards.sample, n_kept, n_contigs)
-        print(results)
+# rule filter_fasta:
+#     """Filter contigs by size."""    
+#     input:
+#         str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa')
+#     output:
+#         fp = str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa')
+#     run:
+#         n_contigs = 0
+#         n_kept = 0
+#         with open(output.fp, 'w') as out:
+#             for record in SeqIO.parse(input[0], 'fasta'):
+#                 n_contigs += 1
+#                 if len(record) >= Cfg['annotation']['min_contig_len']:
+#                     n_kept += 1
+#                     SeqIO.write(record, out, 'fasta')
+#         results = "%s: %d of %d contigs kept" % (wildcards.sample, n_kept, n_contigs)
+#         print(results)
 
 rule aggregate_results:
     input:
-        contigs=str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
+        contigs=str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'),
         contig_results=expand(
             str(ANNOTATION_FP/'blastn'/'{db}'/'contig'/'{{sample}}.xml'),
             db=Blastdbs['nucl']),

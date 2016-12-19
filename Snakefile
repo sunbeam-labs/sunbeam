@@ -72,7 +72,10 @@ include: "rules/classify/kraken.rules"
 include: "rules/mapping/bowtie.rules"
 #include: "rules/mapping/snap.rules"
 
-# ---- Rule all: show intro message
+# ---- Rule all: run all targets
+rule all:
+    input: TARGET_ALL
+
 rule samples:
     run:
         print("Samples found:")

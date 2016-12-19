@@ -29,7 +29,7 @@ rule find_genes_mga:
 rule parse_genes_mga:
     """Parse output from MetaGene Annotator into a set of genes."""
     input:
-        contigs=str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
+        contigs=str(ANNOTATION_FP/'{sample}_assembly'/'final-contigs.fa'),
         genes=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_contigs.genes')
     output:
         nucl=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_nucl.fa'),

@@ -12,7 +12,7 @@ from xml.etree.ElementTree import ParseError
 rule run_blastn:
     """Run BLASTn against a given database and write the results to XML."""    
     input:
-        contigs=str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa'),
+        contigs=str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'),
     output:
         str(ANNOTATION_FP/'blastn'/'{db}'/'{contigs}'/'{sample}.xml')
     params:
