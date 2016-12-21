@@ -25,6 +25,9 @@ def main():
         "init", description="Initialize a new sunbeam project")
     parser.add_argument("project_fp", help="Project root directory")
     parser.add_argument(
+        "--server", choices=['microb120','microb191','pmacs','respublica'],
+        help="Some servers have prebuilt configs; specify one here to use it.")
+    parser.add_argument(
         "--conda_fp", default=conda_fp, type=Path,
         help="path to conda (default: %(default)s)"
     )
@@ -39,6 +42,7 @@ def main():
     else:
         args.conda_fp = args.conda_fp.absolute()
 
-    config = create_blank_config(args.conda_fp, args.project_fp)
+    config = create_blank_config(
+        args.conda_fp, args.project_fp, template=args.server)
     sys.stdout.write(config)
 
