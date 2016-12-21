@@ -5,7 +5,7 @@ setup(
     version="0.1.0",
     packages=["sunbeamlib"],
     include_package_data=True,
-    package_data={"sunbeamlib": ["sunbeamlib/data/config_template.yml"]},
+    package_data={"sunbeamlib": ["sunbeamlib/data/*.yml"]},
     entry_points={'console_scripts': ['sunbeam_init = sunbeamlib.initialize:main']},
     classifiers=[
         'Development Status :: 3 - Alpha',

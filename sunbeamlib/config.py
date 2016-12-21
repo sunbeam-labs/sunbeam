@@ -1,3 +1,4 @@
+import sys
 import pkg_resources
 import yaml
 from pathlib import Path
@@ -82,10 +83,24 @@ def process_databases(db_dict):
     return dbs
 
 
-def create_blank_config(conda_fp, project_fp):
-        
-    template = pkg_resources.resource_stream(
-        "sunbeamlib", "data/config_template.yml")
+def create_blank_config(conda_fp, project_fp, template="default"):
 
-    return template.read().decode().format(
+    if template=="microb120":
+        template_stream = pkg_resources.resource_stream(
+            "sunbeamlib", "data/microb120_config.yml")
+    elif template=="microb191":
+        template_stream = pkg_resources.resource_stream(
+            "sunbeamlib", "data/microb191_config.yml")
+    elif template=="pmacs":
+        template_stream = pkg_resources.resource_stream(
+            "sunbeamlib", "data/pmacs_config.yml")
+    elif template=="respublica":
+        template_stream = pkg_resources.resource_stream(
+            "sunbeamlib", "data/default_config.yml")
+    else:
+        sys.stderr.write("Using default config template...\n")
+        template_stream = pkg_resources.resource_stream(
+            "sunbeamlib", "data/default_config.yml")
+
+    return template_stream.read().decode().format(
         CONDA_FP=conda_fp, PROJECT_FP=project_fp)
