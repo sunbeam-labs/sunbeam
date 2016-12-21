@@ -26,7 +26,8 @@ Right now, the pipeline handles:
 Sunbeam uses [conda](http://conda.pydata.org/miniconda.html). To deploy
 automatically, run `install.sh`. The script will download and install Miniconda3
 to the home folder automatically if it does not exist, and builds an environment
-with the needed dependencies.
+with the needed dependencies. If you're having issues, make sure to add 
+`miniconda3/bin` to your `PATH`.
 
 ## High-level overview
 
