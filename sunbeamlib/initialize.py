@@ -44,5 +44,6 @@ def main():
 
     config = create_blank_config(
         args.conda_fp, args.project_fp, template=args.server)
+    
     sys.stdout.write(config)
 
