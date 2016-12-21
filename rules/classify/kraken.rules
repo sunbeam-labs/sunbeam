@@ -71,18 +71,3 @@ rule kraken_mpa_report:
         {input} > {output}
         """
         
-rule kraken_krona:
-    input:
-        str(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv'),
-        str(Cfg['classify']['taxa_db_fp']/'taxonomy.tab')		
-    output:
-        str(CLASSIFY_FP/'kraken'/'krona'/'{sample}-krona.html')
-    shell:
-        """
-        ktImportTaxonomy \
-        -o {output} \
-        -t 5 \
-        -m 3 \
-        -tax {Cfg[classify][taxa_db_fp]} \
-        {input}
-        """
