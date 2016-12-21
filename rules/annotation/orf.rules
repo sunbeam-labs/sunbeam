@@ -20,7 +20,7 @@ rule _test_genes_mga:
 rule find_genes_mga:
     """Use MetaGene Annotator to find genes in contigs."""
     input:
-        str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa')
+        str(ANNOTATION_FP/'{sample}_assembly'/'final-contigs.fa')
     output:
         str(ANNOTATION_FP/'genes'/'mga'/'{sample}_contigs.genes')
     shell:
