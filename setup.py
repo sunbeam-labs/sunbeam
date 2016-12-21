@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="sunbeam",
-    version="0.1.0",
+    version="0.1.1",
     packages=["sunbeamlib"],
     include_package_data=True,
     package_data={"sunbeamlib": ["sunbeamlib/data/*.yml"]},
