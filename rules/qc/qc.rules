@@ -14,16 +14,22 @@ rule custom_removal:
     output:
         r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq')
-    params:
-        fwd_adapters = " ".join(expand(
-            "-b {adapter}", adapter=Cfg['qc']['fwd_adapters']))
-        rev_adapters = " ".join(expand(
-            "-B {adapter}", adapter=Cfg['qc']['rev_adapters']))
     run:
-        if Cfg['qc']['fwd_adapters'] or Cfg['qc']['rev_adapters']:
+        fwd_adapters = Cfg['qc']['fwd_adapters']
+        rev_adapters = Cfg['qc']['rev_adapters']
+        if fwd_adapters or rev_adapters:
+            overlap = float('inf')
+            if fwd_adapters:
+                overlap = min(min(len(a) for a in fwd_adapters), overlap)
+                fwd_adapter_str = " ".join(expand(
+                    "-b {adapter}", adapter=Cfg['qc']['fwd_adapters']))
+            if rev_adapters:
+                overlap = min(min(len(a) for a in rev_adapters), overlap)
+                rev_adapter_str = " ".join(expand(
+                    "-B {adapter}", adapter=Cfg['qc']['rev_adapters']))
             shell("""
-            cutadapt --discard-trimmed\
-            {params.fwd_adapters} {params.rev_adapters} \
+            cutadapt --discard-trimmed -O {overlap} \
+            {fwd_adapter_str} {rev_adapter_str} \
             -o {output.r1} -p {output.r2} \
             {input.r1} {input.r2}
             """)
