@@ -35,8 +35,7 @@ rule custom_removal:
             """)
         else:
             shell("""
-            ln -s {input.r1} {output.r1} \
-            ln -s {input.r2} {output.r2}
+            ln -s {input.r1} {output.r1} && ln -s {input.r2} {output.r2}
             """)
 
         

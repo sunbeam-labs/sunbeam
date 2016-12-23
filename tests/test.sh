@@ -62,3 +62,13 @@ grep 'NC_006347.1' $TEMPDIR/sunbeam_output/annotation/summary/dummybfragilis.tsv
 
 # Check targets
 python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt 
+
+# Bugfix/feature tests: add as needed
+
+# Fix for #38: Make Cutadapt optional
+# -- Remove adapter sequences and check to make sure qc proceeds correctly
+sed 's/adapters: \[.*\]/adapters: \[\]/g' $TEMPDIR/tmp_config.yml > $TEMPDIR/tmp_config_nocutadapt.yml
+rm -rf $TEMPDIR/sunbeam_output/qc
+snakemake --configfile=$TEMPDIR/tmp_config_nocutadapt.yml all_decontam
+[ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R1.fastq ]
+[ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R2.fastq ]
