@@ -16,16 +16,23 @@ rule custom_removal:
         r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq')
     params:
         fwd_adapters = " ".join(expand(
-            "-b {adapter}", adapter=Cfg['qc']['fwd_adapters'])),
+            "-b {adapter}", adapter=Cfg['qc']['fwd_adapters']))
         rev_adapters = " ".join(expand(
             "-B {adapter}", adapter=Cfg['qc']['rev_adapters']))
-    shell:
-        """
-        cutadapt --discard-trimmed\
-        {params.fwd_adapters} {params.rev_adapters} \
-        -o {output.r1} -p {output.r2} \
-        {input.r1} {input.r2}
-        """
+    run:
+        if Cfg['qc']['fwd_adapters'] or Cfg['qc']['rev_adapters']:
+            shell("""
+            cutadapt --discard-trimmed\
+            {params.fwd_adapters} {params.rev_adapters} \
+            -o {output.r1} -p {output.r2} \
+            {input.r1} {input.r2}
+            """)
+        else:
+            shell("""
+            ln -s {input.r1} {output.r1} \
+            ln -s {input.r2} {output.r2}
+            """)
+
         
 rule trimmomatic:
     input:
