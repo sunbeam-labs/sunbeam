@@ -115,3 +115,27 @@ Each step of this can be run piecemeal by using the rules starting with "all", s
 Example: decontaminate all host reads with ```snakemake --configfile=my_config.yml all_decontam```
 
 You can also see what samples Sunbeam detected by running ```snakemake --configfile=my_config.yml samples```.
+
+
+## Updating Sunbeam
+
+To update sunbeam when a new version is released, it's easiest to simply remove the sunbeam conda environment and reinstall:
+
+```shell
+conda env -d sunbeam
+cd path/to/sunbeam
+git pull
+bash install.sh
+```
+
+## Troubleshooting
+
+- **Q**: When I type `source activate sunbeam`, I get an error.
+- **A**: Make sure that miniconda3 is in your `PATH`: type `echo $PATH` and look for miniconda there. If it does not exist, edit your `.profile` or `.bashrc` file in your home directory and add a line like this: 
+    
+    ```
+    export PATH=$PATH:$HOME/miniconda3/bin
+    ```
+
+- **Q**: I get an error relating to missing files when running on a cluster, and nothing continues after that point.
+- **A**: Increase the waiting time for files to appear by adding `-w 90` to the snakemake command. 
