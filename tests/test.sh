@@ -1,7 +1,6 @@
 #!/bin/bash
 # Bash flags: Do not commit to repo with these commented out
 set -e # Stop on errors
-#set -x # Echo commands
 
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
@@ -22,7 +21,7 @@ function cleanup {
 }
 
 # Calls cleanup when the script exits
-#trap cleanup EXIT
+trap cleanup EXIT
 
 pushd tests
 # Copy data into the temporary directory
