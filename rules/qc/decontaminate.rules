@@ -30,7 +30,7 @@ rule decontam_human:
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
         --organism human \
         --method {Cfg[qc][method]} \
-        --index {Cfg[qc][human_index_fp]} \
+        --index {Cfg[qc][human_genome_fp]} \
         --summary-file {log} \
         --output-dir {params.out_fp} \
         """
@@ -51,7 +51,7 @@ rule decontam_phix:
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
         --organism phix \
         --method {Cfg[qc][method]} \
-        --index {Cfg[qc][human_index_fp]} \
+        --index {Cfg[qc][phix_genome_fp]} \
         --summary-file {log} \
         --output-dir {params.out_fp}
         """
