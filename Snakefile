@@ -32,7 +32,7 @@ def build_sample_from_barcode(bc_file):
     ids = []
     for line in lines:
          ids.append(line.split("\t")[0])
-    # tofix: not sure about adding the path of actual reads
+    # todo: not sure about adding the path of actual reads
     Samples = dict((id,"paired") for id in ids)
     return Samples
 
@@ -48,16 +48,17 @@ if not config:
 Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
 
+# ---- If the data_fp is empty, then read sample names from barcode_fp
 if str(Cfg['all']['root']) != str(Cfg['all']['data_fp']):
      Samples = build_sample_list(Cfg['all']['data_fp'], Cfg['all']['filename_fmt'], Cfg['all']['exclude'])
 else:
-     Samples = build_sample_from_barcode(Cfg['all']['barcode_fp'])
+     Samples = build_sample_from_barcode(Cfg['all']['barcode_fp']) #todo: check existing of barcode_fp ?
 
 # ---- Set up output paths for the various steps
 QC_FP = output_subdir(Cfg, 'qc')
 ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
-CLASSIFY_FP = output_subdir(Cfg, 'classify')
 ANNOTATION_FP = output_subdir(Cfg, 'annotation')
+CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
 
 # ---- Change your workdir so .snakemake won't take all the space in the head node
