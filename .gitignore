@@ -1,7 +1,8 @@
 .DS_Store
 .decontam_human.json
-config.yaml
-config.yml
+config*.yaml
+config*.yml
+configs/config*.yml
 .snakemake
 \#*
 *.fastq.gz
@@ -15,3 +16,6 @@ configs/respublica_config.yml
 *.yml
 *.yaml
 *.egg-*
+local/PathwayAbundanceFinder
+local/*.sh
+local/RAPSearch2

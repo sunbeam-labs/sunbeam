@@ -28,8 +28,10 @@ rule bt2_map_contigs:
         temp(str(MAPPING_FP/'{genome}'/'{sample}/reads.sam'))
     params:
         idx=str(Cfg['mapping']['genomes_fp']/'{genome}')
+    threads:
+        Cfg['mapping']['threads']
     shell:
-        "bowtie2 -x {params.idx} -1 {input.r1} -2 {input.r2} -S {output} -p {Cfg[all][subcores]}"
+        "bowtie2 -x {params.idx} -p {threads} -1 {input.r1} -2 {input.r2} -S {output}"
 
 rule sam_to_bam:
     input: "{fname}.sam"
@@ -57,10 +59,28 @@ rule bam_stats:
 rule _map_all:
     input:
         expand(
-            str(MAPPING_FP/'t_gondii'/'{sample}'/'reads.stats'),
-            sample=Samples.keys())
+            str(MAPPING_FP/'{genome}'/'{sample}'/'reads.stats'),
+            sample=Samples.keys(),
+            genome=["GCA_000328385.1_Cuti_1.0_genomic","GCF_000003835.1_ASM383v1_genomic","GCF_000182965.3_ASM18296v3_genomic","GCA_001417885.1_Kmar_1.0_genomic", "GCF_000146045.2_R64_genomic"]),
+        expand(
+            str(MAPPING_FP/'{genome}'/'{sample}'/'{sample}.reads.coverage.pdf'),
+            sample=Samples.keys(),
+	    genome=["GCA_000328385.1_Cuti_1.0_genomic","GCF_000003835.1_ASM383v1_genomic","GCF_000182965.3_ASM18296v3_genomic","GCA_001417885.1_Kmar_1.0_genomic", "GCF_000146045.2_R64_genomic"])
            
 rule _test_bt2:
     input:
         expand(str(MAPPING_FP/'t_gondii_COUG'/'{sample}/reads.stats'),
                sample='Sample2c_S30')
+
+rule plot_coverage:
+    input:
+        s = str(MAPPING_FP/'{genome}'/'{sample}'/'reads.sorted.bam'),
+        R = str(Cfg['mapping']['Rscript'])
+    output:
+        f = str(MAPPING_FP/'{genome}'/'{sample}'/'{sample}.reads.coverage.pdf'),
+        t = str(MAPPING_FP/'{genome}'/'{sample}'/'reads.coverage')
+    shell:
+        """
+        samtools depth {input.s} 1> {output.t} && \
+        Rscript {input.R} {output.t} {output.f}
+        """

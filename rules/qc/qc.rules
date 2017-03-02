@@ -1,6 +1,9 @@
+
 # -*- mode: Snakemake -*-
 #
 # Illumina quality control rules
+
+localrules: custom_removal
 
 rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
@@ -44,10 +47,10 @@ rule trimmomatic:
         r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq')
     output:
-        pair_r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
-        pair_r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),
-        unpair_r1 = str(QC_FP/'unpaired'/'{sample}_R1_unpaired.fastq.gz'),
-        unpair_r2 = str(QC_FP/'unpaired'/'{sample}_R2_unpaired.fastq.gz')
+        pair_r1 = str(QC_FP/'paired'/'{sample}_R1.fastq'),
+        pair_r2 = str(QC_FP/'paired'/'{sample}_R2.fastq'),
+        unpair_r1 = str(QC_FP/'unpaired'/'{sample}_R1_unpaired.fastq'),
+        unpair_r2 = str(QC_FP/'unpaired'/'{sample}_R2_unpaired.fastq')
     log:
         str(QC_FP/'log'/'trimmomatic'/'{sample}.out')
     params:
@@ -71,10 +74,92 @@ rule trimmomatic:
 
 rule fastqc:
     input:
-        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz')
+        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq')
     output:
         expand(
             str(QC_FP/'paired'/'{{sample}}_{rp}_fastqc.zip'),
             rp=['R1', 'R2'])
-    shell: "fastqc {input.r1} {input.r2}"
+    threads:
+        Cfg['qc']['threads']
+    shell: "fastqc -extract -q {input.r1} {input.r2}"
+
+
+def parse_trim_summary(filename):
+    with open(filename) as f:
+        for line in f:
+            if line.startswith('Input Read Pairs'):
+                vals = re.findall('\D+\: (\d+)', line)
+                keys = ('input', 'both_kept','fwd_only','rev_only','dropped')
+                return(dict(zip(keys, vals)))
+
+def parse_decontam_json(jsonfile):
+    with open(jsonfile) as f:
+        data = json.load(f)
+    return(data['data'])
+
+rule preprocess_report_v1:
+    """Combines the information from multiple preprocessing steps"""
+    input:
+        trim_files = expand(str(QC_FP/'log'/'trimmomatic'/'{sample}.out'), sample=Samples.keys()),
+        json_files = expand(str(QC_FP/'log'/'decontam-human'/'{sample}_summary.json'), sample=Samples.keys())
+    output:
+        str(Cfg['all']['output_fp']/'preprocess_summary.tsv')
+    run:
+        tfiles = [parse_trim_summary(tfile) for tfile in input.trim_files]
+        dfiles = [parse_decontam_json(jfile) for jfile in input.json_files]
+        
+        with open(output[0],'w') as out:
+            for i in range(len(tfiles)):
+                merged_dict = {**tfiles[i], **dfiles[i]}
+                if i == 0:
+                    writer = csv.DictWriter(out, fieldnames=merged_dict.keys(), delimiter='\t')
+                    writer.writeheader()
+                writer.writerow(merged_dict)
+
+rule preprocess_report:
+    """Combines the information from multiple preprocessing steps"""
+    input:
+        trim_files = expand(str(QC_FP/'log'/'trimmomatic'/'{sample}.out'), sample=Samples.keys()),
+        json_files = expand(str(QC_FP/'log'/'decontam-human'/'{sample}_summary.json'), sample=Samples.keys())
+    output:
+        str(Cfg['all']['output_fp']/'preprocess_summary.tsv')
+    run:
+        summary_list = []
+        for i in range(len(input.trim_files)):
+            tfile = input.trim_files[i]
+            jfile = input.json_files[i]
+            tname = os.path.basename(tfile).split('.out')[0]
+            jname = os.path.basename(jfile).split('_summary.json')[0]
+            if tname == jname:
+                merged_dict = {**parse_trim_summary(tfile), **parse_decontam_json(jfile)}
+                summary_list.append(pandas.DataFrame(merged_dict, index=[tname]))
+            else:
+                raise ValueError('Unmatched qc and decontam files for: %s' % tname)
+        reports = pandas.concat(summary_list)
+        reports.to_csv(output[0], sep='\t', index_label='Samples')
+
+def parse_fastqc_quality(filename):
+    with open(filename) as f:
+        report = f.read()
+    tableString = re.search('\>\>Per base sequence quality.*?\n(.*?)\n\>\>END_MODULE', report, re.DOTALL).group(1)
+
+    f_s = StringIO(tableString)
+    df = pandas.read_csv(f_s, sep='\t', usecols=['#Base', 'Mean'], index_col='#Base')
+    sample_name = os.path.basename(filename.split('_fastqc')[0])
+    df.columns=[sample_name]
+    f_s.close()
+    return(df)
+
+rule fastqc_report:
+    input:
+        json_files = expand(str(QC_FP/'paired'/'{sample}_{rp}_fastqc/fastqc_data.txt'),sample=Samples.keys(),rp=['R1','R2'])
+    output:
+        str(Cfg['all']['output_fp']/'fastqc_quality.tsv')
+    run:
+        quality_list = []
+        for file in input.json_files:
+            with open(file) as f:
+                quality_list.append(parse_fastqc_quality(file))
+        quality_table = pandas.concat(quality_list, axis=1).transpose()
+        quality_table.to_csv(output[0],sep="\t",index_label="Samples")
