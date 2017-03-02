@@ -1,0 +1,33 @@
+# -*- mode: Snakemake -*-
+#
+# PathwayFinder rules
+#
+# Requires zhaoc1/PathwayAbundanceFinder (fork for py3+ compatibility / config file )
+
+rule all_path:
+    input:
+        TARGET_PATH
+
+rule path_finder:
+    """Find presence/absence/abundance of pathways from metagenomic data."""    
+    input:
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq')
+    output:
+        summary = str(MAPPING_FP/'summary'/'pathfinder'/'{sample}_summary.json')
+    params:
+        output_dir = str(MAPPING_FP/'pathfinder'),
+        rapsearch = str(Cfg['mapping']['rapsearch_fp']/'rapsearch')
+    threads: 
+        Cfg['mapping']['threads']
+    shell:
+        """
+        pathfinder.py --forward-reads {input.r1} --reverse-reads {input.r2} \
+        --output-dir {params.output_dir} \
+        --summary-file {output.summary} \
+        --threads {threads} \
+        --kegg_fp {Cfg[mapping][kegg_fp]} \
+        --kegg_idx_fp {Cfg[mapping][kegg_idx_fp]} \
+        --kegg_to_ko_fp {Cfg[mapping][kegg_to_ko_fp]} \
+        --rap_search_fp {params.rapsearch}
+        """

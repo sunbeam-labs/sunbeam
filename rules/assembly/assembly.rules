@@ -39,14 +39,14 @@ rule idba_ud:
 rule cap3:
     input:
         contig = str(ASSEMBLY_FP/'idba_ud'/'{sample}'/'contig.fa'),
-#        cap3 = str(Cfg['assembly']['cap3_fp']/'cap3')
+        cap3 = str(Cfg['assembly']['cap3_fp']/'cap3')
     output:
         str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
     log:
         str(ASSEMBLY_FP/'log'/'cap3'/'{sample}.out')
     shell:
         """
-        local/CAP3/cap3 {input.contig} &> {log} && \
+        {input.cap3} {input.contig} &> {log} && \
         cat {input.contig}.cap.singlets {input.contig}.cap.contigs > {output}
         """
 

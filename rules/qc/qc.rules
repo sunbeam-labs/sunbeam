@@ -2,6 +2,8 @@
 #
 # Illumina quality control rules
 
+localrules: custom_removal
+
 rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
     input:
@@ -77,4 +79,6 @@ rule fastqc:
         expand(
             str(QC_FP/'paired'/'{{sample}}_{rp}_fastqc.zip'),
             rp=['R1', 'R2'])
-    shell: "fastqc {input.r1} {input.r2}"
+    log:
+        str(QC_FP/'log'/'fastqc'/'{sample}.out')
+    shell: "fastqc {input.r1} {input.r2} &> {log}"

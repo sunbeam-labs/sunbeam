@@ -1,9 +1,9 @@
 {
     "__default__" :
     {
-        "h_vmem" : "4G",
-        "mem_free" : "3G",
-        "m_mem_free" : "2G"
+        "h_vmem" : "12G",
+        "mem_free" : "10G",
+        "m_mem_free" : "8G"
     },
     "demultiplex" :
     {
@@ -19,15 +19,27 @@
     },
     "decontam_human" :
     {
-        "h_vmem" : "12G",
-        "mem_free" : "10G",
-        "m_mem_free" : "8G"
+        "h_vmem" : "40G",
+        "mem_free" : "35G",
+        "m_mem_free" : "30G"
+    },
+    "idba_ud":
+    {
+        "h_vmem": "50G",
+        "mem_free": "40G",
+        "m_mem_free": "35G"
+    },
+    "cap3" :
+    {
+        "h_vmeme": "300G",
+        "mem_free": "250G",
+        "m_mem_free": "200G"
     },
     "kraken_classify" :
     {
-        "h_vmem" : "15G",
-        "mem_free" : "12G",
-        "m_mem_free" : "10G"
+        "h_vmem" : "25G",
+        "mem_free" : "22G",
+        "m_mem_free" : "20G"
     },
      "build_contigs" :
     {
@@ -35,10 +47,10 @@
         "mem_free" : "90G",
         "m_mem_free" : "50G"
     },
-    "cap3" :
+    "plot_coverage" :
     {
-        "h_vmem" : "16G",
-        "mem_free" : "15G",
-        "m_mem_free" : "12G"
+        "h_vmem" : "20G",
+        "mem_free" : "18G",
+        "m_mem_free" : "15G"
     }
 }
