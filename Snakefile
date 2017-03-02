@@ -57,8 +57,8 @@ else:
 QC_FP = output_subdir(Cfg, 'qc')
 ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
-MAPPING_FP = output_subdir(Cfg, 'mapping')
 ANNOTATION_FP = output_subdir(Cfg, 'annotation')
+MAPPING_FP = output_subdir(Cfg, 'mapping')
 
 # ---- Change your workdir so .snakemake won't take all the space in the head node
 workdir: str(Cfg['all']['output_fp'])
