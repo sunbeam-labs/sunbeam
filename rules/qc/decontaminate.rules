@@ -11,7 +11,7 @@ rule all_decontam:
 
 rule gunzip:
     input: "{filename}.fastq.gz"
-    output: "{filename}.fastq"
+    output: temp("{filename}.fastq")
     shell: "gunzip -c {input} > {output}"
 
 rule decontam_human:

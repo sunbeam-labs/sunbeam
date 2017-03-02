@@ -69,8 +69,8 @@ include: "rules/targets/targets.rules"
 
 
 # ---- Quality control rules
-#include: "rules/qc/qc.rules"
-#include: "rules/qc/decontaminate.rules"
+include: "rules/qc/qc.rules"
+include: "rules/qc/decontaminate.rules"
 
 
 # ---- Assembly rules
