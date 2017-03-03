@@ -62,7 +62,7 @@ rule decontam_phix:
         --output-dir {params.out_fp}
         """
 
-rule decontam:
+localrule decontam:
     input:
         r1 = str(QC_FP/'decontam-phix'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'decontam-phix'/'{sample}_R2.fastq'),
