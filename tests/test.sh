@@ -72,3 +72,12 @@ rm -rf $TEMPDIR/sunbeam_output/qc
 snakemake --configfile=$TEMPDIR/tmp_config_nocutadapt.yml all_decontam
 [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R1.fastq ]
 [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R2.fastq ]
+
+# Test for barcodes file
+sed 's/data_fp: data_files/data_fp: barcodes.txt/g' $TEMPDIR/tmp_config.yml > $TEMPDIR/tmp_config_barcode.yml
+echo -e "dummybfragilis\tTTTTTTTT\ndummyecoli\tTTTTTTTT" > $TEMPDIR/barcodes.txt
+rm -rf $TEMPDIR/data_files
+rm -rf $TEMPDIR/sunbeam_output/qc/decontam*
+snakemake --configfile=$TEMPDIR/tmp_config_barcode.yml all_decontam
+[ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R1.fastq ]
+[ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R2.fastq ]
