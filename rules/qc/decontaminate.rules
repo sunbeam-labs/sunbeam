@@ -21,8 +21,7 @@ rule decontam_human:
     output:
         r1 = str(QC_FP/'decontam-human'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'decontam-human'/'{sample}_R2.fastq'),
-    log:
-        str(QC_FP/'log'/'decontam-human'/'{sample}_summary.json')
+        log = str(QC_FP/'log'/'decontam-human'/'{sample}_summary.json')
     params:
         out_fp = str(QC_FP/'decontam-human')
     shell:
@@ -31,7 +30,7 @@ rule decontam_human:
         --organism human \
         --method {Cfg[qc][method]} \
         --index {Cfg[qc][human_genome_fp]} \
-        --summary-file {log} \
+        --summary-file {output.log} \
         --output-dir {params.out_fp} \
         """
 
@@ -42,8 +41,7 @@ rule decontam_phix:
     output:
         r1=str(QC_FP/'decontam-phix'/'{sample}_R1.fastq'),
         r2=str(QC_FP/'decontam-phix'/'{sample}_R2.fastq'),
-    log:
-        str(QC_FP/'log'/'decontam'/'{sample}_summary.json')
+        log = str(QC_FP/'log'/'decontam'/'{sample}_summary.json')
     params:
         out_fp = str(QC_FP/'decontam-phix')
     shell:
@@ -52,7 +50,7 @@ rule decontam_phix:
         --organism phix \
         --method {Cfg[qc][method]} \
         --index {Cfg[qc][phix_genome_fp]} \
-        --summary-file {log} \
+        --summary-file {output.log} \
         --output-dir {params.out_fp}
         """
 
