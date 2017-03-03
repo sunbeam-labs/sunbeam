@@ -8,12 +8,12 @@ import os
 
 def build_sample_list(data_fp, filename_fmt, excluded):
     if os.path.isdir(str(data_fp)):
-        Samples = build_sample_from_dir(data_fp, filename_fmt, excluded)
+        Samples = _build_samples_from_dir(data_fp, filename_fmt, excluded)
     else:
-        Samples = build_sample_from_file(data_fp)
+        Samples = _build_samples_from_file(data_fp)
     return Samples
 
-def build_sample_from_dir(data_fp, filename_fmt, excluded):
+def _build_samples_from_dir(data_fp, filename_fmt, excluded):
     """
     Build a list of samples from a data filepath and filename format.
 
@@ -39,7 +39,7 @@ def build_sample_from_dir(data_fp, filename_fmt, excluded):
             Samples[wcards['sample']]['paired'] = False
     return Samples
 
-def build_sample_from_file(data_fp):
+def _build_samples_from_file(data_fp):
     """"
     Build a list of samples from a barcode file
     :param bc_file: a Path to barcode file
