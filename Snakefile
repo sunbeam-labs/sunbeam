@@ -39,6 +39,8 @@ ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
 
+localrules: decontam
+
 # ---- Targets rules
 include: "rules/targets/targets.rules"
 
