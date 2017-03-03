@@ -29,7 +29,8 @@ cp -r ../local $TEMPDIR/local
 cp -r indexes $TEMPDIR
 cp -r raw $TEMPDIR
 cp -r truncated_taxonomy $TEMPDIR
-cp -r indexes $TEMPDIR
+#FIXME
+#cp -r indexes $TEMPDIR
 python generate_dummy_data.py $TEMPDIR
 
 # Create a version of the config file customized for this tempdir
