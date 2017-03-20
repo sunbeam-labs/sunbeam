@@ -32,6 +32,9 @@ Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
 Samples = build_sample_list(Cfg['all']['data_fp'], Cfg['all']['filename_fmt'], Cfg['all']['exclude'])
 
+# ---- Change your workdir to output_fp
+workdir: str(Cfg['all']['output_fp'])
+
 # ---- Set up output paths for the various steps
 QC_FP = output_subdir(Cfg, 'qc')
 ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
@@ -80,3 +83,4 @@ rule samples:
     run:
         print("Samples found:")
         pprint(sorted(list(Samples.keys())))
+

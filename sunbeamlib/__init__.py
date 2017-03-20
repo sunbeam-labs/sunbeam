@@ -3,9 +3,17 @@ __license__ = "GPL2+"
 
 from snakemake.utils import listfiles
 from snakemake.workflow import expand
+import os
 
 
 def build_sample_list(data_fp, filename_fmt, excluded):
+    if os.path.isdir(str(data_fp)):
+        Samples = _build_samples_from_dir(data_fp, filename_fmt, excluded)
+    else:
+        Samples = _build_samples_from_file(data_fp)
+    return Samples
+
+def _build_samples_from_dir(data_fp, filename_fmt, excluded):
     """
     Build a list of samples from a data filepath and filename format.
 
@@ -31,6 +39,20 @@ def build_sample_list(data_fp, filename_fmt, excluded):
             Samples[wcards['sample']]['paired'] = False
     return Samples
 
+def _build_samples_from_file(data_fp):
+    """"
+    Build a list of samples from a barcode file
+    :param bc_file: a Path to barcode file
+    :returns: A dictionary of samples, with sample names as keys
+    """
+    with open(str(data_fp)) as f:
+        lines = f.read().splitlines()
+    ids = []
+    for line in lines:
+         ids.append(line.split("\t")[0])
+    # todo: not sure about adding the path of actual reads
+    Samples = dict((id,"paired") for id in ids)
+    return Samples
 
 def index_files(genome, index_fp):
     """
