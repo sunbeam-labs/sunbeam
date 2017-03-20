@@ -7,7 +7,7 @@
 ####################
 
 ### Quality-control reads
-TARGET_QC = expand(str(QC_FP/'paired'/'{sample}_{rp}_fastqc.zip'), sample = Samples.keys(), rp = ['R1','R2'])
+TARGET_QC = expand(str(QC_FP/'paired'/'{sample}_{rp}_fastqc/fastqc_data.txt'), sample = Samples.keys(), rp = ['R1','R2'])
 
 ### Remove host reads
 TARGET_DECONTAM = expand(str(QC_FP/'decontam'/'{sample}_{rp}.fastq'), sample = Samples.keys(), rp = ['R1', 'R2'])
@@ -40,5 +40,9 @@ TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sampl
 ## Annotate all contigs
 TARGET_ANNOTATE = expand(str(ANNOTATION_FP/'summary'/'{sample}.tsv'), sample=Samples.keys())
 
-TARGET_ALL = TARGET_CLASSIFY + TARGET_ASSEMBLY + TARGET_ANNOTATE
+####################
+## report
+####################
+TARGET_REPORT = [str(QC_FP/'preprocess_summary.tsv'), str(QC_FP/'fastqc_quality.tsv')]
 
+TARGET_ALL = TARGET_QC + TARGET_DECONTAM + TARGET_CLASSIFY + TARGET_ASSEMBLY + TARGET_ANNOTATE + TARGET_REPORT

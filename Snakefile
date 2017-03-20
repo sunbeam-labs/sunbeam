@@ -75,6 +75,10 @@ include: "rules/classify/kraken.rules"
 include: "rules/mapping/bowtie.rules"
 #include: "rules/mapping/snap.rules"
 
+
+# ---- Reports rules
+include: "rules/reports/reports.rules"
+
 # ---- Rule all: run all targets
 rule all:
     input: TARGET_ALL
