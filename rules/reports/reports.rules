@@ -21,16 +21,15 @@ def parse_decontam_json(f):
     return(data['data'])
 
 def summarize_qual_decontam(tfile, jfile):
+    """Retuen a dataframe for summary information for trimmomatic and decontam rule"""
     tname = os.path.basename(tfile).split('.out')[0]
     jname = os.path.basename(jfile).split('_summary.json')[0]
     if tname != jname:
         raise ValueError('Unmatched qc and decontam files for: %s' % tname)
-    tf = open(tfile)
-    jf = open(jfile)
-    trim_data = parse_trim_summary(tf)
-    decontam_data = parse_decontam_json(jf)
-    tf.close()
-    jf.close()
+    with open(tfile) as tf:
+         with open(jfile) as jf:
+            trim_data = parse_trim_summary(tf)
+            decontam_data = parse_decontam_json(jf)
     merged_dict = {**trim_data, ** decontam_data}
     # todo: use yield for pandas DataFrame
     return(pandas.DataFrame(merged_dict, index=[tname]))
