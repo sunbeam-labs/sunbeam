@@ -16,18 +16,16 @@ rule all_mask:
           
 rule dustmasker:
     input:
-        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq')
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fasta'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fasta')
     output:
         r1 = temp(str(QC_FP/'masked'/'dust'/'{sample}_R1.fasta')),
         r2 = temp(str(QC_FP/'masked'/'dust'/'{sample}_R2.fasta'))
     shell:
         """
-        awk '{{if(NR%4==1) {{printf(">%s\n",substr($0,2));}} else if(NR%4==2) print;}} {input.r1} |\'
-        dustmasker -outfmt fasta |\
+        dustmasker -in {input.r1} -outfmt fasta |\
         sed '/>/!s/a\|c\|g\|t/N/g' > {output.r1} &&\
-        awk '{{if(NR%4==1) {{printf(">%s\n",substr($0,2));}} else if(NR%4==2) print;}} {input.r2} |\'
-        dustmasker -outfmt fasta |\
+        dustmasker -in {input.r2} -outfmt fasta |\
         sed '/>/!s/a\|c\|g\|t/N/g' > {output.r2}
         """
 
