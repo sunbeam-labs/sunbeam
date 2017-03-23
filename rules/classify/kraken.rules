@@ -31,8 +31,8 @@ rule classic_biom:
         
 rule kraken_classify:
     input:
-        r1=str(QC_FP/'decontam'/'{sample}_R1.fastq'),
-        r2=str(QC_FP/'decontam'/'{sample}_R2.fastq')
+        r1=str(QC_FP/'masked'/'{sample}_R1.fasta'),
+        r2=str(QC_FP/'masked'/'{sample}_R2.fasta')
     output:
         str(CLASSIFY_FP/'kraken'/'raw'/'{sample}-raw.tsv')
     threads:
