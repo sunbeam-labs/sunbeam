@@ -27,6 +27,7 @@ rule decontam_human:
     shell:
         """ 
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
+        --threads {Cfg[qc][threads]} \
         --organism human \
         --method {Cfg[qc][method]} \
         --index {Cfg[qc][human_genome_fp]} \
@@ -47,6 +48,7 @@ rule decontam_phix:
     shell:
         """ 
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
+        --threads {Cfg[qc][threads]} \
         --organism phix \
         --method {Cfg[qc][method]} \
         --index {Cfg[qc][phix_genome_fp]} \
