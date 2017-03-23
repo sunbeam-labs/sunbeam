@@ -39,8 +39,8 @@ rule trf:
         r1 = str(QC_FP/'masked'/'log'/'{sample}_R1.log'),
         r2 = str(QC_FP/'masked'/'log'/'{sample}_R2.log')
     params:
-        basename_r1 = '{sample}_R1.dust.fasta',
-        basename_r2 = '{sample}_R2.dust.fasta'
+        basename_r1 = '{sample}_R1.fasta',
+        basename_r2 = '{sample}_R2.fasta'
     shell:
         """
         trf {input.r1} 2 3 5 75 20 33 6 -m -h -ngs > {log.r1} &&
@@ -54,8 +54,8 @@ rule remove_newlines:
         r1 = str(QC_FP/'masked'/'trf'/'{sample}_R1.fasta'),
         r2 = str(QC_FP/'masked'/'trf'/'{sample}_R2.fasta')
     output:
-        r1 = str(QC_FP/'masked'/'{sample}_R1.fasta'),
-        r2 = str(QC_FP/'masked'/'{sample}_R2.fasta')
+        r1 = str(QC_FP/'masked'/'{sample}_R1.masked.fasta'),
+        r2 = str(QC_FP/'masked'/'{sample}_R2.masked.fasta')
     shell:
         """
         sed '/^$/d' {input.r1} > {output.r1} &&\
