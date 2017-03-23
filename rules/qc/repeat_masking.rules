@@ -33,8 +33,8 @@ rule trf:
         r1 = str(QC_FP/'masked'/'{sample}_R1.dust.fasta'),
         r2 = str(QC_FP/'masked'/'{sample}_R2.dust.fasta')
     output:
-        r1 = str(QC_FP/'masked'/'{sample}_R1.fasta'),
-        r2 = str(QC_FP/'masked'/'{sample}_R2.fasta')
+        r1 = temp(str(QC_FP/'masked'/'{sample}_R1.trf.fasta')),
+        r2 = temp(str(QC_FP/'masked'/'{sample}_R2.trf.fasta'))
     log:
         r1 = str(QC_FP/'masked'/'log'/'{sample}_R1.log'),
         r2 = str(QC_FP/'masked'/'log'/'{sample}_R2.log')
@@ -49,4 +49,17 @@ rule trf:
         mv {params.basename_r2}.2.3.5.75.20.33.6.mask {output.r2}
         """
 
-        
+rule remove_newlines:
+    input:
+        r1 = str(QC_FP/'masked'/'{sample}_R1.trf.fasta'),
+        r2 = str(QC_FP/'masked'/'{sample}_R2.trf.fasta')
+    output:
+        r1 = str(QC_FP/'masked'/'{sample}_R1.fasta'),
+        r2 = str(QC_FP/'masked'/'{sample}_R2.fasta')
+    shell:
+        """
+        sed '/^$/d' {input.r1} > {output.r1} &&\
+        sed '/^$/d' {input.r2} > {output.r2}
+        """
+           
+           
