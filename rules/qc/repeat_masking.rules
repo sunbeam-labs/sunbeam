@@ -6,13 +6,13 @@ rule all_mask:
     input:
         TARGET_MASK
 
-rule fq2fa:
-    input:
-        str(QC_FP/'decontam'/'{filename}.fastq')
-    output:
-        temp(str(QC_FP/'decontam'/'{filename}.fasta'))
-    shell:
-        "fq2fa {input} {output}"
+# rule fq2fa:
+#     input:
+#         str(QC_FP/'decontam'/'{filename}.fastq')
+#     output:
+#         temp(str(QC_FP/'decontam'/'{filename}.fasta'))
+#     shell:
+#         "fq2fa {input} {output}"
           
 rule dustmasker:
     input:
