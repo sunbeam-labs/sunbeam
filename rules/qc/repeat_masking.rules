@@ -1,0 +1,44 @@
+# -*- mode: Snakemake -*-
+#
+# Rules to mask low-complexity regions and short repeats
+
+rule all_mask:
+    input:
+        TARGET_MASK
+
+rule dustmasker:
+    input:
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq')
+    output:
+        r1 = temp(str(QC_FP/'masked'/'{sample}_R1.dust.fasta')),
+        r2 = temp(str(QC_FP/'masked'/'{sample}_R2.dust.fasta'))
+    shell: """
+    dustmasker -in {input.r1} -outfmt fasta |\
+    sed '/>/!s/a\|c\|g\|t/N/g' > {output.r1} &&\
+    dustmasker -in {input.r2} -outfmt fasta |\
+    sed '/>/!s/a\|c\|g\|t/N/g' > {output.r2}
+    """
+
+rule trf:
+    input:
+        r1 = str(QC_FP/'masked'/'{sample}_R1.dust.fasta'),
+        r2 = str(QC_FP/'masked'/'{sample}_R2.dust.fasta')
+    output:
+        r1 = str(QC_FP/'masked'/'{sample}_R1.fasta'),
+        r2 = str(QC_FP/'masked'/'{sample}_R2.fasta')
+    log:
+        r1 = str(QC_FP/'masked'/'log'/'{sample}_R1.log'),
+        r2 = str(QC_FP/'masked'/'log'/'{sample}_R2.log')
+    params:
+        basename_r1 = '{sample}_R1.dust.fasta',
+        basename_r2 = '{sample}_R2.dust.fasta'
+    shell:
+        """
+        trf {input.r1} 2 3 5 75 20 33 6 -m -h -ngs > {log.r1} &&
+        mv {params.basename_r1}.2.3.5.75.20.33.6.mask {output.r1} &&
+        trf {input.r2} 2 3 5 75 20 33 6 -m -h -ngs > {log.r2} &&
+        mv {params.basename_r2}.2.3.5.75.20.33.6.mask {output.r2}
+        """
+
+        
