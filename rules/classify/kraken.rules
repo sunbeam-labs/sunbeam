@@ -43,7 +43,7 @@ rule kraken_classify:
         --db {Cfg[classify][kraken_db_fp]} \
         --threads {threads} \
         --paired \
-        --fastq-input \
+        --fasta-input \
         {input.r1} {input.r2} > {output}
         """
 
