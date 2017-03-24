@@ -28,7 +28,7 @@ rule repeatmasker:
     params:
         dir = str(QC_FP/'masked'/'log')
     log:
-        str(QC_FP/'masked'/'log'/'{sample}.fasta.out')
+        str(QC_FP/'masked'/'log'/'{sample}.fasta.out'),
         str(QC_FP/'masked'/'log'/'{sample}.fasta.tbl')
     shell:
         """
