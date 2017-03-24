@@ -24,9 +24,12 @@ rule decontam_human:
         log = str(QC_FP/'log'/'decontam-human'/'{sample}_summary.json')
     params:
         out_fp = str(QC_FP/'decontam-human')
+    threads:
+        Cfg['qc']['threads']
     shell:
         """ 
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
+        --threads {threads} \
         --organism human \
         --method {Cfg[qc][method]} \
         --index {Cfg[qc][human_genome_fp]} \
@@ -44,9 +47,12 @@ rule decontam_phix:
         log = str(QC_FP/'log'/'decontam'/'{sample}_summary.json')
     params:
         out_fp = str(QC_FP/'decontam-phix')
+    threads:
+        Cfg['qc']['threads']
     shell:
         """ 
         decontaminate.py --forward {input.r1} --reverse {input.r2} \
+        --threads {threads} \
         --organism phix \
         --method {Cfg[qc][method]} \
         --index {Cfg[qc][phix_genome_fp]} \
