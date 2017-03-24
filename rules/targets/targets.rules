@@ -12,8 +12,10 @@ TARGET_QC = expand(str(QC_FP/'paired'/'{sample}_{rp}_fastqc/fastqc_data.txt'), s
 ### Remove host reads
 TARGET_DECONTAM = expand(str(QC_FP/'decontam'/'{sample}_{rp}.fastq'), sample = Samples.keys(), rp = ['R1', 'R2'])
 
-### Mask low-complexity sequences
-TARGET_MASK = expand(str(QC_FP/'masked'/'{sample}_{rp}.masked.fasta'), sample = Samples.keys(), rp = ['R1', 'R2'])
+### Mask low-complexity and repeat sequences
+TARGET_MASK = expand(
+    str(QC_FP/'masked'/'{sample}.fasta'),
+    sample = Samples.keys())
 
 ####################
 ## classify

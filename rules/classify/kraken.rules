@@ -31,8 +31,7 @@ rule classic_biom:
         
 rule kraken_classify:
     input:
-        r1=str(QC_FP/'masked'/'{sample}_R1.masked.fasta'),
-        r2=str(QC_FP/'masked'/'{sample}_R2.masked.fasta')
+        str(QC_FP/'masked'/'{sample}.fasta')
     output:
         str(CLASSIFY_FP/'kraken'/'raw'/'{sample}-raw.tsv')
     threads:
@@ -42,9 +41,8 @@ rule kraken_classify:
         kraken \
         --db {Cfg[classify][kraken_db_fp]} \
         --threads {threads} \
-        --paired \
         --fasta-input \
-        {input.r1} {input.r2} > {output}
+        {input} > {output}
         """
 
 rule kraken_report:
