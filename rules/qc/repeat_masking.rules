@@ -5,62 +5,70 @@
 rule all_mask:
     input:
         TARGET_MASK
-
-# rule fq2fa:
-#     input:
-#         str(QC_FP/'decontam'/'{filename}.fastq')
-#     output:
-#         temp(str(QC_FP/'decontam'/'{filename}.fasta'))
-#     shell:
-#         "fq2fa {input} {output}"
           
 rule dustmasker:
     input:
-        r1 = str(QC_FP/'decontam'/'{sample}_R1.fasta'),
-        r2 = str(QC_FP/'decontam'/'{sample}_R2.fasta')
+        str(ASSEMBLY_FP/'paired'/'{sample}.fasta'),
     output:
-        r1 = temp(str(QC_FP/'masked'/'dust'/'{sample}_R1.fasta')),
-        r2 = temp(str(QC_FP/'masked'/'dust'/'{sample}_R2.fasta'))
+        temp(str(QC_FP/'masked'/'{sample}.fasta.dust'))
     shell:
         """
-        dustmasker -in {input.r1} -outfmt fasta |\
-        sed '/>/!s/a\|c\|g\|t/N/g' > {output.r1} &&\
-        dustmasker -in {input.r2} -outfmt fasta |\
-        sed '/>/!s/a\|c\|g\|t/N/g' > {output.r2}
+        dustmasker -in {input} -outfmt fasta |\
+        sed '/>/!s/a\|c\|g\|t/N/g' > {output}
         """
 
-rule trf:
+rule repeatmasker:
     input:
-        r1 = str(QC_FP/'masked'/'dust'/'{sample}_R1.fasta'),
-        r2 = str(QC_FP/'masked'/'dust'/'{sample}_R2.fasta')
+        str(QC_FP/'masked'/'{sample}.fasta.dust')
     output:
-        r1 = temp(str(QC_FP/'masked'/'trf'/'{sample}_R1.fasta')),
-        r2 = temp(str(QC_FP/'masked'/'trf'/'{sample}_R2.fasta'))
-    log:
-        r1 = str(QC_FP/'masked'/'log'/'{sample}_R1.log'),
-        r2 = str(QC_FP/'masked'/'log'/'{sample}_R2.log')
+        str(QC_FP/'masked'/'{sample}.fasta')
+        tmp(str(QC_FP/'masked'/'log'/'{sample}.fasta.cat'))
+    threads:
+        Cfg['qc']['threads']
     params:
-        basename_r1 = '{sample}_R1.fasta',
-        basename_r2 = '{sample}_R2.fasta'
+        dir = str(QC_FP/'masked'/'log')
+    log:
+        str(QC_FP/'masked'/'log'/'{sample}.fasta.out')
+        str(QC_FP/'masked'/'log'/'{sample}.fasta.tbl')
     shell:
         """
-        trf {input.r1} 2 3 5 75 20 33 6 -m -h -ngs > {log.r1} &&
-        mv {params.basename_r1}.2.3.5.75.20.33.6.mask {output.r1} &&
-        trf {input.r2} 2 3 5 75 20 33 6 -m -h -ngs > {log.r2} &&
-        mv {params.basename_r2}.2.3.5.75.20.33.6.mask {output.r2}
+        mkdir -p {params.dir} &&\
+        RepeatMasker -qq -no_is -pa {threads} -e hmmer -dir {params.dir} {input} &&\
+        mv {params.dir}/{wildcards.sample}.fasta.masked} {output[1]}
         """
+          
+# rule trf:
+#     input:
+#         r1 = str(QC_FP/'masked'/'dust'/'{sample}_R1.fasta'),
+#         r2 = str(QC_FP/'masked'/'dust'/'{sample}_R2.fasta')
+#     output:
+#         r1 = temp(str(QC_FP/'masked'/'trf'/'{sample}_R1.fasta')),
+#         r2 = temp(str(QC_FP/'masked'/'trf'/'{sample}_R2.fasta'))
+#     log:
+#         r1 = str(QC_FP/'masked'/'log'/'{sample}_R1.log'),
+#         r2 = str(QC_FP/'masked'/'log'/'{sample}_R2.log')
+#     params:
+#         basename_r1 = '{sample}_R1.fasta',
+#         basename_r2 = '{sample}_R2.fasta'
+#     shell:
+#         """
+#         trf {input.r1} 2 3 5 75 20 33 6 -m -h -ngs > {log.r1} &&
+#         mv {params.basename_r1}.2.3.5.75.20.33.6.mask {output.r1} &&
+#         trf {input.r2} 2 3 5 75 20 33 6 -m -h -ngs > {log.r2} &&
+#         mv {params.basename_r2}.2.3.5.75.20.33.6.mask {output.r2}
+#         """
 
-rule remove_newlines:
-    input:
-        r1 = str(QC_FP/'masked'/'trf'/'{sample}_R1.fasta'),
-        r2 = str(QC_FP/'masked'/'trf'/'{sample}_R2.fasta')
-    output:
-        r1 = str(QC_FP/'masked'/'{sample}_R1.masked.fasta'),
-        r2 = str(QC_FP/'masked'/'{sample}_R2.masked.fasta')
-    shell:
-        """
-        sed '/^$/d' {input.r1} > {output.r1} &&\
-        sed '/^$/d' {input.r2} > {output.r2}
-        """
+# rule remove_newlines:
+#     input:
+#         r1 = str(QC_FP/'masked'/'trf'/'{sample}_R1.fasta'),
+#         r2 = str(QC_FP/'masked'/'trf'/'{sample}_R2.fasta')
+#     output:
+#         r1 = str(QC_FP/'masked'/'{sample}_R1.masked.fasta'),
+#         r2 = str(QC_FP/'masked'/'{sample}_R2.masked.fasta')
+#     shell:
+#         """
+#         sed '/^$/d' {input.r1} > {output.r1} &&\
+#         sed '/^$/d' {input.r2} > {output.r2}
+#         """
            
            
