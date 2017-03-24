@@ -34,7 +34,7 @@ rule repeatmasker:
         """
         mkdir -p {params.dir} &&\
         RepeatMasker -qq -no_is -pa {threads} -e hmmer -dir {params.dir} {input} &&\
-        mv {params.dir}/{wildcards.sample}.fasta.masked} {output[1]}
+        mv {params.dir}/{wildcards.sample}.fasta.masked {output[1]}
         """
           
 # rule trf:
