@@ -22,7 +22,7 @@ rule repeatmasker:
         str(QC_FP/'masked'/'{sample}.fasta.dust')
     output:
         str(QC_FP/'masked'/'{sample}.fasta'),
-    threads:
+        temp(str(QC_FP/'masked'/'log'/'{sample}.fasta.cat'))
     threads:
         Cfg['qc']['threads']
     params:
