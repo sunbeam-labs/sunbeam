@@ -1,5 +1,4 @@
 # -*- mode: Snakemake -*-
-
 """
 Requirements for the igv functions:
  * IGV
@@ -27,55 +26,54 @@ rule bowtie2_all:
         # * indexed sorted bam files
         # * bcf files
         # * screenshots of alignments made with IGV
-        expand("{segment}.sorted.bam.bai", segment=SEGMENTS),
-        expand("{segment}.raw.bcf", segment=SEGMENTS),
+        expand("{segment}-{sample}.sorted.bam.bai", segment=SEGMENTS, sample=Samples.keys()),
+        expand("{segment}-{sample}.raw.bcf", segment=SEGMENTS, sample=Samples.keys()),
         expand("{segment}.alignment.png", segment=SEGMENTS)
 
 rule bowtie2_build:
-    message: "Creating bowtie2 index files for each reference given"
+    message: "Creating bowtie2 index files for {input}"
     input: GENOME_SEGMENT
     output: INDICES
     params: segment="{segment}"
     shell: "bowtie2-build {input} {params.segment}"
 
 rule bowtie2_align:
-    message: "Aligning reads using bowtie2's index for each genome segment"
+    message: "Aligning {wildcards.sample} reads to genome segment {wildcards.segment}"
     input:
-        rp = expand(str(Cfg['all']['data_fp'] / Cfg['all']['filename_fmt']), rp = ['R1','R2'], sample=Samples.keys()),
+        rp = expand(str(Cfg['all']['data_fp'] / Cfg['all']['filename_fmt']), rp = ['R1','R2'], sample="{sample}"),
         indices = INDICES
-    output: temp("{segment}.sam")
+    output: temp("{segment}-{sample}.sam")
     params: segment="{segment}"
     shell: "bowtie2 -x {params.segment} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
 
 rule samtools_view:
-    message: "Converting alignment files from SAM to BAM format with samtools"
-    input: "{segment}.sam"
-    output: "{segment}.bam"
+    message: "Converting {wildcards.segment}-{wildcards.sample} alignment from SAM to BAM format with samtools"
+    input: "{segment}-{sample}.sam"
+    output: "{segment}-{sample}.bam"
     shell: "samtools view -bS {input} > {output}"
 
 rule samtools_sort:
-    message: "Sorting bam files with samtools"
-    input: "{segment}.bam"
-    output: "{segment}.sorted.bam"
-    params: prefix="{segment}.sorted"
+    message: "Sorting {input} with samtools"
+    input: "{segment}-{sample}.bam"
+    output: "{segment}-{sample}.sorted.bam"
     shell: "samtools sort {input} > {output}"
 
 rule samtools_index:
-    message: "Indexing sorted bam files with samtools"
-    input: "{segment}.sorted.bam"
-    output: "{segment}.sorted.bam.bai"
+    message: "Indexing {input} with samtools"
+    input: "{segment}-{sample}.sorted.bam"
+    output: "{segment}-{sample}.sorted.bam.bai"
     shell: "samtools index {input}"
 
 rule samtools_mpileup:
-    message: "Calling variants with samtools and bcftools"
+    message: "Calling variants for {input.bam} with samtools and bcftools"
     input:
-        bam = "{segment}.sorted.bam",
+        bam = "{segment}-{sample}.sorted.bam",
         genome = GENOME_SEGMENT
-    output: "{segment}.raw.bcf"
+    output: "{segment}-{sample}.raw.bcf"
     shell: "samtools mpileup -gf {input.genome} {input.bam} | bcftools call -Ob -v -c - > {output}"
 
 rule igv_snapshot:
-    message: "Create an alignment image for a sorted bam file with IGV"
+    message: "Create an alignment image for {wildcards.segment} with IGV"
     input:
         genome = GENOME_SEGMENT,
         bam="{segment}.sorted.bam",
