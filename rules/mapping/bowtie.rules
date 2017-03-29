@@ -111,8 +111,8 @@ def igv_render_script(genome, bams, imagefile):
         igvscript.flush()
         shell("xvfb-run -s '-screen 1 1920x1080x24' igv -b %s" % igvscript.name)
 
-def igv_render_socket_nonblocking(genome, bam, imagefile):
-        input_path = str(Path(bam).resolve())
+def igv_render_socket_nonblocking(genome, bams, imagefile):
+        input_paths = [str(Path(bam).resolve()) for bam in bams]
         genome_path = str(Path(genome).resolve())
         output_path = str( Path('.').resolve() / Path(imagefile) )
 
@@ -138,20 +138,20 @@ def igv_render_socket_nonblocking(genome, bam, imagefile):
         shell("DISPLAY="+display+" XAUTHORITY="+xauth+" xdotool search --onlyvisible --name IGV windowsize --sync 100% 100%")
 
         # Generate screenshot
-        commands = ['new', 'genome ' + genome_path, 'load ' + input_path, 'snapshot ' + output_path, 'exit']
+        commands = ['new', 'genome ' + genome_path, 'load ' + ','.join(input_paths), 'collapse', 'snapshot ' + output_path, 'exit']
         s.sendall(bytes('\n'.join(commands), 'ascii'))
         s.close()
         igv.wait()
 
 # NOTE: this version assumes an already-running IGV configured to allow access
 # on the default port (60151), so it's not as useful for automation.
-def igv_render_socket(genome, bam, imagefile):
+def igv_render_socket(genome, bams, imagefile):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('localhost', 60151))
-        input_path = str(Path(bam).resolve())
+        input_paths = [str(Path(bam).resolve()) for bam in bams]
         genome_path = str(Path(genome).resolve())
         output_path = str( Path('.').resolve() / Path(imagefile) )
-        commands = ['new', 'genome ' + genome_path, 'load ' + input_path, 'snapshot ' + output_path]
+        commands = ['new', 'genome ' + genome_path, 'load ' + ','.join(input_paths), 'collapse', 'snapshot ' + output_path]
         s.sendall(bytes('\n'.join(commands), 'ascii'))
         s.close()
         while not Path(output_path).is_file():
