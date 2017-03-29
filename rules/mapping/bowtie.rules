@@ -1,66 +1,159 @@
 # -*- mode: Snakemake -*-
 
-def bt2_index_files(genome, idx_fp):
-    fwd = expand('{idx_fp}/{genome}.{index}.bt2',
-                 genome=genome,
-                 idx_fp=idx_fp,
-                 index=range(1,5))
-    rev = expand('{idx_fp}/{genome}.rev.{index}.bt2',
-                 genome=genome,
-                 idx_fp=idx_fp,
-                 index=range(1,3))
-    return fwd + rev
+"""
+Requirements for the igv functions:
+ * IGV
+ * xvfb
+ * xdotool
+"""
 
-rule bt2_index:
-    output:
-        bt2_index_files('{genome}', Cfg['mapping']['genomes_fp'])
-    params:
-        idx_fp = str(Cfg['mapping']['genomes_fp'])
-    shell:
-        "bowtie2-build {params.idx_fp}/{wildcards.genome}.fa {params.idx_fp}/{wildcards.genome}"
+from pathlib import Path, PurePath
+import socket
+import time
+import tempfile
+import subprocess
+import os
 
-rule bt2_map_contigs:
+# Find all genome segments in the genomes_fp directory
+SEGMENTS = [PurePath(f.name).stem for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
+# Generate Snakemake template strings for a few commonly-used parameters below
+# TODO: Should INDICES come from sunbeamlib.index_files()?
+INDICES = expand("{{segment}}.{s}.bt2", s=["1","2","3","4", "rev.1", "rev.2"])
+GENOME_SEGMENT = str(Cfg['mapping']['genomes_fp'] / "{segment}.fasta")
+
+rule bowtie2_all:
     input:
-        lambda wildcards: bt2_index_files(wildcards.genome, Cfg['mapping']['genomes_fp']),
-        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq')
-    output:
-        temp(str(MAPPING_FP/'{genome}'/'{sample}/reads.sam'))
-    params:
-        idx=str(Cfg['mapping']['genomes_fp']/'{genome}')
-    shell:
-        "bowtie2 -x {params.idx} -1 {input.r1} -2 {input.r2} -S {output} -p {Cfg[all][subcores]}"
+        # Create these three sets of files specifically:
+        # * indexed sorted bam files
+        # * bcf files
+        # * screenshots of alignments made with IGV
+        expand("{segment}.sorted.bam.bai", segment=SEGMENTS),
+        expand("{segment}.raw.bcf", segment=SEGMENTS),
+        expand("{segment}.alignment.png", segment=SEGMENTS)
 
-rule sam_to_bam:
-    input: "{fname}.sam"
-    output: temp("{fname}.bam")
+rule bowtie2_build:
+    message: "Creating bowtie2 index files for each reference given"
+    input: GENOME_SEGMENT
+    output: INDICES
+    params: segment="{segment}"
+    shell: "bowtie2-build {input} {params.segment}"
+
+rule bowtie2_align:
+    message: "Aligning reads using bowtie2's index for each genome segment"
+    input:
+        rp = expand(str(Cfg['all']['data_fp'] / Cfg['all']['filename_fmt']), rp = ['R1','R2'], sample=Samples.keys()),
+        indices = INDICES
+    output: temp("{segment}.sam")
+    params: segment="{segment}"
+    shell: "bowtie2 -x {params.segment} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
+
+rule samtools_view:
+    message: "Converting alignment files from SAM to BAM format with samtools"
+    input: "{segment}.sam"
+    output: "{segment}.bam"
     shell: "samtools view -bS {input} > {output}"
 
-rule sort_bam:
-    input: "{fname}.bam"
-    output: "{fname}.sorted.bam"
-    shell: "samtools sort -o {output} {input}"
+rule samtools_sort:
+    message: "Sorting bam files with samtools"
+    input: "{segment}.bam"
+    output: "{segment}.sorted.bam"
+    params: prefix="{segment}.sorted"
+    shell: "samtools sort {input} > {output}"
 
-rule index_bam:
-    input: "{fname}.sorted.bam"
-    output: "{fname}.sorted.bam.bai"
+rule samtools_index:
+    message: "Indexing sorted bam files with samtools"
+    input: "{segment}.sorted.bam"
+    output: "{segment}.sorted.bam.bai"
     shell: "samtools index {input}"
 
-rule bam_stats:
+rule samtools_mpileup:
+    message: "Calling variants with samtools and bcftools"
     input:
-        bam="{fname}.sorted.bam",
-        bai="{fname}.sorted.bam.bai"
-    output: "{fname}.stats"
-    shell: "samtools stats {input.bam} > {output}"
+        bam = "{segment}.sorted.bam",
+        genome = GENOME_SEGMENT
+    output: "{segment}.raw.bcf"
+    shell: "samtools mpileup -gf {input.genome} {input.bam} | bcftools call -Ob -v -c - > {output}"
+
+rule igv_snapshot:
+    message: "Create an alignment image for a sorted bam file with IGV"
+    input:
+        genome = GENOME_SEGMENT,
+        bam="{segment}.sorted.bam",
+        bai="{segment}.sorted.bam.bai"
+    output: png="{segment}.alignment.png"
+    run:
+        igv_render_script(input.genome, input.bam, output.png)
 
 
-rule _map_all:
-    input:
-        expand(
-            str(MAPPING_FP/'t_gondii'/'{sample}'/'reads.stats'),
-            sample=Samples.keys())
-           
-rule _test_bt2:
-    input:
-        expand(str(MAPPING_FP/'t_gondii_COUG'/'{sample}/reads.stats'),
-               sample='Sample2c_S30')
+### IGV Helper Functions
+
+
+def igv_render_script(genome, bam, imagefile):
+        """ Render an alignment to an image, given a genome and bam file.
+
+        genome: path to a fasta file
+        bam: path to a sorted, indexed bam file
+        imagefile: path to the image to save
+
+        The image file may be smaller than expected.  See
+        igv_render_socket_nonblocking() for an attempt to enlarge the window
+        before saving the image.
+        """
+        input_path = str(Path(bam).resolve())
+        genome_path = str(Path(genome).resolve())
+        output_path = str( Path('.').resolve() / Path(imagefile) )
+        igvcommands = ['new',
+            'genome ' + genome_path,
+            'load ' + input_path,
+            'snapshot ' + output_path,
+            'exit']
+        igvscript = tempfile.NamedTemporaryFile()
+        igvscript.writelines(map(lambda x: bytes(x+'\n', 'ascii'), igvcommands))
+        igvscript.flush()
+        shell("xvfb-run -s '-screen 1 1920x1080x24' igv -b %s" % igvscript.name)
+
+def igv_render_socket_nonblocking(genome, bam, imagefile):
+        input_path = str(Path(bam).resolve())
+        genome_path = str(Path(genome).resolve())
+        output_path = str( Path('.').resolve() / Path(imagefile) )
+
+        # Start up IGV.  Use a port between 10000 and the max available, based
+        # on the PID of this process.  (TODO is using this pid safe?)
+        port = 10000 + os.getpid()%(2**16-10000)
+        xauth = "/tmp/xauth-%d" % os.getpid()
+        igv = subprocess.Popen(["xvfb-run", "-l", "-f" , xauth, "-s", "-screen 1 1920x1080x24", "igv", "-p", str(port)])
+
+        # Connect to running IGV
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        while True:
+            try:
+                s.connect(('localhost', port))
+                break
+            except ConnectionRefusedError:
+                time.sleep(0.5)
+
+        # Based on http://unix.stackexchange.com/questions/5999/ :
+        # This should make the window as large as the virtual X display, but in
+        # practice my screenshots aren't going over 1280 x 1296.
+        display = ":99"
+        shell("DISPLAY="+display+" XAUTHORITY="+xauth+" xdotool search --onlyvisible --name IGV windowsize --sync 100% 100%")
+
+        # Generate screenshot
+        commands = ['new', 'genome ' + genome_path, 'load ' + input_path, 'snapshot ' + output_path, 'exit']
+        s.sendall(bytes('\n'.join(commands), 'ascii'))
+        s.close()
+        igv.wait()
+
+# NOTE: this version assumes an already-running IGV configured to allow access
+# on the default port (60151), so it's not as useful for automation.
+def igv_render_socket(genome, bam, imagefile):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(('localhost', 60151))
+        input_path = str(Path(bam).resolve())
+        genome_path = str(Path(genome).resolve())
+        output_path = str( Path('.').resolve() / Path(imagefile) )
+        commands = ['new', 'genome ' + genome_path, 'load ' + input_path, 'snapshot ' + output_path]
+        s.sendall(bytes('\n'.join(commands), 'ascii'))
+        s.close()
+        while not Path(output_path).is_file():
+            time.sleep(1)
