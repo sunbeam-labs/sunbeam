@@ -77,10 +77,15 @@ rule final_filter:
         filename = os.path.basename(input[0])
         shell(
         """
-        vsearch --sortbylength {input} \
-        --relabel {filename} --minseqlength {params.len} \
-        --output {input}.{params.len}f &> {log} && \
-        cp {input}.{params.len}f {output}
+        if [ -s {input} ]
+        then
+            vsearch --sortbylength {input} \
+            --relabel {filename} --minseqlength {params.len} \
+            --output {input}.{params.len}f &> {log} && \
+            cp {input}.{params.len}f {output}
+        else
+            cp {input} {output} &> {log}
+        fi
         """)
 
 rule clean_assembly:
