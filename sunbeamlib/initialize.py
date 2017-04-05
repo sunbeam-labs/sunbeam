@@ -45,9 +45,6 @@ def main():
     else:
         args.conda_fp = args.conda_fp.absolute()
 
-    
-    print(args.conda_fp)
-    print(args.project_fp)
     if args.custom_configfile_fp is None:
         config = create_blank_config(
             args.conda_fp, args.project_fp, template=args.server)
