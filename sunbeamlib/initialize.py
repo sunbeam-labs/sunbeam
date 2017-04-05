@@ -1,7 +1,6 @@
 import os
 import sys
 import argparse
-import yaml
 
 from pathlib import Path
 
