@@ -12,13 +12,26 @@ import time
 import tempfile
 import subprocess
 import os
+import re
 
-# Find all genome segments in the genomes_fp directory
-SEGMENTS = [PurePath(f.name).stem for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
+def read_seq_ids(fasta_fp):
+    """ Return the sequence identifiers for a given fasta filename. """
+    ids = []
+    with open(str(fasta_fp)) as f:
+        for line in f:
+            if line.startswith('>'):
+                ids.append(re.split('[> ]', line)[1])
+    return ids
+
+# Find all genomes in the genomes_fp directory, and all sequences in each
+# genome file.
+GENOME_FILES = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
+GENOMES = [PurePath(f.name).stem for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
+GENOME_SEGMENTS = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GENOME_FILES}
 # Generate Snakemake template strings for a few commonly-used parameters below
 # TODO: Should INDICES come from sunbeamlib.index_files()?
-INDICES = expand("{{segment}}.{s}.bt2", s=["1","2","3","4", "rev.1", "rev.2"])
-GENOME_SEGMENT = str(Cfg['mapping']['genomes_fp'] / "{segment}.fasta")
+INDICES = expand("{{genome}}.{s}.bt2"), s=["1","2","3","4", "rev.1", "rev.2"])
+GENOME = str(Cfg['mapping']['genomes_fp'] / "{genome}.fasta")
 
 rule bowtie2_all:
     input:
@@ -26,72 +39,80 @@ rule bowtie2_all:
         # * indexed sorted bam files
         # * bcf files
         # * screenshots of alignments made with IGV
-        expand("{segment}-{sample}.sorted.bam.bai", segment=SEGMENTS, sample=Samples.keys()),
-        expand("{segment}-{sample}.raw.bcf", segment=SEGMENTS, sample=Samples.keys()),
-        expand("{segment}.alignment.png", segment=SEGMENTS)
+        expand("{genome}-{sample}.sorted.bam.bai", genome=GENOMES, sample=Samples.keys()),
+        expand("{genome}-{sample}.raw.bcf", genome=GENOMES, sample=Samples.keys()),
+        [expand("{genome}-{segment}.alignment.png", genome=GENOMES, segment=GENOME_SEGMENTS[g]) for g in GENOMES]
 
 rule bowtie2_build:
     message: "Creating bowtie2 index files for {input}"
-    input: GENOME_SEGMENT
+    input: GENOME
     output: INDICES
-    params: segment="{segment}"
-    shell: "bowtie2-build {input} {params.segment}"
+    params: genome="{genome}"
+    shell: "bowtie2-build {input} {params.genome}"
 
 rule bowtie2_align:
-    message: "Aligning {wildcards.sample} reads to genome segment {wildcards.segment}"
+    message: "Aligning {wildcards.sample} reads to genome {wildcards.genome}"
     input:
         rp = expand(str(Cfg['all']['data_fp'] / Cfg['all']['filename_fmt']), rp = ['R1','R2'], sample="{sample}"),
         indices = INDICES
-    output: temp("{segment}-{sample}.sam")
-    params: segment="{segment}"
-    shell: "bowtie2 -x {params.segment} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
+    output: temp("{genome}-{sample}.sam")
+    params: genome="{genome}"
+    shell: "bowtie2 -x {params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
 
 rule samtools_view:
-    message: "Converting {wildcards.segment}-{wildcards.sample} alignment from SAM to BAM format with samtools"
-    input: "{segment}-{sample}.sam"
-    output: "{segment}-{sample}.bam"
+    message: "Converting {wildcards.genome}-{wildcards.sample} alignment from SAM to BAM format with samtools"
+    input: "{genome}-{sample}.sam"
+    output: "{genome}-{sample}.bam"
     shell: "samtools view -bS {input} > {output}"
 
 rule samtools_sort:
     message: "Sorting {input} with samtools"
-    input: "{segment}-{sample}.bam"
-    output: "{segment}-{sample}.sorted.bam"
+    input: "{genome}-{sample}.bam"
+    output: "{genome}-{sample}.sorted.bam"
     shell: "samtools sort {input} > {output}"
 
 rule samtools_index:
     message: "Indexing {input} with samtools"
-    input: "{segment}-{sample}.sorted.bam"
-    output: "{segment}-{sample}.sorted.bam.bai"
+    input: "{genome}-{sample}.sorted.bam"
+    output: "{genome}-{sample}.sorted.bam.bai"
     shell: "samtools index {input}"
 
 rule samtools_mpileup:
     message: "Calling variants for {input.bam} with samtools and bcftools"
     input:
-        bam = "{segment}-{sample}.sorted.bam",
-        genome = GENOME_SEGMENT
-    output: "{segment}-{sample}.raw.bcf"
+        bam = "{genome}-{sample}.sorted.bam",
+        genome = GENOME
+    output: "{genome}-{sample}.raw.bcf"
     shell: "samtools mpileup -gf {input.genome} {input.bam} | bcftools call -Ob -v -c - > {output}"
 
+# I'm creating each segment snapshot separate, but really it could be done in
+# one IGV run.  Can Snakemake handle that?
 rule igv_snapshot:
-    message: "Create an alignment image for {wildcards.segment} with IGV"
+    message: "Create an alignment image for {wildcards.genome}-{wildcards.segment} with IGV"
     input:
-        genome = GENOME_SEGMENT,
-        bams=expand("{segment}-{sample}.sorted.bam", segment="{segment}", sample=Samples.keys()),
-        bais=expand("{segment}-{sample}.sorted.bam.bai", segment="{segment}", sample=Samples.keys())
-    output: png="{segment}.alignment.png"
+        genome = GENOME,
+        #bams=expand("{genome}-{sample}.sorted.bam", genome="{genome}", sample=Samples.keys()),
+        #bais=expand("{genome}-{sample}.sorted.bam.bai", genome="{genome}", sample=Samples.keys())
+        bams=expand("{{genome}}-{sample}.sorted.bam", sample=Samples.keys()),
+        bais=expand("{{genome}}-{sample}.sorted.bam.bai", sample=Samples.keys())
+    params:
+        segment="{segment}"
+    output:
+        png="{genome}-{segment}.alignment.png"
     run:
-        igv_render_script(input.genome, input.bams, output.png)
+        igv_render_script(input.genome, input.bams, output.png, params.segment)
 
 
 ### IGV Helper Functions
 
 
-def igv_render_script(genome, bams, imagefile):
+def igv_render_script(genome, bams, imagefile, seqID=None):
         """ Render an alignment to an image, given a genome and bam files.
 
         genome: path to a fasta file
         bams: list of path to a sorted, indexed bam file
         imagefile: path to the image to save
+        seqID: (optional) sequence identifier to load from genome
 
         The image file may be smaller than expected.  See
         igv_render_socket_nonblocking() for an attempt to enlarge the window
@@ -100,8 +121,11 @@ def igv_render_script(genome, bams, imagefile):
         input_paths = [str(Path(bam).resolve()) for bam in bams]
         genome_path = str(Path(genome).resolve())
         output_path = str( Path('.').resolve() / Path(imagefile) )
+        genome_cmd = 'genome ' + genome_path
+        if seqID:
+            genome_cmd += "\ngoto %s" % seqID
         igvcommands = ['new',
-            'genome ' + genome_path,
+            genome_cmd,
             'load ' + ','.join(input_paths),
             'collapse',
             'snapshot ' + output_path,
@@ -109,7 +133,20 @@ def igv_render_script(genome, bams, imagefile):
         igvscript = tempfile.NamedTemporaryFile()
         igvscript.writelines(map(lambda x: bytes(x+'\n', 'ascii'), igvcommands))
         igvscript.flush()
-        shell("xvfb-run -s '-screen 1 1920x1080x24' igv -b %s" % igvscript.name)
+        # If previous genome files listed in IGV's preferences are no longer
+        # available, IGV will throw a null pointer exception at startup and
+        # batch commands will fail.  So, we'll use a preferences override file
+        # to list the genome file used here.  (This is probably an IGV bug.  We
+        # should see if it happens in the latest release.)
+        # I've also tried setting IGV.Bounds in an attempt to make the window
+        # larger, but it doesn't seem to have any effect.
+        igvprefsfile = tempfile.NamedTemporaryFile()
+        igvprefs = ["GENOME_LIST=;%s" % genome_path,
+            "DEFAULT_GENOME_KEY=%s" % genome_path]
+        igvprefstext = map(lambda x: bytes(x+'\n', 'ascii'), igvprefs)
+        igvprefsfile.writelines(igvprefstext)
+        igvprefsfile.flush()
+        shell("xvfb-run -s '-screen 1 1920x1080x24' igv -o %s -b %s" % (igvprefsfile.name, igvscript.name))
 
 def igv_render_socket_nonblocking(genome, bams, imagefile):
         input_paths = [str(Path(bam).resolve()) for bam in bams]
