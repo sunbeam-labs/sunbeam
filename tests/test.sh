@@ -5,13 +5,20 @@ set -e # Stop on errors
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
 
+# Set up paths
+ROOT=`pwd`
+
+if [ $# -ne 1 ]; then
+    TEMPDIR=`mktemp -d`
+else
+    echo "Write sunbeam test result to provided path"
+    TEMPDIR="$1"
+fi
+
 # Activate the sunbeam environment
 source activate sunbeam
 command -v snakemake
 
-# Set up paths
-ROOT=`pwd`
-TEMPDIR=`mktemp -d`
 mkdir -p $TEMPDIR/data_files
 
 function cleanup {
@@ -21,7 +28,9 @@ function cleanup {
 }
 
 # Calls cleanup when the script exits
-trap cleanup EXIT
+if [ $# -ne 1 ]; then
+    trap cleanup EXIT
+fi
 
 pushd tests
 # Copy data into the temporary directory
