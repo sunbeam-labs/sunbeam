@@ -9,9 +9,9 @@ export PATH=$PATH:$HOME/miniconda3/bin
 ROOT=`pwd`
 
 if [ $# -ne 1 ]; then
-    echo "Write test output to temp file"
     TEMPDIR=`mktemp -d`
 else
+    echo "Write sunbeam test result to provided path"
     TEMPDIR="$1"
 fi
 
@@ -28,7 +28,8 @@ function cleanup {
 }
 
 # Calls cleanup when the script exits
-#trap cleanup EXIT
+if [ $# -ne 1 ]; then
+    trap cleanup EXIT
 
 pushd tests
 # Copy data into the temporary directory
