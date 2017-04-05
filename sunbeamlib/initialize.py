@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import yaml
 
 from pathlib import Path
 
@@ -32,8 +33,9 @@ def main():
         help="path to conda (default: %(default)s)"
     )
     parser.add_argument(
-        "--custom_configfile_fp", help="Custom config file absolute directory", 
-        type=argparse.FileType("r"), default=None)
+        "--template", default=None, 
+        help="Path to custom config file template, in YAML format", 
+        type=argparse.FileType("r"))
 
     args = parser.parse_args()
     
@@ -45,15 +47,11 @@ def main():
     else:
         args.conda_fp = args.conda_fp.absolute()
 
-    if args.custom_configfile_fp is None:
+    if args.template is None:
         config = create_blank_config(
             args.conda_fp, args.project_fp, template=args.server)
-    elif os.path.isfile(args.custom_configfile_fp.name):
-        with open(args.custom_configfile_fp.name, 'r') as f:
-            config = f.read()
     else:
-        raise SystemExit(
-            "Specify a valid path to custom config file --custom_configfile_fp.")
- 
+        config = args.template.read() 
     sys.stdout.write(config)
 
+main()
