@@ -30,6 +30,7 @@ function cleanup {
 # Calls cleanup when the script exits
 if [ $# -ne 1 ]; then
     trap cleanup EXIT
+fi
 
 pushd tests
 # Copy data into the temporary directory
