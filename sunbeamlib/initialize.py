@@ -1,7 +1,7 @@
 import os
 import sys
+import argparse
 
-from argparse import ArgumentParser
 from pathlib import Path
 
 from sunbeamlib.config import create_blank_config
@@ -21,7 +21,7 @@ def main():
 
     conda_fp = _find_conda_fp()
      
-    parser = ArgumentParser(
+    parser = argparse.ArgumentParser(
         "init", description="Initialize a new sunbeam project")
     parser.add_argument("project_fp", help="Project root directory")
     parser.add_argument(
@@ -31,9 +31,13 @@ def main():
         "--conda_fp", default=conda_fp, type=Path,
         help="path to conda (default: %(default)s)"
     )
+    parser.add_argument(
+        "--template", default=None, 
+        help="Path to custom config file template, in YAML format", 
+        type=argparse.FileType("r"))
 
     args = parser.parse_args()
-
+    
     if not args.conda_fp or not args.conda_fp.exists():
         raise SystemExit((
             "Error: conda installation could not be found at '{conda_fp}'. " 
@@ -42,8 +46,11 @@ def main():
     else:
         args.conda_fp = args.conda_fp.absolute()
 
-    config = create_blank_config(
-        args.conda_fp, args.project_fp, template=args.server)
-    
+    if args.template is None:
+        config = create_blank_config(
+            args.conda_fp, args.project_fp, template=args.server)
+    else:
+        config = args.template.read() 
     sys.stdout.write(config)
 
+main()
