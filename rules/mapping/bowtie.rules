@@ -39,9 +39,9 @@ rule bowtie2_all:
         # * indexed sorted bam files
         # * bcf files
         # * screenshots of alignments made with IGV
-        expand("{genome}-{sample}.sorted.bam.bai", genome=GENOMES, sample=Samples.keys()),
-        expand("{genome}-{sample}.raw.bcf", genome=GENOMES, sample=Samples.keys()),
-        [expand("{genome}-{segment}.alignment.png", genome=GENOMES, segment=GENOME_SEGMENTS[g]) for g in GENOMES]
+        expand(str(MAPPING_FP/"{genome}-{sample}.sorted.bam.bai"), genome=GENOMES, sample=Samples.keys()),
+        expand(str(MAPPING_FP/"{genome}-{sample}.raw.bcf"), genome=GENOMES, sample=Samples.keys()),
+        [expand(str(MAPPING_FP/"{genome}-{segment}.alignment.png"), genome=GENOMES, segment=GENOME_SEGMENTS[g]) for g in GENOMES]
 
 rule bowtie2_build:
     message: "Creating bowtie2 index files for {input}"
@@ -57,34 +57,36 @@ rule bowtie2_align:
     input:
         rp = expand(str(Cfg['all']['data_fp'] / Cfg['all']['filename_fmt']), rp = ['R1','R2'], sample="{sample}"),
         indices = INDICES
-    output: temp("{genome}-{sample}.sam")
-    params: genome="{genome}"
-    shell: "bowtie2 -x {params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
+    output: temp(str(MAPPING_FP/"{genome}-{sample}.sam"))
+    params:
+        genome="{genome}",
+        mapping_fp=MAPPING_FP
+    shell: "bowtie2 -x {params.mapping_fp}/{params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
 
 rule samtools_view:
     message: "Converting {wildcards.genome}-{wildcards.sample} alignment from SAM to BAM format with samtools"
-    input: "{genome}-{sample}.sam"
-    output: "{genome}-{sample}.bam"
+    input: str(MAPPING_FP/"{genome}-{sample}.sam")
+    output: str(MAPPING_FP/"{genome}-{sample}.bam")
     shell: "samtools view -bS {input} > {output}"
 
 rule samtools_sort:
     message: "Sorting {input} with samtools"
-    input: "{genome}-{sample}.bam"
-    output: "{genome}-{sample}.sorted.bam"
+    input: str(MAPPING_FP/"{genome}-{sample}.bam")
+    output: str(MAPPING_FP/"{genome}-{sample}.sorted.bam")
     shell: "samtools sort {input} > {output}"
 
 rule samtools_index:
     message: "Indexing {input} with samtools"
-    input: "{genome}-{sample}.sorted.bam"
-    output: "{genome}-{sample}.sorted.bam.bai"
-    shell: "samtools index {input}"
+    input: str(MAPPING_FP/"{genome}-{sample}.sorted.bam")
+    output: str(MAPPING_FP/"{genome}-{sample}.sorted.bam.bai")
+    shell: "samtools index {input} {output}"
 
 rule samtools_mpileup:
     message: "Calling variants for {input.bam} with samtools and bcftools"
     input:
-        bam = "{genome}-{sample}.sorted.bam",
+        bam = str(MAPPING_FP/"{genome}-{sample}.sorted.bam"),
         genome = GENOME
-    output: "{genome}-{sample}.raw.bcf"
+    output: str(MAPPING_FP/"{genome}-{sample}.raw.bcf")
     shell: "samtools mpileup -gf {input.genome} {input.bam} | bcftools call -Ob -v -c - > {output}"
 
 # I'm creating each segment snapshot separate, but really it could be done in
@@ -93,14 +95,12 @@ rule igv_snapshot:
     message: "Create an alignment image for {wildcards.genome}-{wildcards.segment} with IGV"
     input:
         genome = GENOME,
-        #bams=expand("{genome}-{sample}.sorted.bam", genome="{genome}", sample=Samples.keys()),
-        #bais=expand("{genome}-{sample}.sorted.bam.bai", genome="{genome}", sample=Samples.keys())
-        bams=expand("{{genome}}-{sample}.sorted.bam", sample=Samples.keys()),
-        bais=expand("{{genome}}-{sample}.sorted.bam.bai", sample=Samples.keys())
+        bams=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam"), sample=Samples.keys()),
+        bais=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam.bai"), sample=Samples.keys())
     params:
         segment="{segment}"
     output:
-        png="{genome}-{segment}.alignment.png"
+        png=str(MAPPING_FP/"{genome}-{segment}.alignment.png")
     run:
         igv_render_script(input.genome, input.bams, output.png, params.segment)
 
