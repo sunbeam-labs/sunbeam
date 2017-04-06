@@ -50,7 +50,7 @@ def main():
         config = create_blank_config(
             args.conda_fp, args.project_fp, template=args.server)
     else:
-        config = args.template.read() 
+        config = args.template.read().format(
+                 CONDA_FP=args.conda_fp, PROJECT_FP=args.project_fp)
+ 
     sys.stdout.write(config)
-
-main()

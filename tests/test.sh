@@ -83,7 +83,21 @@ snakemake --configfile=$TEMPDIR/tmp_config_nocutadapt.yml all_decontam
 [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R1.fastq ]
 [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R2.fastq ]
 
-# Test for barcodes file
+
+# Test for template option for sunbeamlib: #54
+pushd tests
+# Create a version of the config file customized for this tempdir
+# Provide the sunbeamlib package config file manually
+CONFIG_FP=$HOME/miniconda3/envs/sunbeam/lib/python3.5/site-packages/sunbeamlib/data/default_config.yml
+sunbeam_init $TEMPDIR --template $CONFIG_FP | python prep_config_file.py > $TEMPDIR/tmp_config_2.yml
+popd
+rm -r $TEMPDIR/sunbeam_output
+echo "Now re run snakemake with custeom config file: "
+snakemake --configfile=$TEMPDIR/tmp_config_2.yml
+snakemake --configfile=$TEMPDIR/tmp_config_2.yml clean_assembly
+python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt
+
+# Test for barcodes file 
 sed 's/data_fp: data_files/data_fp: barcodes.txt/g' $TEMPDIR/tmp_config.yml > $TEMPDIR/tmp_config_barcode.yml
 echo -e "dummybfragilis\tTTTTTTTT\ndummyecoli\tTTTTTTTT" > $TEMPDIR/barcodes.txt
 rm -rf $TEMPDIR/data_files
