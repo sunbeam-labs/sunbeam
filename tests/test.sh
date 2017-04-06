@@ -2,14 +2,13 @@
 # Bash flags: Do not commit to repo with these commented out
 set -e # Stop on errors
 
-ROOT=`pwd`
-
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
 # Use local copy of IGV if present
-[ -d $DIR/IGV ] && export PATH=$PATH:$DIR/IGV
+[ -d $HOME/IGV ] && export PATH=$PATH:$HOME/IGV
 
 # Set up paths
+ROOT=`pwd`
 
 if [ $# -ne 1 ]; then
     echo "Write test output to temp file"
