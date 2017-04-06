@@ -1,4 +1,6 @@
 language: ruby
-install: bash install.sh
+install:
+  - bash install.sh
+  - bash install_igv.sh
 script: source tests/test.sh
 #test
