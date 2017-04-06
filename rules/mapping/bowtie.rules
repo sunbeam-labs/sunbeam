@@ -14,34 +14,12 @@ import subprocess
 import os
 import re
 
-def read_seq_ids(fasta_fp):
-    """ Return the sequence identifiers for a given fasta filename. """
-    ids = []
-    with open(str(fasta_fp)) as f:
-        for line in f:
-            if line.startswith('>'):
-                ids.append(re.split('[> ]', line)[1])
-    return ids
-
-# Find all genomes in the genomes_fp directory, and all sequences in each
-# genome file.
-GENOME_FILES = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
-GENOMES = [PurePath(f.name).stem for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
-GENOME_SEGMENTS = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GENOME_FILES}
-# Generate Snakemake template strings for a few commonly-used parameters below
-# TODO: Should INDICES come from sunbeamlib.index_files()?
-INDICES = expand(str(MAPPING_FP/"{{genome}}.{s}.bt2"), s=["1","2","3","4", "rev.1", "rev.2"])
-GENOME = str(Cfg['mapping']['genomes_fp'] / "{genome}.fasta")
-
 rule bowtie2_all:
-    input:
-        # Create these three sets of files specifically:
-        # * indexed sorted bam files
-        # * bcf files
-        # * screenshots of alignments made with IGV
-        expand(str(MAPPING_FP/"{genome}-{sample}.sorted.bam.bai"), genome=GENOMES, sample=Samples.keys()),
-        expand(str(MAPPING_FP/"{genome}-{sample}.raw.bcf"), genome=GENOMES, sample=Samples.keys()),
-        [expand(str(MAPPING_FP/"{genome}-{segment}.alignment.png"), genome=g, segment=GENOME_SEGMENTS[g]) for g in GENOMES]
+    # Create these three sets of files specifically:
+    # * indexed sorted bam files
+    # * bcf files
+    # * screenshots of alignments made with IGV
+    input: TARGET_MAPPING
 
 rule bowtie2_build:
     message: "Creating bowtie2 index files for {input}"
