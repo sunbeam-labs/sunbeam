@@ -13,6 +13,11 @@ import tempfile
 import subprocess
 import os
 import re
+from sunbeamlib import index_files
+
+# Generate Snakemake template strings for a few commonly-used parameters below
+INDICES = index_files('{genome}', Cfg['mapping']['genomes_fp'])
+GENOME = str(Cfg['mapping']['genomes_fp'] / "{genome}.fasta")
 
 rule bowtie2_all:
     # Create these three sets of files specifically:
@@ -27,8 +32,8 @@ rule bowtie2_build:
     output: INDICES
     params:
         genome="{genome}",
-        mapping_fp=MAPPING_FP
-    shell: "cd {params.mapping_fp} && bowtie2-build {input} {params.genome}"
+        index_fp=str(Cfg['mapping']['genomes_fp'])
+    shell: "cd {params.index_fp} && bowtie2-build {input} {params.genome}"
 
 rule bowtie2_align:
     message: "Aligning {wildcards.sample} reads to genome {wildcards.genome}"
@@ -38,8 +43,8 @@ rule bowtie2_align:
     output: temp(str(MAPPING_FP/"{genome}-{sample}.sam"))
     params:
         genome="{genome}",
-        mapping_fp=MAPPING_FP
-    shell: "bowtie2 -x {params.mapping_fp}/{params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
+        index_fp=str(Cfg['mapping']['genomes_fp'])
+    shell: "bowtie2 -x {params.index_fp}/{params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
 
 rule samtools_view:
     message: "Converting {wildcards.genome}-{wildcards.sample} alignment from SAM to BAM format with samtools"

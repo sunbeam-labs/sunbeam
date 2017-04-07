@@ -37,31 +37,10 @@ TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sampl
 ## mapping
 ####################
 
-from pathlib import PurePath
-
-def read_seq_ids(fasta_fp):
-    """ Return the sequence identifiers for a given fasta filename. """
-    ids = []
-    with open(str(fasta_fp)) as f:
-        for line in f:
-            if line.startswith('>'):
-                ids.append(re.split('[> ]', line)[1])
-    return ids
-
-# Find all genomes in the genomes_fp directory, and all sequences in each
-# genome file.
-GENOME_FILES = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
-GENOMES = [PurePath(f.name).stem for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
-GENOME_SEGMENTS = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GENOME_FILES}
-# Generate Snakemake template strings for a few commonly-used parameters below
-# TODO: Should INDICES come from sunbeamlib.index_files()?
-INDICES = expand(str(MAPPING_FP/"{{genome}}.{s}.bt2"), s=["1","2","3","4", "rev.1", "rev.2"])
-GENOME = str(Cfg['mapping']['genomes_fp'] / "{genome}.fasta")
-
 TARGET_MAPPING = [
-        expand(str(MAPPING_FP/"{genome}-{sample}.sorted.bam.bai"), genome=GENOMES, sample=Samples.keys()),
-        expand(str(MAPPING_FP/"{genome}-{sample}.raw.bcf"), genome=GENOMES, sample=Samples.keys()),
-        [expand(str(MAPPING_FP/"{genome}-{segment}.alignment.png"), genome=g, segment=GENOME_SEGMENTS[g]) for g in GENOMES]]
+        expand(str(MAPPING_FP/"{genome}-{sample}.sorted.bam.bai"), genome=GenomeSegments.keys(), sample=Samples.keys()),
+        expand(str(MAPPING_FP/"{genome}-{sample}.raw.bcf"), genome=GenomeSegments.keys(), sample=Samples.keys()),
+        [expand(str(MAPPING_FP/"{genome}-{segment}.alignment.png"), genome=g, segment=GenomeSegments[g]) for g in GenomeSegments.keys()]]
 
 ####################
 ## annotation
