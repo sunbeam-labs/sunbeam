@@ -34,6 +34,15 @@ TARGET_ASSEMBLY = (
 TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sample=Samples.keys())
 
 ####################
+## mapping
+####################
+
+TARGET_MAPPING = [
+        expand(str(MAPPING_FP/"{genome}-{sample}.sorted.bam.bai"), genome=GenomeSegments.keys(), sample=Samples.keys()),
+        expand(str(MAPPING_FP/"{genome}-{sample}.raw.bcf"), genome=GenomeSegments.keys(), sample=Samples.keys()),
+        [expand(str(MAPPING_FP/"{genome}-{segment}.alignment.png"), genome=g, segment=GenomeSegments[g]) for g in GenomeSegments.keys()]]
+
+####################
 ## annotation
 ####################
 
@@ -45,4 +54,4 @@ TARGET_ANNOTATE = expand(str(ANNOTATION_FP/'summary'/'{sample}.tsv'), sample=Sam
 ####################
 TARGET_REPORT = [str(QC_FP/'preprocess_summary.tsv'), str(QC_FP/'fastqc_quality.tsv')]
 
-TARGET_ALL = TARGET_QC + TARGET_DECONTAM + TARGET_CLASSIFY + TARGET_ASSEMBLY + TARGET_ANNOTATE + TARGET_REPORT
+TARGET_ALL = TARGET_QC + TARGET_DECONTAM + TARGET_CLASSIFY + TARGET_ASSEMBLY + TARGET_ANNOTATE + TARGET_REPORT + TARGET_MAPPING

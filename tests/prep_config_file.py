@@ -19,6 +19,7 @@ def main():
     config['assembly']['cap3_fp'] = "local/CAP3"
     config['blastdbs']['root_fp'] = "local/blast"
     config['blastdbs']['nucleotide']['bacteria'] = 'bacteria.fa'
+    config['mapping']['genomes_fp'] = "indexes"
 
     sys.stdout.write(yaml.dump(config))
 

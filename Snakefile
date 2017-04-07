@@ -10,12 +10,12 @@ import sys
 import yaml
 import configparser
 from pprint import pprint
-from pathlib import Path
+from pathlib import Path, PurePath
 
 from snakemake.utils import update_config, listfiles
 from snakemake.exceptions import WorkflowError
 
-from sunbeamlib import build_sample_list
+from sunbeamlib import build_sample_list, read_seq_ids
 from sunbeamlib.config import *
 from sunbeamlib.reports import *
 
@@ -31,6 +31,9 @@ if not config:
 Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
 Samples = build_sample_list(Cfg['all']['data_fp'], Cfg['all']['filename_fmt'], Cfg['all']['exclude'])
+
+GenomeFiles = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
+GenomeSegments = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GenomeFiles}
 
 # ---- Change your workdir to output_fp
 workdir: str(Cfg['all']['output_fp'])
