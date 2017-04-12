@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
-# Quick install of IGV into the home directory.
-# $HOME/IGV will still need to be separately added to PATH for this to work.
+# Quick install of IGV into the sunbeam/local directory.
+# For use in Sunbeam the IGV path should be specified in the mapping section of
+# the configuration file as 'igv_fp'.
 install_igv() {
-    DIR=$HOME
+    DIR=$(readlink -f $(dirname $BASH_SOURCE))/local
     IGV_VER=2.3.68
     wget http://data.broadinstitute.org/igv/projects/downloads/IGV_${IGV_VER}.zip
     unzip IGV_${IGV_VER}.zip -d $DIR
