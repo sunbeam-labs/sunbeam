@@ -77,6 +77,7 @@ rule samtools_mpileup:
 rule igv_snapshot:
     message: "Create an alignment image for {wildcards.genome}-{wildcards.segment} with IGV"
     input:
+        igv_fp = str(Cfg['mapping']['igv_fp']),
         genome = GENOME,
         bams=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam"), sample=Samples.keys()),
         bais=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam.bai"), sample=Samples.keys())
@@ -85,19 +86,20 @@ rule igv_snapshot:
     output:
         png=str(MAPPING_FP/"{genome}-{segment}.alignment.png")
     run:
-        igv_render_script(input.genome, input.bams, output.png, params.segment)
+        igv_render_script(input.genome, input.bams, output.png, params.segment, input.igv_fp)
 
 
 ### IGV Helper Functions
 
 
-def igv_render_script(genome, bams, imagefile, seqID=None):
+def igv_render_script(genome, bams, imagefile, seqID=None, igv_fp="igv"):
         """ Render an alignment to an image, given a genome and bam files.
 
         genome: path to a fasta file
         bams: list of path to a sorted, indexed bam file
         imagefile: path to the image to save
         seqID: (optional) sequence identifier to load from genome
+        igv_fp: (optional) path to IGV executable
 
         The image file may be smaller than expected.  See
         igv_render_socket_nonblocking() for an attempt to enlarge the window
@@ -131,7 +133,7 @@ def igv_render_script(genome, bams, imagefile, seqID=None):
         igvprefstext = map(lambda x: bytes(x+'\n', 'ascii'), igvprefs)
         igvprefsfile.writelines(igvprefstext)
         igvprefsfile.flush()
-        shell("xvfb-run -s '-screen 1 1920x1080x24' igv -o %s -b %s" % (igvprefsfile.name, igvscript.name))
+        shell("xvfb-run -s '-screen 1 1920x1080x24' %s -o %s -b %s" % (igv_fp, igvprefsfile.name, igvscript.name))
 
 def igv_render_socket_nonblocking(genome, bams, imagefile):
         input_paths = [str(Path(bam).resolve()) for bam in bams]

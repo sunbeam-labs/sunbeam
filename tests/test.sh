@@ -4,8 +4,6 @@ set -e # Stop on errors
 
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
-# Use local copy of IGV if present
-[ -d $HOME/IGV ] && export PATH=$PATH:$HOME/IGV
 
 # Set up paths
 ROOT=`pwd`
