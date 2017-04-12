@@ -1,6 +1,6 @@
 language: ruby
 install:
-  - bash install.sh
+  - bash install.sh sunbeam anaconda_log.txt
   - bash install_igv.sh
 script: source tests/test.sh
 #test

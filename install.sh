@@ -5,10 +5,11 @@ set -e
 PREFIX=$HOME/miniconda3
 
 SUNBEAM_ENV_NAME=${1-sunbeam}
+OUTPUT=${2-/dev/stdout}
 
 install_conda () {
     wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    bash Miniconda3-latest-Linux-x86_64.sh -b -p $PREFIX
+    bash Miniconda3-latest-Linux-x86_64.sh -b -p $PREFIX >> $OUTPUT
     export PATH=$PATH:$PREFIX/bin
     command -v conda >/dev/null 2>&1 || { echo "Conda still isn't on the path, try installing manually"; exit 1; }
 }
@@ -21,10 +22,10 @@ conda config --add channels eclarke
 
 # Don't create the enviroment if it already exists
 conda env list | grep -Fxq $SUNBEAM_ENV_NAME || {
-    conda create --name=$SUNBEAM_ENV_NAME --file=requirements.txt --yes;
+    conda create --name=$SUNBEAM_ENV_NAME --file=requirements.txt --yes >> $OUTPUT
     source activate $SUNBEAM_ENV_NAME
-    pip install .
-    pip install git+https://github.com/eclarke/decontam.git
+    pip install . >> $OUTPUT
+    pip install git+https://github.com/eclarke/decontam.git >> $OUTPUT
     echo "Sunbeam successfully installed.";
 }
 
