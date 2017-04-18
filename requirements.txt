@@ -13,6 +13,7 @@ kraken-biom
 pear
 vsearch
 bwa
+bowtie2
 jellyfish=1.1.11=1
 cutadapt
 pysam

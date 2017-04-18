@@ -1,66 +1,76 @@
 # -*- mode: Snakemake -*-
 
-def bt2_index_files(genome, idx_fp):
-    fwd = expand('{idx_fp}/{genome}.{index}.bt2',
-                 genome=genome,
-                 idx_fp=idx_fp,
-                 index=range(1,5))
-    rev = expand('{idx_fp}/{genome}.rev.{index}.bt2',
-                 genome=genome,
-                 idx_fp=idx_fp,
-                 index=range(1,3))
-    return fwd + rev
+from sunbeamlib import index_files, igv
 
-rule bt2_index:
-    output:
-        bt2_index_files('{genome}', Cfg['mapping']['genomes_fp'])
+# Generate Snakemake template strings for a few commonly-used parameters below
+INDICES = index_files('{genome}', Cfg['mapping']['genomes_fp'])
+GENOME = str(Cfg['mapping']['genomes_fp'] / "{genome}.fasta")
+
+rule bowtie2_all:
+    # Create these three sets of files specifically:
+    # * indexed sorted bam files
+    # * bcf files
+    # * screenshots of alignments made with IGV
+    input: TARGET_MAPPING
+
+rule bowtie2_build:
+    message: "Creating bowtie2 index files for {input}"
+    input: GENOME
+    output: INDICES
     params:
-        idx_fp = str(Cfg['mapping']['genomes_fp'])
-    shell:
-        "bowtie2-build {params.idx_fp}/{wildcards.genome}.fa {params.idx_fp}/{wildcards.genome}"
+        genome="{genome}",
+        index_fp=str(Cfg['mapping']['genomes_fp'])
+    shell: "cd {params.index_fp} && bowtie2-build {input} {params.genome}"
 
-rule bt2_map_contigs:
+rule bowtie2_align:
+    message: "Aligning {wildcards.sample} reads to genome {wildcards.genome}"
     input:
-        lambda wildcards: bt2_index_files(wildcards.genome, Cfg['mapping']['genomes_fp']),
-        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq')
-    output:
-        temp(str(MAPPING_FP/'{genome}'/'{sample}/reads.sam'))
+        rp = expand(str(Cfg['all']['data_fp'] / Cfg['all']['filename_fmt']), rp = ['R1','R2'], sample="{sample}"),
+        indices = INDICES
+    output: temp(str(MAPPING_FP/"{genome}-{sample}.sam"))
     params:
-        idx=str(Cfg['mapping']['genomes_fp']/'{genome}')
-    shell:
-        "bowtie2 -x {params.idx} -1 {input.r1} -2 {input.r2} -S {output} -p {Cfg[all][subcores]}"
+        genome="{genome}",
+        index_fp=str(Cfg['mapping']['genomes_fp'])
+    shell: "bowtie2 -x {params.index_fp}/{params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
 
-rule sam_to_bam:
-    input: "{fname}.sam"
-    output: temp("{fname}.bam")
+rule samtools_view:
+    message: "Converting {wildcards.genome}-{wildcards.sample} alignment from SAM to BAM format with samtools"
+    input: str(MAPPING_FP/"{genome}-{sample}.sam")
+    output: str(MAPPING_FP/"{genome}-{sample}.bam")
     shell: "samtools view -bS {input} > {output}"
 
-rule sort_bam:
-    input: "{fname}.bam"
-    output: "{fname}.sorted.bam"
-    shell: "samtools sort -o {output} {input}"
+rule samtools_sort:
+    message: "Sorting {input} with samtools"
+    input: str(MAPPING_FP/"{genome}-{sample}.bam")
+    output: str(MAPPING_FP/"{genome}-{sample}.sorted.bam")
+    shell: "samtools sort {input} > {output}"
 
-rule index_bam:
-    input: "{fname}.sorted.bam"
-    output: "{fname}.sorted.bam.bai"
-    shell: "samtools index {input}"
+rule samtools_index:
+    message: "Indexing {input} with samtools"
+    input: str(MAPPING_FP/"{genome}-{sample}.sorted.bam")
+    output: str(MAPPING_FP/"{genome}-{sample}.sorted.bam.bai")
+    shell: "samtools index {input} {output}"
 
-rule bam_stats:
+rule samtools_mpileup:
+    message: "Calling variants for {input.bam} with samtools and bcftools"
     input:
-        bam="{fname}.sorted.bam",
-        bai="{fname}.sorted.bam.bai"
-    output: "{fname}.stats"
-    shell: "samtools stats {input.bam} > {output}"
+        bam = str(MAPPING_FP/"{genome}-{sample}.sorted.bam"),
+        genome = GENOME
+    output: str(MAPPING_FP/"{genome}-{sample}.raw.bcf")
+    shell: "samtools mpileup -gf {input.genome} {input.bam} | bcftools call -Ob -v -c - > {output}"
 
-
-rule _map_all:
+# I'm creating each segment snapshot separate, but really it could be done in
+# one IGV run.  Can Snakemake handle that?
+rule igv_snapshot:
+    message: "Create an alignment image for {wildcards.genome}-{wildcards.segment} with IGV"
     input:
-        expand(
-            str(MAPPING_FP/'t_gondii'/'{sample}'/'reads.stats'),
-            sample=Samples.keys())
-           
-rule _test_bt2:
-    input:
-        expand(str(MAPPING_FP/'t_gondii_COUG'/'{sample}/reads.stats'),
-               sample='Sample2c_S30')
+        igv_fp = str(Cfg['mapping']['igv_fp']),
+        genome = GENOME,
+        bams=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam"), sample=Samples.keys()),
+        bais=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam.bai"), sample=Samples.keys())
+    params:
+        segment="{segment}"
+    output:
+        png=str(MAPPING_FP/"{genome}-{segment}.alignment.png")
+    run:
+        igv.render(input.genome, input.bams, output.png, params.segment, input.igv_fp, "script")
