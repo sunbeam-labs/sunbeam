@@ -5,6 +5,7 @@ from snakemake.utils import listfiles
 from snakemake.workflow import expand
 import os
 import re
+from Bio import SeqIO
 
 
 def build_sample_list(data_fp, filename_fmt, excluded):
@@ -95,9 +96,4 @@ def read_seq_ids(fasta_fp):
     """
     Return the sequence identifiers for a given fasta filename.
     """
-    ids = []
-    with open(str(fasta_fp)) as f:
-        for line in f:
-            if line.startswith('>'):
-                ids.append(re.split('[> ]', line)[1])
-    return ids
+    return [record.id for record in SeqIO.parse(str(fasta_fp), "fasta")]
