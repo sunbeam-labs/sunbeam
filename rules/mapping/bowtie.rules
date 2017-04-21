@@ -28,22 +28,25 @@ rule bowtie2_align:
         rp = expand(str(Cfg['all']['data_fp'] / Cfg['all']['filename_fmt']), rp = ['R1','R2'], sample="{sample}"),
         indices = INDICES
     output: temp(str(MAPPING_FP/"{genome}-{sample}.sam"))
+    threads: Cfg['mapping']['threads']
     params:
         genome="{genome}",
         index_fp=str(Cfg['mapping']['genomes_fp'])
-    shell: "bowtie2 -x {params.index_fp}/{params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
+    shell: "bowtie2 --threads {threads} -x {params.index_fp}/{params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
 
 rule samtools_view:
     message: "Converting {wildcards.genome}-{wildcards.sample} alignment from SAM to BAM format with samtools"
     input: str(MAPPING_FP/"{genome}-{sample}.sam")
     output: str(MAPPING_FP/"{genome}-{sample}.bam")
-    shell: "samtools view -bS {input} > {output}"
+    threads: Cfg['mapping']['threads']
+    shell: "samtools view -@ {threads} -bS {input} > {output}"
 
 rule samtools_sort:
     message: "Sorting {input} with samtools"
     input: str(MAPPING_FP/"{genome}-{sample}.bam")
     output: str(MAPPING_FP/"{genome}-{sample}.sorted.bam")
-    shell: "samtools sort {input} > {output}"
+    threads: Cfg['mapping']['threads']
+    shell: "samtools sort -@ {threads} {input} > {output}"
 
 rule samtools_index:
     message: "Indexing {input} with samtools"
