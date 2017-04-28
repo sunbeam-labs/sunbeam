@@ -69,8 +69,10 @@ rule igv_snapshot:
         bams=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam"), sample=Samples.keys()),
         bais=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam.bai"), sample=Samples.keys())
     params:
-        segment="{segment}"
+        segment="{segment}",
+        igv_prefs=Cfg['mapping']['igv_prefs']
     output:
         png=str(MAPPING_FP/"{genome}-{segment}.alignment.png")
     run:
-        igv.render(input.genome, input.bams, output.png, params.segment, input.igv_fp, "script")
+        igv.render(input.genome, sorted(input.bams), output.png, params.segment,
+                   input.igv_fp, "script", params.igv_prefs)

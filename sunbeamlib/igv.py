@@ -15,7 +15,7 @@ import tempfile
 import time
 import os
 
-def render(genome, bams, imagefile, seqID=None, igv_fp="igv", method="script"):
+def render(genome, bams, imagefile, seqID=None, igv_fp="igv", method="script", igv_prefs={}):
         """ Render an alignment to an image, given a genome and bam files.
 
         genome: path to a fasta file
@@ -24,6 +24,7 @@ def render(genome, bams, imagefile, seqID=None, igv_fp="igv", method="script"):
         seqID: (optional) sequence identifier to load from genome
         igv_fp: (optional) path to IGV executable
         method: (optional) method for controlling IGV process: "script" or "socket"
+        igv_prefs: (optional) dictionary of IGV preferences to override
 
         The image file may be smaller than expected.  See
         igv_render_socket_nonblocking() for an attempt to enlarge the window
@@ -42,37 +43,38 @@ def render(genome, bams, imagefile, seqID=None, igv_fp="igv", method="script"):
             'snapshot ' + output_path,
             'exit']
         if method == "script":
-            igvprefs = ["GENOME_LIST=;%s" % genome_path,
-                "DEFAULT_GENOME_KEY=%s" % genome_path]
-            _control_script(igvcommands, igv_fp, igvprefs)
+            # If previous genome files listed in IGV's preferences are no
+            # longer available, IGV will throw a null pointer exception at
+            # startup and batch commands will fail.  So, we'll use a
+            # preferences override file to list the genome file used here.
+            # (This is probably an IGV bug.  We should see if it happens in the
+            # latest release.) I've also tried setting IGV.Bounds in an attempt
+            # to make the window larger, but it doesn't seem to have any
+            # effect.
+            igv_prefs["GENOME_LIST"] = ";" + genome_path
+            igv_prefs["DEFAULT_GENOME_KEY"] = genome_path
+            _control_script(igvcommands, igv_fp, igv_prefs)
         elif method == "socket":
-            _control_socket(igvcommands, igv_fp)
+            _control_socket(igvcommands, igv_fp, igv_prefs)
         else:
             raise ValueError("method should be 'script' or 'socket', not '%s'" % method)
 
-def _control_script(igvcommands, igv_fp, igvprefs):
+def _control_script(igvcommands, igv_fp, igv_prefs):
         igvscript = tempfile.NamedTemporaryFile()
         igvscript.writelines(map(lambda x: bytes(x+'\n', 'ascii'), igvcommands))
         igvscript.flush()
-        # If previous genome files listed in IGV's preferences are no longer
-        # available, IGV will throw a null pointer exception at startup and
-        # batch commands will fail.  So, we'll use a preferences override file
-        # to list the genome file used here.  (This is probably an IGV bug.  We
-        # should see if it happens in the latest release.)
-        # I've also tried setting IGV.Bounds in an attempt to make the window
-        # larger, but it doesn't seem to have any effect.
-        igvprefsfile = tempfile.NamedTemporaryFile()
-        igvprefstext = map(lambda x: bytes(x+'\n', 'ascii'), igvprefs)
-        igvprefsfile.writelines(igvprefstext)
-        igvprefsfile.flush()
+        igvprefsfile = _write_prefs(igv_prefs)
         shell("xvfb-run -s '-screen 1 1920x1080x24' %s -o %s -b %s" % (igv_fp, igvprefsfile.name, igvscript.name))
 
-def _control_socket(igvcommands, igv_fp):
+def _control_socket(igvcommands, igv_fp, igv_prefs):
+        igvprefsfile = _write_prefs(igv_prefs)
         # Start up IGV.  Use a port between 10000 and the max available, based
         # on the PID of this process.  (TODO is using this pid safe?)
         port = 10000 + os.getpid()%(2**16-10000)
         xauth = "/tmp/xauth-%d" % os.getpid()
-        igvproc = subprocess.Popen(["xvfb-run", "-l", "-f" , xauth, "-s", "-screen 1 1920x1080x24", str(igv_fp), "-p", str(port)])
+        xvfb_cmdline = ["xvfb-run", "-l", "-f" , xauth, "-s", "-screen 1 1920x1080x24"]
+        igv_cmdline = [ str(igv_fp), "-p", str(port), "-o", igvprefsfile.name ]
+        igvproc = subprocess.Popen(xvfb_cmdline + igv_cmdline)
 
         # Connect to running IGV
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -93,3 +95,10 @@ def _control_socket(igvcommands, igv_fp):
         s.sendall(bytes('\n'.join(igvcommands), 'ascii'))
         s.close()
         igvproc.wait()
+
+def _write_prefs(igv_prefs):
+        igvprefsfile = tempfile.NamedTemporaryFile()
+        for k,v in igv_prefs.items():
+            igvprefsfile.write(bytes("%s=%s\n" % (k, v), 'ascii'))
+        igvprefsfile.flush()
+        return igvprefsfile
