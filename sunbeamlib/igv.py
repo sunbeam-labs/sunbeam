@@ -15,7 +15,7 @@ import tempfile
 import time
 import os
 
-def render(genome, bams, imagefile, seqID=None, igv_fp="igv", method="script", igv_prefs={}):
+def render(genome, bams, imagefile, seqID=None, igv_fp="igv", method="script", igv_prefs=None):
         """ Render an alignment to an image, given a genome and bam files.
 
         genome: path to a fasta file
@@ -30,6 +30,7 @@ def render(genome, bams, imagefile, seqID=None, igv_fp="igv", method="script", i
         igv_render_socket_nonblocking() for an attempt to enlarge the window
         before saving the image.
         """
+        igv_prefs = igv_prefs or {}
         input_paths = [str(Path(bam).resolve()) for bam in bams]
         genome_path = str(Path(genome).resolve())
         output_path = str( Path('.').resolve() / Path(imagefile) )
