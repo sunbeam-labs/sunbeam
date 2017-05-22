@@ -1,6 +1,8 @@
 # -*- mode: Snakemake -*-
 
 from sunbeamlib import index_files, igv
+import subprocess
+import numpy
 
 # Generate Snakemake template strings for a few commonly-used parameters below
 INDICES = index_files('{genome}', Cfg['mapping']['genomes_fp'])
@@ -47,6 +49,50 @@ rule samtools_sort:
     output: str(MAPPING_FP/"{genome}-{sample}.sorted.bam")
     threads: Cfg['mapping']['threads']
     shell: "samtools sort -@ {threads} {input} > {output}"
+
+def get_coverage_stats(genome_name, bamfiles, sample_names, output_fp):
+    """Produce a CSV table of alignment stats for a single genome.
+    
+    genome_name: identifier for genome
+    bamfiles: list of file paths to BAM files
+    sample_names: list of idenifiers for the sample for each BAM file
+    output_fp: path to CSV output file
+    """
+    output_rows = []
+    for bamfile, sample in sorted(zip(bamfiles, sample_names)):
+        # Get coverage depth at each position, even if zero across whole segment
+        p = subprocess.Popen(["samtools", "depth", "-aa", bamfile], stdout=subprocess.PIPE)
+        stdout, stderr = p.communicate()
+        # Organize into a list of depths for each segment
+        lines = str(stdout, 'ascii').splitlines()
+        reader = csv.reader(lines, delimiter='\t')
+        data = {}
+        for row in reader:
+            if not data.get(row[0]):
+                data[row[0]] = []
+            data[row[0]].append(int(row[2]))
+        # Summarize stats for all segments present and append to output
+        for segment in data.keys():
+            minval = numpy.min(data[segment])
+            maxval = numpy.max(data[segment])
+            mean   = numpy.mean(data[segment])
+            median = numpy.median(data[segment])
+            stddev = numpy.std(data[segment])
+            row = [genome_name, segment, sample, minval, maxval, mean, median, stddev]
+            output_rows.append(row)
+    # write out stats per segment per sample
+    fields = ['Genome', 'Segment', 'Sample', 'Min', 'Max', 'Mean', 'Median', 'Std Dev']
+    with open(output_fp, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(fields)
+        writer.writerows(output_rows)
+
+rule samtools_get_coverage:
+    message: "Tabulating coverage stats for {wildcards.genome}"
+    input: expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam"), sample=Samples.keys())
+    output: str(MAPPING_FP/"{genome}.coverage.csv")
+    run:
+        get_coverage_stats(wildcards.genome, input, Samples.keys(), output[0])
 
 rule samtools_index:
     message: "Indexing {input} with samtools"
