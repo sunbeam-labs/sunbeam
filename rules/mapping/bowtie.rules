@@ -32,7 +32,17 @@ rule bowtie2_align:
     params:
         genome="{genome}",
         index_fp=str(Cfg['mapping']['genomes_fp'])
-    shell: "bowtie2 --threads {threads} -x {params.index_fp}/{params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
+    run:
+        sample = Samples[wildcards.sample]
+        # Assume fastq input unless input filename ends with an A
+        fmt_arg = "-q"
+        if input.rp[0].endswith(("a", "A")):
+            fmt_arg = "-f"
+        # Assume unpaired, unless the paired attribute is True for the sample
+        input_args = "-U %s" % input.rp[0]
+        if sample['paired']:
+            input_args = "-1 %s -2 %s" % (input.rp[0], input.rp[1])
+        shell("bowtie2 --threads {threads} -x {params.index_fp}/{params.genome} {fmt_arg} {input_args} -S {output}")
 
 rule samtools_view:
     message: "Converting {wildcards.genome}-{wildcards.sample} alignment from SAM to BAM format with samtools"
