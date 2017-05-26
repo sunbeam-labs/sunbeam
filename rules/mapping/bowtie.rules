@@ -1,6 +1,6 @@
 # -*- mode: Snakemake -*-
 
-from sunbeamlib import index_files, igv
+from sunbeamlib import index_files, igv, samtools
 
 # Generate Snakemake template strings for a few commonly-used parameters below
 INDICES = index_files('{genome}', Cfg['mapping']['genomes_fp'])
@@ -47,6 +47,13 @@ rule samtools_sort:
     output: str(MAPPING_FP/"{genome}-{sample}.sorted.bam")
     threads: Cfg['mapping']['threads']
     shell: "samtools sort -@ {threads} {input} > {output}"
+
+rule samtools_get_coverage:
+    message: "Tabulating coverage stats for {wildcards.genome}"
+    input: expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam"), sample=Samples.keys())
+    output: str(MAPPING_FP/"{genome}.coverage.csv")
+    run:
+        samtools.get_coverage_stats(wildcards.genome, input, Samples.keys(), output[0])
 
 rule samtools_index:
     message: "Indexing {input} with samtools"
