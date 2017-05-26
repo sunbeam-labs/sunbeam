@@ -33,7 +33,7 @@ rule bowtie2_align:
         genome="{genome}",
         index_fp=str(Cfg['mapping']['genomes_fp'])
     run:
-        sample = [v for k,v in Samples.items() if v['file'] == input.rp[0]][0]
+        sample = Samples[wildcards.sample]
         # Assume fastq input unless input filename ends with an A
         fmt_arg = "-q"
         if input.rp[0].endswith(("a", "A")):
@@ -41,7 +41,7 @@ rule bowtie2_align:
         # Assume unpaired, unless the paired attribute is True for the sample
         input_args = "-U %s" % input.rp[0]
         if sample['paired']:
-            input_args = "-1 %s -2 %s" % (input.rp)
+            input_args = "-1 %s -2 %s" % (input.rp[0], input.rp[1])
         shell("bowtie2 --threads {threads} -x {params.index_fp}/{params.genome} {fmt_arg} {input_args} -S {output}")
 
 rule samtools_view:
