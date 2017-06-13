@@ -5,6 +5,8 @@ from sunbeamlib import index_files, igv, samtools
 # Generate Snakemake template strings for a few commonly-used parameters below
 INDICES = index_files('{genome}', Cfg['mapping']['genomes_fp'])
 GENOME = str(Cfg['mapping']['genomes_fp'] / "{genome}.fasta")
+# Toggle for bowtie2's --no-unal (no unaligned reads in output) option
+KEEP_UNALIGNED = {True: "", False: "--no-unal"}[Cfg['mapping']['keep_unaligned']]
 
 rule bowtie2_all:
     # Create these three sets of files specifically:
@@ -31,8 +33,9 @@ rule bowtie2_align:
     threads: Cfg['mapping']['threads']
     params:
         genome="{genome}",
-        index_fp=str(Cfg['mapping']['genomes_fp'])
-    shell: "bowtie2 --threads {threads} -x {params.index_fp}/{params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
+        index_fp=str(Cfg['mapping']['genomes_fp']),
+        keep_unaligned=KEEP_UNALIGNED
+    shell: "bowtie2 {params.keep_unaligned} --threads {threads} -x {params.index_fp}/{params.genome} -1 {input.rp[0]} -2 {input.rp[1]} -S {output}"
 
 rule samtools_view:
     message: "Converting {wildcards.genome}-{wildcards.sample} alignment from SAM to BAM format with samtools"

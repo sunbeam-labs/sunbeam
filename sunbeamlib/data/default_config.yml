@@ -98,6 +98,7 @@ mapping:
   genomes_fp: ""
   igv_fp: ""
   threads: 4
+  keep_unaligned: False
   igv_prefs:
     # Smooth rendered text.  By default it looks jagged.
     ENABLE_ANTIALIASING: true
