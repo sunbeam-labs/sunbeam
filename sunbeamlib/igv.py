@@ -65,7 +65,7 @@ def _control_script(igvcommands, igv_fp, igv_prefs):
         igvscript.writelines(map(lambda x: bytes(x+'\n', 'ascii'), igvcommands))
         igvscript.flush()
         igvprefsfile = _write_prefs(igv_prefs)
-        shell("xvfb-run -s '-screen 1 1920x1080x24' %s -o %s -b %s" % (igv_fp, igvprefsfile.name, igvscript.name))
+        shell("xvfb-run -a -s '-screen 1 1920x1080x24' %s -o %s -b %s" % (igv_fp, igvprefsfile.name, igvscript.name))
 
 def _control_socket(igvcommands, igv_fp, igv_prefs):
         igvprefsfile = _write_prefs(igv_prefs)
@@ -73,7 +73,7 @@ def _control_socket(igvcommands, igv_fp, igv_prefs):
         # on the PID of this process.  (TODO is using this pid safe?)
         port = 10000 + os.getpid()%(2**16-10000)
         xauth = "/tmp/xauth-%d" % os.getpid()
-        xvfb_cmdline = ["xvfb-run", "-l", "-f" , xauth, "-s", "-screen 1 1920x1080x24"]
+        xvfb_cmdline = ["xvfb-run", "-a", "-l", "-f" , xauth, "-s", "-screen 1 1920x1080x24"]
         igv_cmdline = [ str(igv_fp), "-p", str(port), "-o", igvprefsfile.name ]
         igvproc = subprocess.Popen(xvfb_cmdline + igv_cmdline)
 
@@ -86,10 +86,18 @@ def _control_socket(igvcommands, igv_fp, igv_prefs):
             except ConnectionRefusedError:
                 time.sleep(0.5)
 
+        # Figure out what X11 display the IGV process is using.  It should be
+        # the second child of the initial xfvb-run process (the first child
+        # being Xvfb, I think.)
+        with open("/proc/%s/task/%s/children" % (igvproc.pid, igvproc.pid)) as f:
+            child_pid = f.read().split()[1]
+        with open("/proc/%s/environ" % child_pid) as f:
+            env_vars = [env_var.split('=', 1) for env_var in f.read().split('\x00') ]
+            env_vars = {env_var[0]: env_var[1] for env_var in env_vars if len(env_var)==2}
+        display = env_vars['DISPLAY']
         # Based on http://unix.stackexchange.com/questions/5999/ :
         # This should make the window as large as the virtual X display, but in
         # practice my screenshots aren't going over 1280 x 1296.
-        display = ":99"
         shell("DISPLAY="+display+" XAUTHORITY="+xauth+" xdotool search --onlyvisible --name IGV windowsize --sync 100% 100%")
 
         # Generate screenshot
