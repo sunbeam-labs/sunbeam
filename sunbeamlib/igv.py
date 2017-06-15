@@ -9,6 +9,7 @@ Dependencies:
 
 from pathlib import Path
 from snakemake import shell
+from Bio import SeqIO
 import socket
 import subprocess
 import tempfile
@@ -34,11 +35,13 @@ def render(genome, bams, imagefile, seqID=None, igv_fp="igv", method="script", i
         input_paths = [str(Path(bam).resolve()) for bam in bams]
         genome_path = str(Path(genome).resolve())
         output_path = str( Path('.').resolve() / Path(imagefile) )
-        genome_cmd = 'genome ' + genome_path
-        if seqID:
-            genome_cmd += "\ngoto %s" % seqID
+        # build a "seqID:1:length" string to force IGV to display the full
+        # segment.  If no segment was given it will default to the first.
+        goto_locus = _seq_length(genome, seqID)
+        goto_locus = "%s:%s-%s" % (goto_locus[0], '1', goto_locus[1])
         igvcommands = ['new',
-            genome_cmd,
+            'genome ' + genome_path,
+            'goto ' + goto_locus,
             'load ' + ','.join(input_paths),
             'collapse',
             'snapshot ' + output_path,
@@ -111,3 +114,11 @@ def _write_prefs(igv_prefs):
             igvprefsfile.write(bytes("%s=%s\n" % (k, v), 'ascii'))
         igvprefsfile.flush()
         return igvprefsfile
+
+def _seq_length(fasta_fp, seqID=None):
+    """Give the ID and sequence length of the first (or specified) sequence. """
+    record_lengths = [[r.id, len(r.seq)] for r in SeqIO.parse(fasta_fp, "fasta")]
+    if not seqID:
+        return(record_lengths[0])
+    record_length_match = [r for r in record_lengths if r[0] == seqID]
+    return(record_length_match[0])
