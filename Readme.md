@@ -89,6 +89,16 @@ copies of their databases to be accessible. If you are not ready to use them,
 you can leave their paths blank and the automated checker will not complain
 about them being invalid. 
 
+#### Setting up custom Kraken databases
+
+[Kraken](https://ccb.jhu.edu/software/kraken/) is the default read annotation software for Sunbeam.
+It is installed as a dependency, so manual installation is not required.
+Unfortunately it hasn't been updated in a while and the scripts to build custom databases no longer work with NCBI.
+
+We recommend installing this [fork](https://github.com/taltman/kraken), which updates the database building scripts to use the correct NCBI URLs. 
+As a bonus, it also uses `dust` to mask problematic low-complexity regions of the genomes being used to build the database. 
+This step is essential to perform by hand if not using this fork; see this page on instructions: https://groups.google.com/forum/#!topic/kraken-users/jjRe21-qyvw
+
 ### Running sunbeam
 
 ```sh
