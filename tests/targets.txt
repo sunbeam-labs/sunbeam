@@ -1,26 +1,34 @@
 annotation/blastn/bacteria/contig/dummybfragilis.xml
 annotation/blastn/bacteria/contig/dummyecoli.xml
+annotation/blastn/bacteria/contig/random.xml
 
 annotation/summary/dummybfragilis.tsv
 annotation/summary/dummyecoli.tsv
+annotation/summary/random.tsv
 
 assembly/dummybfragilis_assembly/final-contigs.fa
 assembly/dummyecoli_assembly/final-contigs.fa
+assembly/random_assembly/final-contigs.fa
 
 classify/kraken/all_samples.biom
 classify/kraken/all_samples.tsv
 classify/kraken/dummybfragilis-taxa.tsv
 classify/kraken/dummyecoli-taxa.tsv
+classify/kraken/random-taxa.tsv
 
 qc/decontam/dummybfragilis_R1.fastq
 qc/decontam/dummybfragilis_R2.fastq
 qc/decontam/dummyecoli_R1.fastq
 qc/decontam/dummyecoli_R2.fastq
+qc/decontam/random_R1.fastq
+qc/decontam/random_R2.fastq
 
 qc/paired/dummybfragilis_R1.fastq.gz
 qc/paired/dummybfragilis_R2.fastq.gz
 qc/paired/dummyecoli_R1.fastq.gz
 qc/paired/dummyecoli_R2.fastq.gz
+qc/paired/random_R1.fastq.gz
+qc/paired/random_R2.fastq.gz
 
 mapping/human-KI270762.1.alignment.png
 mapping/phix174-gi|9626372|ref|NC_001422.1|.alignment.png

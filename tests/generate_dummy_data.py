@@ -5,6 +5,10 @@
 
 import sys
 import os
+import random
+# So that "random" values in this testing will actually be arbitrary but still
+# deterministic:
+random.seed(sum(bytes('sunbeam', 'ascii')))
 
 def reverse_complement(dna):
 	dnadict = {'A':'T','C':'G','G':'C','T':'A'}
@@ -48,6 +52,21 @@ def write_fastq(genome_segment, locs, sample_name,file_fp):
 		file2.write("%s\n" % ''.join("G"*250))
 	file2.close()
 
+# Using this to trigger a failure to assemble any contigs in the assembly
+# rules.  Note the random.seed() call above so that we will always get the same
+# sequences.
+def write_random_fastq(sample_name, file_fp, numreads=4, readlen=100):
+    """Write a pair of sample fastq files containing randomized sequences."""
+    dna = 'ATCG'
+    randread = lambda: ''.join([dna[random.randint(0,len(dna)-1)] for i in range(readlen)])
+    for r in (1,2):
+        with open(file_fp + '/PCMP_'+sample_name+'_R%s.fastq' % r, 'w') as f:
+            for s in range(numreads):
+                f.write('@read%s\n' % s)
+                f.write('%s\n' % randread())
+                f.write('+\n')
+                f.write('%s\n' % ('G'*readlen))
+
 def generate_dummyfastq(rootpath):
 
 	raw_fp = rootpath + "/raw"
@@ -73,6 +92,7 @@ def generate_dummyfastq(rootpath):
 
 	write_fastq(genome_segment_e, locs, "dummyecoli", fastq_fp)
 	write_fastq(genome_segment_b, locs, "dummybfragilis",fastq_fp)
+	write_random_fastq('random', fastq_fp)
 
 
 if __name__ == '__main__':

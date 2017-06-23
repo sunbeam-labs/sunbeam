@@ -46,8 +46,10 @@ rule cap3:
         str(ASSEMBLY_FP/'log'/'cap3'/'{sample}.out')
     shell:
         """
+        [[ -s {input.contig} ]] && \
         {input.cap3} {input.contig} &> {log} && \
-        cat {input.contig}.cap.singlets {input.contig}.cap.contigs > {output}
+        cat {input.contig}.cap.singlets {input.contig}.cap.contigs > {output} || \
+        cp {input.contig} {output} &> {log}
         """
 
 rule save_intermediates:

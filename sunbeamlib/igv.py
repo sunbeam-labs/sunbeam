@@ -32,7 +32,9 @@ def render(genome, bams, imagefile, seqID=None, igv_fp="igv", method="script", i
         before saving the image.
         """
         igv_prefs = igv_prefs or {}
-        input_paths = [str(Path(bam).resolve()) for bam in bams]
+        genome = str(genome)
+        imagefile = str(imagefile)
+        input_paths = [str(Path(str(bam)).resolve()) for bam in bams]
         genome_path = str(Path(genome).resolve())
         output_path = str( Path('.').resolve() / Path(imagefile) )
         # build a "seqID:1:length" string to force IGV to display the full
