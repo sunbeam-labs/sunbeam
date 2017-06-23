@@ -1,4 +1,4 @@
-snakemake
+snakemake=3.13.0
 biopython
 trimmomatic
 fastqc
