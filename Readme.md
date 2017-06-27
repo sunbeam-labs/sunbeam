@@ -35,6 +35,7 @@ The pipeline is separated into sections:
 
 - quality control (`qc`)
 - read classification (`classify`)
+- read mapping and alignment visualization (`mapping`)
 - contig assembly (`assembly`)
 - contig annotation (`annotation`)
 
@@ -82,6 +83,31 @@ defining the read pair would be `R1` and `R2`, and the intermediate part `L001`
 doesn't change between samples. Thus, the way you'd specify the `filename_fmt`
 parameter would be `{sample}_L001_{rp}.fastq.gz`.
 
+### Defining genomes to align to
+
+The mapping rules will attempt to align all reads from all samples to all
+available genome sequences, and will also create some summary statistics and a
+visualization of alignments for each genome using [IGV].
+
+At a minimum the mapping configuration requires a path to a directory of genome
+files in fasta format (for alignment of reads), and the path to an IGV
+executable (for visualizing alignments against each genome).  IGV version
+2.3.68 is known to work.  [Xvfb] also must be installed for IGV visualization.
+
+An example for the two required mapping configuration options, if you have a
+custom IGV install in `sunbeam/local/IGV`:
+
+    mapping:
+      genomes_fp: "/home/erik/OceanVirome/genomes"
+      igv_fp: "local/IGV/igv.sh"
+
+Some other settings specific to the mapping rules:
+
+- `keep_unaligned`: A boolean defining if unaligned reads should be kept in
+  bowtie2's output, along with aligned reads. (Defaults to False.)
+- `igv_prefs`: A dictionary of IGV preferences to apply.  (Defaults to a few
+  basic rendering options.)
+
 ### Databases
 
 Currently, a number of the annotation and classification rules require specific
@@ -109,6 +135,7 @@ Running sunbeam without specifying a rule will perform, by default:
 
 - quality control
 - host read filtering
+- read alignment to genome sequences
 - read-level classification from given Kraken database
 - contig assembly
 - gene detection
@@ -118,6 +145,7 @@ Each step of this can be run piecemeal by using the rules starting with "all", s
 
 - all_qc: quality control on all reads
 - all_decontam: remove all host reads
+- all_mapping: align all reads to all genome sequences
 - all_classify: classify all reads
 - all_assembly: build contigs
 - all_annotate: annotate all contigs
@@ -149,3 +177,6 @@ bash install.sh
 
 - **Q**: I get an error relating to missing files when running on a cluster, and nothing continues after that point.
 - **A**: Increase the waiting time for files to appear by adding `-w 90` to the snakemake command. 
+
+[IGV]: https://software.broadinstitute.org/software/igv
+[Xvfb]: https://www.x.org/archive/X11R7.7/doc/man/man1/Xvfb.1.xhtml
