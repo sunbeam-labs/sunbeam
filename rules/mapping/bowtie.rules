@@ -8,7 +8,7 @@ GENOME = str(Cfg['mapping']['genomes_fp'] / "{genome}.fasta")
 # Toggle for bowtie2's --no-unal (no unaligned reads in output) option
 KEEP_UNALIGNED = {True: "", False: "--no-unal"}[Cfg['mapping']['keep_unaligned']]
 
-rule bowtie2_all:
+rule all_mapping:
     # Create these three sets of files specifically:
     # * indexed sorted bam files
     # * bcf files
