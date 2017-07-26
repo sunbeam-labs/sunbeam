@@ -36,7 +36,8 @@ rule repeatmasker:
         RepeatMasker -qq -no_is -pa {threads} -e hmmer -dir {params.dir} {input}
         if [[ -s {params.dir}/{wildcards.sample}.fasta.masked ]]; then
             mv {params.dir}/{wildcards.sample}.fasta.masked {output[1]}
-        else 
+        else
+            cp {input} {output[0]}x
             touch {output[1]}
         fi
         """
