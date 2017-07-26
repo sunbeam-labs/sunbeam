@@ -33,8 +33,13 @@ rule repeatmasker:
     shell:
         """
         mkdir -p {params.dir} &&\
-        RepeatMasker -qq -no_is -pa {threads} -e hmmer -dir {params.dir} {input} &&\
-        mv {params.dir}/{wildcards.sample}.fasta.masked {output[1]}
+        RepeatMasker -qq -no_is -pa {threads} -e hmmer -dir {params.dir} {input}
+        if [[ -s {params.dir}/{wildcards.sample}.fasta.masked ]]; then
+            mv {params.dir}/{wildcards.sample}.fasta.masked {output[1]}
+        else 
+            ln -s {input} {output[0]}
+            touch {output[1]}
+        fi
         """
           
 # rule trf:
