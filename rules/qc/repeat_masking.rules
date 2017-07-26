@@ -37,7 +37,6 @@ rule repeatmasker:
         if [[ -s {params.dir}/{wildcards.sample}.fasta.masked ]]; then
             mv {params.dir}/{wildcards.sample}.fasta.masked {output[1]}
         else 
-            ln -s {input} {output[0]}
             touch {output[1]}
         fi
         """
