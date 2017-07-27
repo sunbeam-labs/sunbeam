@@ -26,21 +26,32 @@ rule repeatmasker:
     threads:
         Cfg['qc']['threads']
     params:
-        dir = str(QC_FP/'masked'/'log')
+        dir = str(QC_FP/'masked'/'log'),
+        skip = Cfg['qc']['mask_reads'] if 'mask_reads' in Cfg['qc'].keys() else False
     log:
         str(QC_FP/'masked'/'log'/'{sample}.fasta.out'),
         str(QC_FP/'masked'/'log'/'{sample}.fasta.tbl')
-    shell:
-        """
-        mkdir -p {params.dir} &&\
-        RepeatMasker -qq -no_is -pa {threads} -e hmmer -dir {params.dir} {input}
-        if [[ -s {params.dir}/{wildcards.sample}.fasta.masked ]]; then
-            mv {params.dir}/{wildcards.sample}.fasta.masked {output[1]}
-        else
-            cp {input} {output[0]}
-            touch {output[1]}
-        fi
-        """
+    run:
+        if params.skip:
+            shell(
+                """
+                cp {input} {output[0]}
+                touch {output[1]}
+                """
+            )
+        else:
+            shell(
+                """
+                mkdir -p {params.dir} &&\
+                RepeatMasker -qq -no_is -pa {threads} -e hmmer -dir {params.dir} {input}
+                    if [[ -s {params.dir}/{wildcards.sample}.fasta.masked ]]; then
+                    mv {params.dir}/{wildcards.sample}.fasta.masked {output[1]}
+                else
+                    cp {input} {output[0]}
+                    touch {output[1]}
+                fi
+                """
+            )
           
 # rule trf:
 #     input:
