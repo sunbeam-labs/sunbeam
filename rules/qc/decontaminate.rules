@@ -10,9 +10,17 @@ rule all_decontam:
         TARGET_DECONTAM
 
 rule gunzip:
-    input: "{filename}.fastq.gz"
-    output: temp("{filename}.fastq")
-    shell: "gunzip -c {input} > {output}"
+    input: 
+        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz')
+    output:
+        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq'),
+        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq')
+    shell: 
+        """
+        gunzip -c {input.r1} > {output.r1}
+        gunzip -c {input.r2} > {output.r2}
+        """
 
 rule decontam_human:
     input:
