@@ -27,7 +27,7 @@ rule repeatmasker:
         Cfg['qc']['threads']
     params:
         dir = str(QC_FP/'masked'/'log'),
-        skip = Cfg['qc']['mask_reads'] if 'mask_reads' in Cfg['qc'].keys() else False
+        skip = Cfg['qc'].get('skip_complexity_masking', False)
     log:
         str(QC_FP/'masked'/'log'/'{sample}.fasta.out'),
         str(QC_FP/'masked'/'log'/'{sample}.fasta.tbl')
