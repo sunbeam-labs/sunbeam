@@ -160,7 +160,7 @@ You can also see what samples Sunbeam detected by running ```snakemake --configf
 To update sunbeam when a new version is released, it's easiest to simply remove the sunbeam conda environment and reinstall:
 
 ```shell
-conda env -d sunbeam
+conda env remove sunbeam
 cd path/to/sunbeam
 git pull
 bash install.sh
