@@ -7,7 +7,7 @@ set -e
 install_igv() {
     DIR=$(readlink -f $(dirname $BASH_SOURCE))/local
     IGV_VER=2.3.68
-    wget http://data.broadinstitute.org/igv/projects/downloads/IGV_${IGV_VER}.zip
+    wget http://data.broadinstitute.org/igv/projects/downloads/2.3/IGV_${IGV_VER}.zip
     unzip IGV_${IGV_VER}.zip -d $DIR
     ln -s IGV_$IGV_VER $DIR/IGV
     # A symlink will confuse igv.sh so I'm using a wrapper script instead
