@@ -3,6 +3,7 @@
 config.yaml
 config.yml
 configs/config*.yml
+configs/cluster.json
 .snakemake
 \#*
 *.fastq.gz
