@@ -5,5 +5,5 @@ before_install:
 install:
   - bash install.sh sunbeam anaconda_log.txt
   - bash install_igv.sh
-script: source tests/test.sh
+script: bash tests/test.sh
 #test
