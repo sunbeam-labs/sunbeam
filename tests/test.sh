@@ -1,6 +1,7 @@
 #!/bin/bash
 # Bash flags: Do not commit to repo with these commented out
 set -e # Stop on errors
+set -x # Display all commands
 
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
