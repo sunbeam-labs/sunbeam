@@ -39,6 +39,7 @@ cp -r ../local $TEMPDIR/local
 cp -r indexes $TEMPDIR
 cp -r raw $TEMPDIR
 cp -r truncated_taxonomy $TEMPDIR
+cp seqid2taxid.map $TEMPDIR
 #FIXME
 #cp -r indexes $TEMPDIR
 python generate_dummy_data.py $TEMPDIR
@@ -53,6 +54,7 @@ pushd $TEMPDIR
 kraken-build --db mindb --add-to-library raw/GCF_Bfragilis_10k_genomic.fna
 kraken-build --db mindb --add-to-library raw/GCF_Ecoli_10k_genomic.fna
 mv truncated_taxonomy mindb/taxonomy
+cp seqid2taxid.map mindb
 kraken-build --db mindb --build --kmer-len 16 --minimizer-len 1
 kraken-build --db mindb --clean
 
