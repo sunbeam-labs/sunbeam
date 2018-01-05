@@ -19,6 +19,7 @@ command -v conda >/dev/null 2>&1 || { echo "Conda not installed, installing now"
 conda config --add channels r
 conda config --add channels bioconda
 conda config --add channels eclarke
+conda config --add channels conda-forge
 
 # Don't create the enviroment if it already exists
 conda env list | grep -Fxq $SUNBEAM_ENV_NAME || {
