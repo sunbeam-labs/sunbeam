@@ -72,8 +72,8 @@ echo "Now testing snakemake: "
 echo " ===== CONFIG FILE ====="
 cat $TEMPDIR/tmp_config.yml
 echo " ===== END CONFIG FILE ===== "
-snakemake --configfile=$TEMPDIR/tmp_config.yml
-snakemake --configfile=$TEMPDIR/tmp_config.yml clean_assembly
+snakemake --configfile=$TEMPDIR/tmp_config.yml -p
+snakemake --configfile=$TEMPDIR/tmp_config.yml clean_assembly -p
 
 # Check contents
 echo "Now checking whether we hit the expected genome:"
