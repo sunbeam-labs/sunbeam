@@ -13,9 +13,10 @@ rule custom_removal:
     input:
         r1 = lambda wildcards: Samples[wildcards.sample]['R1'],
         r2 = lambda wildcards: Samples[wildcards.sample]['R2']
+    params:
+        r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq.gz')
     output:
-        r1 = temp(str(QC_FP/'cutadapt'/'{sample}_R1.fastq')),
-        r2 = temp(str(QC_FP/'cutadapt'/'{sample}_R2.fastq')),
         gr1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq.gz'),
         gr2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq.gz')
     run:
@@ -34,10 +35,10 @@ rule custom_removal:
             shell("""
             cutadapt --discard-trimmed -O {overlap} \
             {fwd_adapter_str} {rev_adapter_str} \
-            -o {output.r1} -p {output.r2} \
+            -o {params.r1} -p {params.r2} \
             {input.r1} {input.r2}
-            gzip {output.r1}
-            gzip {output.r2}
+            gzip {params.r1}
+            gzip {params.r2}
             """)
         else:
             shell("""
@@ -47,8 +48,8 @@ rule custom_removal:
         
 rule trimmomatic:
     input:
-        r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq')
+        r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq.gz')
     output:
         pair_r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
         pair_r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),
