@@ -35,11 +35,14 @@ fi
 
 pushd tests
 # Copy data into the temporary directory
-cp -r ../local $TEMPDIR/local
+cp -r ../local $TEMPDIR
 cp -r indexes $TEMPDIR
 cp -r raw $TEMPDIR
 cp -r truncated_taxonomy $TEMPDIR
 cp seqid2taxid.map $TEMPDIR
+
+ls $TEMPDIR/local
+
 #FIXME
 #cp -r indexes $TEMPDIR
 python generate_dummy_data.py $TEMPDIR
@@ -59,7 +62,7 @@ kraken-build --db mindb --build --kmer-len 16 --minimizer-len 1
 kraken-build --db mindb --clean
 
 # Build fake blast database
-mkdir -p local/blast
+mkdir local/blast
 cat raw/*.fna > local/blast/bacteria.fa
 makeblastdb -dbtype nucl -in local/blast/bacteria.fa
 popd
