@@ -77,7 +77,6 @@ rule samtools_mpileup:
 rule igv_snapshot:
     message: "Create an alignment image for {wildcards.genome}-{wildcards.segment} with IGV"
     input:
-        igv_fp = str(Cfg['mapping']['igv_fp']),
         genome = GENOME,
         bams=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam"), sample=Samples.keys()),
         bais=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam.bai"), sample=Samples.keys())

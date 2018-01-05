@@ -4,6 +4,5 @@ before_install:
   - sudo apt-get install xdotool
 install:
   - bash install.sh sunbeam anaconda_log.txt
-  - bash install_igv.sh
 script: bash tests/test.sh
 #test
