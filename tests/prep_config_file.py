@@ -20,7 +20,6 @@ def main():
     config['blastdbs']['root_fp'] = "local/blast"
     config['blastdbs']['nucleotide']['bacteria'] = 'bacteria.fa'
     config['mapping']['genomes_fp'] = "indexes"
-    config['mapping']['igv_fp'] = "local/IGV/igv.sh"
 
     sys.stdout.write(yaml.dump(config))
 
