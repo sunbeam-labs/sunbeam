@@ -11,11 +11,11 @@ rule all_assembly:
 
 rule merge_fq:
     input:
-        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq')
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq.gz')
     output:
         str(ASSEMBLY_FP/'merged_reads'/'{sample}_merged.fasta')
-    shell: "fq2fa --merge --filter {input.r1} {input.r2} {output}"
+    shell: "fq2fa --merge --filter <(gunzip -c {input.r1}) <(gunzip -c {input.r2}) {output}"
 
 
 rule idba_ud:

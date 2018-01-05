@@ -12,7 +12,7 @@ def main():
     args = parser.parse_args()
     config = yaml.load(args.config)
 
-    config['all']['filename_fmt'] = "PCMP_{sample}_{rp}.fastq"
+    config['all']['filename_fmt'] = "PCMP_{sample}_{rp}.fastq.gz"
     config['qc']['human_index_fp'] = "indexes/human.fasta"
     config['qc']['phix_index_fp'] = "indexes/phix174.fasta"
     config['classify']['kraken_db_fp'] = "mindb"
