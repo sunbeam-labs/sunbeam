@@ -66,6 +66,9 @@ popd
 
 # Running snakemake
 echo "Now testing snakemake: "
+echo " ===== CONFIG FILE ====="
+cat $TEMPDIR/tmp_config.yml
+echo " ===== END CONFIG FILE ===== "
 snakemake --configfile=$TEMPDIR/tmp_config.yml
 snakemake --configfile=$TEMPDIR/tmp_config.yml clean_assembly
 
