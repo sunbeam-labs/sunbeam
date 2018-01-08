@@ -16,12 +16,12 @@ classify/kraken/dummybfragilis-taxa.tsv
 classify/kraken/dummyecoli-taxa.tsv
 classify/kraken/random-taxa.tsv
 
-qc/decontam/dummybfragilis_R1.fastq
-qc/decontam/dummybfragilis_R2.fastq
-qc/decontam/dummyecoli_R1.fastq
-qc/decontam/dummyecoli_R2.fastq
-qc/decontam/random_R1.fastq
-qc/decontam/random_R2.fastq
+qc/decontam/dummybfragilis_R1.fastq.gz
+qc/decontam/dummybfragilis_R2.fastq.gz
+qc/decontam/dummyecoli_R1.fastq.gz
+qc/decontam/dummyecoli_R2.fastq.gz
+qc/decontam/random_R1.fastq.gz
+qc/decontam/random_R2.fastq.gz
 
 qc/paired/dummybfragilis_R1.fastq.gz
 qc/paired/dummybfragilis_R2.fastq.gz

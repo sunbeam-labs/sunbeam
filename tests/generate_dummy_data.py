@@ -6,6 +6,7 @@
 import sys
 import os
 import random
+import gzip
 # So that "random" values in this testing will actually be arbitrary but still
 # deterministic:
 random.seed(sum(bytes('sunbeam', 'ascii')))
@@ -34,7 +35,7 @@ def write_fastq(genome_segment, locs, sample_name,file_fp):
 		seqs2.append(r2)
 
 	## write dummy fastq files
-	file1 = open(file_fp + '/PCMP_'+sample_name+'_R1.fastq', 'w')
+	file1 = gzip.open(file_fp + '/PCMP_'+sample_name+'_R1.fastq.gz', 'wt')
 	for i, seq in enumerate(seqs1):
 		header = "@D00728:28:C9W1KANXX:" + str(i)
 		file1.write("%s\n" % header)
@@ -43,7 +44,7 @@ def write_fastq(genome_segment, locs, sample_name,file_fp):
 		file1.write("%s\n" % ''.join("G"*250))
 	file1.close()
 
-	file2 = open(file_fp + '/PCMP_'+sample_name+'_R2.fastq', 'w')
+	file2 = gzip.open(file_fp + '/PCMP_'+sample_name+'_R2.fastq.gz', 'wt')
 	for i, seq in enumerate(seqs2):
 		header = "@D00728:28:C9W1KANXX:" + str(i)
 		file2.write("%s\n" % header)
@@ -60,7 +61,7 @@ def write_random_fastq(sample_name, file_fp, numreads=4, readlen=100):
     dna = 'ATCG'
     randread = lambda: ''.join([dna[random.randint(0,len(dna)-1)] for i in range(readlen)])
     for r in (1,2):
-        with open(file_fp + '/PCMP_'+sample_name+'_R%s.fastq' % r, 'w') as f:
+        with gzip.open(file_fp + '/PCMP_'+sample_name+'_R%s.fastq.gz' % r, 'wt') as f:
             for s in range(numreads):
                 f.write('@read%s\n' % s)
                 f.write('%s\n' % randread())

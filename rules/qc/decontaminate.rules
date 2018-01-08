@@ -10,8 +10,8 @@ rule all_decontam:
         TARGET_DECONTAM
 
 rule gunzip:
-    input: "{filename}.fastq.gz"
-    output: temp("{filename}.fastq")
+    input: str(QC_FP/'paired'/'{filename}.fastq.gz')
+    output: temp(str(QC_FP/'paired'/'{filename}.fastq'))
     shell: "gunzip -c {input} > {output}"
 
 rule decontam_human:
@@ -19,8 +19,8 @@ rule decontam_human:
         r1 = str(QC_FP/'paired'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'paired'/'{sample}_R2.fastq')
     output:
-        r1 = str(QC_FP/'decontam-human'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'decontam-human'/'{sample}_R2.fastq'),
+        r1 = temp(str(QC_FP/'decontam-human'/'{sample}_R1.fastq')),
+        r2 = temp(str(QC_FP/'decontam-human'/'{sample}_R2.fastq')),
         log = str(QC_FP/'log'/'decontam-human'/'{sample}_summary.json')
     params:
         out_fp = str(QC_FP/'decontam-human')
@@ -42,8 +42,8 @@ rule decontam_phix:
         r1 = str(QC_FP/'decontam-human'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'decontam-human'/'{sample}_R2.fastq')
     output:
-        r1=str(QC_FP/'decontam-phix'/'{sample}_R1.fastq'),
-        r2=str(QC_FP/'decontam-phix'/'{sample}_R2.fastq'),
+        r1 = temp(str(QC_FP/'decontam-phix'/'{sample}_R1.fastq')),
+        r2 = temp(str(QC_FP/'decontam-phix'/'{sample}_R2.fastq')),
         log = str(QC_FP/'log'/'decontam'/'{sample}_summary.json')
     params:
         out_fp = str(QC_FP/'decontam-phix')
@@ -65,10 +65,10 @@ rule decontam:
         r1 = str(QC_FP/'decontam-phix'/'{sample}_R1.fastq'),
         r2 = str(QC_FP/'decontam-phix'/'{sample}_R2.fastq'),
     output:
-        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq'),
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq.gz'),
     shell:
         """
-        ln -s {input.r1} {output.r1}
-        ln -s {input.r2} {output.r2}
+        gzip -c {input.r1} > {output.r1}
+        gzip -c {input.r2} > {output.r2}
         """

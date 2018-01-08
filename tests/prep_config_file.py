@@ -12,7 +12,7 @@ def main():
     args = parser.parse_args()
     config = yaml.load(args.config)
 
-    config['all']['filename_fmt'] = "PCMP_{sample}_{rp}.fastq"
+    config['all']['filename_fmt'] = "PCMP_{sample}_{rp}.fastq.gz"
     config['qc']['human_index_fp'] = "indexes/human.fasta"
     config['qc']['phix_index_fp'] = "indexes/phix174.fasta"
     config['classify']['kraken_db_fp'] = "mindb"
@@ -20,7 +20,6 @@ def main():
     config['blastdbs']['root_fp'] = "local/blast"
     config['blastdbs']['nucleotide']['bacteria'] = 'bacteria.fa'
     config['mapping']['genomes_fp'] = "indexes"
-    config['mapping']['igv_fp'] = "local/IGV/igv.sh"
 
     sys.stdout.write(yaml.dump(config))
 

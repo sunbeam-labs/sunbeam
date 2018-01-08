@@ -4,7 +4,7 @@ trimmomatic
 fastqc
 blast
 CLARK
-kraken
+kraken=1.0
 krona
 idba=1.1.1
 amos
@@ -18,3 +18,4 @@ jellyfish=1.1.11=1
 cutadapt
 pysam
 pandas
+igv=2.3.98
