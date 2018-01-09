@@ -19,3 +19,4 @@ cutadapt
 pysam
 pandas
 igv=2.3.98
+megahit
