@@ -58,7 +58,6 @@ assembly:
   suffix: assembly
   min_length: 300
   threads: 4
-  cap3_fp: "local/CAP3"
 
 
 # Contig annotation
