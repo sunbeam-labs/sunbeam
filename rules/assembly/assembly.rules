@@ -36,33 +36,47 @@ rule idba_ud:
         if [ ! -a {output} ]; then cp {params.out_fp}/contig-100.fa {output}; fi
         """
 
+rule megahit:
+    input:
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq.gz')
+    output:
+        str(ASSEMBLY_FP/'megahit'/'.save_{sample}')
+    params:
+        out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
+    shell:
+        """
+        megahit -1 {input.r1} -2 {input.r2} -o {params.out_fp} && touch {output} 
+        """
+
 rule cap3:
     input:
-        contig = str(ASSEMBLY_FP/'idba_ud'/'{sample}'/'contig.fa'),
+        megahit = str(ASSEMBLY_FP/'megahit'/'.save_{sample}'),
         cap3 = str(Cfg['assembly']['cap3_fp']/'cap3')
     output:
         str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
+    params: 
+        contig = str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa')
     log:
         str(ASSEMBLY_FP/'log'/'cap3'/'{sample}.out')
     shell:
         """
-        [[ -s {input.contig} ]] && \
-        {input.cap3} {input.contig} &> {log} && \
-        cat {input.contig}.cap.singlets {input.contig}.cap.contigs > {output} || \
-        cp {input.contig} {output} &> {log}
+        {input.cap3} {params.contig} &> {log}
         """
 
 rule save_intermediates:
     input:
-        I = str(ASSEMBLY_FP/'idba_ud'/'{sample}'/'contig.fa'),
+        M = str(ASSEMBLY_FP/'megahit'/'.save_{sample}'),
         C = str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
     output:
-        I = str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa'),
+        M = str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa'),
         C = str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
         sentinel = str(ASSEMBLY_FP/'{sample}_assembly'/'.save')
+    params:
+        M = str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa')
     shell:
         """
-        cp {input.I} {output.I} && cp {input.C} {output.C} && \
+        cp {params.M} {output.M} && cp {input.C} {output.C} && \
         touch {output.sentinel}
         """
 
@@ -92,13 +106,11 @@ rule final_filter:
 
 rule clean_assembly:
     input:
-        I = str(ASSEMBLY_FP/'idba_ud'),
-        C = str(ASSEMBLY_FP/'cap3'),
-        M = str(ASSEMBLY_FP/'merged_reads')
+        M = str(ASSEMBLY_FP/'megahit'),
+        C = str(ASSEMBLY_FP/'cap3')
     shell:
         """
-        rm -rf {input.I} && \
-        rm -rf {input.C} && \
         rm -rf {input.M} && \
+        rm -rf {input.C} && \
         echo "Cleanup assembly finished."
         """
