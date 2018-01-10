@@ -1,4 +1,5 @@
 snakemake=3.13.0
+ruamel.yaml
 biopython
 trimmomatic
 fastqc

@@ -1,26 +1,41 @@
 import sys
-import yaml
+import ruamel.yaml
 import argparse
+import collections
+
+def update_dict(target, new):
+    for k, v in new.items():
+        if isinstance(v, collections.Mapping):
+            target[k] = update_dict(target.get(k, {}), v)
+        else:
+            target[k] = v
+    return target
 
 def main():
 
-    parser = argparse.ArgumentParser(description="Modifies test config with testing values")
+    parser = argparse.ArgumentParser(
+        description="Modifies a Sunbeam config file")
     parser.add_argument(
-        "--config", help="Test config file", type=argparse.FileType("r"),
+        "--config", help="Config file to modify", type=argparse.FileType("r"),
         default=sys.stdin)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "--mod_fp", help="File with config values to replace",
+        type=argparse.FileType("r"), metavar="FILE")
+    group.add_argument(
+        "--mod_str", help="Replacement YAML string (e.g. 'blast:{threads:4}')",
+        type=str, metavar="STR")
 
     args = parser.parse_args()
-    config = yaml.load(args.config)
+    config = ruamel.yaml.round_trip_load(args.config)
 
-    config['all']['filename_fmt'] = "PCMP_{sample}_{rp}.fastq.gz"
-    config['qc']['human_index_fp'] = "indexes/human.fasta"
-    config['qc']['phix_index_fp'] = "indexes/phix174.fasta"
-    config['classify']['kraken_db_fp'] = "mindb"
-    config['blastdbs']['root_fp'] = "local/blast"
-    config['blastdbs']['nucleotide']['bacteria'] = 'bacteria.fa'
-    config['mapping']['genomes_fp'] = "indexes"
-
-    sys.stdout.write(yaml.dump(config))
+    if args.mod_fp:
+        mods = ruamel.yaml.safe_load(args.mod_fp)
+    else:
+        mods = ruamel.yaml.safe_load(args.mod_str)
+    print(mods)
+    config = update_dict(config, mods)
+    ruamel.yaml.round_trip_dump(config, sys.stdout)
 
 if __name__ == "__main__":
     main()

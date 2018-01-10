@@ -1,6 +1,13 @@
 # 
 # Sunbeam configuration file
 #
+# Defining samples:
+#   Samples must be gzipped fastq files.
+#   Samples can be either discovered in a directory specified by 'data_fp' and
+#   'filename_fmt' OR by manually listing the samples in a file via
+#   'samplelist_fp'. If using 'samplelist_fp', the file format is one sample
+#   name per line (no file extension or read pair info).
+#
 # Paths:
 #   Paths are resolved through the following rules:
 #     1. If the path is absolute, the path is parsed as-is
@@ -18,7 +25,8 @@ all:
   root: "{PROJECT_FP}"
   data_fp: "data_files"
   output_fp: "sunbeam_output"
-  filename_fmt: "{{sample}}_{{rp}}.fastq"
+  samplelist_fp: ""
+  filename_fmt: "{{sample}}_{{rp}}.fastq.gz"
   subcores: 4
   exclude: []
 
@@ -50,7 +58,7 @@ qc:
 classify:
   suffix: classify
   threads: 4
-  kraken_db_fp: "mindb"
+  kraken_db_fp: ""
   taxa_db_fp: ""
 
 # Contig assembly
@@ -74,23 +82,11 @@ blast:
   threads: 4
 
 blastdbs:
-  root_fp: "local/blast"
+  root_fp: ""
   nucleotide:
-    bacteria:
-      bacteria.fa
-#    viral:
-#      viral.1.1.genomic.fna
-#    nt:
-#      nt/nt
-#  protein:
-#    integrase:
-#      UniprotPhageIntegrase.fasta
-#    aclame:
-#      ACLAME/aclame_proteins_viruses_prophages_0.4.fasta
-#    vfdb:
-#      VFDB/VFs.faa
-#    card:
-#      card/nucl_homolog.fasta
+    nt: ""
+  protein:
+    nr: ""
 
 mapping:
   suffix: mapping

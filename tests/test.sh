@@ -13,7 +13,7 @@ if [ $# -ne 1 ]; then
     TEMPDIR=`mktemp -d`
 else
     echo "Write sunbeam test result to provided path"
-    TEMPDIR="$1"
+    TEMPDIR=`realpath $1`
 fi
 
 # Activate the sunbeam environment
@@ -38,24 +38,18 @@ fi
 
 pushd tests
 # Copy data into the temporary directory
-cp -r ../local $TEMPDIR
 cp -r indexes $TEMPDIR
 cp -r raw $TEMPDIR
 cp -r truncated_taxonomy $TEMPDIR
 cp seqid2taxid.map $TEMPDIR
 
-ls $TEMPDIR/local
-
-#FIXME
-#cp -r indexes $TEMPDIR
 python generate_dummy_data.py $TEMPDIR
-
 # Create a version of the config file customized for this tempdir
-sunbeam_init $TEMPDIR | python prep_config_file.py > $TEMPDIR/tmp_config.yml
-
+sunbeam_init $TEMPDIR --defaults testing > $TEMPDIR/tmp_config.yml
 popd
 
 pushd $TEMPDIR
+
 # Build fake kraken data
 kraken-build --db mindb --add-to-library raw/GCF_Bfragilis_10k_genomic.fna
 kraken-build --db mindb --add-to-library raw/GCF_Ecoli_10k_genomic.fna
@@ -65,7 +59,7 @@ kraken-build --db mindb --build --kmer-len 16 --minimizer-len 1
 kraken-build --db mindb --clean
 
 # Build fake blast database
-mkdir local/blast
+mkdir -p local/blast
 cat raw/*.fna > local/blast/bacteria.fa
 makeblastdb -dbtype nucl -in local/blast/bacteria.fa
 popd
@@ -107,11 +101,11 @@ pushd tests
 # Create a version of the config file customized for this tempdir
 # Provide the sunbeamlib package config file manually
 CONFIG_FP=$HOME/miniconda3/envs/sunbeam/lib/python3.5/site-packages/sunbeamlib/data/default_config.yml
-sunbeam_init $TEMPDIR --template $CONFIG_FP | python prep_config_file.py > $TEMPDIR/tmp_config_2.yml
+sunbeam_init $TEMPDIR --template $CONFIG_FP --defaults testing > $TEMPDIR/tmp_config_2.yml
 popd
 rm -r $TEMPDIR/sunbeam_output
-echo "Now re run snakemake with custom config file: "
-snakemake --configfile=$TEMPDIR/tmp_config_2.yml
+echo "Now re-run snakemake with custom config file: "
+snakemake --configfile=$TEMPDIR/tmp_config_2.yml 
 snakemake --configfile=$TEMPDIR/tmp_config_2.yml clean_assembly
 python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt
 }
@@ -121,9 +115,8 @@ test_template_option
 
 # Test for barcodes file
 function test_barcode_file {
-sed 's/data_fp: data_files/data_fp: barcodes.txt/g' $TEMPDIR/tmp_config.yml > $TEMPDIR/tmp_config_barcode.yml
+sunbeam_mod_config --config $TEMPDIR/tmp_config.yml --mod_str 'all:{samplelist_fp:barcodes.txt}' > $TEMPDIR/tmp_config_barcode.yml
 echo -e "dummybfragilis\tTTTTTTTT\ndummyecoli\tTTTTTTTT" > $TEMPDIR/barcodes.txt
-rm -rf $TEMPDIR/data_files
 rm -rf $TEMPDIR/sunbeam_output/qc/decontam*
 cat $TEMPDIR/tmp_config_barcode.yml
 snakemake --configfile=$TEMPDIR/tmp_config_barcode.yml all_decontam
@@ -131,4 +124,4 @@ snakemake --configfile=$TEMPDIR/tmp_config_barcode.yml all_decontam
 [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R2.fastq.gz ]
 }
 
-test_barcode_file || echo "Error ignored pending issue #92 resolution"
+test_barcode_file # || echo "Error ignored pending issue #92 resolution"

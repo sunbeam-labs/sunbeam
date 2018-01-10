@@ -30,7 +30,11 @@ if not config:
 # ---- Setting up config files and samples
 Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
-Samples = build_sample_list(Cfg['all']['data_fp'], Cfg['all']['filename_fmt'], Cfg['all']['exclude'])
+Samples = build_sample_list(
+        Cfg['all']['data_fp'],
+        Cfg['all']['filename_fmt'],
+        Cfg['all']['samplelist_fp'],
+        Cfg['all']['exclude'])
 
 GenomeFiles = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
 GenomeSegments = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GenomeFiles}
