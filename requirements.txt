@@ -6,7 +6,6 @@ blast
 CLARK
 kraken=1.0
 krona
-idba=1.1.1
 amos
 mga
 kraken-biom
