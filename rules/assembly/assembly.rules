@@ -2,7 +2,7 @@
 #
 # Contig building and other assembly rules
 #
-# Requires IDBA_UD and CAP3.
+# Requires Megahit and CAP3.
 
 rule all_assembly:
     """Build contigs for all samples."""
@@ -36,33 +36,46 @@ rule idba_ud:
         if [ ! -a {output} ]; then cp {params.out_fp}/contig-100.fa {output}; fi
         """
 
+rule megahit:
+    input:
+        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq.gz')
+    output:
+        str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa')
+    params:
+        out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
+    shell:
+        """
+        megahit -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue || \
+        if [ ! -a {output} ]; then touch {output}; fi
+        """
+
 rule cap3:
     input:
-        contig = str(ASSEMBLY_FP/'idba_ud'/'{sample}'/'contig.fa'),
-        cap3 = str(Cfg['assembly']['cap3_fp']/'cap3')
+        str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa')
     output:
         str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
     log:
         str(ASSEMBLY_FP/'log'/'cap3'/'{sample}.out')
     shell:
         """
-        [[ -s {input.contig} ]] && \
-        {input.cap3} {input.contig} &> {log} && \
-        cat {input.contig}.cap.singlets {input.contig}.cap.contigs > {output} || \
-        cp {input.contig} {output} &> {log}
+        [[ -s {input} ]] && \
+        cap3 {input} &> {log} && \
+        cat {input}.cap.singlets {input}.cap.contigs > {output} || \
+        cp {input} {output} &> {log}
         """
 
 rule save_intermediates:
     input:
-        I = str(ASSEMBLY_FP/'idba_ud'/'{sample}'/'contig.fa'),
+        M = str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa'),
         C = str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
     output:
-        I = str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa'),
+        M = str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa'),
         C = str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
         sentinel = str(ASSEMBLY_FP/'{sample}_assembly'/'.save')
     shell:
         """
-        cp {input.I} {output.I} && cp {input.C} {output.C} && \
+        cp {input.M} {output.M} && cp {input.C} {output.C} && \
         touch {output.sentinel}
         """
 
@@ -92,13 +105,11 @@ rule final_filter:
 
 rule clean_assembly:
     input:
-        I = str(ASSEMBLY_FP/'idba_ud'),
-        C = str(ASSEMBLY_FP/'cap3'),
-        M = str(ASSEMBLY_FP/'merged_reads')
+        M = str(ASSEMBLY_FP/'megahit'),
+        C = str(ASSEMBLY_FP/'cap3')
     shell:
         """
-        rm -rf {input.I} && \
-        rm -rf {input.C} && \
         rm -rf {input.M} && \
+        rm -rf {input.C} && \
         echo "Cleanup assembly finished."
         """

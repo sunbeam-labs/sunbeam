@@ -16,7 +16,6 @@ def main():
     config['qc']['human_index_fp'] = "indexes/human.fasta"
     config['qc']['phix_index_fp'] = "indexes/phix174.fasta"
     config['classify']['kraken_db_fp'] = "mindb"
-    config['assembly']['cap3_fp'] = "local/CAP3"
     config['blastdbs']['root_fp'] = "local/blast"
     config['blastdbs']['nucleotide']['bacteria'] = 'bacteria.fa'
     config['mapping']['genomes_fp'] = "indexes"
