@@ -1,0 +1,23 @@
+qc:
+  human_genome_fp: "/media/THING1/local/genomeIndexes/bowtie2/GCA_000001405.15_GRCh38_genomic.fna"
+  phix_genome_fp: "/media/THING1/local/genomeIndexes/bowtie2/Enterobacteria_phage_phiX174_gi9626372.fna"
+classify:
+  kraken_db_fp: "/media/THING1/local/kraken/standard"
+blastdbs:
+  root_fp: "/media/THING1/local/genomeIndexes/blast"
+  nucleotide:
+    bacteria:
+      BacterialGenomes/ncbi_bacteria.fa
+    viral:
+      viral.1.1.genomic.fna
+    nt:
+      nt/nt
+  protein:
+    integrase:
+      UniprotPhageIntegrase.fasta
+    aclame:
+      ACLAME/aclame_proteins_viruses_prophages_0.4.fasta
+    vfdb:
+      VFDB/VFs.faa
+    card:
+      card/nucl_homolog.fasta
