@@ -65,11 +65,18 @@ makeblastdb -dbtype nucl -in local/blast/bacteria.fa
 popd
 
 # Running snakemake
-echo "Now testing snakemake: "
+
 echo " ===== CONFIG FILE ====="
 cat $TEMPDIR/tmp_config.yml
 echo " ===== END CONFIG FILE ===== "
 
+# Integration tests: add as needed
+# Make each test a function, then call it so that the error can be isolated
+# ===================================
+
+# Testing correct expected behavior
+function test_all {
+echo "Now testing snakemake: "
 snakemake --configfile=$TEMPDIR/tmp_config.yml -p
 snakemake --configfile=$TEMPDIR/tmp_config.yml clean_assembly -p
 
@@ -79,10 +86,10 @@ grep 'NC_006347.1' $TEMPDIR/sunbeam_output/annotation/summary/dummybfragilis.tsv
 
 # Check targets
 python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt 
+}
 
-# Bugfix/feature tests: add as needed
-# Make each test a function, then call it so that the error can be isolated
-# ===================================
+test_all
+
 # Fix for #38: Make Cutadapt optional
 # -- Remove adapter sequences and check to make sure qc proceeds correctly
 function test_optional_cutadapt {
@@ -115,13 +122,15 @@ test_template_option
 
 # Test for barcodes file
 function test_barcode_file {
-sunbeam_mod_config --config $TEMPDIR/tmp_config.yml --mod_str 'all:{samplelist_fp:barcodes.txt}' > $TEMPDIR/tmp_config_barcode.yml
+sunbeam_mod_config --config $TEMPDIR/tmp_config.yml --mod_str 'all: {samplelist_fp: barcodes.txt}' > $TEMPDIR/tmp_config_barcode.yml
 echo -e "dummybfragilis\tTTTTTTTT\ndummyecoli\tTTTTTTTT" > $TEMPDIR/barcodes.txt
 rm -rf $TEMPDIR/sunbeam_output/qc/decontam*
+echo "CONFIG START"
 cat $TEMPDIR/tmp_config_barcode.yml
+echo "CONFIG END"
 snakemake --configfile=$TEMPDIR/tmp_config_barcode.yml all_decontam
 [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R1.fastq.gz ]
 [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R2.fastq.gz ]
 }
 
-test_barcode_file # || echo "Error ignored pending issue #92 resolution"
+test_barcode_file

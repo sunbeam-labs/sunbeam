@@ -2,7 +2,7 @@ import sys
 import ruamel.yaml
 import argparse
 
-from .config import update_config
+from .config import update
 
 def main():
 
@@ -25,8 +25,10 @@ def main():
         mods = ruamel.yaml.safe_load(args.mod_fp)
     else:
         mods = ruamel.yaml.safe_load(args.mod_str)
-    print(mods)
-    config = update_config(args.config, mods)
+        if isinstance(mods, str):
+            sys.exit("Invalid YAML: did you put spaces between keys and values?")
+
+    config = update(args.config, mods)
     ruamel.yaml.round_trip_dump(config, sys.stdout)
 
 if __name__ == "__main__":

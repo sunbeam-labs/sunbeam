@@ -83,10 +83,6 @@ blast:
 
 blastdbs:
   root_fp: ""
-  nucleotide:
-    nt: ""
-  protein:
-    nr: ""
 
 mapping:
   suffix: mapping
