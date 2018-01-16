@@ -1,0 +1,11 @@
+qc:
+  human_genome_fp: "/project/bushmanlab/indexes/GCA_000001405.15_GRCh38_genomic.fna"
+  phix_genome_fp: "/project/bushmanlab/indexes/phix174.fasta"
+
+classify:
+  kraken_db_fp: "/project/bushmanlab/kraken/standard"
+
+blastdbs:
+  root_fp: "/project/bushmanlab/genomeIndexes/blast"
+  nucleotide:
+    nt: nt/nt
