@@ -1,10 +1,11 @@
 import os
 import sys
 import argparse
+import ruamel.yaml
 
 from pathlib import Path
 
-from sunbeamlib.config import create_blank_config
+import sunbeamlib
 
 def _find_conda_fp():
     """Try to detect conda install in the path."""
@@ -25,8 +26,8 @@ def main():
         "init", description="Initialize a new sunbeam project")
     parser.add_argument("project_fp", help="Project root directory")
     parser.add_argument(
-        "--server", choices=['microb120','microb191','pmacs','respublica'],
-        help="Some servers have prebuilt configs; specify one here to use it.")
+        "--defaults", choices=['microb120','testing'],
+        help="Some servers and configurations have prebuilt default configs")
     parser.add_argument(
         "--conda_fp", default=conda_fp, type=Path,
         help="path to conda (default: %(default)s)"
@@ -46,11 +47,12 @@ def main():
     else:
         args.conda_fp = args.conda_fp.absolute()
 
-    if args.template is None:
-        config = create_blank_config(
-            args.conda_fp, args.project_fp, template=args.server)
-    else:
-        config = args.template.read().format(
-                 CONDA_FP=args.conda_fp, PROJECT_FP=args.project_fp)
- 
-    sys.stdout.write(config)
+    
+    config = sunbeamlib.config.new(
+        args.conda_fp, args.project_fp, args.template)
+
+    if args.defaults:
+        defaults = sunbeamlib.config.load_defaults(args.defaults)
+        config = sunbeamlib.config.update(config, defaults)
+        
+    sunbeamlib.config.dump(config)

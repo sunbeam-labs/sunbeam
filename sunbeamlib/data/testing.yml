@@ -1,0 +1,13 @@
+all:
+  filename_fmt: PCMP_{sample}_{rp}.fastq.gz
+qc:
+  human_genome_fp: indexes/human.fasta
+  phix_genome_fp: indexes/phix174.fasta
+classify:
+  kraken_db_fp: mindb
+blastdbs:
+  root_fp: local/blast
+  nucleotide:
+    bacteria: bacteria.fa
+mapping:
+  genomes_fp: indexes

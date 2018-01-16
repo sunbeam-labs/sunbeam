@@ -1,8 +1,9 @@
 import sys
 import pkg_resources
-import yaml
+import collections
 from pathlib import Path
 
+import ruamel.yaml
 
 def makepath(path):
     return Path(path).expanduser()
@@ -60,13 +61,6 @@ def output_subdir(cfg, section):
     return cfg['all']['output_fp']/cfg[section]['suffix']
 
 
-def load_subconfig(fp, verify=True):
-    if verify:
-        return validate_paths(yaml.load(open(fp)))
-    else:
-        return yaml.load(open(fp))
-
-
 def process_databases(db_dict):
     """Process the list of databases.
 
@@ -83,24 +77,37 @@ def process_databases(db_dict):
     return dbs
 
 
-def create_blank_config(conda_fp, project_fp, template="default"):
+def _update_dict(target, new):
+    for k, v in new.items():
+        if isinstance(v, collections.Mapping):
+            target[k] = _update_dict(target.get(k, {}), v)
+        else:
+            target[k] = v
+    return target
 
-    if template=="microb120":
-        template_stream = pkg_resources.resource_stream(
-            "sunbeamlib", "data/microb120_config.yml")
-    elif template=="microb191":
-        template_stream = pkg_resources.resource_stream(
-            "sunbeamlib", "data/microb191_config.yml")
-    elif template=="pmacs":
-        template_stream = pkg_resources.resource_stream(
-            "sunbeamlib", "data/pmacs_config.yml")
-    elif template=="respublica":
-        template_stream = pkg_resources.resource_stream(
-            "sunbeamlib", "data/default_config.yml")
+    
+def update(config_str, new):
+    config = ruamel.yaml.round_trip_load(config_str)
+    config = _update_dict(config, new)
+    return config
+
+def new(conda_fp, project_fp, template=None):
+    if template:
+        config = template.read()
     else:
-        sys.stderr.write("Using default config template...\n")
-        template_stream = pkg_resources.resource_stream(
-            "sunbeamlib", "data/default_config.yml")
-
-    return template_stream.read().decode().format(
+        config = pkg_resources.resource_stream(
+            "sunbeamlib", "data/default_config.yml").read().decode()
+    return config.format(
         CONDA_FP=conda_fp, PROJECT_FP=project_fp)
+
+def load_defaults(default_name):
+    return ruamel.yaml.safe_load(
+        pkg_resources.resource_stream(
+            "sunbeamlib", "data/{}.yml".format(default_name)
+        ).read().decode())
+    
+def dump(config):
+    if isinstance(config, collections.Mapping):
+        ruamel.yaml.round_trip_dump(config, sys.stdout)
+    else:
+        sys.stdout.write(config)

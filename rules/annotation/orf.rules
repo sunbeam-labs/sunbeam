@@ -11,12 +11,6 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
 
 
-rule _test_genes_mga:
-    input:
-        expand(str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_nucl.fa'),
-        sample=Samples.keys())
-
-
 rule find_genes_mga:
     """Use MetaGene Annotator to find genes in contigs."""
     input:
