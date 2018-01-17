@@ -1,9 +1,10 @@
 # -*- mode: Snakemake -*-
 #
-# Viral contig annotation:
+# Contig annotation:
 # 	Rules for BLASTing against databases
 #
 # See Readme.md
+
 import csv
 
 from Bio import SearchIO
@@ -34,7 +35,7 @@ rule run_blastn:
 rule run_blastp:
     """Run BLASTp on translated genes against a target db and write to XML."""
     input:
-        genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_prot11.fa'),
+        genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_prot.fa'),
         db=lambda wildcard: Blastdbs['prot'][wildcard.db]
     output:
         str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.xml')
@@ -55,11 +56,9 @@ rule run_blastp:
 rule run_blastx:
     """Run BLASTx on untranslated genes against a target db and write to XML."""
     input:
-        # output/virome/genes/mga/HUP3D03BALc_S92_genes_nucl.fa
         genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_nucl.fa'),
         db=lambda wildcard: Blastdbs['prot'][wildcard.db]
     output:
-        # output/virome/blastx/aclame/mga/HUP3D03balc_S92.xml
         str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.xml')
     threads:
         Cfg['blast']['threads']
@@ -92,16 +91,12 @@ rule blast_report:
             writer.writeheader()
             list(writer.writerow(result) for result in blast_summary(input))
 
-
-rule _test_blastx:
+rule _test_blastpx:
     input:
-        expand(str(ANNOTATION_FP/'blastx'/'aclame'/'mga'/'{sample}.xml'),
-               sample=Samples.keys())
+        expand(str(ANNOTATION_FP/'{blastpx}'/'card'/'prodigal'/'{sample}.xml'), 
+               blastpx=['blastx','blastp'], sample=Samples.keys())
     
-rule _test_blast_report:
+rule _test_blastpx_report:
     input:
-        str(ANNOTATION_FP/'blastx'/'aclame'/'mga'/'report.tsv')
-
-rule _test_blast_card:
-    input:
-        str(ANNOTATION_FP/'blastx'/'card'/'mga'/'report.tsv')
+        expand(str(ANNOTATION_FP/'{blastpx}'/'card'/'prodigal'/'report.tsv'),
+        blastpx=['blastx','blastp'])
