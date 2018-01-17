@@ -84,7 +84,7 @@ snakemake --configfile=$TEMPDIR/tmp_config.yml clean_assembly -p
 
 # Check contents
 echo "Now checking whether we hit the expected genome:"
-grep 'NC_006347.1' $TEMPDIR/sunbeam_output/annotation/summary/dummybfragilis.tsv
+awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/sunbeam_output/annotation/summary/dummybfragilis.tsv
 
 # Check targets
 python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt 
