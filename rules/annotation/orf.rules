@@ -18,11 +18,9 @@ rule prodigal:
     shell:
         """
         if [[ -s {input} ]]; then
-          echo "yes"
           prodigal -i {input} -o {output.gff} \
           -a {output.faa} -d {output.fna} -p meta  &> {output.log}
         else
-          echo "no"
           touch {output.faa}
           touch {output.gff}
           touch {output.fna}
