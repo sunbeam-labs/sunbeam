@@ -13,7 +13,7 @@ if [ $# -ne 1 ]; then
     TEMPDIR=`mktemp -d`
 else
     echo "Write sunbeam test result to provided path"
-    TEMPDIR=`realpath $1`
+    TEMPDIR=`readlink -f $1`
 fi
 
 # Activate the sunbeam environment
@@ -62,6 +62,8 @@ kraken-build --db mindb --clean
 mkdir -p local/blast
 cat raw/*.fna > local/blast/bacteria.fa
 makeblastdb -dbtype nucl -in local/blast/bacteria.fa
+cp indexes/card.fa local/blast
+makeblastdb -dbtype prot -in local/blast/card.fa
 popd
 
 # Running snakemake
