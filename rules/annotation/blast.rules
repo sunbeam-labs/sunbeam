@@ -94,9 +94,9 @@ rule blast_report:
 rule _test_blastpx:
     input:
         expand(str(ANNOTATION_FP/'{blastpx}'/'card'/'prodigal'/'{sample}.xml'), 
-               blast=['blastx','blastp'], sample=Samples.keys())
+               blastpx=['blastx','blastp'], sample=Samples.keys())
     
 rule _test_blastpx_report:
     input:
         expand(str(ANNOTATION_FP/'{blastpx}'/'card'/'prodigal'/'report.tsv'),
-        blast=['blastx','blastp'])
+        blastpx=['blastx','blastp'])
