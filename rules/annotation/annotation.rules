@@ -1,6 +1,6 @@
 # -*- mode: Snakemake -*-
 #
-# Viral contig annotation.
+# Contig annotation.
 #
 # See Readme.md
 
@@ -16,24 +16,6 @@ rule all_annotate:
     input:
         TARGET_ANNOTATE
 
-# rule filter_fasta:
-#     """Filter contigs by size."""    
-#     input:
-#         str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa')
-#     output:
-#         fp = str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa')
-#     run:
-#         n_contigs = 0
-#         n_kept = 0
-#         with open(output.fp, 'w') as out:
-#             for record in SeqIO.parse(input[0], 'fasta'):
-#                 n_contigs += 1
-#                 if len(record) >= Cfg['annotation']['min_contig_len']:
-#                     n_kept += 1
-#                     SeqIO.write(record, out, 'fasta')
-#         results = "%s: %d of %d contigs kept" % (wildcards.sample, n_kept, n_contigs)
-#         print(results)
-
 rule aggregate_results:
     input:
         contigs=str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'),
@@ -44,7 +26,7 @@ rule aggregate_results:
             str(ANNOTATION_FP/'{blastpx}'/'{db}'/'{orf_finder}'/'{{sample}}.xml'),
             blastpx=['blastp','blastx'],
             db=Blastdbs['prot'],
-            orf_finder=['mga'])
+            orf_finder=['prodigal'])
     output:
         str(ANNOTATION_FP/'summary'/'{sample}.tsv')
     params:
