@@ -107,7 +107,7 @@ function test_template_option {
 pushd tests
 # Create a version of the config file customized for this tempdir
 # Provide the sunbeamlib package config file manually
-CONFIG_FP=$HOME/miniconda3/envs/sunbeam/lib/python3.5/site-packages/sunbeamlib/data/default_config.yml
+CONFIG_FP=test_config_template.yml
 sunbeam_init $TEMPDIR --template $CONFIG_FP --defaults testing > $TEMPDIR/tmp_config_2.yml
 popd
 rm -r $TEMPDIR/sunbeam_output
