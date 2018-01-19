@@ -111,14 +111,9 @@ function test_template_option {
 pushd tests
 # Create a version of the config file customized for this tempdir
 # Provide the sunbeamlib package config file manually
-CONFIG_FP=test_config_template.yml
-sunbeam_init $TEMPDIR --template $CONFIG_FP --defaults testing > $TEMPDIR/tmp_config_2.yml
+CONFIG_FP=cfg_template.yml
+sunbeam_init $TEMPDIR --template $CONFIG_FP --defaults testing | grep 'from_template:' || exit 1
 popd
-rm -r $TEMPDIR/sunbeam_output
-echo "Now re-run snakemake with custom config file: "
-snakemake --configfile=$TEMPDIR/tmp_config_2.yml 
-snakemake --configfile=$TEMPDIR/tmp_config_2.yml clean_assembly
-python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt
 }
 
 test_template_option
