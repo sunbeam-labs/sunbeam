@@ -1,45 +1,39 @@
 # -*- mode: Snakemake -*-
 #
-# Viral contig annotation:
+# Contig annotation:
 # 	Rules for finding and extracting ORFs.
 #
 # See Readme.md
 
 
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC
-
-
-rule find_genes_mga:
-    """Use MetaGene Annotator to find genes in contigs."""
+rule prodigal:
+    """Use Progial for coding genes predictions in contigs."""
     input:
         str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa')
     output:
-        str(ANNOTATION_FP/'genes'/'mga'/'{sample}_contigs.genes')
+        gff = str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes.gff'),
+        faa = str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_prot.fa'),
+        fna = str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_nucl.fa'),
+        log = str(ANNOTATION_FP/'genes'/'prodigal'/'log'/'{sample}.out')
     shell:
-        """mga -m {input} > {output}"""
+        """
+        if [[ -s {input} ]]; then
+          prodigal -i {input} -o {output.gff} \
+          -a {output.faa} -d {output.fna} -p meta  &> {output.log}
+        else
+          touch {output.faa}
+          touch {output.gff}
+          touch {output.fna}
+          touch {output.log}
+        fi
+        """
 
-rule parse_genes_mga:
-    """Parse output from MetaGene Annotator into a set of genes."""
+rule _test_prodigal:
     input:
-        contigs=str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'),
-        genes=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_contigs.genes')
-    output:
-        nucl=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_nucl.fa'),
-        prot01=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_prot01.fa'),
-        prot11=str(ANNOTATION_FP/'genes'/'mga'/'{sample}_genes_prot11.fa')
-    run:
-        genes = mga_summary(input.genes, input.contigs, wildcards.sample)
-        SeqIO.write(genes, output.nucl, 'fasta')
-        # Write proteins using standard translation table
-        SeqIO.write(
-            [SeqRecord(r.seq.translate(), r.id, description=r.description) for r in genes],
-            output.prot01, 'fasta')
-        # Write proteins using bacterial/archaeal/prok. phage translation table
-        SeqIO.write(
-            [SeqRecord(r.seq.translate(table=11), r.id, description=r.description) for r in genes],
-            output.prot11, 'fasta')
+        expand(str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_{suffix}.fa'),
+        sample=Samples.keys(), suffix=['prot','nucl'])
+
+
         
                 
         
