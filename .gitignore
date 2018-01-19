@@ -16,3 +16,4 @@ configs/respublica_config.yml
 *.yml
 *.yaml
 *.egg-*
+docs/_build

@@ -7,8 +7,6 @@ blast
 CLARK
 kraken=1.0
 krona
-amos
-mga
 kraken-biom
 pear
 vsearch
