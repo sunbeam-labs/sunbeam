@@ -7,8 +7,6 @@ blast
 CLARK
 kraken=1.0
 krona
-amos
-mga
 kraken-biom
 pear
 vsearch
@@ -21,3 +19,4 @@ pandas
 igv=2.3.98
 megahit
 cap3
+prodigal
