@@ -3,6 +3,8 @@
 set -e # Stop on errors
 set -x # Display all commands
 
+echo "Testing"
+
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
 
