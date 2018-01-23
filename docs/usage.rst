@@ -281,10 +281,10 @@ Cluster options
 ---------------
 
 Sunbeam inherits its cluster abilities from Snakemake. There's nothing special
-about installing Sunbeam on a cluster, but in order to execute it on cluster
-nodes, you have to use the ``--cluster`` and ``--jobs`` flags. For example, if
-we wanted each rule to run on a 12-thread node, and a max of 100 rules executing
-in parallel, we would use the following command on our cluster:
+about installing Sunbeam on a cluster, but in order to distribute work to
+cluster nodes, you have to use the ``--cluster`` and ``--jobs`` flags. For
+example, if we wanted each rule to run on a 12-thread node, and a max of 100
+rules executing in parallel, we would use the following command on our cluster:
 
 .. code-block:: shell
 
@@ -298,17 +298,144 @@ complaining that an expected output file is missing.
 Outputs
 =======
 
-Quality control
----------------
+This section describes all the outputs from Sunbeam. Here is an example output
+directory, where we had two samples (sample1 and sample2), and two BLAST
+databases, one nucleotide ('bacteria') and one protein ('card').
 
-Taxonomic classification
-------------------------
+.. code-block:: shell
+
+   sunbeam_output
+	├── annotation
+	│   ├── blastn
+	│   │   └── bacteria
+	│   │       └── contig
+	│   ├── blastp
+	│   │   └── card
+	│   │       └── prodigal
+	│   ├── blastx
+	│   │   └── card
+	│   │       └── prodigal
+	│   ├── genes
+	│   │   └── prodigal
+	│   │       └── log
+	│   └── summary
+	├── assembly
+	│   ├── sample1_assembly
+	│   ├── sample2_assembly
+	│   ├── log
+	│   │   ├── cap3
+	│   │   └── vsearch
+	├── classify
+	│   └── kraken
+	│       └── raw
+	├── mapping
+	└── qc
+	    ├── cutadapt
+	    ├── decontam
+	    ├── decontam-human
+	    ├── decontam-phix
+	    ├── log
+	    │   ├── decontam
+	    │   ├── decontam-human
+	    │   └── trimmomatic
+	    ├── paired
+	    └── unpaired
+
+In order of appearance, the folders contain the following:
+
+Contig annotation
+-----------------
+
+.. code-block:: shell
+
+   sunbeam_output
+	├── annotation
+	│   ├── blastn
+	│   │   └── bacteria
+	│   │       └── contig
+	│   ├── blastp
+	│   │   └── card
+	│   │       └── prodigal
+	│   ├── blastx
+	│   │   └── card
+	│   │       └── prodigal
+	│   ├── genes
+	│   │   └── prodigal
+	│   │       └── log
+	│   └── summary
+   
+This contains the BLAST results in XML from the assembled contigs. ``blastn``
+contains the results from directly BLASTing the contig nucleotide sequences
+against the nucleotide databases. ``blastp`` and ``blastx`` use genes identified
+by the ORF finding program Prodigal to search for hits in the protein databases.
+
+The genes found from Prodigal are available in the ``genes`` folder.
+
+Finally, the ``summary`` folder contains an aggregated report of the number and
+types of hits of each contig against the BLAST databases, as well as length and
+circularity.
 
 Contig assembly
 ---------------
 
-Contig annotation
------------------
+.. code-block:: shell
+
+	├── assembly
+	│   ├── sample1_assembly
+	│   ├── sample2_assembly
+	│   ├── log
+	│   │   ├── cap3
+	│   │   └── vsearch
+
+This contains the assembled contigs for each sample in its own folder under [samplename]_assembly.
+
+Taxonomic classification
+------------------------
+
+.. code-block:: shell
+   
+	├── classify
+	│   └── kraken
+	│       └── raw
+
+This contains the taxonomic outputs from Kraken, both the raw output as well as
+summarized results. The primary output file is ``all_samples.tsv``, which is a
+BIOM-style format with samples as columns and taxonomy IDs as rows, and number
+of reads assigned to each in each cell.
+
+Alignment to genomes
+--------------------
+
+.. code-block:: shell
+   
+	├── mapping
+
+Right now this contains all the output files (.bam) for the mapping of reads
+back to target genomes. We plan on breaking down the output into subfolders for
+a more organized structure soon.
+
+Quality control
+---------------
+
+.. code-block:: shell
+   
+	└── qc
+	    ├── cutadapt
+	    ├── decontam
+	    ├── decontam-human
+	    ├── decontam-phix
+	    ├── log
+	    │   ├── decontam
+	    │   ├── decontam-human
+	    │   └── trimmomatic
+	    ├── paired
+	    └── unpaired
+
+
+This folder contains paired, non-host-removed reads in ``paired`` (and unpaired
+in ``unpaired``). ``decontam`` contains the final output of both the host and
+phix removal steps.
+	
 
 .. _troubleshooting:
 Troubleshooting
