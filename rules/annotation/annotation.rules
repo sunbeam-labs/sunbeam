@@ -1,6 +1,6 @@
 # -*- mode: Snakemake -*-
 #
-# Viral contig annotation.
+# Contig annotation.
 #
 # See Readme.md
 
@@ -16,24 +16,6 @@ rule all_annotate:
     input:
         TARGET_ANNOTATE
 
-# rule filter_fasta:
-#     """Filter contigs by size."""    
-#     input:
-#         str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa')
-#     output:
-#         fp = str(ANNOTATION_FP/'filtered'/'{sample}_filtered_contigs.fa')
-#     run:
-#         n_contigs = 0
-#         n_kept = 0
-#         with open(output.fp, 'w') as out:
-#             for record in SeqIO.parse(input[0], 'fasta'):
-#                 n_contigs += 1
-#                 if len(record) >= Cfg['annotation']['min_contig_len']:
-#                     n_kept += 1
-#                     SeqIO.write(record, out, 'fasta')
-#         results = "%s: %d of %d contigs kept" % (wildcards.sample, n_kept, n_contigs)
-#         print(results)
-
 rule aggregate_results:
     input:
         contigs=str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'),
@@ -44,7 +26,7 @@ rule aggregate_results:
             str(ANNOTATION_FP/'{blastpx}'/'{db}'/'{orf_finder}'/'{{sample}}.xml'),
             blastpx=['blastp','blastx'],
             db=Blastdbs['prot'],
-            orf_finder=['mga'])
+            orf_finder=['prodigal'])
     output:
         str(ANNOTATION_FP/'summary'/'{sample}.tsv')
     params:
@@ -81,8 +63,12 @@ rule aggregate_results:
                 }
                 for db in Blastdbs['nucl']:                
                     results[db] = contig_results[db].get(contig, "NA")
+                # Report the number of hits of each contig/gene for each prot. db
+                # Genes are reported from prodigal as contig_1,contig_2, etc so
+                # aggregate all hits for all of a contig's genes together using sum
                 for db in Blastdbs['prot']:
-                    results[db] = gene_hits[db].get(contig, 0)
+                    results[db] = sum(
+                        gene_hits[db][gene] for gene in gene_hits[db] if contig in gene)
                 writer.writerow(results)
 
 rule aggregate_all:

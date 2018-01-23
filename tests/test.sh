@@ -3,6 +3,8 @@
 set -e # Stop on errors
 set -x # Display all commands
 
+echo "Testing"
+
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
 
@@ -13,7 +15,7 @@ if [ $# -ne 1 ]; then
     TEMPDIR=`mktemp -d`
 else
     echo "Write sunbeam test result to provided path"
-    TEMPDIR=`realpath $1`
+    TEMPDIR=`readlink -f $1`
 fi
 
 # Activate the sunbeam environment
@@ -62,6 +64,8 @@ kraken-build --db mindb --clean
 mkdir -p local/blast
 cat raw/*.fna > local/blast/bacteria.fa
 makeblastdb -dbtype nucl -in local/blast/bacteria.fa
+cp indexes/card.fa local/blast
+makeblastdb -dbtype prot -in local/blast/card.fa
 popd
 
 # Running snakemake
@@ -82,7 +86,7 @@ snakemake --configfile=$TEMPDIR/tmp_config.yml clean_assembly -p
 
 # Check contents
 echo "Now checking whether we hit the expected genome:"
-grep 'NC_006347.1' $TEMPDIR/sunbeam_output/annotation/summary/dummybfragilis.tsv
+awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/sunbeam_output/annotation/summary/dummyecoli.tsv
 
 # Check targets
 python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt 
@@ -107,14 +111,9 @@ function test_template_option {
 pushd tests
 # Create a version of the config file customized for this tempdir
 # Provide the sunbeamlib package config file manually
-CONFIG_FP=$HOME/miniconda3/envs/sunbeam/lib/python3.5/site-packages/sunbeamlib/data/default_config.yml
-sunbeam_init $TEMPDIR --template $CONFIG_FP --defaults testing > $TEMPDIR/tmp_config_2.yml
+CONFIG_FP=cfg_template.yml
+sunbeam_init $TEMPDIR --template $CONFIG_FP --defaults testing | grep 'from_template:' || exit 1
 popd
-rm -r $TEMPDIR/sunbeam_output
-echo "Now re-run snakemake with custom config file: "
-snakemake --configfile=$TEMPDIR/tmp_config_2.yml 
-snakemake --configfile=$TEMPDIR/tmp_config_2.yml clean_assembly
-python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt
 }
 
 test_template_option
