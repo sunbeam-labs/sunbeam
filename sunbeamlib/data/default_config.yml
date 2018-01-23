@@ -27,7 +27,6 @@ all:
   output_fp: "sunbeam_output"
   samplelist_fp: ""
   filename_fmt: "{{sample}}_{{rp}}.fastq.gz"
-  subcores: 4
   exclude: []
 
 
