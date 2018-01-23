@@ -1,0 +1,5 @@
+.. _extensions:
+
+==============
+Sunbeam Extensions
+==============
