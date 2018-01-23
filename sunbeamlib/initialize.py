@@ -26,7 +26,7 @@ def main():
         "init", description="Initialize a new sunbeam project")
     parser.add_argument("project_fp", help="Project root directory")
     parser.add_argument(
-        "--defaults", choices=['microb120','testing'],
+        "--defaults", choices=['microb120','pmacs','testing'],
         help="Some servers and configurations have prebuilt default configs")
     parser.add_argument(
         "--conda_fp", default=conda_fp, type=Path,
