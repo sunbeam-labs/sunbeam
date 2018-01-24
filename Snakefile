@@ -9,6 +9,7 @@ import re
 import sys
 import yaml
 import configparser
+import warnings
 from pprint import pprint
 from pathlib import Path, PurePath
 
@@ -24,8 +25,18 @@ if not config:
                 "No config file specified. Run `sunbeam_init` to generate a "
                 "config file, and specify with --configfile")
 
-# ---- Substitute $HOME_DIR variable
-#varsub(config)
+# Check for major version compatibility
+pkg_major, cfg_major = check_compatibility(config)
+if pkg_major > cfg_major:
+        raise SystemExit(
+                "\nThis config file was created with an older version of Sunbeam"
+                " and may not be compatible. Create a new config file using"
+                "`sunbeam_init`\n")
+elif pkg_major < cfg_major:
+        raise SystemExit(
+                "\nThis config file was created with an older version of Sunbeam"
+                " and may not be compatible. Create a new config file using "
+                "`sunbeam_init`\n")
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)
@@ -49,7 +60,6 @@ ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
 
-#localrules: decontam
 
 # ---- Targets rules
 include: "rules/targets/targets.rules"

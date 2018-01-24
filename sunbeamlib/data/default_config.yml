@@ -28,7 +28,7 @@ all:
   samplelist_fp: ""
   filename_fmt: "{{sample}}_{{rp}}.fastq.gz"
   exclude: []
-
+  version: "{SB_VERSION}"
 
 # Quality control
 qc:

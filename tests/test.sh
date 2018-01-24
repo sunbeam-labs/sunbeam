@@ -133,3 +133,11 @@ snakemake --configfile=$TEMPDIR/tmp_config_barcode.yml all_decontam
 }
 
 test_barcode_file
+
+# Test for version check
+function test_version_check {
+    sunbeam_mod_config --config $TEMPDIR/tmp_config.yml --mod_str 'all: {version: 9999.9.9}' > $TEMPDIR/too_high_config.yml
+    snakemake --configfile $TEMPDIR/too_high_config.yml && exit 1
+}
+
+test_version_check
