@@ -20,3 +20,4 @@ igv=2.3.98
 megahit
 cap3
 prodigal
+setuptools_scm

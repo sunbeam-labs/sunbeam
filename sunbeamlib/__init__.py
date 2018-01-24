@@ -4,12 +4,14 @@ __license__ = "GPL2+"
 import os
 import re
 import sys
+from setuptools_scm import get_version
 
+from semantic_version import Version
 from snakemake.utils import listfiles
 from snakemake.workflow import expand
 from Bio import SeqIO
 
-from .config import verify
+__version__ = str(Version.coerce(get_version()))
 
 def build_sample_list(data_fp, filename_fmt, samplelist_fp, excluded):
     if os.path.isfile(str(samplelist_fp)):
@@ -82,12 +84,12 @@ def _build_samples_from_file(data_fp, filename_fmt, samplelist_fp, excluded):
     return Samples
 
 def _check_sample_path(sample, fp):
-    try: verify(fp)
-    except ValueError:
+    path = Path(fp)
+    if not path.exists():
         sys.stderr.write(
             "Warning: original file for sample '{}' not found at {}\n".format(
                 sample, fp))
-    return fp
+    return path.resolve()
 
 def index_files(genome, index_fp):
     """

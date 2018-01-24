@@ -1,9 +1,12 @@
 import sys
-import pkg_resources
 import collections
 from pathlib import Path
+from pkg_resources import get_distribution, resource_stream
 
+from semantic_version import Version
 import ruamel.yaml
+from sunbeamlib import __version__
+
 
 def makepath(path):
     return Path(path).expanduser()
@@ -43,9 +46,21 @@ def validate_paths(cfg, root):
         new_cfg[k] = v
     return new_cfg
 
+def check_compatibility(cfg):
+    """Returns the major version numbers from the package and config file, respectively"""
 
+    cfg_version = Version(cfg['all'].get('version', '0.0.0'))
+    pkg_version = Version(__version__)
+
+    return (pkg_version.major, cfg_version.major)
+    
 def check_config(cfg):
-    """Resolve root in config file, then validate paths."""
+    """
+    Validate the config file.
+    
+    Check version compatibility, resolve root in config file, then validate paths.
+    """
+    
     if 'root' in cfg['all']:
         root = verify(cfg['all']['root'])
     else:
@@ -91,11 +106,14 @@ def update(config_str, new):
     config = _update_dict(config, new)
     return config
 
-def new(conda_fp, project_fp, version=get_distribution(__name__).version, template=None):
+def new(
+        conda_fp, project_fp,
+        version=__version__,
+        template=None):
     if template:
         config = template.read()
     else:
-        config = pkg_resources.resource_stream(
+        config = resource_stream(
             "sunbeamlib", "data/default_config.yml").read().decode()
     return config.format(
         CONDA_FP=conda_fp,
@@ -104,7 +122,7 @@ def new(conda_fp, project_fp, version=get_distribution(__name__).version, templa
 
 def load_defaults(default_name):
     return ruamel.yaml.safe_load(
-        pkg_resources.resource_stream(
+        resource_stream(
             "sunbeamlib", "data/{}.yml".format(default_name)
         ).read().decode())
     
