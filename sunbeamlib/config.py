@@ -91,14 +91,16 @@ def update(config_str, new):
     config = _update_dict(config, new)
     return config
 
-def new(conda_fp, project_fp, template=None):
+def new(conda_fp, project_fp, version=get_distribution(__name__).version, template=None):
     if template:
         config = template.read()
     else:
         config = pkg_resources.resource_stream(
             "sunbeamlib", "data/default_config.yml").read().decode()
     return config.format(
-        CONDA_FP=conda_fp, PROJECT_FP=project_fp)
+        CONDA_FP=conda_fp,
+        PROJECT_FP=project_fp,
+        SB_VERSION=version)
 
 def load_defaults(default_name):
     return ruamel.yaml.safe_load(
