@@ -4,14 +4,16 @@ __license__ = "GPL2+"
 import os
 import re
 import sys
-from setuptools_scm import get_version
+from pkg_resources import get_distribution
+#from setuptools_scm import get_version
 
 from semantic_version import Version
 from snakemake.utils import listfiles
 from snakemake.workflow import expand
 from Bio import SeqIO
 
-__version__ = str(Version.coerce(get_version()))
+__version__ = str(Version.coerce(get_distribution('sunbeam').version))
+# __version__ = str(Version.coerce(get_version()))
 
 def build_sample_list(data_fp, filename_fmt, samplelist_fp, excluded):
     if os.path.isfile(str(samplelist_fp)):

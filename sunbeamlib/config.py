@@ -1,7 +1,7 @@
 import sys
 import collections
 from pathlib import Path
-from pkg_resources import get_distribution, resource_stream
+from pkg_resources import resource_stream
 
 from semantic_version import Version
 import ruamel.yaml
