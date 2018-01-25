@@ -84,6 +84,8 @@ def _build_samples_from_file(data_fp, filename_fmt, samplelist_fp, excluded):
                     sample,
                     expand(str(data_fp/filename_fmt), sample=sample, rp=rp)[0])
             Samples[sample]['paired'] = True
+
+    print(Samples)
     return Samples
 
 def _check_sample_path(sample, fp):
@@ -92,7 +94,7 @@ def _check_sample_path(sample, fp):
         sys.stderr.write(
             "Warning: original file for sample '{}' not found at {}\n".format(
                 sample, fp))
-    return path.resolve()
+    return str(path.resolve())
 
 def index_files(genome, index_fp):
     """
