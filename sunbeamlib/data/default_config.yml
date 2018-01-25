@@ -88,13 +88,3 @@ mapping:
   genomes_fp: ""
   threads: 4
   keep_unaligned: False
-  igv_prefs:
-    # Smooth rendered text.  By default it looks jagged.
-    ENABLE_ANTIALIASING: true
-    # The pixel width of the left panel that shows the name of the input files.
-    # The default is a bit too narrow and will truncate long filenames.
-    NAME_PANEL_WIDTH: 360
-    # The alignment window size, in kb, below which alignments will become
-    # visible.  We don't want to ever require zooming so we will set it to a
-    # high value.
-    SAM.MAX_VISIBLE_RANGE: 1000
