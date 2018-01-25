@@ -12,7 +12,6 @@ setup(
         'sunbeam_mod_config = sunbeamlib.mod_config:main'
     ]},
     classifiers=[
-        'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3.4'
     ]
 )
