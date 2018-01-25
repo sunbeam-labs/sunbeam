@@ -4,8 +4,9 @@ __license__ = "GPL2+"
 import os
 import re
 import sys
+
+from pathlib import Path
 from pkg_resources import get_distribution
-#from setuptools_scm import get_version
 
 from semantic_version import Version
 from snakemake.utils import listfiles
