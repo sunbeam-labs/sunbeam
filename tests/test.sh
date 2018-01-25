@@ -3,7 +3,6 @@
 set -e # Stop on errors
 set -x # Display all commands
 
-echo "Testing"
 
 # Ensure we can activate the environment
 export PATH=$PATH:$HOME/miniconda3/bin
@@ -133,3 +132,14 @@ snakemake --configfile=$TEMPDIR/tmp_config_barcode.yml all_decontam
 }
 
 test_barcode_file
+
+# Test for version check
+function test_version_check {
+    sunbeam_mod_config --config $TEMPDIR/tmp_config.yml --mod_str 'all: {version: 9999.9.9}' > $TEMPDIR/too_high_config.yml
+    # this should produce a nonzero exit code and fail if it does not
+    if snakemake --configfile $TEMPDIR/too_high_config.yml; then
+	exit 1
+    fi
+}
+
+test_version_check

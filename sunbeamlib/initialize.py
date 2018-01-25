@@ -5,7 +5,7 @@ import ruamel.yaml
 
 from pathlib import Path
 
-import sunbeamlib
+from sunbeamlib import config
 
 def _find_conda_fp():
     """Try to detect conda install in the path."""
@@ -48,11 +48,11 @@ def main():
         args.conda_fp = args.conda_fp.absolute()
 
     
-    config = sunbeamlib.config.new(
-        args.conda_fp, args.project_fp, args.template)
+    cfg = config.new(
+        conda_fp=args.conda_fp, project_fp=args.project_fp, template=args.template)
 
     if args.defaults:
-        defaults = sunbeamlib.config.load_defaults(args.defaults)
-        config = sunbeamlib.config.update(config, defaults)
+        defaults = config.load_defaults(args.defaults)
+        cfg = config.update(cfg, defaults)
         
-    sunbeamlib.config.dump(config)
+    config.dump(cfg)

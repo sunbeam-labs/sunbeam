@@ -2,7 +2,8 @@ from distutils.core import setup
 
 setup(
     name="sunbeam",
-    version="0.2.1",
+    use_scm_version = True,
+    setup_requires=['setuptools_scm'],
     packages=["sunbeamlib"],
     include_package_data=True,
     package_data={"sunbeamlib": ["sunbeamlib/data/*.yml"]},
