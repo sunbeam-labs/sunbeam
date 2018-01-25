@@ -86,27 +86,14 @@ parameter would be `{sample}_L001_{rp}.fastq.gz`.
 ### Defining genomes to align to
 
 The mapping rules will attempt to align all reads from all samples to all
-available genome sequences, and will also create some summary statistics and a
-visualization of alignments for each genome using [IGV].
+available genome sequences, and will also create some summary statistics.
 
 At a minimum the mapping configuration requires a path to a directory of genome
-files in fasta format (for alignment of reads), and the path to an IGV
-executable (for visualizing alignments against each genome).  IGV version
-2.3.68 is known to work.  [Xvfb] also must be installed for IGV visualization.
-
-An example for the two required mapping configuration options, if you have a
-custom IGV install in `sunbeam/local/IGV`:
-
-    mapping:
-      genomes_fp: "/home/erik/OceanVirome/genomes"
-      igv_fp: "local/IGV/igv.sh"
-
-Some other settings specific to the mapping rules:
+files in fasta format (for alignment of reads).
 
 - `keep_unaligned`: A boolean defining if unaligned reads should be kept in
   bowtie2's output, along with aligned reads. (Defaults to False.)
-- `igv_prefs`: A dictionary of IGV preferences to apply.  (Defaults to a few
-  basic rendering options.)
+
 
 ### Databases
 
