@@ -9,7 +9,7 @@ import re
 import sys
 import yaml
 import configparser
-import warnings
+
 from pprint import pprint
 from pathlib import Path, PurePath
 

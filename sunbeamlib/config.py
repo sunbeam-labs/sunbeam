@@ -55,11 +55,7 @@ def check_compatibility(cfg):
     return (pkg_version.major, cfg_version.major)
     
 def check_config(cfg):
-    """
-    Validate the config file.
-    
-    Check version compatibility, resolve root in config file, then validate paths.
-    """
+    """Resolve root in config file, then validate paths."""
     
     if 'root' in cfg['all']:
         root = verify(cfg['all']['root'])
