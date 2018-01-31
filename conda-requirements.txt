@@ -16,7 +16,6 @@ jellyfish=1.1.11=1
 cutadapt
 pysam
 pandas
-igv=2.3.98
 megahit
 cap3
 prodigal

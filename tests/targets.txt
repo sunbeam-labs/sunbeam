@@ -30,7 +30,5 @@ qc/paired/dummyecoli_R2.fastq.gz
 qc/paired/random_R1.fastq.gz
 qc/paired/random_R2.fastq.gz
 
-mapping/human-KI270762.1.alignment.png
-mapping/phix174-gi|9626372|ref|NC_001422.1|.alignment.png
 mapping/human.coverage.csv
 mapping/phix174.coverage.csv

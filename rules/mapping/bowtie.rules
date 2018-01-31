@@ -1,6 +1,6 @@
 # -*- mode: Snakemake -*-
 
-from sunbeamlib import index_files, igv, samtools
+from sunbeamlib import index_files, samtools
 
 # Generate Snakemake template strings for a few commonly-used parameters below
 INDICES = index_files('{genome}', Cfg['mapping']['genomes_fp'])
@@ -71,26 +71,4 @@ rule samtools_mpileup:
         genome = GENOME
     output: str(MAPPING_FP/"{genome}-{sample}.raw.bcf")
     shell: "samtools mpileup -gf {input.genome} {input.bam} | bcftools call -Ob -v -c - > {output}"
-
-# I'm creating each segment snapshot separate, but really it could be done in
-# one IGV run.  Can Snakemake handle that?
-rule igv_snapshot:
-    message: "Create an alignment image for {wildcards.genome}-{wildcards.segment} with IGV"
-    input:
-        genome = GENOME,
-        bams=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam"), sample=Samples.keys()),
-        bais=expand(str(MAPPING_FP/"{{genome}}-{sample}.sorted.bam.bai"), sample=Samples.keys())
-    params:
-        segment="{segment}",
-        igv_prefs=Cfg['mapping']['igv_prefs']
-    output:
-        png=str(MAPPING_FP/"{genome}-{segment}.alignment.png")
-    run:
-        igv.render(
-            genome=input.genome,
-            bams=sorted(input.bams),
-            imagefile=output.png,
-            seqID=params.segment,
-            method="script",
-            igv_prefs=params.igv_prefs
-        )
+           
