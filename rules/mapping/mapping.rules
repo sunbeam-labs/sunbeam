@@ -1,0 +1,74 @@
+# -*- mode: Snakemake -*-
+
+from sunbeamlib import samtools
+
+rule all_mapping:
+    input: TARGET_MAPPING
+
+rule build_genome_index:
+    input:
+        str(Cfg['mapping']['genomes_fp']/'{genome}.fasta')
+    output:
+        str(Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb')
+    shell:
+        "cd {Cfg[mapping][genomes_fp]} && bwa index {input}"
+
+rule align_to_genome:
+    input:
+        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),
+        index = str(Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb')
+    output:
+        temp(str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.sam'))
+    threads:
+        Cfg['mapping']['threads']
+    params:
+        index_fp = str(Cfg['mapping']['genomes_fp'])
+    shell:
+        """
+        bwa mem -M -t {threads} {params.index_fp}/{wildcards.genome}.fasta \
+        {input.r1} {input.r2} -o {output}
+        """
+
+
+rule samtools_convert:
+    input:
+        str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.sam')
+    output:
+        str(MAPPING_FP/'{genome}'/'{sample}.bam')
+    threads:
+        Cfg['mapping']['threads']
+    shell:
+        """
+        samtools view -@ {threads} -b {Cfg[mapping][samtools_opts]} {input} | \
+        samtools sort -@ {threads} > {output}
+        """
+
+rule samtools_get_coverage:
+    input:
+        expand(
+            str(MAPPING_FP/'{{genome}}'/'{sample}.bam'), sample=Samples.keys())
+    output:
+        str(MAPPING_FP/'{genome}'/'coverage.csv')
+    run:
+        samtools.get_coverage_stats(
+            wildcards.genome, input, Samples.keys(), output[0])
+
+rule samtools_index:
+    input: str(MAPPING_FP/'{genome}'/'{sample}.bam')
+    output: str(MAPPING_FP/'{genome}'/'{sample}.bam.bai')
+    shell: "samtools index {input} {output}"
+
+           
+rule samtools_mpileup:
+    input:
+        bam = str(MAPPING_FP/'{genome}'/'{sample}.bam'),
+        genome = str(Cfg['mapping']['genomes_fp']/'{genome}.fasta')
+    output: str(MAPPING_FP/'{genome}'/'{sample}.raw.bcf')
+    shell:
+        """
+        samtools mpileup -gf {input.genome} {input.bam} | \
+        bcftools call -Ob -v -c - > {output}
+        """
+
+    

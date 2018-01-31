@@ -2,56 +2,40 @@
 #
 # list the all input files for each step
 
-####################
-## qc
-####################
-
-### Quality-control reads
+# ---- Quality control
+# Quality-control reads
 TARGET_QC = expand(str(QC_FP/'paired'/'{sample}_{rp}_fastqc/fastqc_data.txt'), sample = Samples.keys(), rp = ['R1','R2'])
-
-### Remove host reads
+# Remove host reads
 TARGET_DECONTAM = expand(str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'), sample = Samples.keys(), rp = ['R1', 'R2'])
 
-####################
-## classify
-####################
 
-### Classify all reads
-TARGET_KRAKEN = [str(CLASSIFY_FP/'kraken'/'all_samples.tsv')]
-TARGET_CLASSIFY = TARGET_KRAKEN
+# ---- Classification
+# Classify all reads
+TARGET_CLASSIFY = [str(CLASSIFY_FP/'kraken'/'all_samples.tsv')]
 
-####################
-## assembly
-####################
 
-### Assemble contigs
-TARGET_ASSEMBLY = (
-    expand(str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'),
-           sample = Samples.keys()) +
-    expand(str(ASSEMBLY_FP/'{sample}_assembly'/'.save'),
-           sample = Samples.keys()))
-## Pair reads
-TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sample=Samples.keys())
+# ---- Assembly
+# Assemble contigs
+TARGET_ASSEMBLY = expand(
+    str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'), sample = Samples.keys())
 
-####################
-## mapping
-####################
 
+# ---- Mapping
+# Map reads to target genomes
 TARGET_MAPPING = [
-        expand(str(MAPPING_FP/"{genome}-{sample}.sorted.bam.bai"), genome=GenomeSegments.keys(), sample=Samples.keys()),
-        expand(str(MAPPING_FP/"{genome}-{sample}.raw.bcf"), genome=GenomeSegments.keys(), sample=Samples.keys()),
-        expand(str(MAPPING_FP/"{genome}.coverage.csv"), genome=GenomeSegments.keys())]
+        expand(str(MAPPING_FP/"{genome}"/"{sample}.bam.bai"), genome=GenomeSegments.keys(), sample=Samples.keys()),
+        expand(str(MAPPING_FP/"{genome}"/"{sample}.raw.bcf"), genome=GenomeSegments.keys(), sample=Samples.keys()),
+        expand(str(MAPPING_FP/"{genome}"/"coverage.csv"), genome=GenomeSegments.keys())]
 
-####################
-## annotation
-####################
 
-## Annotate all contigs
+# ---- Contig annotation
+# Annotate all contigs
 TARGET_ANNOTATE = expand(str(ANNOTATION_FP/'summary'/'{sample}.tsv'), sample=Samples.keys())
 
-####################
-## report
-####################
+
+# ---- Reports
 TARGET_REPORT = [str(QC_FP/'preprocess_summary.tsv'), str(QC_FP/'fastqc_quality.tsv')]
 
+
+# ---- All targets
 TARGET_ALL = TARGET_QC + TARGET_DECONTAM + TARGET_CLASSIFY + TARGET_ASSEMBLY + TARGET_ANNOTATE + TARGET_REPORT + TARGET_MAPPING

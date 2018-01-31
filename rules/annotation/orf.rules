@@ -9,7 +9,7 @@
 rule prodigal:
     """Use Progial for coding genes predictions in contigs."""
     input:
-        str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa')
+        str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa')
     output:
         gff = str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes.gff'),
         faa = str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_prot.fa'),

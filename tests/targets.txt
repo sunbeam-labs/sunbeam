@@ -6,9 +6,9 @@ annotation/summary/dummybfragilis.tsv
 annotation/summary/dummyecoli.tsv
 annotation/summary/random.tsv
 
-assembly/dummybfragilis_assembly/final-contigs.fa
-assembly/dummyecoli_assembly/final-contigs.fa
-assembly/random_assembly/final-contigs.fa
+assembly/contigs/dummybfragilis-contigs.fa
+assembly/contigs/dummyecoli-contigs.fa
+assembly/contigs/random-contigs.fa
 
 classify/kraken/all_samples.biom
 classify/kraken/all_samples.tsv
@@ -30,5 +30,5 @@ qc/paired/dummyecoli_R2.fastq.gz
 qc/paired/random_R1.fastq.gz
 qc/paired/random_R2.fastq.gz
 
-mapping/human.coverage.csv
-mapping/phix174.coverage.csv
+mapping/human/coverage.csv
+mapping/phix174/coverage.csv
