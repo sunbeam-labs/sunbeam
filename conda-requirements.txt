@@ -22,3 +22,4 @@ cap3
 prodigal
 semantic_version
 setuptools_scm
+bbmap
