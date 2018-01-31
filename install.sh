@@ -22,7 +22,7 @@ conda config --add channels eclarke
 conda config --add channels conda-forge
 
 # Don't create the enviroment if it already exists
-conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV_NAME
+conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV_NAME || {
     conda create --name=$SUNBEAM_ENV_NAME --file=conda-requirements.txt --yes >> $OUTPUT
     source activate $SUNBEAM_ENV_NAME
     pip install --editable . >> $OUTPUT
