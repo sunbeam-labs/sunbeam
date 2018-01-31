@@ -16,20 +16,21 @@ def parse_trim_summary(f):
             keys = ('input', 'both_kept','fwd_only','rev_only','dropped')
             return(dict(zip(keys, vals)))
 
-def parse_decontam_json(f):
-    data = json.load(f)
-    return(data['data'])
+def parse_decontam_log(f):
+    f.readline()
+    (host, nonhost) = f.readline().split()
+    return {'host':host, 'nonhost':nonhost}
 
-def summarize_qual_decontam(tfile, jfile):
+def summarize_qual_decontam(tfile, dfile):
     """Retuen a dataframe for summary information for trimmomatic and decontam rule"""
     tname = os.path.basename(tfile).split('.out')[0]
-    jname = os.path.basename(jfile).split('_summary.json')[0]
-    if tname != jname:
-        raise ValueError('Unmatched qc and decontam files for: %s' % tname)
+    dname = os.path.basename(dfile).split('.txt')[0]
+    if tname != dname:
+        raise ValueError('Unmatched qc and decontam files for: %s and %s' % (tname, dname))
     with open(tfile) as tf:
-         with open(jfile) as jf:
+         with open(dfile) as jf:
             trim_data = parse_trim_summary(tf)
-            decontam_data = parse_decontam_json(jf)
+            decontam_data = parse_decontam_log(jf)
     merged_dict = {**trim_data, ** decontam_data}
     # todo: use yield for pandas DataFrame
     return(pandas.DataFrame(merged_dict, index=[tname]))
@@ -37,12 +38,12 @@ def summarize_qual_decontam(tfile, jfile):
 rule preprocess_report:
     """Combines the information from multiple preprocessing steps"""
     input:
-        trim_files = expand(str(QC_FP/'log'/'trimmomatic'/'{sample}.out'), sample=Samples.keys()),
-        json_files = expand(str(QC_FP/'log'/'decontam-human'/'{sample}_summary.json'), sample=Samples.keys())
+        trim_files = expand(str(QC_FP/'log'/'trimmomatic'/'{sample}.out'), sample=sorted(Samples.keys())),
+        decontam_files = expand(str(QC_FP/'log'/'decontam'/'{sample}.txt'), sample=sorted(Samples.keys()))
     output:
         str(QC_FP/'preprocess_summary.tsv')
     run:
-        summary_list = [summarize_qual_decontam(q, d) for q, d in zip(input.trim_files, input.json_files)]
+        summary_list = [summarize_qual_decontam(q, d) for q, d in zip(input.trim_files, input.decontam_files)]
         reports = pandas.concat(summary_list)
         reports.to_csv(output[0], sep='\t', index_label='Samples')
 

@@ -43,6 +43,8 @@ cp -r indexes $TEMPDIR
 cp -r raw $TEMPDIR
 cp -r truncated_taxonomy $TEMPDIR
 cp seqid2taxid.map $TEMPDIR
+mkdir $TEMPDIR/hosts
+cp indexes/*.fasta $TEMPDIR/hosts
 
 python generate_dummy_data.py $TEMPDIR
 # Create a version of the config file customized for this tempdir

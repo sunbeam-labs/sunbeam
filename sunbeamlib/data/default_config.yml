@@ -47,10 +47,6 @@ qc:
   # Decontam.py
   pct_id: 0.5
   frac: 0.6
-  keep_sam: False
-  method: bwa
-  human_genome_fp: "indexes/human.fasta"
-  phix_genome_fp: "indexes/phix174.fasta"
 
 
 # Taxonomic classifications

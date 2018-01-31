@@ -1,8 +1,7 @@
 all:
   filename_fmt: PCMP_{sample}_{rp}.fastq.gz
 qc:
-  human_genome_fp: indexes/human.fasta
-  phix_genome_fp: indexes/phix174.fasta
+  host_fp: hosts
 classify:
   kraken_db_fp: mindb
 blastdbs:
