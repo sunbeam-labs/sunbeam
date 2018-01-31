@@ -96,10 +96,23 @@ def _update_dict(target, new):
             target[k] = v
     return target
 
-    
-def update(config_str, new):
+def _update_dict_strict(target, new):
+    for k, v in new.items():
+        if isinstance(v, collections.Mapping) and k in target.keys():
+            target[k] = _update_dict_strict(target.get(k, {}), v)
+        elif k in target.keys():
+            target[k] = v
+        else:
+            sys.stderr.write("Key '%s' not found in target, skipping\n" % k)
+            continue
+    return target
+
+def update(config_str, new, strict=False):
     config = ruamel.yaml.round_trip_load(config_str)
-    config = _update_dict(config, new)
+    if strict:
+        config = _update_dict_strict(config, new)
+    else:
+        config = _update_dict(config, new)
     return config
 
 def new(

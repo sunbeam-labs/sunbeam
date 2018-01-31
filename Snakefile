@@ -31,12 +31,12 @@ if pkg_major > cfg_major:
         raise SystemExit(
                 "\nThis config file was created with an older version of Sunbeam"
                 " and may not be compatible. Create a new config file using"
-                "`sunbeam_init`\n")
+                "`sunbeam_init` and update it using `sunbeam_mod_config`\n")
 elif pkg_major < cfg_major:
         raise SystemExit(
-                "\nThis config file was created with an older version of Sunbeam"
+                "\nThis config file was created with an newer version of Sunbeam"
                 " and may not be compatible. Create a new config file using "
-                "`sunbeam_init`\n")
+                "`sunbeam_init` and update it using `sunbeam_mod_config`\n")
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)

@@ -63,6 +63,19 @@ files may not work anymore.
 
    Then follow the installation_ instructions above.
 
+
+   a. Updating your config files
+		   
+      Once you've installed the new version, migrate your old config files by
+      activating the ``sunbeam`` environment (see below), making a new config
+      file, and using our tool to add in values from your old config file.
+
+      .. code-block:: shell
+
+	 source activate sunbeam
+	 sunbeam_init my_project > my_project/new_config.yaml
+	 sunbeam_mod_config --config my_project/new_config.yaml --old_config my_project/old_config.yaml > my_project/new_config.yaml
+
 Setup
 =====
 

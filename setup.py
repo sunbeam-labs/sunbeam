@@ -8,8 +8,8 @@ setup(
     include_package_data=True,
     package_data={"sunbeamlib": ["sunbeamlib/data/*.yml"]},
     entry_points={'console_scripts': [
-        'sunbeam_init = sunbeamlib.initialize:main',
-        'sunbeam_mod_config = sunbeamlib.mod_config:main'
+        'sunbeam_init = sunbeamlib.scripts.init:main',
+        'sunbeam_mod_config = sunbeamlib.scripts.config:main'
     ]},
     classifiers=[
         'Programming Language :: Python :: 3.4'
