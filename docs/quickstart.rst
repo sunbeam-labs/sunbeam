@@ -27,7 +27,7 @@ how to do that. Next, run:
 
 .. code-block:: shell
 
-   bash tests/test.sh || echo "Tests failed" && echo "Tests succeeded"
+   bash tests/test.sh && echo "Tests succeeded" || echo "Tests failed"
 
 This runs the test script to make sure everything works. If you see "Tests
 failed" see the :ref:`install` guide for troubleshooting or file an issue on our
