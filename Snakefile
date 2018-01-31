@@ -47,6 +47,16 @@ Samples = build_sample_list(
         Cfg['all']['samplelist_fp'],
         Cfg['all']['exclude'])
 
+HostGenomeFiles = [f for f in Cfg['qc']['host_fp'].glob('*.fasta')]
+if not HostGenomeFiles:
+        sys.stderr.write(
+                "\n\nWARNING: No files detected in host genomes folder ({}). "
+                "If this is not intentional, make sure all files end in "
+                ".fasta and the folder is specified correctly.\n\n".format(
+                        Cfg['qc']['host_fp']
+                ))
+HostGenomes = {Path(g.name).stem: read_seq_ids(Cfg['qc']['host_fp'] / g) for g in HostGenomeFiles}
+
 GenomeFiles = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
 GenomeSegments = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GenomeFiles}
 

@@ -1,74 +1,93 @@
-# -*- mode: Snakemake -*-
-#
-# Decontamination rules
-#
-# Requires eclarke/decontam (fork for py3+ compatibility)
+import subprocess
+from sunbeamlib import index_files
+from sunbeamlib.decontam import get_mapped_reads
 
 rule all_decontam:
-    """Decontaminate all samples."""
     input:
         TARGET_DECONTAM
 
-rule gunzip:
-    input: str(QC_FP/'paired'/'{filename}.fastq.gz')
-    output: temp(str(QC_FP/'paired'/'{filename}.fastq'))
-    shell: "gunzip -c {input} > {output}"
-
-rule decontam_human:
+rule build_host_index:
     input:
-        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq')
+        str(Cfg['qc']['host_fp']/'{host}.fasta')
     output:
-        r1 = temp(str(QC_FP/'decontam-human'/'{sample}_R1.fastq')),
-        r2 = temp(str(QC_FP/'decontam-human'/'{sample}_R2.fastq')),
-        log = str(QC_FP/'log'/'decontam-human'/'{sample}_summary.json')
+        str(Cfg['qc']['host_fp']/'{host}.fasta.amb')
     params:
-        out_fp = str(QC_FP/'decontam-human')
+        host='{host}',
+        index_fp=str(Cfg['qc']['host_fp'])
+    shell:
+        "cd {Cfg[qc][host_fp]} && bwa index {input}"
+
+rule align_to_host:
+    input:
+        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),
+        index = str(Cfg['qc']['host_fp']/'{host}.fasta.amb')
+    output:
+        temp(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.bam'))
     threads:
         Cfg['qc']['threads']
-    shell:
-        """ 
-        decontaminate.py --forward {input.r1} --reverse {input.r2} \
-        --threads {threads} \
-        --organism human \
-        --method {Cfg[qc][method]} \
-        --index {Cfg[qc][human_genome_fp]} \
-        --summary-file {output.log} \
-        --output-dir {params.out_fp} \
-        """
-
-rule decontam_phix:
-    input:
-        r1 = str(QC_FP/'decontam-human'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'decontam-human'/'{sample}_R2.fastq')
-    output:
-        r1 = temp(str(QC_FP/'decontam-phix'/'{sample}_R1.fastq')),
-        r2 = temp(str(QC_FP/'decontam-phix'/'{sample}_R2.fastq')),
-        log = str(QC_FP/'log'/'decontam'/'{sample}_summary.json')
     params:
-        out_fp = str(QC_FP/'decontam-phix')
-    threads:
-        Cfg['qc']['threads']
+        sam = temp(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.sam')),
+        index_fp = str(Cfg['qc']['host_fp'])
     shell:
-        """ 
-        decontaminate.py --forward {input.r1} --reverse {input.r2} \
-        --threads {threads} \
-        --organism phix \
-        --method {Cfg[qc][method]} \
-        --index {Cfg[qc][phix_genome_fp]} \
-        --summary-file {output.log} \
-        --output-dir {params.out_fp}
+        """
+        bwa mem -M -t {threads} \
+        {params.index_fp}/{wildcards.host}.fasta \
+        {input.r1} {input.r2} -o {params.sam} && \
+        samtools view -bSF4 {params.sam} > {output} && \
+        rm {params.sam}
         """
 
-rule decontam:
+rule get_mapped_reads:
     input:
-        r1 = str(QC_FP/'decontam-phix'/'{sample}_R1.fastq'),
-        r2 = str(QC_FP/'decontam-phix'/'{sample}_R2.fastq'),
+        str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.bam')
+    output:
+        ids = str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.ids'),
+    params:
+        pct_id =  Cfg['qc']['pct_id'],
+        frac = Cfg['qc']['frac']
+    run:
+        with open(output.ids, 'w') as out:
+            last = None
+            for read_id in get_mapped_reads(input[0], params.pct_id, params.frac):
+                if read_id == last:
+                    continue
+                else:
+                    out.write(read_id + '\n')
+                    last = read_id
+
+rule aggregate_reads:
+    input:
+        expand(
+            str(QC_FP/'decontam'/'intermediates'/'{host}'/'{{sample}}.ids'),
+            host=HostGenomes.keys())
+    output:
+        temp(str(QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids')),
+    run:
+        if len(input) == 0:
+            shell("touch {output}")
+        else:
+            shell("cat {input} > {output}")
+
+rule filter_reads:
+    input:
+        hostreads = str(QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids'),
+        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz')
     output:
         r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq.gz'),
         r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq.gz'),
-    shell:
-        """
-        gzip -c {input.r1} > {output.r1}
-        gzip -c {input.r2} > {output.r2}
-        """
+        log = str(QC_FP/'log'/'decontam'/'{sample}.txt')
+    run:
+        original = int(str(subprocess.getoutput("zcat {} | wc -l".format(input.r1))).strip())//4
+        host = int(subprocess.getoutput("cat {} | wc -l".format(input.hostreads)).strip())
+        nonhost = int(original-host)
+        shell("""
+        filterbyname.sh \
+        in={input.r1} in2={input.r2} \
+        out={output.r1} out2={output.r2} \
+        names={input.hostreads}
+        """)
+        with open(output.log, 'w') as log:
+            log.write("host\tnonhost\n")
+            log.write("{}\t{}\n".format(host, nonhost))
