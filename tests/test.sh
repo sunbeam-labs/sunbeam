@@ -105,7 +105,7 @@ snakemake --configfile=$TEMPDIR/tmp_config_nocutadapt.yml all_decontam
 [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R2.fastq.gz ]
 }
 
-# test_optional_cutadapt
+test_optional_cutadapt
 
 # Test for template option for sunbeamlib: #54
 function test_template_option {
@@ -117,7 +117,7 @@ sunbeam_init $TEMPDIR --template $CONFIG_FP --defaults testing | grep 'from_temp
 popd
 }
 
-# test_template_option
+test_template_option
 
 
 # Test for barcodes file
@@ -133,7 +133,7 @@ snakemake --configfile=$TEMPDIR/tmp_config_barcode.yml all_decontam
 [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R2.fastq.gz ]
 }
 
-# test_barcode_file
+test_barcode_file
 
 # Test for version check
 function test_version_check {
@@ -144,4 +144,4 @@ function test_version_check {
     fi
 }
 
-# test_version_check
+test_version_check
