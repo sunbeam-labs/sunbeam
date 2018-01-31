@@ -40,8 +40,7 @@ TARGET_PAIR = expand(str(ASSEMBLY_FP/'paired'/'{sample}.assembled.fastq'), sampl
 TARGET_MAPPING = [
         expand(str(MAPPING_FP/"{genome}-{sample}.sorted.bam.bai"), genome=GenomeSegments.keys(), sample=Samples.keys()),
         expand(str(MAPPING_FP/"{genome}-{sample}.raw.bcf"), genome=GenomeSegments.keys(), sample=Samples.keys()),
-        expand(str(MAPPING_FP/"{genome}.coverage.csv"), genome=GenomeSegments.keys()),
-        [expand(str(MAPPING_FP/"{genome}-{segment}.alignment.png"), genome=g, segment=GenomeSegments[g]) for g in GenomeSegments.keys()]]
+        expand(str(MAPPING_FP/"{genome}.coverage.csv"), genome=GenomeSegments.keys())]
 
 ####################
 ## annotation
