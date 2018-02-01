@@ -9,6 +9,7 @@ kraken-biom
 vsearch
 jellyfish=1.1.11=1
 cutadapt
+bwa
 pysam
 pandas
 megahit
