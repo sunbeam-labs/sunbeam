@@ -9,33 +9,6 @@ rule all_assembly:
     input:
         TARGET_ASSEMBLY
 
-rule merge_fq:
-    input:
-        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq.gz')
-    output:
-        str(ASSEMBLY_FP/'merged_reads'/'{sample}_merged.fasta')
-    shell: "fq2fa --merge --filter <(gunzip -c {input.r1}) <(gunzip -c {input.r2}) {output}"
-
-
-rule idba_ud:
-    input:
-        str(ASSEMBLY_FP/'merged_reads'/'{sample}_merged.fasta')
-    output:
-    	str(ASSEMBLY_FP/'idba_ud'/'{sample}'/'contig.fa')
-    log:
-        str(ASSEMBLY_FP/'log'/'idba_ud'/'{sample}.out')
-    params:
-        out_fp = str(ASSEMBLY_FP/'idba_ud'/'{sample}')
-    threads:
-        Cfg['assembly']['threads']
-    shell:
-        """
-        idba_ud -l {input} -o {params.out_fp} \
-        --num_threads {threads} --pre_correction &> {log} || \
-        if [ ! -a {output} ]; then cp {params.out_fp}/contig-100.fa {output}; fi
-        """
-
 rule megahit:
     input:
         r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq.gz'),
@@ -50,40 +23,11 @@ rule megahit:
         if [ ! -a {output} ]; then touch {output}; fi
         """
 
-rule cap3:
+rule final_filter:
     input:
         str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa')
     output:
-        str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
-    log:
-        str(ASSEMBLY_FP/'log'/'cap3'/'{sample}.out')
-    shell:
-        """
-        [[ -s {input} ]] && \
-        cap3 {input} &> {log} && \
-        cat {input}.cap.singlets {input}.cap.contigs > {output} || \
-        cp {input} {output} &> {log}
-        """
-
-rule save_intermediates:
-    input:
-        M = str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa'),
-        C = str(ASSEMBLY_FP/'cap3'/'{sample}'/'cap3-contigs.fa')
-    output:
-        M = str(ASSEMBLY_FP/'{sample}_assembly'/'contig.fa'),
-        C = str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa'),
-        sentinel = str(ASSEMBLY_FP/'{sample}_assembly'/'.save')
-    shell:
-        """
-        cp {input.M} {output.M} && cp {input.C} {output.C} && \
-        touch {output.sentinel}
-        """
-
-rule final_filter:
-    input:
-        str(ASSEMBLY_FP/'{sample}_assembly'/'cap3-contigs.fa')
-    output:
-        str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa')
+        str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa')
     params:
         len = Cfg['assembly']['min_length']
     log:
@@ -95,7 +39,7 @@ rule final_filter:
         if [ -s {input} ]
         then
             vsearch --sortbylength {input} \
-            --relabel {filename} --minseqlength {params.len} \
+            --minseqlength {params.len} \
             --output {input}.{params.len}f &> {log} && \
             cp {input}.{params.len}f {output}
         else
@@ -106,10 +50,7 @@ rule final_filter:
 rule clean_assembly:
     input:
         M = str(ASSEMBLY_FP/'megahit'),
-        C = str(ASSEMBLY_FP/'cap3')
     shell:
         """
-        rm -rf {input.M} && \
-        rm -rf {input.C} && \
-        echo "Cleanup assembly finished."
+        rm -rf {input.M} && echo "Cleanup assembly finished."
         """

@@ -82,11 +82,7 @@ include: "rules/qc/decontaminate.rules"
 
 # ---- Assembly rules
 include: "rules/assembly/assembly.rules"
-include: "rules/assembly/pairing.rules"
 
-
-# ---- Antibiotic resistance gene rules
-include: "rules/abx/abx_genes.rules"
 
 # ---- Contig annotation rules
 include: "rules/annotation/annotation.rules"
@@ -99,8 +95,7 @@ include: "rules/classify/kraken.rules"
 
 
 # ---- Mapping rules
-include: "rules/mapping/bowtie.rules"
-#include: "rules/mapping/snap.rules"
+include: "rules/mapping/mapping.rules"
 
 
 # ---- Reports rules

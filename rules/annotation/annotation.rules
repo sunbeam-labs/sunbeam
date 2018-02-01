@@ -18,7 +18,7 @@ rule all_annotate:
 
 rule aggregate_results:
     input:
-        contigs=str(ASSEMBLY_FP/'{sample}_assembly'/'final-contigs.fa'),
+        contigs=str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'),
         contig_results=expand(
             str(ANNOTATION_FP/'blastn'/'{db}'/'contig'/'{{sample}}.xml'),
             db=Blastdbs['nucl']),

@@ -83,5 +83,6 @@ blastdbs:
 mapping:
   suffix: mapping
   genomes_fp: ""
+  samtools_opts: ""
   threads: 4
   keep_unaligned: False
