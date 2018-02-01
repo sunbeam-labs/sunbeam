@@ -1,8 +1,6 @@
 language: ruby
-cache:
-  directories:
-    - $HOME/miniconda
 install:
   - bash tests/test.sh
-
+test:
+  - echo "Done"
 
