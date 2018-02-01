@@ -1,9 +1,9 @@
+<img src="docs/images/sunbeam_logo.gif" width=120, height=120 align="left" />
+
 # Sunbeam: a robust, extensible metagenomic sequencing pipeline 
 
 [![Build Status](https://travis-ci.org/sunbeam-labs/sunbeam.svg?branch=dev)](https://travis-ci.org/eclarke/sunbeam) 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥3.5.2-brightgreen.svg?style=flat)](http://snakemake.bitbucket.org)
-
-<img src="docs/images/sunbeam_logo.gif" width=120, height=120 align="left" />
 
 Sunbeam is a pipeline written in [snakemake](http://snakemake.readthedocs.io)
 that simplifies and automates many of the steps in metagenomic sequencing
