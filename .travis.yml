@@ -2,10 +2,7 @@ language: ruby
 cache:
   directories:
     - $HOME/miniconda
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install xdotool
 install:
-  - bash install.sh sunbeam anaconda_log.txt
-script: bash tests/test.sh
+  - bash tests/test.sh
+
 

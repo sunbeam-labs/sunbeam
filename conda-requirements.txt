@@ -1,4 +1,4 @@
-snakemake=3.13.0
+snakemake
 ruamel.yaml
 biopython
 trimmomatic

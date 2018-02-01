@@ -17,8 +17,12 @@ else
     TEMPDIR=`readlink -f $1`
 fi
 
+# Install sunbeam into temporary environment
+SUNBEAM_ENV="sunbeam-`basename $TEMPDIR`"
+bash install.sh $SUNBEAM_ENV
+
 # Activate the sunbeam environment
-source activate sunbeam
+source activate $SUNBEAM_ENV
 command -v snakemake
 
 mkdir -p $TEMPDIR/data_files
@@ -28,7 +32,8 @@ function cleanup {
     # (must be careful with rm -rf and variables)
     # Keep retcode from any previous command
     RETCODE=$?
-    echo "Exiting with return code $RETCODE"
+    echo "Removing files and exiting with return code $RETCODE"
+    source deactivate && conda env remove -yn $SUNBEAM_ENV
     [ -z ${TEMPDIR+x} ] || rm -rf "$TEMPDIR"; exit $RETCODE
 }
 

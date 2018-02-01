@@ -26,7 +26,6 @@ conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV_NAME || {
     conda create --name=$SUNBEAM_ENV_NAME --file=conda-requirements.txt --yes >> $OUTPUT
     source activate $SUNBEAM_ENV_NAME
     pip install --editable . >> $OUTPUT
-    pip install git+https://github.com/eclarke/decontam.git >> $OUTPUT
     echo "Sunbeam successfully installed.";
 }
 
