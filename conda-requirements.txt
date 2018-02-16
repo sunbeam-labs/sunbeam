@@ -17,3 +17,4 @@ prodigal
 semantic_version
 setuptools_scm
 bbmap
+komplexity

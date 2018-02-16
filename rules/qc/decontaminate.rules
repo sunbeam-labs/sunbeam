@@ -19,8 +19,8 @@ rule build_host_index:
 
 rule align_to_host:
     input:
-        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),
+        r1 = str(QC_FP/'masked'/'{sample}_R1.fastq.gz'),
+        r2 = str(QC_FP/'masked'/'{sample}_R2.fastq.gz'),
         index = str(Cfg['qc']['host_fp']/'{host}.fasta.amb')
     output:
         temp(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.bam'))

@@ -168,16 +168,17 @@ qc
   using cutadapt. Replace with "" to skip.
 * ``rev_adaptors``: (cutadapt) custom reverse adaptor sequences to remove
   using cutadapt. Replace with "" to skip.
+* ``mask_low_complexity``: [true/false] mask low-complexity sequences with Ns
+* ``kz_threshold``: a value between 0 and 1 to determine the low-complexity boundary (1 is most stringent). Ignored if not masking low-complexity sequences.
+* ``kz_window``: window size to use (in bp) for local complexity
+  assessment. Ignored if not masking low-complexity sequences.
 * ``pct_id``: (decontaminate) minimum percent identity to host genome to
   consider match
 * ``frac``: (decontaminate) minimum fraction of the read that must align to
   consider match
-* ``keep_sam``: (decontaminate) keep SAM file of host read alignment for
-  debuggging
-* ``method``: (decontaminate) use either BWA or BowTie for alignment
-* ``human_genome_fp``: The path to the host genome for host read
-  removal. Despite the name, this doesn't have to be a human genome.
-* ``phix_genome_fp``: The path to the PhiX genome for PhiX removal.
+* ``host_fp``: the path to the folder with host/contaminant genomes (ending in
+  *.fasta)
+
 
 classify
 ++++++++
