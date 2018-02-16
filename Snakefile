@@ -20,6 +20,7 @@ from sunbeamlib import build_sample_list, read_seq_ids
 from sunbeamlib.config import *
 from sunbeamlib.reports import *
 
+# Load config file
 if not config:
         raise SystemExit(
                 "No config file specified. Run `sunbeam_init` to generate a "
@@ -38,6 +39,11 @@ elif pkg_major < cfg_major:
                 " and may not be compatible. Create a new config file using "
                 "`sunbeam_init` and update it using `sunbeam_mod_config`\n")
 
+# Load extensions
+sbxs = list(listfiles("extensions/{sbx_folder}/{sbx}.rules"))
+for sbx in sbxs:
+        print("Found extension {sbx} in folder {sbx_folder}".format(**sbx[1]))
+
 # ---- Setting up config files and samples
 Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
@@ -47,6 +53,7 @@ Samples = build_sample_list(
         Cfg['all']['samplelist_fp'],
         Cfg['all']['exclude'])
 
+sys.stderr.write("Collecting host genomes... ")
 HostGenomeFiles = [f for f in Cfg['qc']['host_fp'].glob('*.fasta')]
 if not HostGenomeFiles:
         sys.stderr.write(
@@ -56,9 +63,12 @@ if not HostGenomeFiles:
                         Cfg['qc']['host_fp']
                 ))
 HostGenomes = {Path(g.name).stem: read_seq_ids(Cfg['qc']['host_fp'] / g) for g in HostGenomeFiles}
+sys.stderr.write("done.\n")
 
+sys.stderr.write("Collecting target genomes... ")
 GenomeFiles = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
 GenomeSegments = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GenomeFiles}
+sys.stderr.write("done.\n")
 
 # ---- Change your workdir to output_fp
 workdir: str(Cfg['all']['output_fp'])
@@ -100,6 +110,10 @@ include: "rules/mapping/mapping.rules"
 
 # ---- Reports rules
 include: "rules/reports/reports.rules"
+
+for sbx_path, wildcards in sbxs:
+        include: sbx_path
+        
 
 # ---- Rule all: run all targets
 rule all:

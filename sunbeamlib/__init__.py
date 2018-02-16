@@ -17,11 +17,13 @@ __version__ = str(Version.coerce(get_distribution('sunbeam').version))
 
 def build_sample_list(data_fp, filename_fmt, samplelist_fp, excluded):
     if os.path.isfile(str(samplelist_fp)):
-        sys.stderr.write("Building sample list using {}...\n".format(samplelist_fp))
+        sys.stderr.write("Building sample list using {}...".format(samplelist_fp))
         Samples = _build_samples_from_file(data_fp, filename_fmt, samplelist_fp, excluded)
+        sys.stderr.write(" done.\n")
     else:
-        sys.stderr.write("Building sample list from {}/{}...\n".format(data_fp, filename_fmt))
+        sys.stderr.write("Building sample list from {}/{}...".format(data_fp, filename_fmt))
         Samples = _build_samples_from_dir(data_fp, filename_fmt, excluded)
+        sys.stderr.write(" done.\n")
     return Samples
 
 def _build_samples_from_dir(data_fp, filename_fmt, excluded):
