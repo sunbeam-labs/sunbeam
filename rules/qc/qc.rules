@@ -82,3 +82,18 @@ rule fastqc:
             str(QC_FP/'paired'/'{{sample}}_{rp}_fastqc/fastqc_data.txt'),
             rp=['R1', 'R2'])
     shell: "fastqc {input.r1} {input.r2} -extract"
+
+rule mask_low_complexity:
+    input:
+        str(QC_FP/'paired'/'{sample}_{rp}.fastq.gz')
+    output:
+        str(QC_FP/'masked'/'{sample}_{rp}.fastq.gz')
+    run:
+        if Cfg['qc']['mask_low_complexity']:
+            shell("""
+            kz --mask -t {Cfg[qc][kz_threshold]} -w {Cfg[qc][kz_window]} \
+            < <(gzip -cd {input}) | gzip -c > {output}
+            """)
+        else:
+            shell("ln -s {input} {output}")
+            
