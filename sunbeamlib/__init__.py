@@ -85,8 +85,6 @@ def _build_samples_from_file(data_fp, filename_fmt, samplelist_fp, excluded):
                     sample,
                     expand(str(data_fp/filename_fmt), sample=sample, rp=rp)[0])
             Samples[sample]['paired'] = True
-
-    print(Samples)
     return Samples
 
 def _check_sample_path(sample, fp):

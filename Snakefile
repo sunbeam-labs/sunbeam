@@ -42,7 +42,7 @@ elif pkg_major < cfg_major:
 # Load extensions
 sbxs = list(listfiles("extensions/{sbx_folder}/{sbx}.rules"))
 for sbx in sbxs:
-        print("Found extension {sbx} in folder {sbx_folder}".format(**sbx[1]))
+        sys.stderr.write("Found extension {sbx} in folder {sbx_folder}\n".format(**sbx[1]))
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)
@@ -120,7 +120,8 @@ rule all:
     input: TARGET_ALL
 
 rule samples:
+    message: "Samples to be processed:"
     run:
-        print("Samples found:")
-        pprint(sorted(list(Samples.keys())))
+        [print(sample) for sample in sorted(list(Samples.keys()))]
+
 
