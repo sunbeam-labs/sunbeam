@@ -2,8 +2,9 @@
 
 set -e
 
-# Ensure we're running in the correct directory
 STARTING_DIR=$(pwd)
+
+# Ensure we're running in the correct directory
 case $BASH_SOURCE in
     tests/*)
 	;;
@@ -107,6 +108,7 @@ function setup {
     if [ "$USE_TMPENV" = true ]; then
 	SUNBEAM_ENV="sunbeam-`basename $TEMPDIR`"
 	bash install.sh $SUNBEAM_ENV
+	export PATH=$PATH:$HOME/miniconda3/bin
     fi
     
     verbose "\n\t${GREEN}Conda environment${RESET}: ${SUNBEAM_ENV}\n"
