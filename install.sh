@@ -7,14 +7,14 @@ PREFIX=$HOME/miniconda3
 SUNBEAM_ENV_NAME=${1-sunbeam}
 OUTPUT=${2-/dev/stdout}
 
-_conda () {
+install_conda () {
     wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash Miniconda3-latest-Linux-x86_64.sh -b -p $PREFIX >> $OUTPUT
     export PATH=$PATH:$PREFIX/bin
-    command -v conda &>/dev/null || { echo "Conda still isn't on the path, try installing manually"; exit 1; }
+    command -v conda >/dev/null 2>&1 || { echo "Conda still isn't on the path, try installing manually"; exit 1; }
 }
 
-command -v conda &>/dev/null || { echo "Conda not installed, installing now"; install_conda; }
+command -v conda >/dev/null 2>&1 || { echo "Conda not installed, installing now"; install_conda; }
 
 conda config --add channels r
 conda config --add channels bioconda
