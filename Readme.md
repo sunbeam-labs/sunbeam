@@ -2,7 +2,7 @@
 
 # Sunbeam: a robust, extensible metagenomic sequencing pipeline 
 
-Dev branch status: [![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=svg)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev)
+[![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=svg)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev)
 
 
 Sunbeam is a pipeline written in [snakemake](http://snakemake.readthedocs.io)
