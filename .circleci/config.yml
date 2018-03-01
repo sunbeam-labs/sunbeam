@@ -1,0 +1,54 @@
+version: 2
+jobs:
+  build:
+    environment:
+      MINICONDA: "$HOME/miniconda3"
+      MINICONDA_PATH: "$MINICONDA/bin"
+      PATH: "$MINICONDA_PATH:$PATH"
+      CONDA: "$MINICONDA_PATH/conda"
+      ANACONDA: "$MINICONDA_PATH/anaconda"
+      # This ensures we don't accidentally pull in ~/.condarc
+      # if it happens to be there for some strange reason
+      CONDARC: "$MINICONDA/condarc.none"
+  steps:
+    - checkout
+    - run: git fetch --depth 1000000
+    - run: git fetch --tags
+    - run: bash tests/run_tests.bash -v
+  dependencies:
+    override:
+      - rm -rf virtualenvs venv .pyenv
+      - |
+        if [[ ! -f $MINICONDA/.finished ]]; then
+        rm -rf $MINICONDA
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        bash Miniconda3-latest-linux-x86_64.sh -b -p $MINICONDA
+        # Use --system so the settings are placed in $MINICONDA
+        # Add any other conda settings you like here
+        $CONDA config --system --add channels conda-forge bioconda eclarke r
+        # If you'd like to make sure conda is up to date
+        touch $MINICONDA/.finished
+        fi
+        # Install some packages in our _cache environment that we know we're going to
+        # need during the build process---say, your conda package's dependencies. Because
+        # CircleCI saves this cache _before_ the build process proper, there is no way
+        # to just let that build process populate the cache. So we install them into
+        # this environment---and then promptly remove them. I have some rather large
+        # packages in my particular use case so this helps me.
+        - $CONDA create -n cache --file conda_requirements.txt --yes # add packages here
+        - $CONDA remove -n cache --all --yes
+        # Ideally, what I'd do is blow away the tarballs and leave the extracted packages.
+        # That would save the extraction cost during the build process. Unfortunately, the
+        # absence of a tarball is interpreted as a missing package, because there's no MD5
+        # signature available to verify. I understand why this is done (indeed I might 
+        # have implemented it) but this is certainly a downside. So what I've chosen to
+        # do is clean out the extracted packages here and suffer the extraction cost,
+        # trading smaller cache tarball size for package extraction time. Experiments are
+        # needed to determine if it is worthwhile.
+        - $CONDA clean --packages --yes
+        # Likely unnecessary, but just in case.
+        - $CONDA build purge-all
+      cache_directories:
+        - ~/miniconda3
+
+ 
