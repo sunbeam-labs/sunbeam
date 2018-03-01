@@ -1,6 +1,6 @@
 language: ruby
 install:
-  - bash tests/run_tests.bash
+  - bash install.sh sunbeam /dev/null
 script:
-  - echo "Done"
+  - bash tests/run_tests.sh -s sunbeam
 
