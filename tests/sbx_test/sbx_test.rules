@@ -1,0 +1,4 @@
+rule sbx_test:
+    shell:
+        "echo SBX_TEST"
+          

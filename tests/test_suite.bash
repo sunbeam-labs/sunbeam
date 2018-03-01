@@ -1,7 +1,6 @@
 # Test normal behavior
 function test_all {
     snakemake --configfile=$TEMPDIR/tmp_config.yml -p
-    snakemake --configfile=$TEMPDIR/tmp_config.yml clean_assembly -p
 
     # Check contents
     awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/sunbeam_output/annotation/summary/dummyecoli.tsv
@@ -37,10 +36,6 @@ function test_template_option {
 function test_barcode_file {
     sunbeam_mod_config --config $TEMPDIR/tmp_config.yml --mod_str 'all: {samplelist_fp: barcodes.txt}' > $TEMPDIR/tmp_config_barcode.yml
     echo -e "dummybfragilis\tTTTTTTTT\ndummyecoli\tTTTTTTTT" > $TEMPDIR/barcodes.txt
-    rm -rf $TEMPDIR/sunbeam_output/qc/decontam*
-    echo "CONFIG START"
-    cat $TEMPDIR/tmp_config_barcode.yml
-    echo "CONFIG END"
     snakemake --configfile=$TEMPDIR/tmp_config_barcode.yml all_decontam
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R1.fastq.gz ]
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_R2.fastq.gz ]
@@ -56,3 +51,7 @@ function test_version_check {
     fi
 }
 
+# Test that we can 
+function test_extensions {
+    snakemake --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
+}

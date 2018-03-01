@@ -34,7 +34,7 @@ USE_TMPENV=true
 SBX_FP=extensions
 VERBOSE=false
 
-while getopts "d:s:v" opt; do
+while getopts "d:s:t:v" opt; do
     case $opt in
 	d)
 	    USE_TMPDIR=false
@@ -43,6 +43,9 @@ while getopts "d:s:v" opt; do
 	s)
 	    USE_TMPENV=false
 	    SUNBEAM_ENV=$OPTARG
+	    ;;
+	t)
+	    RUN_TEST=$OPTARG
 	    ;;
 	v)
 	    VERBOSE=true
@@ -168,7 +171,9 @@ function build_test_data {
     cp -r indexes $TEMPDIR
     cp -r raw $TEMPDIR
     cp -r truncated_taxonomy $TEMPDIR
+    cp -r sbx_test $STARTING_DIR/$SBX_FP/sbx_test
     cp seqid2taxid.map $TEMPDIR
+
     mkdir -p $TEMPDIR/hosts
     cp indexes/*.fasta $TEMPDIR/hosts
     python generate_dummy_data.py $TEMPDIR
@@ -198,7 +203,7 @@ function build_test_data {
 
 function run_test_suite {
     for testcase in $(declare -f | grep -o "^test[a-zA-Z_]*") ; do
-	capture_output ${testcase} 
+	capture_output ${testcase}
     done
 }
 
@@ -209,7 +214,12 @@ capture_output build_test_data
 
 source tests/test_suite.bash
 
-run_test_suite
+# Run single test, if specified, or all detected tests otherwise
+if [ ! -z ${RUN_TEST+x} ]; then
+    capture_output ${RUN_TEST}
+else
+    run_test_suite
+fi
 
 
 
