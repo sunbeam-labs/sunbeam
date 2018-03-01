@@ -1,6 +1,6 @@
 language: ruby
 install:
-  - bash tests/test.sh
+  - bash tests/run_tests.bash -v
 script:
   - echo "Done"
 
