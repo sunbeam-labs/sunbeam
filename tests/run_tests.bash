@@ -107,11 +107,12 @@ function setup {
     
     verbose "\n\t${GREEN}Test directory${RESET}: ${TEMPDIR}"
 
+    export PATH=$PATH:$HOME/miniconda3/bin
+    
     # Install Sunbeam (maybe)
     if [ "$USE_TMPENV" = true ]; then
 	SUNBEAM_ENV="sunbeam-`basename $TEMPDIR`"
-	bash install.sh $SUNBEAM_ENV
-	export PATH=$PATH:$HOME/miniconda3/bin
+	bash install.sh $SUNBEAM_ENV /dev/null
     fi
     
     verbose "\n\t${GREEN}Conda environment${RESET}: ${SUNBEAM_ENV}\n"
