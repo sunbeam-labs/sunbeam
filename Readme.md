@@ -1,7 +1,6 @@
-<img src="docs/images/sunbeam_logo.gif" width=120, height=120 align="left" />
+<img src="docs/images/sunbeam_logo.gif" width=130, height=130 align="left" />
 
 # Sunbeam: a robust, extensible metagenomic sequencing pipeline 
-
 [![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev)
 
 
