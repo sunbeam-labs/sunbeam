@@ -34,13 +34,13 @@ USE_TMPENV=true
 SBX_FP=extensions
 VERBOSE=false
 
-while getopts "d:s:t:v" opt; do
+while getopts "d:e:t:v" opt; do
     case $opt in
 	d)
 	    USE_TMPDIR=false
 	    TEMPDIR=`readlink -f $OPTARG`
 	    ;;
-	s)
+	e)
 	    USE_TMPENV=false
 	    SUNBEAM_ENV=$OPTARG
 	    ;;

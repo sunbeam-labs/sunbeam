@@ -21,21 +21,21 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "conda-requirements.txt" }}
+          - v1-dependencies-{{ checksum "environment.yml" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
       - run:
           name: install
           command: |
-            bash install.sh
+            bash install.sh -u lib 
       - run:
           name: run tests
           command: |
-            bash tests/run_tests.bash -s sunbeam
+            bash tests/run_tests.bash -e sunbeam
 
       - save_cache:
           paths:
             - ~/miniconda3
-          key: v1-dependencies-{{ checksum "conda-requirements.txt" }}
+          key: v1-dependencies-{{ checksum "environment.yml" }}
            
