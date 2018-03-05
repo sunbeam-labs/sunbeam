@@ -87,9 +87,10 @@ function install_sunbeamlib {
 command -v conda >/dev/null 2>&1 || {
     echo "Conda not installed, installing now"
     install_conda
+    echo "Finished installing Conda."
 }
 
-conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV > /dev/null
+conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV >> $OUTPUT
 ENV_EXISTS=$?
 ENV_CHANGED=false
 
