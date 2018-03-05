@@ -19,16 +19,6 @@ Clone the stable branch of Sunbeam and run the installation script:
    cd sunbeam-stable
    bash install.sh
 
-The installer will test for and download Conda if necessary. If you don't have
-it installed already, you need to add a line (displayed during install) to your
-config file (often in ``~/.bashrc``).
-
-The installer contains a number of configurable options. To view them, execute
-``bash install.sh -h``.
-
-For more information on how to install Conda, see their `docs
-<https://conda.io/docs/user-guide/install/index.html#regular-installation>`_.
-		
 Testing
 -------
 
@@ -38,10 +28,11 @@ installing or updating Sunbeam:
 
 .. code-block:: shell
 
-   bash tests/run_tests.bash
+   bash tests/test.sh
 
-If the tests fail, you should either refer to our troubleshooting_ guide or file
-an issue on our `Github page <https://github.com/eclarke/sunbeam/issues>`_.
+If the test exits with anything besides 0, something isn't working and you
+should either refer to our troubleshooting_ guide or file an issue on our
+`Github page <https://github.com/eclarke/sunbeam/issues>`_.
 
 .. _updating:
 Updating
@@ -50,44 +41,40 @@ Updating
 Sunbeam follows semantic versioning. In short, this means that the version has
 three numbers: x.y.z (e.g. 1.0.2). In between major updates (where x changes),
 the config file and dependencies remain the same and Sunbeam can be updated in
-place. When x changes, you need to update your config file with ``sunbeam config
-update`` because old config files may not work anymore.
+place. When x changes, we suggest a complete reinstallation because old config
+files may not work anymore.
 
-To update, pull the most recent changes into your Sunbeam directory and re-run
-the installer with the ``-u all`` option:
+1. Minor version upgrades
 
-.. code-block:: shell
-
-   cd /path/to/sunbeam-stable   #or whatever your directory is called
-   git pull
-   ./install.sh -u all
-
-It's a good idea to re-run the tests after this to make sure everything is working.
-
-.. note:: Updating your config files
-
-   Major version updates will invalidate your config file. This is done to
-   prevent unexpected behavior if something major changes. However, it's simple
-   to create a new one based off your old config that preserves values where
-   possible:
-
-   .. code-block:: shell
-
-      sunbeam config update old_config.yml > new_config.yml
+   To update between major versions, simply pull the most recent changes into
+   the ``sunbeam-stable`` directory using ``git pull``. We suggest running the
+   tests after this step to verify the update.
 
 .. _uninstall:
-Uninstalling or reinstalling
-----------------------------
-
-If things go awry and updating doesn't work, simply uninstall and reinstall Sunbeam.
+2. Major version upgrades
+   
+   To upgrade versions, we suggest uninstalling and reinstalling Sunbeam. To
+   uninstall, run:
 
    .. code-block:: shell
 
-      source deactivate
       conda env remove sunbeam
       rm -rf sunbeam-stable
 
-Then follow the installation_ instructions above.
+   Then follow the installation_ instructions above.
+
+
+   a. Updating your config files
+		   
+      Once you've installed the new version, migrate your old config files by
+      activating the ``sunbeam`` environment (see below), making a new config
+      file, and using our tool to add in values from your old config file.
+
+      .. code-block:: shell
+
+	 source activate sunbeam
+	 sunbeam_init my_project > my_project/new_config.yaml
+	 sunbeam_mod_config --config my_project/new_config.yaml --old_config my_project/old_config.yaml > my_project/new_config.yaml
 
 Setup
 =====
@@ -108,7 +95,7 @@ the environment, run ``source deactivate`` or close the terminal.
 Creating a new project
 ----------------------
 
-We provide a utility, ``sunbeam init``, to create a new config file for a
+We provide a utility, ``sunbeam_init``, to create a new config file for a
 project. The utility takes one required argument: a path to your project
 folder. This folder may be empty, or contain a subfolder with your sequencing
 data. 

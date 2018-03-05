@@ -8,7 +8,6 @@ setup(
     include_package_data=True,
     package_data={"sunbeamlib": ["sunbeamlib/data/*.yml"]},
     entry_points={'console_scripts': [
-        'sunbeam = sunbeamlib.scripts.command:main',
         'sunbeam_init = sunbeamlib.scripts.init:main',
         'sunbeam_mod_config = sunbeamlib.scripts.config:main'
     ]},
