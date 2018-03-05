@@ -34,7 +34,7 @@ USE_TMPENV=true
 SBX_FP=extensions
 VERBOSE=false
 
-while getopts "d:e:t:v" opt; do
+while getopts "d:e:t:vh" opt; do
     case $opt in
 	d)
 	    USE_TMPDIR=false
@@ -49,6 +49,15 @@ while getopts "d:e:t:v" opt; do
 	    ;;
 	v)
 	    VERBOSE=true
+	    ;;
+	h)
+	    echo "Run the Sunbeam test suite."
+	    echo "  -d DIR       Use DIR rather than a temporary directory (remains after tests finish)"
+	    echo "  -e ENV_NAME  Use a pre-existing Conda environment rather than creating one (remains after tests finish)"
+	    echo "  -t TEST      Run a specific test from tests/test_suite.bash only"
+	    echo "  -v           Show command output while running"
+	    echo "  -h           Display this message and exit"
+	    exit 1
 	    ;;
 	\?)
 	    echo "Unrecognized option -'$OPTARG'"
