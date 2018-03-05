@@ -1,17 +1,32 @@
 #!/bin/bash
 set -e
 
-PREFIX=$HOME/miniconda3
+# Colors
+GREEN="\x1B[32m"
+RED="\x1B[31m"
+RESET="\x1B[0m"
+
+function truefalse {
+    if [ $1 = true ]; then
+	echo -ne "\u2713"
+    else
+	echo -ne "\u2717"
+    fi
+}
+	
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE))
 UPDATE=false
 
-while getopts "e:s:u:qh" opt; do
+while getopts "e:s:c:u:qh" opt; do
     case $opt in
 	e)
 	    SUNBEAM_ENV=$OPTARG
 	    ;;
 	s)
 	    SUNBEAM_DIR=$OPTARG
+	    ;;
+	c)
+	    PREFIX=$OPTARG
 	    ;;
 	u)
 	    UPDATE=$OPTARG
@@ -23,6 +38,7 @@ while getopts "e:s:u:qh" opt; do
 	    echo "Installs the Sunbeam metagenomics pipeline."
 	    echo "  -e ENV_NAME      Conda environment name to create/update (default: sunbeam)"
 	    echo "  -s SUNBEAM_DIR    Path containing Sunbeam rules (default: this directory)"
+	    echo "  -c CONDA_DIR      Path to Anaconda/miniconda install (default: $HOME/miniconda3)"
 	    echo "  -u [lib/env/all]  Update sunbeam[lib], conda [env], or both [all]"
 	    echo "  -q                Suppress most Conda output"
 	    echo "  -h                Display this message and exit"
@@ -32,6 +48,7 @@ while getopts "e:s:u:qh" opt; do
 done
 
 # Set defaults if not set by user
+PREFIX=${PREFIX:-"${HOME}/miniconda3"}
 SUNBEAM_ENV=${SUNBEAM_ENV:-sunbeam}
 SUNBEAM_DIR=${SUNBEAM_DIR:-$SCRIPT_DIR}
 UPDATE_ENV=false
@@ -50,10 +67,11 @@ esac
 OUTPUT=${OUTPUT:-/dev/tty}
 
 echo "Installation parameters:"
+echo "  Conda installation:  ${PREFIX}"
 echo "  Sunbeam environment: ${SUNBEAM_ENV}"
-echo "  Update environment:  ${UPDATE_ENV}"
 echo "  Sunbeam directory:   ${SUNBEAM_DIR}"
-echo "  Update sunbeamlib:   ${UPDATE_LIB}"
+echo "  Update environment:  $(truefalse $UPDATE_ENV)"
+echo "  Update sunbeamlib:   $(truefalse $UPDATE_LIB)"
 
 export PATH=$PATH:$PREFIX/bin
 
@@ -90,7 +108,7 @@ command -v conda >/dev/null 2>&1 || {
     echo "Finished installing Conda."
 }
 
-conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV >> $OUTPUT
+$(conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV >> $OUTPUT) || false && true
 ENV_EXISTS=$?
 ENV_CHANGED=false
 
@@ -114,5 +132,5 @@ fi
 
 install_env_vars
 
-echo "To get started, ensure ${PREFIX}/bin is in your $PATH and run 'source activate $SUNBEAM_ENV'"
+echo "To get started, ensure ${PREFIX}/bin is in your PATH and run 'source activate $SUNBEAM_ENV'"
 
