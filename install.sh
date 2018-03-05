@@ -1,11 +1,43 @@
 #!/bin/bash
 set -e
-#set -x
 
 PREFIX=$HOME/miniconda3
 
-SUNBEAM_ENV_NAME=${1-sunbeam}
-OUTPUT=${2-/dev/stdout}
+while getopts "e:s:uqh" opt; do
+    case $opt in
+	e)
+	    SUNBEAM_ENV=$OPTARG
+	    ;;
+	s)  SUNBEAM_DIR=$OPTARG
+	    ;;
+	u)
+	    UPDATE=true
+	    ;;
+	q)
+	    OUTPUT=/dev/null
+	    ;;
+	h)
+	    echo -ne "Installs the Sunbeam metagenomics pipeline.\n"
+	    echo -ne "  -e ENV_NAME     Conda environment name to create/update (default: sunbeam).\n"
+	    echo -ne "  -s SUNBEAM_DIR  Path containing Sunbeam rules (default: this directory).\n"
+	    echo -ne "  -u              Update an existing Sunbeam install.\n"
+	    echo -ne "  -q              Suppress most Conda output.\n"
+	    echo -ne "  -h              Display this message and exit.\n\n"
+	    exit 1
+	    ;;
+    esac
+done
+
+# Set defaults if not set by user
+SUNBEAM_ENV=${SUNBEAM_ENV:-sunbeam}
+SUNBEAM_DIR=${SUNBEAM_DIR:-$BASH_SOURCE}
+UPDATE=${UPDATE:-false}
+OUTPUT=${OUTPUT:-/dev/tty}
+
+echo "Settings:"
+echo -ne "\tEnvironment: ${SUNBEAM_ENV}\n"
+echo -ne "\tSunbeam directory: ${SUNBEAM_DIR}\n"
+echo -ne "\tUpdate? ${UPDATE}\n"
 
 export PATH=$PATH:$PREFIX/bin
 
@@ -13,30 +45,50 @@ install_conda () {
     wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash Miniconda3-latest-Linux-x86_64.sh -b -p $PREFIX >> $OUTPUT
     export PATH=$PATH:$PREFIX/bin
-    command -v conda >/dev/null 2>&1 || { echo "Conda still isn't on the path, try installing manually"; exit 1; }
+    command -v conda >/dev/null 2>&1 || {
+	echo "Conda still isn't on the path, try installing manually"; exit 1;
+    }
 }
 
 # Install conda if it doesn't show up on the path
-command -v conda >/dev/null 2>&1 || { echo "Conda not installed, installing now"; install_conda; }
-
-# Create the environment if it doesn't yet exist
-conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV_NAME || {
-    
-    conda config --add channels r
-    conda config --add channels bioconda
-    conda config --add channels eclarke
-    conda config --add channels conda-forge
-    conda create --name=$SUNBEAM_ENV_NAME --file=conda-requirements.txt --quiet --yes >> $OUTPUT
-    
+command -v conda >/dev/null 2>&1 || {
+    echo "Conda not installed, installing now"
+    install_conda
 }
+
+function set_env_vars {
+    source activate $SUNBEAM_ENV
+    echo -ne "#/bin/sh]nexport SUNBEAM_DIR=${SUNBEAM_DIR}" > \
+	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
+    echo -ne "#/bin/sh\nunset SUNBEAM_DIR" > \
+	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
+}   
+
+conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV > /dev/null
+ENV_EXISTS=$?
+
+if [ $UPDATE = true ]; then
+    echo "Updating Sunbeam environment '${SUNBEAM_ENV}'"
+    conda env update --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
+    set_env_vars
+elif [ $ENV_EXISTS -ne 0 ]; then
+    echo "Creating new Sunbeam environment '${SUNBEAM_ENV}'"
+    conda env create --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
+    set_env_vars
+else
+    echo "Skipping environment creation (${SUNBEAM_ENV} already exists)".
+    echo "Re-run with -u option to force upgrade."
+fi
 
 # Install sunbeam module 
 command -v sunbeam_init >/dev/null 2>&1 || {
-    source activate $SUNBEAM_ENV_NAME
+    source activate $SUNBEAM_ENV
     pip install --upgrade --editable . >> $OUTPUT
-    command -v conda >/dev/null 2>&1 || { echo "Couldn't install sunbeam; please report this as a bug."; exit 1; }
+    command -v sunbeam_init >/dev/null 2>&1 || {
+	echo "Couldn't install Sunbeam; please report this as a bug."; exit 1;
+    }
     echo "Sunbeam successfully installed.";
 }
 
-echo "To get started, ensure ${PREFIX}/bin is in your path and run 'source activate $SUNBEAM_ENV_NAME'"
+echo "To get started, ensure ${PREFIX}/bin is in your path and run 'source activate $SUNBEAM_ENV'"
 
