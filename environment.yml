@@ -1,0 +1,25 @@
+channels:
+  - bioconda
+  - conda-forge
+  - eclarke
+dependencies:
+  - snakemake
+  - ruamel.yaml
+  - biopython
+  - trimmomatic
+  - fastqc
+  - blast
+  - kraken=1.0
+  - kraken-biom
+  - vsearch
+  - jellyfish=1.1.11=1
+  - cutadapt
+  - bwa
+  - pysam
+  - pandas
+  - megahit
+  - prodigal
+  - semantic_version
+  - setuptools_scm
+  - komplexity
+
