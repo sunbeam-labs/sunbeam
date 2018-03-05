@@ -34,10 +34,10 @@ SUNBEAM_DIR=${SUNBEAM_DIR:-$BASH_SOURCE}
 UPDATE=${UPDATE:-false}
 OUTPUT=${OUTPUT:-/dev/tty}
 
-echo "Settings:"
-echo -ne "\tEnvironment: ${SUNBEAM_ENV}\n"
-echo -ne "\tSunbeam directory: ${SUNBEAM_DIR}\n"
-echo -ne "\tUpdate? ${UPDATE}\n"
+echo "Installation parameters:"
+echo "  Environment (-e):       ${SUNBEAM_ENV}"
+echo "  Sunbeam directory (-s): ${SUNBEAM_DIR}"
+echo "  Perform update (-u):    ${UPDATE}"
 
 export PATH=$PATH:$PREFIX/bin
 
@@ -50,38 +50,15 @@ install_conda () {
     }
 }
 
-# Install conda if it doesn't show up on the path
-command -v conda >/dev/null 2>&1 || {
-    echo "Conda not installed, installing now"
-    install_conda
-}
-
-function set_env_vars {
+function install_env_vars {
     source activate $SUNBEAM_ENV
-    echo -ne "#/bin/sh]nexport SUNBEAM_DIR=${SUNBEAM_DIR}" > \
+    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${SUNBEAM_DIR}" > \
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
     echo -ne "#/bin/sh\nunset SUNBEAM_DIR" > \
 	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
-}   
+}
 
-conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV > /dev/null
-ENV_EXISTS=$?
-
-if [ $UPDATE = true ]; then
-    echo "Updating Sunbeam environment '${SUNBEAM_ENV}'"
-    conda env update --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
-    set_env_vars
-elif [ $ENV_EXISTS -ne 0 ]; then
-    echo "Creating new Sunbeam environment '${SUNBEAM_ENV}'"
-    conda env create --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
-    set_env_vars
-else
-    echo "Skipping environment creation (${SUNBEAM_ENV} already exists)".
-    echo "Re-run with -u option to force upgrade."
-fi
-
-# Install sunbeam module 
-command -v sunbeam_init >/dev/null 2>&1 || {
+function install_sunbeamlib {
     source activate $SUNBEAM_ENV
     pip install --upgrade --editable . >> $OUTPUT
     command -v sunbeam_init >/dev/null 2>&1 || {
@@ -89,6 +66,31 @@ command -v sunbeam_init >/dev/null 2>&1 || {
     }
     echo "Sunbeam successfully installed.";
 }
+
+# Install conda if it doesn't show up on the path
+command -v conda >/dev/null 2>&1 || {
+    echo "Conda not installed, installing now"
+    install_conda
+}
+
+conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV > /dev/null
+ENV_EXISTS=$?
+
+if [ $UPDATE = true ]; then
+    echo "Updating Sunbeam environment '${SUNBEAM_ENV}'"
+    conda env update --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
+    install_env_vars
+    install_sunbeamlib
+elif [ $ENV_EXISTS -ne 0 ]; then
+    echo "Creating new Sunbeam environment '${SUNBEAM_ENV}'"
+    conda env create --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
+    install_env_vars
+    install_sunbeamlib
+else
+    install_env_vars
+    echo "Skipping further installation (${SUNBEAM_ENV} already exists)".
+    echo "Re-run with -u option to force upgrade."
+fi
 
 echo "To get started, ensure ${PREFIX}/bin is in your path and run 'source activate $SUNBEAM_ENV'"
 
