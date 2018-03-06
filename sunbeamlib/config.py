@@ -91,7 +91,12 @@ def process_databases(db_dict):
 def _update_dict(target, new):
     for k, v in new.items():
         if isinstance(v, collections.Mapping):
-            target[k] = _update_dict(target.get(k, {}), v)
+            # We could use .get() here but ruamel.yaml's weird Mapping
+            # subclass outputs errors to stdout if the key doesn't exist
+            if k in target:
+                target[k] = _update_dict(target[k], v)
+            else:
+                target[k] = _update_dict({}, v)
         else:
             target[k] = v
     return target

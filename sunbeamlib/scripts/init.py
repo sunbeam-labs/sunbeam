@@ -50,7 +50,6 @@ def main():
     
     cfg = config.new(
         conda_fp=args.conda_fp, project_fp=args.project_fp, template=args.template)
-
     if args.defaults:
         defaults = config.load_defaults(args.defaults)
         cfg = config.update(cfg, defaults)

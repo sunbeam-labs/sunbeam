@@ -17,6 +17,11 @@ function truefalse {
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE))
 UPDATE=false
 
+function msg {
+    echo -ne "${1}"
+} &>$TTY
+
+
 while getopts "e:s:c:u:qh" opt; do
     case $opt in
 	e)
@@ -64,7 +69,7 @@ case $UPDATE in
     *)
 	;;
 esac
-OUTPUT=${OUTPUT:-/dev/tty}
+OUTPUT=${OUTPUT:-/dev/stdout}
 
 echo "Installation parameters:"
 echo "  Conda installation:  ${PREFIX}"
@@ -115,11 +120,11 @@ ENV_CHANGED=false
 if [ $UPDATE_ENV = true ]; then
     echo "Updating Sunbeam environment '${SUNBEAM_ENV}'"
     conda env update --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
-    $ENV_CHANGED=true
+    ENV_CHANGED=true
 elif [ $ENV_EXISTS -ne 0 ]; then
     echo "Creating new Sunbeam environment '${SUNBEAM_ENV}'"
     conda env create --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
-    $ENV_CHANGED=true
+    ENV_CHANGED=true
 else
     echo -ne "Skipping conda environment creation (${SUNBEAM_ENV} already exists). "
     echo "Re-run with '-u env' option to force upgrade."

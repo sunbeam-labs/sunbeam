@@ -39,6 +39,7 @@ while getopts "d:e:t:vh" opt; do
 	d)
 	    USE_TMPDIR=false
 	    TEMPDIR=`readlink -f $OPTARG`
+	    mkdir -p $TEMPDIR
 	    ;;
 	e)
 	    USE_TMPENV=false
@@ -121,7 +122,7 @@ function setup {
     # Install Sunbeam (maybe)
     if [ "$USE_TMPENV" = true ]; then
 	SUNBEAM_ENV="sunbeam-`basename $TEMPDIR`"
-	bash install.sh $SUNBEAM_ENV /dev/null
+	bash install.sh -e $SUNBEAM_ENV 
     fi
     
     verbose "\n\t${GREEN}Conda environment${RESET}: ${SUNBEAM_ENV}\n"
