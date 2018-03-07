@@ -1,156 +1,226 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
 
-# Colors
-GREEN="\x1B[32m"
-RED="\x1B[31m"
-RESET="\x1B[0m"
+read -r -d '' __usage <<-'EOF'
+  -e --environment  [arg] Environment to install to. Default: "sunbeam"
+  -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
+  -c --conda  [arg]       Location of Conda installation. Default: ${PREFIX}
+  -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
+  -v --verbose            Show subcommand output
+  -d --debug              Run in debug mode.
+  -h --help               Display this message and exit.
+EOF
 
-function truefalse {
-    if [ $1 = true ]; then
-	echo -ne "\u2713"
+read -r -d '' __helptext <<-'EOF'
+ This script installs or upgrades Sunbeam, including Conda (if not installed).
+ To upgrade, pass the '--upgrade all' option, then be sure to update your config
+ files using 'sunbeam config update'.
+EOF
+
+# Load BASH3Boilerplate for command-line parsing and logging
+source etc/b3bp.sh
+
+function __err_report() {
+    local error_code
+    error_code=${?}
+    error "Error in ${__file} in function ${1} on line ${2}"
+    exit ${error_code}
+}
+trap '__err_report "${FUNCNAME:-.}" ${LINENO}' ERR  
+
+# help mode
+if [[ "${arg_h:?}" = "1" ]]; then
+    # Help exists with code 1
+    help "Help using ${0}:"
+fi
+
+# verbose mode
+if [[ "${arg_v:?}" = "1" ]]; then
+    LOG_LEVEL="7"
+fi
+
+# debug mode
+if [[ "${arg_d:?}" = "1" ]]; then
+    set -o xtrace
+    LOG_LEVEL="7"
+fi
+
+function debug_capture () {
+    debug "$(echo -e "$(${@})")"
+}
+
+function installation_error () {
+    error "${1} failed!"
+    if [[ "${arg_v:?}" != 1 && "${arg_d:?}" != 1 ]]; then
+	error "Try re-running with -v or -d, or file an issue on Github."
+    fi
+    exit 1
+}
+
+# Set variables
+__conda_path="${arg_c:-${HOME}/miniconda3}"
+__sunbeam_dir="${arg_s:-$(readlink -f ${__dir})}"
+__sunbeam_env="${arg_e:-sunbeam}"
+__update_lib=false
+__update_env=false
+if [[ "${arg_u}" = "all" || "${arg_u}" = "env" ]]; then
+    __update_lib=true
+    __update_env=true
+elif [[ "${arg_u}" = "lib" ]]; then
+    __update_lib=true
+fi
+
+__old_path=$PATH
+PATH=$PATH:${__conda_path}/bin
+
+function __test_conda() {
+    command -v conda &> /dev/null && echo true || echo false
+}
+
+function __detect_conda_install() {
+    local discovered=$(__test_conda)
+    if [[ $discovered = true ]]; then
+	local conda_path="$(which conda)"
+	echo ${conda_path%'/bin/conda'}
+    fi
+}    
+
+function __test_env() {
+    if [[ $(__test_conda) = true ]]; then
+	$(conda env list \
+		 | cut -f1 -d' ' \
+		 | grep -Fxq $__sunbeam_env > /dev/null) && \
+	   echo true || echo false
     else
-	echo -ne "\u2717"
+	echo false
     fi
 }
 
-OLD_PATH=$PATH
-
-SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE))
-UPDATE=false
-
-function warn {
-    echo -ne "${RED}${1}${RESET}"
+function __test_sunbeam() {
+    if [[ $(__test_env) = true ]]; then
+	activate_sunbeam
+	command -v sunbeam &> /dev/null && echo true || echo false
+	deactivate_sunbeam
+    else
+	echo false
+    fi
 }
 
-
-while getopts "e:s:c:u:qh" opt; do
-    case $opt in
-	e)
-	    SUNBEAM_ENV=$OPTARG
-	    ;;
-	s)
-	    _SUNBEAM_DIR=$OPTARG
-	    ;;
-	c)
-	    PREFIX=$OPTARG
-	    ;;
-	u)
-	    UPDATE=$OPTARG
-	    ;;
-	q)
-	    OUTPUT=/dev/null
-	    ;;
-	h)
-	    echo "Installs the Sunbeam metagenomics pipeline."
-	    echo "  -e ENV_NAME      Conda environment name to create/update (default: sunbeam)"
-	    echo "  -s SUNBEAM_DIR    Path containing Sunbeam rules (default: this directory)"
-	    echo "  -c CONDA_DIR      Path to Anaconda/miniconda install (default: $HOME/miniconda3)"
-	    echo "  -u [lib/env/all]  Update sunbeam[lib], conda [env], or both [all]"
-	    echo "  -q                Suppress most Conda output"
-	    echo "  -h                Display this message and exit"
-	    exit 1
-	    ;;
-    esac
-done
-
-# Set defaults if not set by user
-PREFIX=${PREFIX:-"${HOME}/miniconda3"}
-SUNBEAM_ENV=${SUNBEAM_ENV:-sunbeam}
-_SUNBEAM_DIR=${_SUNBEAM_DIR:-$SCRIPT_DIR}
-UPDATE_ENV=false
-UPDATE_LIB=false
-case $UPDATE in
-    lib)
-	UPDATE_LIB=true	;;
-    env)
-	UPDATE_ENV=true	;;
-    both)
-	UPDATE_LIB=true
-	UPDATE_ENV=true	;;
-    *)
-	;;
-esac
-OUTPUT=${OUTPUT:-/dev/stdout}
-
-echo "Installation parameters:"
-echo "  Conda installation:  ${PREFIX}"
-echo "  Sunbeam environment: ${SUNBEAM_ENV}"
-echo "  Sunbeam directory:   ${_SUNBEAM_DIR}"
-echo "  Update environment:  $(truefalse $UPDATE_ENV)"
-echo "  Update sunbeamlib:   $(truefalse $UPDATE_LIB)"
-
-export PATH=$PATH:$PREFIX/bin
-
-install_conda () {
-    wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    bash Miniconda3-latest-Linux-x86_64.sh -b -p $PREFIX >> $OUTPUT
-    export PATH=$PATH:$PREFIX/bin
-    command -v conda >/dev/null 2>&1 || {
-	echo "Conda still isn't on the path, try installing manually"; exit 1;
-    }
+function activate_sunbeam () {
+    set +o nounset
+    source activate $__sunbeam_env
+    set -o nounset
 }
 
-function install_env_vars {    
-    source activate $SUNBEAM_ENV
-    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${_SUNBEAM_DIR}" > \
+function deactivate_sunbeam () {
+    set +o nounset
+    source deactivate
+    set -o nounset
+}
+
+function install_conda () {
+    debug "Downloading miniconda..."
+    debug_capture wget -nv https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh 2>&1
+    debug "Installing miniconda..."
+    debug_capture bash Miniconda3-latest-Linux-x86_64.sh -b -p $__conda_path 2>&1
+    if [[ $(__test_conda) != true ]]; then
+	installation_error "Environment creation"
+    fi
+}
+
+function install_environment () {
+    debug_capture $(conda env update --name=$__sunbeam_env \
+			  --quiet --file environment.yml)
+    if [[ $(__test_env) != true ]]; then
+	installation_error "Environment creation"
+    fi
+
+}
+
+function install_env_vars () {
+    activate_sunbeam
+    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}" > \
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
     echo -ne "#/bin/sh\nunset SUNBEAM_DIR" > \
 	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
+    
 }
 
-function install_sunbeamlib {
-    source activate $SUNBEAM_ENV
-    pip install --upgrade --editable . >> $OUTPUT
-    command -v sunbeam_init >/dev/null 2>&1 || {
-	echo "Couldn't install Sunbeam; please report this as a bug."; exit 1;
-    }
-    echo "Sunbeam successfully installed.";
+function install_sunbeamlib () {
+    activate_sunbeam
+    debug_capture pip install --upgrade $__sunbeam_dir 2>&1
 }
 
-# Install conda if it doesn't show up on the path
-command -v conda >/dev/null 2>&1 || {
-    echo "Conda not installed, installing now"
+info "Starting Sunbeam installation..."
+info "    Conda path:   ${__conda_path}"
+info "    Sunbeam src:  ${__sunbeam_dir}"
+info "    Sunbeam env:  '${__sunbeam_env}'"
+
+__conda_installed=$(__test_conda)
+__env_exists=$(__test_env)
+__sunbeam_installed=$(__test_sunbeam)
+__env_changed=false
+
+debug "Components detected:"
+debug "    Conda:       ${__conda_installed}"
+debug "    Environment: ${__env_exists}"
+debug "    Library:     ${__sunbeam_installed}"
+
+
+# Install Conda if necessary
+if [[ $__conda_installed = true ]]; then
+    if [[ __detect_conda_install != __conda_path ]]; then
+	warning "Found pre-existing Conda installation in $(__detect_conda_install)".
+	warning "Ignoring specified Conda path in favor of existing Conda install."
+	__conda_path=$(__detect_conda_install)
+    fi
+    info "Conda already installed, skipping..."
+else
+    info "Installing Conda..."
     install_conda
-    echo "Finished installing Conda."
-}
-
-$(conda env list | cut -f1 -d' ' | grep -Fxq $SUNBEAM_ENV >> $OUTPUT) || false && true
-ENV_EXISTS=$?
-ENV_CHANGED=false
-
-if [ $UPDATE_ENV = true ]; then
-    echo "Updating Sunbeam environment '${SUNBEAM_ENV}'"
-    conda env update --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
-    ENV_CHANGED=true
-elif [ $ENV_EXISTS -ne 0 ]; then
-    echo "Creating new Sunbeam environment '${SUNBEAM_ENV}'"
-    conda env create --name=$SUNBEAM_ENV --quiet -f environment.yml >> $OUTPUT
-    ENV_CHANGED=true
-else
-    echo -ne "Skipping conda environment creation (${SUNBEAM_ENV} already exists). "
-    echo "Re-run with '-u env' option to force upgrade."
+    __env_changed=true
 fi
 
-if [[ $UPDATE_ENV = true ]] || [[ $ENV_CHANGED = true ]]; then
-    # Skip if we created a new environment, as it was just installed
-    install_sunbeamlib >> $OUTPUT
+# Create Conda environment for Sunbeam
+if [[ $__env_exists = true && $__update_env = false ]]; then
+    info "Specified environment already exists (use '--update env' to update)"
 else
-    echo -ne "Skipping sunbeam library installation (already installed). "
-    echo "Re-run with '-u lib' or '-u all' to force upgrade."
+    info "Creating Sunbeam environment..."
+    install_environment
+    __env_changed=true
 fi
 
+# Check again to ensure success
+
+# Install sunbeamlib into environment if changed or requested
+if [[ $__env_changed = true ]]; then
+    info "Environment installed/updated; (re)installing Sunbeam library..."
+    install_sunbeamlib
+elif [[ $__sunbeam_installed = false ]]; then
+    info "Installing Sunbeam library..."
+    install_sunbeamlib
+elif [[ $__update_lib = true ]]; then
+    info "Updating Sunbeam library..."
+    install_sunbeamlib
+else
+    info "Sunbeam library already installed (use '--update lib' to update)"
+fi
+
+# Always update the env_vars.sh in the sunbeam environment
+info "Updating \$SUNBEAM_DIR variable to point to ${__sunbeam_dir}"
 install_env_vars
 
-# Check that miniconda is in the path and warn if not
-if [[ $OLD_PATH != *"${PREFIX}/bin"* ]]; then
-    warn "\nWARNING: ${PREFIX}/bin was not found in your path.\n"
-    echo -ne "Run 'echo \"export PATH=\$PATH:${PREFIX}/bin\" >> ~/.bashrc' "
-    echo -ne "to add it to your bash config file.\n"
-    echo -ne "Close and re-open your terminal to apply changes, then run "
-    echo -ne "'source activate ${SUNBEAM_ENV}' to start.\n"
+# Check if on pre-existing path
+if [[ $__old_path != *"${__conda_path}/bin"* ]]; then
+    warning "** Conda was not detected on your PATH. **"
+    warning "This is normal if you haven't installed Conda before."
+    warning "To add it to your path, run "
+    warning "   'echo \"export PATH=\$PATH:${__conda_path}/bin\" >> ~/.bashrc'"
+    warning "and close and re-open your terminal session to apply."
+    warning "When finished, run 'source activate ${__sunbeam_env}' to begin."
 else
-    echo -ne "${GREEN}\nSuccess! Run 'source activate ${SUNBEAM_ENV}' to start.${RESET}\n"
+    info "Done. Run 'source activate ${__sunbeam_env}' to begin."
 fi
+
+   
 
 
