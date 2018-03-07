@@ -17,7 +17,7 @@ def _find_conda_fp():
         pass
 
     
-def main():
+def main(argv):
     """Create a blank config file with the given name."""
 
     conda_fp = _find_conda_fp()

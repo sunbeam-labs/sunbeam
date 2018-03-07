@@ -13,13 +13,15 @@ function truefalse {
 	echo -ne "\u2717"
     fi
 }
-	
+
+OLD_PATH=$PATH
+
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE))
 UPDATE=false
 
-function msg {
-    echo -ne "${1}"
-} &>$TTY
+function warn {
+    echo -ne "${RED}${1}${RESET}"
+}
 
 
 while getopts "e:s:c:u:qh" opt; do
@@ -28,7 +30,7 @@ while getopts "e:s:c:u:qh" opt; do
 	    SUNBEAM_ENV=$OPTARG
 	    ;;
 	s)
-	    SUNBEAM_DIR=$OPTARG
+	    _SUNBEAM_DIR=$OPTARG
 	    ;;
 	c)
 	    PREFIX=$OPTARG
@@ -55,7 +57,7 @@ done
 # Set defaults if not set by user
 PREFIX=${PREFIX:-"${HOME}/miniconda3"}
 SUNBEAM_ENV=${SUNBEAM_ENV:-sunbeam}
-SUNBEAM_DIR=${SUNBEAM_DIR:-$SCRIPT_DIR}
+_SUNBEAM_DIR=${_SUNBEAM_DIR:-$SCRIPT_DIR}
 UPDATE_ENV=false
 UPDATE_LIB=false
 case $UPDATE in
@@ -74,7 +76,7 @@ OUTPUT=${OUTPUT:-/dev/stdout}
 echo "Installation parameters:"
 echo "  Conda installation:  ${PREFIX}"
 echo "  Sunbeam environment: ${SUNBEAM_ENV}"
-echo "  Sunbeam directory:   ${SUNBEAM_DIR}"
+echo "  Sunbeam directory:   ${_SUNBEAM_DIR}"
 echo "  Update environment:  $(truefalse $UPDATE_ENV)"
 echo "  Update sunbeamlib:   $(truefalse $UPDATE_LIB)"
 
@@ -89,9 +91,9 @@ install_conda () {
     }
 }
 
-function install_env_vars {
+function install_env_vars {    
     source activate $SUNBEAM_ENV
-    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${SUNBEAM_DIR}" > \
+    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${_SUNBEAM_DIR}" > \
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
     echo -ne "#/bin/sh\nunset SUNBEAM_DIR" > \
 	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
@@ -130,12 +132,25 @@ else
     echo "Re-run with '-u env' option to force upgrade."
 fi
 
-if [[ $UPDATE_ENV = true ]] || [[ $ENV_CHANGED ]]; then
+if [[ $UPDATE_ENV = true ]] || [[ $ENV_CHANGED = true ]]; then
     # Skip if we created a new environment, as it was just installed
     install_sunbeamlib >> $OUTPUT
+else
+    echo -ne "Skipping sunbeam library installation (already installed). "
+    echo "Re-run with '-u lib' or '-u all' to force upgrade."
 fi
 
 install_env_vars
 
-echo "To get started, ensure ${PREFIX}/bin is in your PATH and run 'source activate $SUNBEAM_ENV'"
+# Check that miniconda is in the path and warn if not
+if [[ $OLD_PATH != *"${PREFIX}/bin"* ]]; then
+    warn "\nWARNING: ${PREFIX}/bin was not found in your path.\n"
+    echo -ne "Run 'echo \"export PATH=\$PATH:${PREFIX}/bin\" >> ~/.bashrc' "
+    echo -ne "to add it to your bash config file.\n"
+    echo -ne "Close and re-open your terminal to apply changes, then run "
+    echo -ne "'source activate ${SUNBEAM_ENV}' to start.\n"
+else
+    echo -ne "${GREEN}\nSuccess! Run 'source activate ${SUNBEAM_ENV}' to start.${RESET}\n"
+fi
+
 

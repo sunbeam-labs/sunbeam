@@ -1,7 +1,9 @@
+import sys
 import argparse
 import subprocess
 import sunbeamlib
 from sunbeamlib.scripts.run import main as Run
+from sunbeamlib.scripts.init import main as Init
 
 def main():
 
@@ -31,6 +33,11 @@ def main():
 
     if args.command == "run":
         Run(remaining)
-    elif args.command is None:
+    elif args.command == "init":
+        Init(remaining)
+    elif args.command == "config":
+        pass
+    else:
         parser.print_help()
+        sys.stderr.write("Unrecognized command.\n")
         
