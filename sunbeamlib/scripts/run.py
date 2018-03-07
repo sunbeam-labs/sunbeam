@@ -4,7 +4,7 @@ import argparse
 import subprocess
 from pathlib import Path
 
-def main(argv):
+def main(argv=sys.argv):
 
     epilog_str = (
         "You can pass further arguments to Snakemake after --, e.g:\n"
@@ -28,7 +28,9 @@ def main(argv):
 
     snakefile = Path(args.sunbeam_dir)/"Snakefile"
     if not snakefile.exists():
-        sys.stderr.write("Error: could not find a Snakefile in directory '{}'\n".format(args.sunbeam_dir))
+        sys.stderr.write(
+            "Error: could not find a Snakefile in directory '{}'\n".format(
+                args.sunbeam_dir))
         sys.exit(1)
         
     snakemake_args = ['--snakefile', snakefile] + remaining

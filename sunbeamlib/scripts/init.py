@@ -2,7 +2,6 @@ import os
 import sys
 import argparse
 import ruamel.yaml
-
 from pathlib import Path
 
 from sunbeamlib import config
@@ -17,9 +16,8 @@ def _find_conda_fp():
         pass
 
     
-def main(argv):
+def main(argv=sys.argv):
     """Create a blank config file with the given name."""
-
     conda_fp = _find_conda_fp()
      
     parser = argparse.ArgumentParser(
@@ -37,7 +35,7 @@ def main(argv):
         help="Path to custom config file template, in YAML format", 
         type=argparse.FileType("r"))
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     
     if not args.conda_fp or not args.conda_fp.exists():
         raise SystemExit((

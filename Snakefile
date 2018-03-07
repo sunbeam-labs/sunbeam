@@ -1,4 +1,3 @@
--*- mode: Snakemake; python-indent-offset: 4 -*-
 #
 # Sunbeam: an iridescent HTS pipeline
 #

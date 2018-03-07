@@ -168,12 +168,12 @@ debug "    Library:     ${__sunbeam_installed}"
 
 # Install Conda if necessary
 if [[ $__conda_installed = true ]]; then
-    if [[ __detect_conda_install != __conda_path ]]; then
+    if [[ $(__detect_conda_install) != $__conda_path ]]; then
 	warning "Found pre-existing Conda installation in $(__detect_conda_install)".
 	warning "Ignoring specified Conda path in favor of existing Conda install."
 	__conda_path=$(__detect_conda_install)
     fi
-    info "Conda already installed, skipping..."
+    info "Conda already installed."
 else
     info "Installing Conda..."
     install_conda
