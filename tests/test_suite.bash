@@ -27,7 +27,7 @@ function test_template_option {
     # Create a version of the config file customized for this tempdir
     # Provide the sunbeamlib package config file manually
     CONFIG_FP=cfg_template.yml
-    sunbeam_init $TEMPDIR --template $CONFIG_FP --defaults testing | grep 'from_template:' || exit 1
+    sunbeam init $TEMPDIR --template $CONFIG_FP --defaults testing | grep 'from_template:' || exit 1
     popd
 }
 

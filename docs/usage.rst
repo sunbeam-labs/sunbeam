@@ -116,14 +116,14 @@ data.
 .. code-block:: shell
 
    mkdir ~/my_project
-   sunbeam_init ~/my_project > ~/my_project/sunbeam_config.yml
+   sunbeam init ~/my_project > ~/my_project/sunbeam_config.yml
    
 We now have a config file in that directory. If you're a member of the Bushman Lab or PennCHOP group, there are defaults available for you depending on what server you're running on. To use these, pass the ``--server`` option along with the server name. For instance, if I'm running on microb120:
 
 .. code-block:: shell
 
    mkdir ~/my_project
-   sunbeam_init --server microb120 ~/my_project > ~/my_project/sunbeam_config.yml
+   sunbeam init --server microb120 ~/my_project > ~/my_project/sunbeam_config.yml
 
 
 Configuration

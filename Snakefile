@@ -24,7 +24,7 @@ from sunbeamlib.reports import *
 # Load config file
 if not config:
     raise SystemExit(
-        "No config file specified. Run `sunbeam_init` to generate a "
+        "No config file specified. Run `sunbeam init` to generate a "
         "config file, and specify with --configfile")
 
 # Check for major version compatibility
@@ -33,12 +33,12 @@ if pkg_major > cfg_major:
     raise SystemExit(
         "\nThis config file was created with an older version of Sunbeam"
         " and may not be compatible. Create a new config file using"
-        "`sunbeam_init` and update it using `sunbeam_mod_config`\n")
+        "`sunbeam init` and update it using `sunbeam_mod_config`\n")
 elif pkg_major < cfg_major:
     raise SystemExit(
         "\nThis config file was created with an newer version of Sunbeam"
         " and may not be compatible. Create a new config file using "
-        "`sunbeam_init` and update it using `sunbeam_mod_config`\n")
+        "`sunbeam init` and update it using `sunbeam_mod_config`\n")
 
 # Load extensions
 sbxs = list(listfiles("extensions/{sbx_folder}/{sbx}.rules"))

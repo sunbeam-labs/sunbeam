@@ -42,12 +42,12 @@ full of paired, gzipped fastq files that you get from Illumina's
 sequencer. Let's assume those files live in ``~/my_project/data_files``.
 
 To set up a new Sunbeam config file, activate the Sunbeam environment and run
-``sunbeam_init``:
+``sunbeam init``:
 
 .. code-block:: shell
    
    source activate sunbeam
-   sunbeam_init ~/my_project > ~/my_project/config.yml
+   sunbeam init ~/my_project > ~/my_project/config.yml
 
 This writes a new ``config.yml`` file into your project directory, pre-filled
 with some convenient defaults. However, there are some things we'll need to edit

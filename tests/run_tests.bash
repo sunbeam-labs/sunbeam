@@ -189,7 +189,7 @@ function build_test_data {
     cp indexes/*.fasta $TEMPDIR/hosts
     python generate_dummy_data.py $TEMPDIR
     # Create a version of the config file customized for this tempdir
-    sunbeam_init $TEMPDIR --defaults testing > $TEMPDIR/tmp_config.yml
+    sunbeam init $TEMPDIR --defaults testing > $TEMPDIR/tmp_config.yml
     popd
     
     # Build fake kraken data
