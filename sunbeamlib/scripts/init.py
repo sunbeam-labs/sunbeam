@@ -6,19 +6,11 @@ from pathlib import Path
 
 from sunbeamlib import config
 
-def _find_conda_fp():
-    """Try to detect conda install in the path."""
-    try:
-        path = os.environ["PATH"].split(":")
-        conda_fp = Path([p for p in path if "conda" in p][0]).parent
-        return conda_fp
-    except (KeyError, IndexError):
-        pass
 
     
 def main(argv=sys.argv):
     """Create a blank config file with the given name."""
-    conda_fp = _find_conda_fp()
+    conda_fp = config._find_conda_fp()
      
     parser = argparse.ArgumentParser(
         "init", description="Initialize a new sunbeam project")

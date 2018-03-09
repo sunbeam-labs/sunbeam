@@ -4,6 +4,7 @@ import subprocess
 import sunbeamlib
 from sunbeamlib.scripts.run import main as Run
 from sunbeamlib.scripts.init import main as Init
+from sunbeamlib.scripts._config import main as Config
 
 def main():
 
@@ -36,7 +37,7 @@ def main():
     elif args.command == "init":
         Init(remaining)
     elif args.command == "config":
-        pass
+        Config(remaining)
     else:
         parser.print_help()
         sys.stderr.write("Unrecognized command.\n")

@@ -1,3 +1,4 @@
+import os
 import sys
 import collections
 from pathlib import Path
@@ -6,6 +7,15 @@ from pkg_resources import resource_stream
 from semantic_version import Version
 import ruamel.yaml
 from sunbeamlib import __version__
+
+def _find_conda_fp():
+    """Try to detect conda install in the path."""
+    try:
+        path = os.environ["PATH"].split(":")
+        conda_fp = Path([p for p in path if "conda" in p][0]).parent
+        return conda_fp
+    except (KeyError, IndexError):
+        pass
 
 
 def makepath(path):
@@ -140,8 +150,8 @@ def load_defaults(default_name):
             "sunbeamlib", "data/{}.yml".format(default_name)
         ).read().decode())
     
-def dump(config):
+def dump(config, out=sys.stdout):
     if isinstance(config, collections.Mapping):
-        ruamel.yaml.round_trip_dump(config, sys.stdout)
+        ruamel.yaml.round_trip_dump(config, out)
     else:
-        sys.stdout.write(config)
+        out.write(config)

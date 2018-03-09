@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+__conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+
 read -r -d '' __usage <<-'EOF'
   -e --environment  [arg] Environment to install to. Default: "sunbeam"
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
@@ -118,13 +120,15 @@ function deactivate_sunbeam () {
 }
 
 function install_conda () {
+    local tmpdir=$(mktemp -d)
     debug "Downloading miniconda..."
-    debug_capture wget -nv https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh 2>&1
+    debug_capture wget -nv ${__conda_url} -O ${tmpdir}/miniconda.sh 2>&1
     debug "Installing miniconda..."
-    debug_capture bash Miniconda3-latest-Linux-x86_64.sh -b -p $__conda_path 2>&1
+    debug_capture bash ${tmpdir}/miniconda.sh -b -p ${__conda_path} 2>&1
     if [[ $(__test_conda) != true ]]; then
 	installation_error "Environment creation"
     fi
+    rm ${tmpdir}/miniconda.sh
 }
 
 function install_environment () {
@@ -133,7 +137,6 @@ function install_environment () {
     if [[ $(__test_env) != true ]]; then
 	installation_error "Environment creation"
     fi
-
 }
 
 function install_env_vars () {
@@ -142,12 +145,14 @@ function install_env_vars () {
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
     echo -ne "#/bin/sh\nunset SUNBEAM_DIR" > \
 	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
-    
 }
 
 function install_sunbeamlib () {
     activate_sunbeam
     debug_capture pip install --upgrade $__sunbeam_dir 2>&1
+    if [[ $(__test_sunbeam) != true ]]; then
+	installation_error "Library installation"
+    fi
 }
 
 info "Starting Sunbeam installation..."
@@ -155,16 +160,15 @@ info "    Conda path:   ${__conda_path}"
 info "    Sunbeam src:  ${__sunbeam_dir}"
 info "    Sunbeam env:  '${__sunbeam_env}'"
 
-__conda_installed=$(__test_conda)
-__env_exists=$(__test_env)
-__sunbeam_installed=$(__test_sunbeam)
-__env_changed=false
-
 debug "Components detected:"
+__conda_installed=$(__test_conda)
 debug "    Conda:       ${__conda_installed}"
+__env_exists=$(__test_env)
 debug "    Environment: ${__env_exists}"
+__sunbeam_installed=$(__test_sunbeam)
 debug "    Library:     ${__sunbeam_installed}"
 
+__env_changed=false
 
 # Install Conda if necessary
 if [[ $__conda_installed = true ]]; then
@@ -206,7 +210,7 @@ else
 fi
 
 # Always update the env_vars.sh in the sunbeam environment
-info "Updating \$SUNBEAM_DIR variable to point to ${__sunbeam_dir}"
+debug "Updating \$SUNBEAM_DIR variable to point to ${__sunbeam_dir}"
 install_env_vars
 
 # Check if on pre-existing path
