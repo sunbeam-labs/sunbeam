@@ -77,7 +77,6 @@ annotation:
   circular_min_len: 3500
 
   
-# Blast databases
 blast:
   threads: 4
 

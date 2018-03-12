@@ -15,7 +15,8 @@ def _find_conda_fp():
         conda_fp = Path([p for p in path if "conda" in p][0]).parent
         return conda_fp
     except (KeyError, IndexError):
-        pass
+        raise ValueError(
+            "Could not find a conda installation in your PATH.")
 
 
 def makepath(path):
