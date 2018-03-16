@@ -1,3 +1,4 @@
+import os
 import sys
 import collections
 from pathlib import Path
@@ -6,6 +7,16 @@ from pkg_resources import resource_stream
 from semantic_version import Version
 import ruamel.yaml
 from sunbeamlib import __version__
+
+def _find_conda_fp():
+    """Try to detect conda install in the path."""
+    try:
+        path = os.environ["PATH"].split(":")
+        conda_fp = Path([p for p in path if "conda" in p][0]).parent
+        return conda_fp
+    except (KeyError, IndexError):
+        raise ValueError(
+            "Could not find a conda installation in your PATH.")
 
 
 def makepath(path):
@@ -91,7 +102,12 @@ def process_databases(db_dict):
 def _update_dict(target, new):
     for k, v in new.items():
         if isinstance(v, collections.Mapping):
-            target[k] = _update_dict(target.get(k, {}), v)
+            # We could use .get() here but ruamel.yaml's weird Mapping
+            # subclass outputs errors to stdout if the key doesn't exist
+            if k in target:
+                target[k] = _update_dict(target[k], v)
+            else:
+                target[k] = _update_dict({}, v)
         else:
             target[k] = v
     return target
@@ -135,8 +151,8 @@ def load_defaults(default_name):
             "sunbeamlib", "data/{}.yml".format(default_name)
         ).read().decode())
     
-def dump(config):
+def dump(config, out=sys.stdout):
     if isinstance(config, collections.Mapping):
-        ruamel.yaml.round_trip_dump(config, sys.stdout)
+        ruamel.yaml.round_trip_dump(config, out)
     else:
-        sys.stdout.write(config)
+        out.write(config)

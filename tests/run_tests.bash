@@ -34,13 +34,14 @@ USE_TMPENV=true
 SBX_FP=extensions
 VERBOSE=false
 
-while getopts "d:s:t:v" opt; do
+while getopts "d:e:t:vh" opt; do
     case $opt in
 	d)
 	    USE_TMPDIR=false
 	    TEMPDIR=`readlink -f $OPTARG`
+	    mkdir -p $TEMPDIR
 	    ;;
-	s)
+	e)
 	    USE_TMPENV=false
 	    SUNBEAM_ENV=$OPTARG
 	    ;;
@@ -49,6 +50,15 @@ while getopts "d:s:t:v" opt; do
 	    ;;
 	v)
 	    VERBOSE=true
+	    ;;
+	h)
+	    echo "Run the Sunbeam test suite."
+	    echo "  -d DIR       Use DIR rather than a temporary directory (remains after tests finish)"
+	    echo "  -e ENV_NAME  Use a pre-existing Conda environment rather than creating one (remains after tests finish)"
+	    echo "  -t TEST      Run a specific test from tests/test_suite.bash only"
+	    echo "  -v           Show command output while running"
+	    echo "  -h           Display this message and exit"
+	    exit 1
 	    ;;
 	\?)
 	    echo "Unrecognized option -'$OPTARG'"
@@ -112,7 +122,7 @@ function setup {
     # Install Sunbeam (maybe)
     if [ "$USE_TMPENV" = true ]; then
 	SUNBEAM_ENV="sunbeam-`basename $TEMPDIR`"
-	bash install.sh $SUNBEAM_ENV /dev/null
+	bash install.sh -e $SUNBEAM_ENV 
     fi
     
     verbose "\n\t${GREEN}Conda environment${RESET}: ${SUNBEAM_ENV}\n"
@@ -179,7 +189,7 @@ function build_test_data {
     cp indexes/*.fasta $TEMPDIR/hosts
     python generate_dummy_data.py $TEMPDIR
     # Create a version of the config file customized for this tempdir
-    sunbeam_init $TEMPDIR --defaults testing > $TEMPDIR/tmp_config.yml
+    sunbeam init -o tmp_config.yml -d test_config_defaults.yml $TEMPDIR
     popd
     
     # Build fake kraken data

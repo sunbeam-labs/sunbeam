@@ -22,46 +22,46 @@ from sunbeamlib.reports import *
 
 # Load config file
 if not config:
-        raise SystemExit(
-                "No config file specified. Run `sunbeam_init` to generate a "
-                "config file, and specify with --configfile")
+    raise SystemExit(
+        "No config file specified. Run `sunbeam init` to generate a "
+        "config file, and specify with --configfile")
 
 # Check for major version compatibility
 pkg_major, cfg_major = check_compatibility(config)
 if pkg_major > cfg_major:
-        raise SystemExit(
-                "\nThis config file was created with an older version of Sunbeam"
-                " and may not be compatible. Create a new config file using"
-                "`sunbeam_init` and update it using `sunbeam_mod_config`\n")
+    raise SystemExit(
+        "\nThis config file was created with an older version of Sunbeam"
+        " and may not be compatible. Create a new config file using"
+        "`sunbeam init` and update it using `sunbeam_mod_config`\n")
 elif pkg_major < cfg_major:
-        raise SystemExit(
-                "\nThis config file was created with an newer version of Sunbeam"
-                " and may not be compatible. Create a new config file using "
-                "`sunbeam_init` and update it using `sunbeam_mod_config`\n")
+    raise SystemExit(
+        "\nThis config file was created with an newer version of Sunbeam"
+        " and may not be compatible. Create a new config file using "
+        "`sunbeam init` and update it using `sunbeam_mod_config`\n")
 
 # Load extensions
 sbxs = list(listfiles("extensions/{sbx_folder}/{sbx}.rules"))
 for sbx in sbxs:
-        sys.stderr.write("Found extension {sbx} in folder {sbx_folder}\n".format(**sbx[1]))
+    sys.stderr.write("Found extension {sbx} in folder {sbx_folder}\n".format(**sbx[1]))
 
 # ---- Setting up config files and samples
 Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
 Samples = build_sample_list(
-        Cfg['all']['data_fp'],
-        Cfg['all']['filename_fmt'],
-        Cfg['all']['samplelist_fp'],
-        Cfg['all']['exclude'])
+    Cfg['all']['data_fp'],
+    Cfg['all']['filename_fmt'],
+    Cfg['all']['samplelist_fp'],
+    Cfg['all']['exclude'])
 
 sys.stderr.write("Collecting host genomes... ")
 HostGenomeFiles = [f for f in Cfg['qc']['host_fp'].glob('*.fasta')]
 if not HostGenomeFiles:
-        sys.stderr.write(
-                "\n\nWARNING: No files detected in host genomes folder ({}). "
-                "If this is not intentional, make sure all files end in "
-                ".fasta and the folder is specified correctly.\n\n".format(
-                        Cfg['qc']['host_fp']
-                ))
+    sys.stderr.write(
+        "\n\nWARNING: No files detected in host genomes folder ({}). "
+        "If this is not intentional, make sure all files end in "
+        ".fasta and the folder is specified correctly.\n\n".format(
+            Cfg['qc']['host_fp']
+        ))
 HostGenomes = {Path(g.name).stem: read_seq_ids(Cfg['qc']['host_fp'] / g) for g in HostGenomeFiles}
 sys.stderr.write("done.\n")
 
@@ -112,7 +112,7 @@ include: "rules/mapping/mapping.rules"
 include: "rules/reports/reports.rules"
 
 for sbx_path, wildcards in sbxs:
-        include: sbx_path
+    include: sbx_path
         
 
 # ---- Rule all: run all targets
