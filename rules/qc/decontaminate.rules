@@ -83,10 +83,8 @@ rule filter_reads:
         host = int(subprocess.getoutput("cat {} | wc -l".format(input.hostreads)).strip())
         nonhost = int(original-host)
         shell("""
-        filterbyname.sh \
-        in={input.r1} in2={input.r2} \
-        out={output.r1} out2={output.r2} \
-        names={input.hostreads}
+        gzip -dc {input.r1} | rbt fastq-filter {input.hostreads} | gzip > {output.r1}
+        gzip -dc {input.r2} | rbt fastq-filter {input.hostreads} | gzip > {output.r2}
         """)
         with open(output.log, 'w') as log:
             log.write("host\tnonhost\n")
