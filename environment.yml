@@ -22,5 +22,5 @@ dependencies:
   - semantic_version
   - setuptools_scm
   - komplexity
-  - bbmap
+  - rust-bio-tools
 
