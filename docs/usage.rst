@@ -19,15 +19,20 @@ Clone the stable branch of Sunbeam and run the installation script:
    cd sunbeam-stable
    bash install.sh
 
-The installer will test for and download Conda if necessary. If you don't have
-it installed already, you need to add a line (displayed during install) to your
-config file (often in ``~/.bashrc``).
+The installer will check for and install the three components necessary for
+Sunbeam to work. The first is `Conda <https://conda.io>`_, a system for
+downloading and managing software environments. The second is the Sunbeam
+environment, which will contain all the required software. The third is the
+Sunbeam library, which provides the necessary commands to run Sunbeam.
 
-The installer contains a number of configurable options. To view them, execute
-``bash install.sh -h``.
+All of this is handled for you automatically. If Sunbeam is already installed,
+you can upgrade either or both the Sunbeam environment and library by passing
+``--upgrade [env/lib/all]`` to the install script.
 
-For more information on how to install Conda, see their `docs
-<https://conda.io/docs/user-guide/install/index.html#regular-installation>`_.
+If you don't have Conda installed prior to this, you will need to add a line
+(displayed during install) to your config file (usually in ``~/.bashrc`` or
+``~/.profile``). Restart your terminal after installation for this to take
+effect.
 		
 Testing
 -------
@@ -47,33 +52,32 @@ an issue on our `Github page <https://github.com/eclarke/sunbeam/issues>`_.
 Updating
 --------
 
-Sunbeam follows semantic versioning. In short, this means that the version has
-three numbers: x.y.z (e.g. 1.0.2). In between major updates (where x changes),
-the config file and dependencies remain the same and Sunbeam can be updated in
-place. When x changes, you need to update your config file with ``sunbeam config
-update`` because old config files may not work anymore.
+Sunbeam follows semantic versioning practices. In short, this means that the
+version has three numbers: major, minor and patch. For instance, a version
+number of 1.2.1 has 1 as the major version, 2 as the minor, and 1 as the patch.
 
-To update, pull the most recent changes into your Sunbeam directory and re-run
-the installer with the ``-u all`` option:
+When we update Sunbeam, if your config files and environment will work between
+upgrades, we will increment the patch or minor numbers (e.g. 1.0.0 ->
+1.1.0). All you need to do is the following:
 
 .. code-block:: shell
 
-   cd /path/to/sunbeam-stable   #or whatever your directory is called
    git pull
-   ./install.sh -u all
+   ./install.sh --upgrade all
+
+If we make a change that affects your config file (such as renaming keys or
+adding a new section), we will increase the major number (e.g. 1.1.0 ->
+2.0.0). When this occurs, you can use the same update procedure as before, and
+then update your config file to the new format:
+
+.. code-block:: shell
+
+   git pull
+   ./install.sh --upgrade all
+   source activate sunbeam
+   sunbeam config upgrade --in_place /path/to/my_config.yml
 
 It's a good idea to re-run the tests after this to make sure everything is working.
-
-.. note:: Updating your config files
-
-   Major version updates will invalidate your config file. This is done to
-   prevent unexpected behavior if something major changes. However, it's simple
-   to create a new one based off your old config that preserves values where
-   possible:
-
-   .. code-block:: shell
-
-      sunbeam config update old_config.yml > new_config.yml
 
 .. _uninstall:
 Uninstalling or reinstalling
@@ -110,26 +114,36 @@ Creating a new project
 
 We provide a utility, ``sunbeam init``, to create a new config file for a
 project. The utility takes one required argument: a path to your project
-folder. This folder may be empty, or contain a subfolder with your sequencing
-data. 
+folder. This folder will be created if it doesn't exist.
 
 .. code-block:: shell
 
-   mkdir ~/my_project
-   sunbeam init ~/my_project > ~/my_project/sunbeam_config.yml
+   sunbeam init /path/to/my_project
+
+In this directory, a new config file was created (by default named
+``sunbeam_config.yml``). Edit this file in your favorite text editor- all the
+keys are described below.
+
+If some config values are always the same for all projects (e.g. paths to shared
+databases), you can put these keys in a file and auto-populate your config file
+with them during initialization. For instance, if your Kraken databases are
+located at ``/shared/kraken/standard``, you could have a file containing the
+following called ``common_values.yml``:
+
+.. code-block:: yaml
+
+   classify:
+     kraken_db_fp: "/shared/kraken/standard"
+
+When you make a new Sunbeam project, use the ``--defaults common_values.yml`` as
+part of the init command.
    
-We now have a config file in that directory. If you're a member of the Bushman Lab or PennCHOP group, there are defaults available for you depending on what server you're running on. To use these, pass the ``--server`` option along with the server name. For instance, if I'm running on microb120:
-
-.. code-block:: shell
-
-   mkdir ~/my_project
-   sunbeam init --server microb120 ~/my_project > ~/my_project/sunbeam_config.yml
-
 
 Configuration
 =============
 
-Sunbeam has lots of configuration options, but most don't need individual attention. Below, each is described by section.
+Sunbeam has lots of configuration options, but most don't need individual
+attention. Below, each is described by section.
 
 Sections
 -------
@@ -266,11 +280,11 @@ mapping
 Running
 =======
 
-To run Sunbeam, make sure you've activated the sunbeam environment and are in the sunbeam folder. Then run:
+To run Sunbeam, make sure you've activated the sunbeam environment. Then run:
 
 .. code-block:: shell
 
-   snakemake --configfile ~/path/to/config.yml
+   sunbeam run -- --configfile ~/path/to/config.yml
 
 There are many options that you can use to determine which outputs you want. By
 default, if nothing is specified, this runs the entire pipeline. However, each
@@ -290,9 +304,10 @@ To use one of these options, simply run it like so:
 
 .. code-block:: shell
 
-   snakemake --configfile ~/path/to/config.yml all_classify
+   sunbeam run -- --configfile ~/path/to/config.yml all_classify
 
-In addition, since Sunbeam is really just a set of `snakemake <http://snakemake.readthedocs.io/en/latest/executable.html>`_ rules, all the
+In addition, since Sunbeam is really just a set of `snakemake
+<http://snakemake.readthedocs.io/en/latest/executable.html>`_ rules, all the
 (many) snakemake options apply here as well. Some useful ones are:
 
 * ``-n`` performs a dry run, and will just list which rules are going to be
@@ -315,7 +330,7 @@ rules executing in parallel, we would use the following command on our cluster:
 
 .. code-block:: shell
 
-   snakemake --configfile ~/path/to/config.yml --cluster "bsub -n 12" -j 100 -w 90
+   sunbeam run -- --configfile ~/path/to/config.yml --cluster "bsub -n 12" -j 100 -w 90
 
 The ``-w 90`` flag is provided to account for filesystem latency that often
 causes issues on clusters. It asks Snakemake to wait for 90 seconds before
@@ -347,23 +362,19 @@ databases, one nucleotide ('bacteria') and one protein ('card').
 	│   │       └── log
 	│   └── summary
 	├── assembly
-	│   ├── sample1_assembly
-	│   ├── sample2_assembly
-	│   ├── log
-	│   │   ├── cap3
-	│   │   └── vsearch
+	│   ├── contigs
+	│   │   ├── sample1-contigs.fa
+	│   │   └── sample2-contigs.fa
 	├── classify
 	│   └── kraken
 	│       └── raw
 	├── mapping
+   	│   └── genome1
 	└── qc
 	    ├── cutadapt
 	    ├── decontam
-	    ├── decontam-human
-	    ├── decontam-phix
 	    ├── log
 	    │   ├── decontam
-	    │   ├── decontam-human
 	    │   └── trimmomatic
 	    ├── paired
 	    └── unpaired
@@ -434,12 +445,13 @@ Alignment to genomes
 --------------------
 
 .. code-block:: shell
-   
-	├── mapping
 
-Right now this contains all the output files (.bam) for the mapping of reads
-back to target genomes. We plan on breaking down the output into subfolders for
-a more organized structure soon.
+   	├── mapping
+   	│   └── genome1
+
+
+Alignment files (in BAM format) to each target genome are contained in
+subfolders named for the genome.
 
 Quality control
 ---------------
@@ -449,21 +461,19 @@ Quality control
 	└── qc
 	    ├── cutadapt
 	    ├── decontam
-	    ├── decontam-human
-	    ├── decontam-phix
 	    ├── log
 	    │   ├── decontam
-	    │   ├── decontam-human
 	    │   └── trimmomatic
 	    ├── paired
 	    └── unpaired
 
 
-This folder contains paired, non-host-removed reads in ``paired`` (and unpaired
-in ``unpaired``). ``decontam`` contains the final output of both the host and
-phix removal steps.
-	
+This folder contains the quality-controlled reads in ``paired`` (and those where
+one mate-pair didn't survive qc in ``unpaired``). The ``decontam`` folder
+contains the reads with all host/contaminant genomes removed.	
 
 .. _troubleshooting:
 Troubleshooting
 ===============
+
+Coming soon. For now we suggest browsing the closed issues tab on Github.
