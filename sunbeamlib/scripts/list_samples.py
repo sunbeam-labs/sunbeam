@@ -27,28 +27,32 @@ def main(argv=sys.argv):
             "guessed)"))
 
     args = parser.parse_args(argv)
+    try:
+        build_sample_list(args.data_fp, args.format, sys.stdout, args.single_end)
+    except ValueError as e:
+        raise SystemExit(
+            "Could not build sample list. Specify correct filename format using "
+            "--format. \n\tReason: {}".format(e))
 
-    data_fp = args.data_fp.resolve()
+def build_sample_list(data_fp, format_str, output_file, is_single_end):
+
+    data_fp = data_fp.resolve()
     fnames = [f.name for f in data_fp.iterdir() if f.is_file()]
     
-    if not args.format:
-        try:
-            sys.stderr.write("Attempting to guess sample name format... ")
-            args.format = guess_format_string(fnames, not args.single_end)
-            sys.stderr.write("'{}'\n".format(args.format))
-        except ValueError as e:
-            raise SystemExit(
-                "Could not guess sample name format. Please provide it using"
-                " --format. (Reason: {})".format(e))
-
-    samples = find_samples(args.data_fp.resolve(), args.format)
+    if not format_str:
+        sys.stderr.write(
+            "Guessing sample name format from files in {}...\n".format(data_fp))
+        format_str = guess_format_string(fnames, not is_single_end)
+        sys.stderr.write("  Best guess: {}\n".format(format_str))
+        
+    samples = find_samples(data_fp, format_str)
 
     if len(samples) == 0:
-        raise SystemExit("Error: No samples matching the given format found.")
+        raise ValueError("no samples matching the given format found.")
 
-    sys.stderr.write("Found {} samples matching this format.\n".format(len(samples)))
+    sys.stderr.write("Found {} samples in {}.\n".format(len(samples), data_fp))
     fieldnames = ["sample", "1", "2"]
-    writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
+    writer = csv.DictWriter(output_file, fieldnames=fieldnames)
     for sample in samples.keys():
         writer.writerow({'sample':sample, **samples[sample]})
 

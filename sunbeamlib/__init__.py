@@ -54,16 +54,16 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
     """
     
     if isinstance(fnames, str):
-        raise ValueError("Need a list of filenames, not a string")
+        raise ValueError("need a list of filenames, not a string")
     if len(fnames) == 1:
-        raise ValueError("Need a list of filenames, not just one")
+        raise ValueError("need a list of filenames, not just one")
     if len(set(fnames)) == 1:
-        raise ValueError("All filenames are the same")
+        raise ValueError("all filenames are the same")
     
     splits = [re.split(split_pattern, fname) for fname in fnames]
 
     if len(set([len(p) for p in splits])) > 1:
-        raise ValueError("Files have inconsistent numbers of _ or . characters")
+        raise ValueError("files have inconsistent numbers of _ or . characters")
 
     elements = []
     variant_idx = []
