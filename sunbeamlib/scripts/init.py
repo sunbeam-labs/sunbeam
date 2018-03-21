@@ -4,6 +4,7 @@ import argparse
 import ruamel.yaml
 from pathlib import Path
 
+from .list_samples import build_sample_list
 from sunbeamlib import config
     
 def main(argv=sys.argv):
@@ -15,49 +16,97 @@ def main(argv=sys.argv):
         raise SystemExit(
             "Could not determine Conda prefix. Activate your Sunbeam "
             "environment and try this command again.")
-     
+
+    description_str = (
+        "Initialize a new Sunbeam project in a given directory, creating "
+        "a new config file and (optionally) a sample list.")
+    
     parser = argparse.ArgumentParser(
-        "init", description="Initialize a new sunbeam project")
-    parser.add_argument(
-        "-o", "--output", help="Name of config file (written to project_fp)",
-        default="sunbeam_config.yml", metavar="FILE")
-    parser.add_argument(
-        "-f", "--force", help="Overwrite config file if it already exists",
-        action="store_true")
-    parser.add_argument(
-        "-d", "--defaults", type=argparse.FileType("r"), metavar="FILE",
-        help="Set of default values to use to populate config file")
+        "init", description=description_str)
     parser.add_argument(
         "project_fp", type=Path,
-        help="Project directory (will be created if it does not exist)")
+        help="project directory (will be created if it does not exist)")
     parser.add_argument(
+        "-f", "--force", help="overwrite files if they already exist",
+        action="store_true")
+    parser.add_argument(
+        "--output", help=(
+            "name of config file (%(default)s)"),
+        default="sunbeam_config.yml", metavar="FILE")
+
+    configs = parser.add_argument_group("config file options")
+    configs.add_argument(
+        "--defaults", type=argparse.FileType("r"), metavar="FILE",
+        help="set of default values to use to populate config file")
+    configs.add_argument(
         "--template", default=None, metavar="FILE",
-        help="Custom config file template, in YAML format", 
+        help="custom config file template, in YAML format", 
         type=argparse.FileType("r"))
+
+    samplelist = parser.add_argument_group("sample list options")
+    samplelist.add_argument(
+        "--data_fp", type=Path, metavar="PATH",
+        help="path to folder containing fastq.gz files")
+    samplelist.add_argument(
+        "--format", type=str, metavar="STR",
+        help="filename format (default: guessed)")
+    samplelist.add_argument(
+        "--single_end", action="store_true",
+        help="fastq files are in single-end, not paired-end, format")
 
     args = parser.parse_args(argv)
 
     # Create project folder if it doesn't exist
-    if not args.project_fp.exists():
-        sys.stderr.write("Creating project folder at {}...\n".format(args.project_fp))
-        args.project_fp.mkdir(parents=True, exist_ok=True)
+    project_fp = args.project_fp.resolve()
 
-    cfg_fp = args.project_fp/args.output
-    if cfg_fp.exists() and not args.force:
-        raise SystemExit(
-            "Error: config file already exists at {}. Choose a new name or use --force "
-            "to overwrite.".format(cfg_fp))
-        
+    # Check if files already exist
+    config_file = check_existing(project_fp/args.output, args.force)
+    samplelist_file = check_existing(project_fp/"samples.csv", args.force)
+    
+    if not project_fp.exists():
+        sys.stderr.write(
+            "Creating project folder at {}...\n".format(args.project_fp))
+        project_fp.mkdir(parents=True, exist_ok=True)
+
+    # Create config file        
     cfg = config.new(
         conda_fp=conda_prefix,
-        project_fp=args.project_fp,
+        project_fp=project_fp,
         template=args.template)
 
     if args.defaults:
         defaults = ruamel.yaml.safe_load(args.defaults)
         cfg = config.update(cfg, defaults)
 
-    with open(cfg_fp, 'w') as out:
+    with config_file.open('w') as out:
         config.dump(cfg, out)
 
-    sys.stderr.write("New config file written to {}\n".format(cfg_fp))
+    sys.stderr.write("New config file written to {}\n".format(config_file))
+
+    # Create sample list (if given data_fp)
+    if args.data_fp:
+        try:
+            with samplelist_file.open('w') as out:
+                build_sample_list(
+                    data_fp = args.data_fp,
+                    format_str = args.format,
+                    output_file = out,
+                    is_single_end = args.single_end)
+                sys.stderr.write(
+                    "New sample list written to {}\n".format(samplelist_file))
+        except ValueError as e:
+            raise SystemExit(
+                "Error: could not create sample list (reason: {}). Provide a "
+                "format string using --format, use `sunbeam list_samples` or "
+                "create manually (see user guide).".format(e))
+
+        
+def check_existing(path, force=False):
+    if path.is_dir():
+        raise SystemExit(
+            "Error: specified file '{}' exists and is a directory".format(path))
+    if path.is_file() and not force:
+        raise SystemExit(
+            "Error: specified file '{}' exists. Use --force to "
+            "overwrite.".format(path))
+    return path
