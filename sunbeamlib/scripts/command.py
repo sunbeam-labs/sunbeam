@@ -5,15 +5,17 @@ import sunbeamlib
 from sunbeamlib.scripts.run import main as Run
 from sunbeamlib.scripts.init import main as Init
 from sunbeamlib.scripts._config import main as Config
+from sunbeamlib.scripts.list_samples import main as ListSamples
 
 def main():
 
     usage_str = "%(prog)s [-h/--help,-v/--version] <subcommand>"
     description_str = (
         "subcommands:\n"
-        "  init   \tCreate a new config file for a project.\n"
-        "  run    \tExecute the pipeline.\n"
-        "  config \tModify or update config files.\n"
+        "  init         \tCreate a new config file for a project.\n"
+        "  run          \tExecute the pipeline.\n"
+        "  config       \tModify or update config files.\n"
+        "  list_samples \tMake a list of samples from a directory.\n"
     ).format(version=sunbeamlib.__version__)
 
     parser = argparse.ArgumentParser(
@@ -38,6 +40,8 @@ def main():
         Init(remaining)
     elif args.command == "config":
         Config(remaining)
+    elif args.command == "list_samples":
+        ListSamples(remaining)
     else:
         parser.print_help()
         sys.stderr.write("Unrecognized command.\n")

@@ -4,6 +4,7 @@ __license__ = "GPL2+"
 import os
 import re
 import sys
+import csv
 
 from pathlib import Path
 from pkg_resources import get_distribution
@@ -15,103 +16,92 @@ from Bio import SeqIO
 
 __version__ = str(Version.coerce(get_distribution('sunbeam').version))
 
-def build_sample_list(data_fp, filename_fmt, samplelist_fp, excluded):
-    if os.path.isfile(str(samplelist_fp)):
-        sys.stderr.write("Building sample list using {}...".format(samplelist_fp))
-        Samples = _build_samples_from_file(data_fp, filename_fmt, samplelist_fp, excluded)
-        sys.stderr.write(" done.\n")
-    else:
-        sys.stderr.write("Building sample list from {}/{}...".format(data_fp, filename_fmt))
-        Samples = _build_samples_from_dir(data_fp, filename_fmt, excluded)
-        sys.stderr.write(" done.\n")
-    return Samples
-
-def _build_samples_from_dir(data_fp, filename_fmt, excluded):
-    """
-    Build a list of samples from a data filepath and filename format.
-
-    :param data_fp: a Path to data files
-    :param filename_fmt: a string giving wildcards for {sample} and (optionally)
-        {rp}, for read pair (e.g. R1 or R2).
-    :param exclude: a list of sample names to exclude
-    :returns: A dictionary of samples, with sample names as keys:
-       Samples = {
-         'sample1': {
-           'R1': 'path/to/sample1_R1.fastq.gz',
-           'R2': 'path/to/sample1_R2.fastq.gz',
-           'paired': True
-         }, ...
-       }
-    """
-    files = list(listfiles(str(data_fp/filename_fmt)))
-    Samples = {t[1]['sample']: {} for t in files if t[1]['sample'] not in excluded}
-    for f in files:
-        fpath = f[0]
-        wcards = f[1]
-        if wcards['sample'] in excluded:
-            continue
-        rp = wcards['rp'] if 'rp' in wcards.keys() else False
-        if rp:
-            Samples[wcards['sample']][rp] = fpath
-            Samples[wcards['sample']]['paired'] = True
-        else:
-            Samples[wcards['sample']]['file'] = fpath
-            Samples[wcards['sample']]['paired'] = False
-    return Samples
-
-def _build_samples_from_file(data_fp, filename_fmt, samplelist_fp, excluded):
+def build_sample_list(samplelist_fp, paired_end):
     """
     Build a list of samples from a sample list file.
-    
-    :param data_fp: a Path to data files
-    :param filename_fmt: a string giving wildcards for {sample} and (optionally)
-        {rp}, for read pair (e.g. R1 or R2).
     :param samplelist_fp: a Path to a whitespace-delimited samplelist file,
        where the first entry is the sample name and the rest is ignored.
-    :param exclude: a list of sample names to exclude
-    :returns: A dictionary of samples with the same structure as
-       `_build_samples_from_dir`. Paths are reconstructed using `data_fp`
-       and `filename_fmt`. Samples are assumed to be paired reads.
+    :returns: A dictionary of samples with sample name and associated file(s)
     """
     Samples = {}
     with open(str(samplelist_fp)) as f:
-        for line in f:
-            sample = line.strip().split('\t')[0]
-            if sample in excluded:
-                continue
-            Samples[sample] = {}
-            for rp in ['R1', 'R2']:
-                Samples[sample][rp] = _check_sample_path(
-                    sample,
-                    expand(str(data_fp/filename_fmt), sample=sample, rp=rp)[0])
-            Samples[sample]['paired'] = True
+        reader = csv.DictReader(f, fieldnames=['sample','1','2'])
+        for row in reader:
+            sample = row['sample']
+            try:
+                r1 = _verify_path(row['1'])
+            except ValueError:
+                raise ValueError("Associated file for {} not found.".format(
+                    sample))
+            r2 = None
+            if paired_end:
+                try:
+                    r2 = _verify_path(row['2'])
+                except ValueError:
+                    raise ValueError(
+                        "Paired-end files specified, but mate pair for '{}' "
+                        "is missing or does not exist.".format(sample))
+            Samples[sample] = {'1': r1, '2': r2}
     return Samples
 
-def _check_sample_path(sample, fp):
-    path = Path(fp)
-    if not path.exists():
-        sys.stderr.write(
-            "Warning: original file for sample '{}' not found at {}\n".format(
-                sample, fp))
-    return str(path.resolve())
+def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
+    """
+    Try to guess the format string given a list of filenames.
+    :param fnames: a list of filename strings
+    :param paired_end: if True, will try to find a read-pair designator
+    :param split_pattern: regex to split filenames on
+    :returns: a format string with a {sample} and (maybe) an {rp} element
+    """
+    
+    if isinstance(fnames, str):
+        raise ValueError("Need a list of filenames, not a string")
+    if len(fnames) == 1:
+        raise ValueError("Need a list of filenames, not just one")
+    if len(set(fnames)) == 1:
+        raise ValueError("All filenames are the same")
+    
+    splits = [re.split(split_pattern, fname) for fname in fnames]
 
-def index_files(genome, index_fp):
-    """
-    Return the bowtie index files for a file.
-    """
-    fwd, rev = (
-        expand(
-            "{index_fp}/{genome}.{index}.bt2",
-            index_fp=index_fp,
-            genome=genome,
-            index=range(1,5)),
-        expand(
-            "{index_fp}/{genome}.rev.{index}.bt2",
-            index_fp=index_fp,
-            genome=genome,
-            index=range(1,3))
-    )
-    return fwd + rev
+    if len(set([len(p) for p in splits])) > 1:
+        raise ValueError("Files have inconsistent numbers of _ or . characters")
+
+    elements = []
+    variant_idx = []
+
+    for i, parts in enumerate(zip(*splits)):
+        items = set(parts)
+        # If they're all the same, it's a common part; so add it to the element
+        # list unchanged
+        if len(items) == 1:
+            elements.append(parts[0])
+        else:
+            if paired_end:
+                # If all the items in a split end with 1 or 2, and only have
+                # one char preceding that that's the same among all items,
+                # then it's like a read-pair identifier.
+                if set(_[-1] for _ in items) == {'1', '2'}:
+                    prefixes = set(_[:-1] for _ in items)
+                    if len(prefixes) == 1 and all(len(p) == 1 for p in prefixes):
+                        prefix = parts[0][:-1]
+                        elements.append(prefix)
+                        elements.append("{rp}")
+                        continue
+            variant_idx.append(i)                        
+            elements.append("{sample}")
+            
+    # Combine multiple variant elements
+    _min = min(variant_idx)
+    _max = max(variant_idx)
+    elements[_min:_max+1] = ["{sample}"]
+    return "".join(elements)
+
+
+
+def _verify_path(fp):
+    path = Path(fp)
+    if not path.is_file():
+        raise ValueError("File not found")
+    return str(path.resolve())
 
 def circular(seq, kmin, kmax, min_len):
     """Determine if a sequence is circular.

@@ -23,10 +23,9 @@
 
 all:
   root: "{PROJECT_FP}"
-  data_fp: "data_files"
   output_fp: "sunbeam_output"
   samplelist_fp: ""
-  filename_fmt: "{{sample}}_{{rp}}.fastq.gz"
+  paired_end: true
   exclude: []
   version: "{SB_VERSION}"
 
