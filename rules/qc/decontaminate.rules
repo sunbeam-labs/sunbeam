@@ -1,11 +1,14 @@
 import subprocess
-from sunbeamlib import index_files
 from sunbeamlib.decontam import get_mapped_reads
 
 rule all_decontam:
     input:
-        TARGET_DECONTAM
+        expand(
+            str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'),
+            sample=Samples.keys(), rp=Pairs)
 
+ruleorder: build_host_index > build_genome_index
+        
 rule build_host_index:
     input:
         str(Cfg['qc']['host_fp']/'{host}.fasta')
@@ -19,8 +22,9 @@ rule build_host_index:
 
 rule align_to_host:
     input:
-        r1 = str(QC_FP/'masked'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'masked'/'{sample}_R2.fastq.gz'),
+        reads = expand(
+            str(QC_FP/'cleaned'/'{{sample}}_{rp}.fastq.gz'),
+            rp = Pairs),
         index = str(Cfg['qc']['host_fp']/'{host}.fasta.amb')
     output:
         temp(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.bam'))
@@ -33,7 +37,7 @@ rule align_to_host:
         """
         bwa mem -M -t {threads} \
         {params.index_fp}/{wildcards.host}.fasta \
-        {input.r1} {input.r2} -o {params.sam} && \
+        {input.reads} -o {params.sam} && \
         samtools view -bSF4 {params.sam} > {output} && \
         rm {params.sam}
         """
@@ -72,19 +76,20 @@ rule aggregate_reads:
 rule filter_reads:
     input:
         hostreads = str(QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids'),
-        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz')
+        reads = str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')
     output:
-        r1 = str(QC_FP/'decontam'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'decontam'/'{sample}_R2.fastq.gz'),
-        log = str(QC_FP/'log'/'decontam'/'{sample}.txt')
+        reads = str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'),
+        log = str(QC_FP/'log'/'decontam'/'{sample}_{rp}.txt')
     run:
-        original = int(str(subprocess.getoutput("zcat {} | wc -l".format(input.r1))).strip())//4
-        host = int(subprocess.getoutput("cat {} | wc -l".format(input.hostreads)).strip())
+        original = int(str(subprocess.getoutput(
+            "zcat {} | wc -l".format(input.reads))).strip())//4
+        host = int(subprocess.getoutput(
+            "cat {} | wc -l".format(input.hostreads)).strip())
         nonhost = int(original-host)
         shell("""
-        gzip -dc {input.r1} | rbt fastq-filter {input.hostreads} | gzip > {output.r1}
-        gzip -dc {input.r2} | rbt fastq-filter {input.hostreads} | gzip > {output.r2}
+        gzip -dc {input.reads} | \
+        rbt fastq-filter {input.hostreads} | \
+        gzip > {output.reads}
         """)
         with open(output.log, 'w') as log:
             log.write("host\tnonhost\n")

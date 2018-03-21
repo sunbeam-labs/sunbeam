@@ -131,8 +131,10 @@ function setup {
     source activate $SUNBEAM_ENV
 
     # Move extensions out of the way temporarily
-    OLD_SBX_FP="${SBX_FP}_moved_for_testing"
-    mv $SBX_FP $OLD_SBX_FP
+    if [ -d $SBX_FP ]; then
+	OLD_SBX_FP="${SBX_FP}_moved_for_testing"
+	mv $SBX_FP $OLD_SBX_FP
+    fi
     mkdir $SBX_FP
 }
     
@@ -189,7 +191,12 @@ function build_test_data {
     cp indexes/*.fasta $TEMPDIR/hosts
     python generate_dummy_data.py $TEMPDIR
     # Create a version of the config file customized for this tempdir
-    sunbeam init -o tmp_config.yml -d test_config_defaults.yml $TEMPDIR
+    sunbeam init \
+	    --force \
+	    --output tmp_config.yml \
+	    --defaults test_config_defaults.yml \
+	    --data_fp $TEMPDIR/data_files \
+	    $TEMPDIR
     popd
     
     # Build fake kraken data

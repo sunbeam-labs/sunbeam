@@ -33,7 +33,7 @@ def build_sample_list(samplelist_fp, paired_end):
             except ValueError:
                 raise ValueError("Associated file for {} not found.".format(
                     sample))
-            r2 = None
+            r2 = ''
             if paired_end:
                 try:
                     r2 = _verify_path(row['2'])
@@ -98,6 +98,8 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
 
 
 def _verify_path(fp):
+    if not fp:
+        raise ValueError("Missing filename")
     path = Path(fp)
     if not path.is_file():
         raise ValueError("File not found")

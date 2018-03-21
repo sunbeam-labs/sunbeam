@@ -31,10 +31,13 @@ rule classic_biom:
         
 rule kraken_classify:
     input:
-        r1=str(QC_FP/'decontam'/'{sample}_R1.fastq.gz'),
-        r2=str(QC_FP/'decontam'/'{sample}_R2.fastq.gz')
+        expand(
+            str(QC_FP/'decontam'/'{{sample}}_{rp}.fastq.gz'),
+            rp = Pairs)
     output:
         str(CLASSIFY_FP/'kraken'/'raw'/'{sample}-raw.tsv')
+    params:
+        paired_end = "--paired" if Cfg['all']['paired_end'] else ""
     threads:
         Cfg['classify']['threads']
     shell:
@@ -42,10 +45,10 @@ rule kraken_classify:
         kraken \
         --db {Cfg[classify][kraken_db_fp]} \
         --threads {threads} \
-        --paired \
+        {params.paired_end} \
         --gzip-compressed \
         --fastq-input \
-        {input.r1} {input.r2} > {output}
+        {input} > {output}
         """
 
 rule kraken_report:

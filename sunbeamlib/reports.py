@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings('ignore', '.*experimental.*')
 from pathlib import Path
 from collections import Counter
 
