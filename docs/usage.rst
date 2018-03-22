@@ -248,6 +248,8 @@ blast
 
 * ``threads``: number of threads provided to all BLAST programs
 
+.. _blastdbs:
+
 blastdbs
 ++++++++
 
@@ -290,6 +292,7 @@ mapping
   decrease the space these files occupy.
 
 
+.. _running:
 
 Running
 =======
@@ -483,6 +486,7 @@ to any contaminant or host genomes. In general, most downstream steps should ref
 
 
 .. _troubleshooting:
+
 Troubleshooting
 ===============
 
