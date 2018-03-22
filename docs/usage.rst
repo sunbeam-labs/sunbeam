@@ -112,17 +112,38 @@ the environment, run ``source deactivate`` or close the terminal.
 Creating a new project
 ----------------------
 
-We provide a utility, ``sunbeam init``, to create a new config file for a
-project. The utility takes one required argument: a path to your project
-folder. This folder will be created if it doesn't exist.
+We provide a utility, ``sunbeam init``, to create a new config file and sample
+list for a project. The utility takes one required argument: a path to your
+project folder. This folder will be created if it doesn't exist. You can also
+specify the path to your gzipped fastq files, and Sunbeam will try to guess how
+your samples are named, and whether they're paired.
 
 .. code-block:: shell
 
-   sunbeam init /path/to/my_project
+   sunbeam init --data_fp /path/to/fastq/files /path/to/my_project
 
-In this directory, a new config file was created (by default named
-``sunbeam_config.yml``). Edit this file in your favorite text editor- all the
-keys are described below.
+In this directory, a new config file and a new sample list were created (by
+default named ``sunbeam_config.yml`` and ``samplelist.csv``, respectively). Edit
+the config file in your favorite text editor- all the keys are described below.
+
+.. note::
+
+   Sunbeam will do its best to determine how your samples are named in the
+   ``data_fp`` you specify. It assumes they are named something regular, like
+   ``MP66_S109_L008_R1_001.fastq.gz`` and ``MP66_S109_L008_R2_001.fastq.gz``. In
+   this case, the sample name would be 'MP66_S109_L008' and the read pair
+   indicator would be '1' and '2'. Thus, the filename format would look like
+   ``{sample}_R{rp}_001.fastq.gz``, where {sample} defines the sample name and
+   {rp} defines the 1 or 2 in the read pair.
+
+   If you have single-end reads, you can pass ``--single_end`` to ``sunbeam
+   init`` and it will not try to identify read pairs.
+
+   If the guessing doesn't work as expected, you can manually specify the
+   filename format after the ``--format`` option in ``sunbeam init``.
+
+   Finally, if you don't have your data ready yet, simply omit the ``--data_fp``
+   option. You can create a sample list later with ``sunbeam list_samples``.
 
 If some config values are always the same for all projects (e.g. paths to shared
 databases), you can put these keys in a file and auto-populate your config file
@@ -137,6 +158,8 @@ following called ``common_values.yml``:
 
 When you make a new Sunbeam project, use the ``--defaults common_values.yml`` as
 part of the init command.
+
+Further usage information is available by typing ``sunbeam init --help``.
    
 
 Configuration
@@ -153,27 +176,15 @@ all
 
 * ``root``: The root project folder, used to resolve any relative paths in the
   rest of the config file.
-* ``data_fp``: The path to the raw, gzipped fastq sequence files.
-* ``filename_fmt``: This defines how to find the sample and read pairing
-  in your samples' filenames.
-
-  .. tip::
-     If your files are in pairs like ``MP66_S109_L008_R1_001.fastq.gz``
-     and ``MP66_S109_L008_R2_001.fastq.gz``, the sample name would be
-     'MP66_S109_L008' and the read pair (rp) would be 'R1' and 'R2'. Thus, the
-     ``filename_fmt`` would be ``{sample}_{rp}_001.fastq.gz``.
-
-* ``samplelist_fp``: The path to a file with list of sample names (one per
-  line) to work on instead of finding them in the ``data_fp`` directory. This
-  is useful for only working on certain samples in a folder.
-* ``subcores``: currently ignored.
-* ``exclude``: A list, specified using sample names in quotes between the
-  square brackets, of samples to ignore. This is useful when a sample is
-  causing an error downstream and you want to skip it. For example:
-  
-  .. code-block:: yaml
-		    
-     exclude: ['bad_sample1', 'bad_sample2']
+* ``output_fp``: Path to where the Sunbeam outputs will be stored.
+* ``samplelist_fp``: Path to a comma-separated file where each row contains a
+  sample name and one or two paths (if single- or paired-end) to raw gzipped
+  fastq files. This can be created for you by ``sunbeam init`` or ``sunbeam
+  list_samples``.
+* ``paired_end``: 'true' or 'false' depending on whether you are using paired-
+  or single-end reads.
+* ``version``: Automatically added for you by ``sunbeam init``. Ensures
+  compatibility with the right version of Sunbeam.
 
 qc
 ++++
@@ -214,7 +225,7 @@ classify
     classification steps
   * ``threads``: threads to use for Kraken
   * ``kraken_db_fp``: path to Kraken database
-  * ``taxa_db_fp``: currently ignored
+
 
 assembly
 ++++++++
@@ -274,7 +285,10 @@ mapping
   upon which to map reads. Genomes should be in FASTA format, and Sunbeam will
   create the indexes if necessary.
 * ``threads``: number of threads to use for alignment to the target genomes
-* ``keep_unaligned``: whether or not to keep unaligned reads
+* ``samtools_opts``: a string added to the ``samtools view`` command during
+  mapping. This is a good place to add '-F4' to keep only mapped reads and
+  decrease the space these files occupy.
+
 
 
 Running
@@ -284,7 +298,7 @@ To run Sunbeam, make sure you've activated the sunbeam environment. Then run:
 
 .. code-block:: shell
 
-   sunbeam run -- --configfile ~/path/to/config.yml
+   sunbeam run --configfile ~/path/to/config.yml
 
 There are many options that you can use to determine which outputs you want. By
 default, if nothing is specified, this runs the entire pipeline. However, each
@@ -363,21 +377,19 @@ databases, one nucleotide ('bacteria') and one protein ('card').
 	│   └── summary
 	├── assembly
 	│   ├── contigs
-	│   │   ├── sample1-contigs.fa
-	│   │   └── sample2-contigs.fa
 	├── classify
 	│   └── kraken
 	│       └── raw
 	├── mapping
    	│   └── genome1
 	└── qc
-	    ├── cutadapt
+	    ├── cleaned
 	    ├── decontam
 	    ├── log
 	    │   ├── decontam
+	    │   ├── cutadapt
 	    │   └── trimmomatic
-	    ├── paired
-	    └── unpaired
+	    └── reports
 
 In order of appearance, the folders contain the following:
 
@@ -418,14 +430,11 @@ Contig assembly
 
 .. code-block:: shell
 
-	├── assembly
-	│   ├── sample1_assembly
-	│   ├── sample2_assembly
-	│   ├── log
-	│   │   ├── cap3
-	│   │   └── vsearch
+   	├── assembly
+	│   ├── contigs
 
-This contains the assembled contigs for each sample in its own folder under [samplename]_assembly.
+
+This contains the assembled contigs for each sample under 'contigs'.
 
 Taxonomic classification
 ------------------------
@@ -451,26 +460,27 @@ Alignment to genomes
 
 
 Alignment files (in BAM format) to each target genome are contained in
-subfolders named for the genome.
+subfolders named for the genome, such as 'genome1'.
 
 Quality control
 ---------------
 
 .. code-block:: shell
-   
-	└── qc
-	    ├── cutadapt
+
+   	└── qc
+	    ├── cleaned
 	    ├── decontam
 	    ├── log
 	    │   ├── decontam
+	    │   ├── cutadapt
 	    │   └── trimmomatic
-	    ├── paired
-	    └── unpaired
+	    └── reports
 
 
-This folder contains the quality-controlled reads in ``paired`` (and those where
-one mate-pair didn't survive qc in ``unpaired``). The ``decontam`` folder
-contains the reads with all host/contaminant genomes removed.	
+This   folder   contains  the   trimmed,   low-complexity   filtered  reads   in
+``cleaned``. The ``decontam`` folder contains the cleaned reads that did not map
+to any contaminant or host genomes. In general, most downstream steps should reference the ``decontam`` reads.
+
 
 .. _troubleshooting:
 Troubleshooting
