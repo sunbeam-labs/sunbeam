@@ -7,16 +7,51 @@ rule all_qc:
     input:
         TARGET_QC
 
-rule custom_removal:
+ruleorder: adapter_removal_unpaired > adapter_removal_paired
+        
+rule adapter_removal_unpaired:
     input:
-        r1 = lambda wildcards: Samples[wildcards.sample]['R1'],
-        r2 = lambda wildcards: Samples[wildcards.sample]['R2']
+        lambda wildcards: Samples[wildcards.sample]['1']
     params:
-        r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq.gz')
+        tmp = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq'),
+    log: str(QC_FP/'log'/'cutadapt'/'{sample}.log') 
     output:
-        gr1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq.gz'),
-        gr2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq.gz')
+        str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz')
+    run:
+        fwd_adapters = Cfg['qc'].get('fwd_adapters')
+        rev_adapters = Cfg['qc'].get('rev_adapters')
+        if fwd_adapters or rev_adapters:
+            overlap = float('inf')
+            if fwd_adapters:
+                overlap = min(min(len(a) for a in fwd_adapters), overlap)
+                fwd_adapter_str = " ".join(expand(
+                    "-b {adapter}", adapter=Cfg['qc']['fwd_adapters']))
+            if rev_adapters:
+                overlap = min(min(len(a) for a in rev_adapters), overlap)
+                rev_adapter_str = " ".join(expand(
+                    "-g {adapter}", adapter=Cfg['qc']['rev_adapters']))
+            shell("""
+            cutadapt --discard-trimmed -O {overlap} \
+            {fwd_adapter_str} {rev_adapter_str} \
+            -o {params.tmp} \
+            {input} \
+            > >(tee -a {log}) 2> >(tee -a {log} >&2) 
+            gzip {params.tmp}
+            """)
+        else:
+            shell("ln -s {input} {output}")
+    
+rule adapter_removal_paired:
+    input:
+        r1 = lambda wildcards: Samples[wildcards.sample]['1'],
+        r2 = lambda wildcards: Samples[wildcards.sample]['2']
+    params:
+        r1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
+        r2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
+    log: str(QC_FP/'log'/'cutadapt'/'{sample}.log') 
+    output:
+        gr1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
+        gr2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
     run:
         fwd_adapters = Cfg['qc']['fwd_adapters']
         rev_adapters = Cfg['qc']['rev_adapters']
@@ -34,7 +69,8 @@ rule custom_removal:
             cutadapt --discard-trimmed -O {overlap} \
             {fwd_adapter_str} {rev_adapter_str} \
             -o {params.r1} -p {params.r2} \
-            {input.r1} {input.r2}
+            {input.r1} {input.r2} \
+            > >(tee -a {log}) 2> >(tee -a {log} >&2) 
             gzip {params.r1}
             gzip {params.r2}
             """)
@@ -43,17 +79,43 @@ rule custom_removal:
             ln -s {input.r1} {output.gr1} && ln -s {input.r2} {output.gr2}
             """)
 
+ruleorder: trimmomatic_unpaired > trimmomatic_paired
         
-rule trimmomatic:
+rule trimmomatic_unpaired:
     input:
-        r1 = str(QC_FP/'cutadapt'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'cutadapt'/'{sample}_R2.fastq.gz')
+        str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz')
     output:
-        pair_r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
-        pair_r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),
-        unpair_r1 = str(QC_FP/'unpaired'/'{sample}_R1_unpaired.fastq.gz'),
-        unpair_r2 = str(QC_FP/'unpaired'/'{sample}_R2_unpaired.fastq.gz'),
-        log = str(QC_FP/'log'/'trimmomatic'/'{sample}.out')
+        str(QC_FP/'02_trimmomatic'/'{sample}_1.fastq.gz')
+    log: str(QC_FP/'log'/'trimmomatic'/'{sample}.out')
+    params:
+        sw_start = Cfg['qc']['slidingwindow'][0],
+        sw_end = Cfg['qc']['slidingwindow'][1]
+    threads:
+        Cfg['qc']['threads']
+    shell:
+        """
+        trimmomatic \
+        SE -threads {threads} -phred33 \
+        {input} {output} \
+        ILLUMINACLIP:{Cfg[qc][adapter_fp]}:2:30:10:8:true \
+        LEADING:{Cfg[qc][leading]} \
+        TRAILING:{Cfg[qc][trailing]} \
+        SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
+        MINLEN:{Cfg[qc][minlen]} \
+        > >(tee -a {log}) 2> >(tee -a {log} >&2)
+        """
+
+            
+rule trimmomatic_paired:
+    input:
+        r1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
+        r2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
+    output:
+        pair_r1 = str(QC_FP/'02_trimmomatic'/'{sample}_1.fastq.gz'),
+        pair_r2 = str(QC_FP/'02_trimmomatic'/'{sample}_2.fastq.gz'),
+        unpair_r1 = temp(str(QC_FP/'02_trimmomatic'/'unpaired'/'{sample}_1_unpaired.fastq.gz')),
+        unpair_r2 = temp(str(QC_FP/'02_trimmomatic'/'unpaired'/'{sample}_2_unpaired.fastq.gz'))
+    log: str(QC_FP/'log'/'trimmomatic'/'{sample}.out'),
     params:
         sw_start = Cfg['qc']['slidingwindow'][0],
         sw_end = Cfg['qc']['slidingwindow'][1]
@@ -70,24 +132,29 @@ rule trimmomatic:
         LEADING:{Cfg[qc][leading]} \
         TRAILING:{Cfg[qc][trailing]} \
         SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
-        MINLEN:{Cfg[qc][minlen]} &> {output.log}\
+        MINLEN:{Cfg[qc][minlen]} \
+        > >(tee -a {log}) 2> >(tee -a {log} >&2)
         """
 
 rule fastqc:
     input:
-        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz')
+        reads = expand(
+            str(QC_FP/"02_trimmomatic"/"{{sample}}_{rp}.fastq.gz"),
+            rp=Pairs)
     output:
         expand(
-            str(QC_FP/'paired'/'{{sample}}_{rp}_fastqc/fastqc_data.txt'),
-            rp=['R1', 'R2'])
-    shell: "fastqc {input.r1} {input.r2} -extract"
-
-rule mask_low_complexity:
+            str(QC_FP/'reports'/'{{sample}}_{rp}_fastqc/fastqc_data.txt'),
+            rp=Pairs)
+    params:
+        outdir = str(QC_FP/'reports')
+    shell:
+        "fastqc -o {params.outdir} {input.reads} -extract"
+           
+rule remove_low_complexity:
     input:
-        str(QC_FP/'paired'/'{sample}_{rp}.fastq.gz')
+        str(QC_FP/'02_trimmomatic'/'{sample}_{rp}.fastq.gz')
     output:
-        str(QC_FP/'masked'/'{sample}_{rp}.fastq.gz')
+        str(QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz')
     run:
         if Cfg['qc']['mask_low_complexity']:
             shell("""
@@ -97,3 +164,30 @@ rule mask_low_complexity:
         else:
             shell("ln -s {input} {output}")
             
+rule qc_final:
+    input:
+        str(QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz')
+    output:
+        str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')
+    shell:
+        """cp {input} {output}"""
+
+rule clean_qc:
+    input:
+        expand(
+            str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'),
+            sample=Samples.keys(), rp=Pairs)
+    params:
+        cutadapt_fp = str(QC_FP/'01_cutadapt'),
+        trimmomatic_fp = str(QC_FP/'02_trimmomatic'),
+        komplexity_fp = str(QC_FP/'03_komplexity')
+    output:
+        touch(".qc_cleaned")
+    shell:
+        """
+        rm -r {params.cutadapt_fp} && \
+        rm -r {params.trimmomatic_fp} && \
+        rm -r {params.komplexity_fp}
+        """
+        
+    

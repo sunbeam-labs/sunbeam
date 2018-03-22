@@ -9,11 +9,18 @@ rule all_reports:
     input:
         TARGET_REPORT
 
-def parse_trim_summary(f):
-    for line in f:
-        if line.startswith('Input Read Pairs'):
+def parse_trim_summary_paired(f):
+    for line in f.readlines():
+        if line.startswith('Input Read'):
             vals = re.findall('\D+\: (\d+)', line)
             keys = ('input', 'both_kept','fwd_only','rev_only','dropped')
+            return(dict(zip(keys, vals)))
+
+def parse_trim_summary_single(f):
+    for line in f:
+        if line.startswith('Input Read'):
+            vals = re.findall('\D+\: (\d+)', line)
+            keys = ('input', 'kept', 'dropped')
             return(dict(zip(keys, vals)))
 
 def parse_decontam_log(f):
@@ -22,26 +29,34 @@ def parse_decontam_log(f):
     return {'host':host, 'nonhost':nonhost}
 
 def summarize_qual_decontam(tfile, dfile):
-    """Retuen a dataframe for summary information for trimmomatic and decontam rule"""
+    """Return a dataframe for summary information for trimmomatic and decontam rule"""
     tname = os.path.basename(tfile).split('.out')[0]
     dname = os.path.basename(dfile).split('.txt')[0]
-    if tname != dname:
-        raise ValueError('Unmatched qc and decontam files for: %s and %s' % (tname, dname))
     with open(tfile) as tf:
-         with open(dfile) as jf:
-            trim_data = parse_trim_summary(tf)
+        with open(dfile) as jf:
+            if Cfg['all']['paired_end']:
+                trim_data = parse_trim_summary_paired(tf)
+            else:
+                trim_data = parse_trim_summary_single(tf)
+                
             decontam_data = parse_decontam_log(jf)
-    merged_dict = {**trim_data, ** decontam_data}
+    sys.stderr.write("trim data: {}\n".format(trim_data))
+    sys.stderr.write("decontam data: {}\n".format(decontam_data))
+    merged_dict = {**trim_data, **decontam_data}
     # todo: use yield for pandas DataFrame
     return(pandas.DataFrame(merged_dict, index=[tname]))
 
 rule preprocess_report:
     """Combines the information from multiple preprocessing steps"""
     input:
-        trim_files = expand(str(QC_FP/'log'/'trimmomatic'/'{sample}.out'), sample=sorted(Samples.keys())),
-        decontam_files = expand(str(QC_FP/'log'/'decontam'/'{sample}.txt'), sample=sorted(Samples.keys()))
+        trim_files = expand(
+            str(QC_FP/'log'/'trimmomatic'/'{sample}.out'),
+            sample=sorted(Samples.keys())),
+        decontam_files = expand(
+            str(QC_FP/'log'/'decontam'/'{sample}_1.txt'),
+            sample=sorted(Samples.keys()))
     output:
-        str(QC_FP/'preprocess_summary.tsv')
+        str(QC_FP/'reports'/'preprocess_summary.tsv')
     run:
         summary_list = [summarize_qual_decontam(q, d) for q, d in zip(input.trim_files, input.decontam_files)]
         reports = pandas.concat(summary_list)
@@ -50,10 +65,13 @@ rule preprocess_report:
 def parse_fastqc_quality(filename):
     with open(filename) as f:
         report = f.read()
-    tableString = re.search('\>\>Per base sequence quality.*?\n(.*?)\n\>\>END_MODULE', report, re.DOTALL).group(1)
+    tableString = re.search(
+        '\>\>Per base sequence quality.*?\n(.*?)\n\>\>END_MODULE',
+        report, re.DOTALL).group(1)
 
     f_s = StringIO(tableString)
-    df = pandas.read_csv(f_s, sep='\t', usecols=['#Base', 'Mean'], index_col='#Base')
+    df = pandas.read_csv(
+        f_s, sep='\t', usecols=['#Base', 'Mean'], index_col='#Base')
     sample_name = os.path.basename(filename.split('_fastqc')[0])
     df.columns=[sample_name]
     f_s.close()
@@ -62,9 +80,11 @@ def parse_fastqc_quality(filename):
 rule fastqc_report:
     """ make fastqc reports """
     input:
-        files = expand(str(QC_FP/'paired'/'{sample}_{rp}_fastqc/fastqc_data.txt'),sample=Samples.keys(),rp=['R1','R2'])
+        files = expand(
+            str(QC_FP/'reports'/'{sample}_{rp}_fastqc/fastqc_data.txt'),
+            sample=Samples.keys(),rp=Pairs)
     output:
-        str(QC_FP/'fastqc_quality.tsv')
+        str(QC_FP/'reports'/'fastqc_quality.tsv')
     run:
         quality_list = [parse_fastqc_quality(file) for file in input.files]
         quality_table = pandas.concat(quality_list, axis=1).transpose()

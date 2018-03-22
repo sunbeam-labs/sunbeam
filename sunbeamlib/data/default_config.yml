@@ -2,11 +2,8 @@
 # Sunbeam configuration file
 #
 # Defining samples:
-#   Samples must be gzipped fastq files.
-#   Samples can be either discovered in a directory specified by 'data_fp' and
-#   'filename_fmt' OR by manually listing the samples in a file via
-#   'samplelist_fp'. If using 'samplelist_fp', the file format is one sample
-#   name per line (no file extension or read pair info).
+#   Run 'sunbeam list_samples <data_dir>' to create a list of samples and
+#   associated fastq.gz files. Samples must be in gzipped fastq format.
 #
 # Paths:
 #   Paths are resolved through the following rules:
@@ -20,14 +17,11 @@
 #
 
 # General options
-
 all:
   root: "{PROJECT_FP}"
-  data_fp: "data_files"
   output_fp: "sunbeam_output"
-  samplelist_fp: ""
-  filename_fmt: "{{sample}}_{{rp}}.fastq.gz"
-  exclude: []
+  samplelist_fp: "samples.csv"
+  paired_end: true
   version: "{SB_VERSION}"
 
 # Quality control
@@ -59,14 +53,12 @@ classify:
   suffix: classify
   threads: 4
   kraken_db_fp: ""
-  taxa_db_fp: ""
 
 # Contig assembly
 assembly:
   suffix: assembly
   min_length: 300
   threads: 4
-
 
 # Contig annotation
 annotation:
@@ -75,7 +67,6 @@ annotation:
   circular_kmin: 10
   circular_kmax: 1000
   circular_min_len: 3500
-
   
 blast:
   threads: 4
@@ -88,4 +79,4 @@ mapping:
   genomes_fp: ""
   samtools_opts: ""
   threads: 4
-  keep_unaligned: False
+

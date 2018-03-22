@@ -1,5 +1,3 @@
-all:
-  filename_fmt: PCMP_{sample}_{rp}.fastq.gz
 qc:
   host_fp: hosts
 classify:

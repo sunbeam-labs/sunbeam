@@ -15,8 +15,9 @@ rule build_genome_index:
 
 rule align_to_genome:
     input:
-        r1 = str(QC_FP/'paired'/'{sample}_R1.fastq.gz'),
-        r2 = str(QC_FP/'paired'/'{sample}_R2.fastq.gz'),
+        reads = expand(
+            str(QC_FP/'cleaned'/'{{sample}}_{rp}.fastq.gz'),
+            rp = Pairs),
         index = str(Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb')
     output:
         temp(str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.sam'))
@@ -26,8 +27,9 @@ rule align_to_genome:
         index_fp = str(Cfg['mapping']['genomes_fp'])
     shell:
         """
-        bwa mem -M -t {threads} {params.index_fp}/{wildcards.genome}.fasta \
-        {input.r1} {input.r2} -o {output}
+        bwa mem -M -t {threads} \
+        {params.index_fp}/{wildcards.genome}.fasta \
+        {input.reads} -o {output}
         """
 
 

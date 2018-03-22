@@ -44,16 +44,15 @@ sbxs = list(listfiles("extensions/{sbx_folder}/{sbx}.rules"))
 for sbx in sbxs:
     sys.stderr.write("Found extension {sbx} in folder {sbx_folder}\n".format(**sbx[1]))
 
-# ---- Setting up config files and samples
+# Setting up config files and samples
 Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
-Samples = build_sample_list(
-    Cfg['all']['data_fp'],
-    Cfg['all']['filename_fmt'],
-    Cfg['all']['samplelist_fp'],
-    Cfg['all']['exclude'])
+Samples = build_sample_list(Cfg['all']['samplelist_fp'], Cfg['all']['paired_end'])
+Pairs = ['1', '2'] if Cfg['all']['paired_end'] else ['1']
+print(Samples)
 
-sys.stderr.write("Collecting host genomes... ")
+# Collect host (contaminant) genomes
+sys.stderr.write("Collecting host/contaminant genomes... ")
 HostGenomeFiles = [f for f in Cfg['qc']['host_fp'].glob('*.fasta')]
 if not HostGenomeFiles:
     sys.stderr.write(

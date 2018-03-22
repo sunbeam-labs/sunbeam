@@ -1,8 +1,8 @@
 .. _quickstart:
 
-===============
-Getting Started
-===============
+=====================
+Quickstart Guide
+=====================
 
 .. contents::
    :depth: 2
@@ -10,124 +10,105 @@ Getting Started
 Installation
 ************
 
-The easiest way to get an up-to-date version of Sunbeam is to clone the latest
-stable release from our source repository (other installation methods are
-described in our :ref:`install` guide):
+Download a copy of Sunbeam from our GitHub repository, and install.
 
 .. code-block:: shell
 
-   git clone -b stable https://github.com/eclarke/sunbeam
-   cd sunbeam
-   bash install.sh
+   git clone -b stable https://github.com/eclarke/sunbeam sunbeam-stable
+   cd sunbeam-stable
+   ./install.sh
+   tests/run_tests.bash -e sunbeam
 
-This downloads Sunbeam and installs all the dependencies. If you've never
-installed Conda before, you will need to add a link to it to your profile to
-make sure we can use it later. The install script should output instructions on
-how to do that. Next, run:
+This installs Sunbeam and all its dependencies, including the `Conda
+<https://conda.io/miniconda.html>`_ environment manager, if required. It then
+runs some tests to make sure everything was installed correctly.
 
-.. code-block:: shell
+.. tip::
 
-   bash tests/test.sh && echo "Tests succeeded" || echo "Tests failed"
+   If you've never installed Conda before, you'll need to add it to your shell's
+   path. If you're running Bash (the most common terminal shell), the following
+   command will add it to your path: ``echo 'export
+   PATH=$PATH:$HOME/miniconda3/bin` > ~/.bashrc``
 
-This runs the test script to make sure everything works. If you see "Tests
-failed" see the :ref:`install` guide for troubleshooting or file an issue on our
-`GitHub <https://github.com/eclarke/sunbeam/issues>`_ page.
-
+If you see "Tests failed", check out our :ref:`troubleshooting` section or file an issue
+on our `GitHub <https://github.com/eclarke/sunbeam/issues>`_ page.
 
 Setup
 *****
 
-We need to set a few things up before we can start. Sunbeam takes a directory
-full of paired, gzipped fastq files that you get from Illumina's
-sequencer. Let's assume those files live in ``~/my_project/data_files``.
+Let's say your sequencing reads live in a folder called
+``/sequencing/project/reads``, with one or two files per sample (for single- and
+paired-end sequencing, respectively). These files *must* be in gzipped FASTQ
+format.
 
-To set up a new Sunbeam config file, activate the Sunbeam environment and run
-``sunbeam init``:
+Let's create a new Sunbeam project (we'll call it ``my_project``):
 
 .. code-block:: shell
-   
+
    source activate sunbeam
-   sunbeam init ~/my_project > ~/my_project/config.yml
+   sunbeam init my_project --data_fp /sequencing/project/reads
 
-This writes a new ``config.yml`` file into your project directory, pre-filled
-with some convenient defaults. However, there are some things we'll need to edit
-by hand.
+Sunbeam will create a new folder called ``my_project`` and put two files
+there:
 
-Sample filenames
-----------------
-The first thing is describing to Sunbeam what your files look like. If
-we take a peek inside our ``data_files`` directory, we might see something like
-this:
+- ``sunbeam_config.yml`` contains all the configuration parameters for each step
+  of the Sunbeam pipeline.
 
-.. code-block:: shell
+- ``samples.csv`` is a comma-separated list of samples that Sunbeam found the
+  given data folder, along with absolute paths to their FASTQ files.
 
-   $ ls ~/my_project/data_files
-   MP66_S109_L008_R1_001.fastq.gz   VS_B3_S173_L004_R2_001.fastq.gz
-   MP66_S109_L008_R2_001.fastq.gz   VS_B3_S173_L005_R1_001.fastq.gz
-   MP67_S110_L001_R1_001.fastq.gz   VS_B3_S173_L005_R2_001.fastq.gz
-   MP67_S110_L001_R2_001.fastq.gz   VS_B3_S173_L006_R1_001.fastq.gz
-   MP67_S110_L002_R1_001.fastq.gz   VS_B3_S173_L006_R2_001.fastq.gz
-   ...
+Right now we have everything we need to do basic quality-control and contig assembly. However, let's go ahead and set up contaminant filtering and some basic taxonomy databases to make things interesting.
 
-In this example, our samples are the first part of this filename
-(e.g. ``MP66_S109_L008``) and the read pair is the second (``R1`` or
-``R2``). The rest is the same between all the files, so if we were to describe a
-pattern it would look like ``{sample}_{rp}_001.fastq.gz``.
+Contaminant filtering
+---------------------
 
-We will input this filename format into the config file now. Open the config
-file in your favorite editor and change the value after ``filename_fmt:`` to
-whatever best describes your samples.
+Sunbeam can align your reads to an arbitrary number of contaminant sequences or
+host genomes and remove reads that map above a given threshold.
 
-Data directory
---------------
+To use this, make a folder containing all the target sequences in FASTA
+format. The filenames should end in "fasta" to be recognized by Sunbeam. In your ``sunbeam_config.yml`` file, edit the ``host_fp:`` line in the ``qc``
+section to point to this folder.
 
-The value of ``data_fp`` points to your raw, gzipped fastq files that we described above. Edit this if the directory isn't named ``data_files``. If you use a relative path here, it will be referenced relative to the ``root`` directory (this is true for all paths in the config file).
+Taxonomic classification
+------------------------
 
-Host genomes
-------------
+Sunbeam can use Kraken to assign putative taxonomic identities to your
+reads. While creating a Kraken database is beyond the scope of this guide,
+pre-built ones are available at the `Kraken homepage
+<http://ccb.jhu.edu/software/kraken/>`_. Download or build one, then add the
+path to the database under ``classify:kraken_db_fp:``.
 
-Sunbeam decontaminates host and PhiX reads by default. Input paths to the host and phix genome under the ``qc: human_genome_fp:`` and ``qc: phix_genome_fp:``, respectively.
+Contig annotation
+-----------------
 
-.. note:: The host genome doesn't have to be human, despite the name. This should be fixed in an upcoming release.
+Sunbeam can automatically BLAST your contigs against any number of
+nucleotide or protein databases and summarize the top hits. Download or create
+your BLAST databases, then add the paths to your config file, following the
+instructions on here: :ref:`blastdbs`.
 
-Databases
----------
+Reference mapping
+-----------------
 
-Sunbeam can use Kraken and BLAST databases to perform taxonomic and functional characterization of the reads and/or contigs after quality control and contig assembly.
-
-To add a Kraken database, provide a path to it at ``classify: kraken_fp:``.
-
-To add one or more BLAST databases, provide paths to them under ``blastdbs:``. You have to specify if the databases are protein or nucleotide databases; for instance, if I were using the CARD protein database and the NT nucleotide database, that section of the config file would look like this:
-
-.. code-block:: yaml
-
-   blastdbs:
-     root_fp: "/local/blast_databases"
-     nucleotide:
-	nt: "nt/nt"
-     protein:
-	card: "card_db/card"
-
-This tells Sunbeam that our databases are in ``/local/blast_databases/nt/nt`` and ``/local/blast_databases/card_db/card``, and that they are respectively named 'nt' and 'card'. 
-
+If you'd like to map the reads against a set of reference genomes of interest,
+follow the same method as for the host/contaminant sequences above. Make a
+folder containing FASTA files for each reference genome, then add the path to
+that folder in ``mapping:genomes_fp:``.
 
 Running
 *******
 
-After you've saved your edits to the config file, try a dry run of Sunbeam to see if everything looks okay. Make sure you're in the ``sunbeam`` folder and have activated Sunbeam using ``source activate sunbeam``, then run:
+After you've finished editing your config file, you're ready to run Sunbeam:
 
 .. code-block:: bash
 
-   snakemake --configfile ~/my_project/config.yml -n
+   sunbeam run --configfile my_project/sunbeam_config.yml
 
-The ``-n`` specifies a dry run, so Sunbeam will verify all the paths in the config file to verify they exist and complain about any errors that may occur.
-
-If everything looks good, you can start Sunbeam by removing the ``-n``
-option. At this point, the operation of Sunbeam is done using Snakemake, and all
-of the (many) options available to Snakemake apply here.
+By default, this will do a lot, including trimming and quality-controlling your
+reads, removing contaminant, host, and low-complexity sequences, assigning
+read-level taxonomy, assembling the reads in each sample into contigs, and then
+BLASTing those contigs against your databases. Each of these steps can also be run independently by adding arguments after the ``sunbeam run`` command. See :ref:`running` for more info. 
 
 Viewing results
 ***************
 
-The results of Sunbeam are in the folder dictated by ``output_fp`` in the config file. The resulting folder structure contains various outputs in subdirectories like 'qc' (host-filtered and adaptor-trimmed sequences), 'classify' (Kraken classification results) and 'assembly' (reads assembled into contigs).
-
+The output is stored by default under ``my_project/sunbeam_output``. For more information on the output files and all of Sunbeam's different parts, see our full :ref:`usage`!
