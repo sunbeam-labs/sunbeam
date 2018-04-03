@@ -21,6 +21,6 @@ dependencies:
   - prodigal
   - semantic_version
   - setuptools_scm
-  - komplexity
+  - komplexity=0.3.6
   - rust-bio-tools
 
