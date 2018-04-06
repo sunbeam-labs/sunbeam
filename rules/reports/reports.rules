@@ -43,7 +43,6 @@ def summarize_qual_decontam(tfile, dfile):
             decontam_data = parse_decontam_log(jf)
     sys.stderr.write("trim data: {}\n".format(trim_data))
     sys.stderr.write("decontam data: {}\n".format(decontam_data))
-    print(OrderedDict(trim_data, **(decontam_data)))
     return(pandas.DataFrame(OrderedDict(trim_data, **(decontam_data)), index=[tname]))
 
 rule preprocess_report:
