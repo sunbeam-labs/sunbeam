@@ -1,5 +1,6 @@
 import subprocess
 from sunbeamlib.decontam import get_mapped_reads
+from collections import OrderedDict
 
 rule all_decontam:
     input:
@@ -76,7 +77,8 @@ rule aggregate_reads:
 rule filter_reads:
     input:
         hostreads = str(QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids'),
-        reads = str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')
+        reads = str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'),
+        hostids = expand(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{{sample}}.ids'), host=HostGenomes.keys())
     output:
         reads = str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'),
         log = str(QC_FP/'log'/'decontam'/'{sample}_{rp}.txt')
@@ -91,6 +93,13 @@ rule filter_reads:
         rbt fastq-filter {input.hostreads} | \
         gzip > {output.reads}
         """)
+        
+        hostdict = OrderedDict()
+        for hostid in input.hostids:
+            hostname = os.path.basename(os.path.dirname(hostid))
+            hostcts = int(subprocess.getoutput("cat {} | wc -l".format(hostid)).strip())
+            hostdict[hostname] = hostcts
+        
         with open(output.log, 'w') as log:
-            log.write("host\tnonhost\n")
-            log.write("{}\t{}\n".format(host, nonhost))
+            log.write("{}\n".format("\t".join(list(hostdict.keys()) + ["host","nonhost"] )))
+            log.write("{}\n".format("\t".join( map(str, list(hostdict.values()) + [host, nonhost]) )))

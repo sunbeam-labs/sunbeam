@@ -4,6 +4,7 @@
 
 import pandas
 from io import StringIO
+from collections import OrderedDict
 
 rule all_reports:
     input:
@@ -14,19 +15,19 @@ def parse_trim_summary_paired(f):
         if line.startswith('Input Read'):
             vals = re.findall('\D+\: (\d+)', line)
             keys = ('input', 'both_kept','fwd_only','rev_only','dropped')
-            return(dict(zip(keys, vals)))
+            return(OrderedDict(zip(keys, vals)))
 
 def parse_trim_summary_single(f):
     for line in f:
         if line.startswith('Input Read'):
             vals = re.findall('\D+\: (\d+)', line)
             keys = ('input', 'kept', 'dropped')
-            return(dict(zip(keys, vals)))
+            return(OrderedDict(zip(keys, vals)))
 
 def parse_decontam_log(f):
-    f.readline()
-    (host, nonhost) = f.readline().split()
-    return {'host':host, 'nonhost':nonhost}
+    keys = f.readline().rstrip().split('\t')
+    vals = f.readline().rstrip().split('\t')
+    return(OrderedDict(zip(keys,vals)))
 
 def summarize_qual_decontam(tfile, dfile):
     """Return a dataframe for summary information for trimmomatic and decontam rule"""
@@ -42,9 +43,7 @@ def summarize_qual_decontam(tfile, dfile):
             decontam_data = parse_decontam_log(jf)
     sys.stderr.write("trim data: {}\n".format(trim_data))
     sys.stderr.write("decontam data: {}\n".format(decontam_data))
-    merged_dict = {**trim_data, **decontam_data}
-    # todo: use yield for pandas DataFrame
-    return(pandas.DataFrame(merged_dict, index=[tname]))
+    return(pandas.DataFrame(OrderedDict(trim_data, **(decontam_data)), index=[tname]))
 
 rule preprocess_report:
     """Combines the information from multiple preprocessing steps"""
@@ -58,7 +57,8 @@ rule preprocess_report:
     output:
         str(QC_FP/'reports'/'preprocess_summary.tsv')
     run:
-        summary_list = [summarize_qual_decontam(q, d) for q, d in zip(input.trim_files, input.decontam_files)]
+        summary_list = [summarize_qual_decontam(q, d) for q, d in 
+                       zip(input.trim_files, input.decontam_files)]
         reports = pandas.concat(summary_list)
         reports.to_csv(output[0], sep='\t', index_label='Samples')
 
