@@ -157,17 +157,13 @@ rule find_low_complexity:
             rp=Pairs)
     output:
         str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids')
-    run:
-        if Cfg['qc']['remove_low_complexity']:
-            shell("""
-            for rp in {input}; do
-              gzip -dc $rp | kz | \
-              awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> \
-              {output}
-            done
-            """)
-        else:
-            touch(output)
+    shell:
+        """
+        for rp in {input}; do
+          gzip -dc $rp | kz | \
+          awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> {output}
+        done
+        """
 
 rule remove_low_complexity:
     input:
@@ -175,14 +171,11 @@ rule remove_low_complexity:
         ids = str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids')
     output:
         str(QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz')
-    run:
-        if Cfg['qc']['remove_low_complexity']:
-            shell("""
-            gzip -dc {input.reads} | rbt fastq-filter {input.ids} |\
-            gzip > {output}
-            """)
-        else:
-            shell("ln -s {input.reads} {output}")
+    shell:
+        """
+        gzip -dc {input.reads} | rbt fastq-filter {input.ids} |\
+        gzip > {output}
+        """
 
 rule qc_final:
     input:
