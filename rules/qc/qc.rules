@@ -7,7 +7,7 @@ rule all_qc:
     input:
         TARGET_QC
 
-ruleorder: adapter_removal_unpaired > adapter_removal_paired
+ruleorder: adapter_removal_paired > adapter_removal_unpaired
         
 rule adapter_removal_unpaired:
     input:
@@ -79,7 +79,7 @@ rule adapter_removal_paired:
             ln -s {input.r1} {output.gr1} && ln -s {input.r2} {output.gr2}
             """)
 
-ruleorder: trimmomatic_unpaired > trimmomatic_paired
+ruleorder: trimmomatic_paired > trimmomatic_unpaired
         
 rule trimmomatic_unpaired:
     input:
@@ -149,21 +149,41 @@ rule fastqc:
         outdir = str(QC_FP/'reports')
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract"
-           
+
+rule find_low_complexity:
+    input:
+        expand(
+            str(QC_FP/'02_trimmomatic'/'{{sample}}_{rp}.fastq.gz'),
+            rp=Pairs)
+    output:
+        str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids')
+    run:
+        if Cfg['qc']['remove_low_complexity']:
+            shell("""
+            for rp in {input}; do
+              gzip -dc $rp | kz | \
+              awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> \
+              {output}
+            done
+            """)
+        else:
+            touch(output)
+
 rule remove_low_complexity:
     input:
-        str(QC_FP/'02_trimmomatic'/'{sample}_{rp}.fastq.gz')
+        reads = str(QC_FP/'02_trimmomatic'/'{sample}_{rp}.fastq.gz'),
+        ids = str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids')
     output:
         str(QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz')
     run:
-        if Cfg['qc']['mask_low_complexity']:
+        if Cfg['qc']['remove_low_complexity']:
             shell("""
-            kz --mask -t {Cfg[qc][kz_threshold]} -w {Cfg[qc][kz_window]} \
-            < <(gzip -cd {input}) | gzip -c > {output}
+            gzip -dc {input.reads} | rbt fastq-filter {input.ids} |\
+            gzip > {output}
             """)
         else:
-            shell("ln -s {input} {output}")
-            
+            shell("ln -s {input.reads} {output}")
+
 rule qc_final:
     input:
         str(QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz')
