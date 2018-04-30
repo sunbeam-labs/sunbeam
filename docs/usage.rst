@@ -7,6 +7,15 @@ User Guide
 .. contents::
    :depth: 3
 
+Requirements
+============
+
+- A relatively-recent Linux computer with more than 2Gb of RAM
+
+We do not currently support Windows or Mac. (You may be able to run this on
+Windows using the [WSL](https://docs.microsoft.com/en-us/windows/wsl/about), but
+it has not been tested.
+      
 .. _installation:
 Installation
 ============

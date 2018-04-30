@@ -10,7 +10,8 @@ Quickstart Guide
 Installation
 ************
 
-Download a copy of Sunbeam from our GitHub repository, and install.
+On a Linux machine, download a copy of Sunbeam from our GitHub repository, and
+install. We do not currently support non-Linux environments.
 
 .. code-block:: shell
 

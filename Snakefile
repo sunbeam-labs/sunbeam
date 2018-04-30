@@ -4,7 +4,7 @@
 # Author: Erik Clarke <ecl@mail.med.upenn.edu>
 # Created: 2016-04-28
 #
-
+import os
 import re
 import sys
 import yaml
@@ -26,6 +26,14 @@ if not config:
         "No config file specified. Run `sunbeam init` to generate a "
         "config file, and specify with --configfile")
 
+sunbeam_dir = ""
+try:
+    sunbeam_dir = os.environ["SUNBEAM_DIR"]
+except KeyError:
+    raise SystemExit(
+        "$SUNBEAM_DIR environment variable not defined. Are you sure you're "
+        "running this from the Sunbeam conda env?")
+
 # Check for major version compatibility
 pkg_major, cfg_major = check_compatibility(config)
 if pkg_major > cfg_major:
@@ -40,7 +48,7 @@ elif pkg_major < cfg_major:
         "`sunbeam init` and update it using `sunbeam_mod_config`\n")
 
 # Load extensions
-sbxs = list(listfiles("extensions/{sbx_folder}/{sbx}.rules"))
+sbxs = list(listfiles(sunbeam_dir+"/extensions/{sbx_folder}/{sbx}.rules"))
 for sbx in sbxs:
     sys.stderr.write("Found extension {sbx} in folder {sbx_folder}\n".format(**sbx[1]))
 
