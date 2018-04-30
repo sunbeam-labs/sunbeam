@@ -18,7 +18,7 @@ Sunbeam is a pipeline written in `snakemake <http://snakemake.readthedocs.io>`_
 that simplifies and automates many of the steps in metagenomic sequencing
 analysis. It uses `conda <http://conda.io>`_ to manage dependencies, so it
 doesn't have pre-existing dependencies or admin privileges, and can be deployed
-on most Linux and Mac workstations and clusters.
+on most Linux workstations and clusters.
 
 Sunbeam currently automates the following tasks:
 
