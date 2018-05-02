@@ -39,9 +39,7 @@ qc:
   fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   # Komplexity
-  mask_low_complexity: true
   kz_threshold: 0.55
-  kz_window: 32
   # Decontam.py
   pct_id: 0.5
   frac: 0.6

@@ -10,11 +10,12 @@ Quickstart Guide
 Installation
 ************
 
-Download a copy of Sunbeam from our GitHub repository, and install.
+On a Linux machine, download a copy of Sunbeam from our GitHub repository, and
+install. We do not currently support non-Linux environments.
 
 .. code-block:: shell
 
-   git clone -b stable https://github.com/eclarke/sunbeam sunbeam-stable
+   git clone -b stable https://github.com/sunbeam-labs/sunbeam sunbeam-stable
    cd sunbeam-stable
    ./install.sh
    tests/run_tests.bash -e sunbeam
@@ -31,7 +32,7 @@ runs some tests to make sure everything was installed correctly.
    PATH=$PATH:$HOME/miniconda3/bin` > ~/.bashrc``
 
 If you see "Tests failed", check out our :ref:`troubleshooting` section or file an issue
-on our `GitHub <https://github.com/eclarke/sunbeam/issues>`_ page.
+on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.
 
 Setup
 *****
