@@ -2,14 +2,14 @@
 #
 # Contig building and other assembly rules
 #
-# Requires Megahit and CAP3.
+# Requires Megahit.
 
 rule all_assembly:
     """Build contigs for all samples."""
     input:
         TARGET_ASSEMBLY
 
-ruleorder: megahit_unpaired > megahit_paired
+ruleorder: megahit_paired > megahit_unpaired
           
 rule megahit_paired:
     input:
