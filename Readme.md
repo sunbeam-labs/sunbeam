@@ -59,3 +59,13 @@ To get started, see our [documentation](http://sunbeam.readthedocs.io)!
  - Can remove reads from any number of host/contaminant genomes
  - Semantic versioning checks
  - Integration tests and continuous deployment
+
+-------
+
+### Contributors
+
+- Erik Clarke ([@eclarke](https://github.com/eclarke))
+- Chunyu Zhao ([@zhaoc1](https://github.com/zhaoc1))
+- Jesse Connell ([@ressy](https://github.com/ressy))
+- Louis Taylor ([@louiejtaylor](https://github.com/louiejtaylor))
+
