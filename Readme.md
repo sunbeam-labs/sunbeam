@@ -35,19 +35,19 @@ To get started, see our [documentation](http://sunbeam.readthedocs.io)!
 
 ### Changelog:
 
-#### v1.2.0
+#### v1.2.0 (May 2, 2018)
 
  - Low-complexity reads are now removed by default rather than masked
  - Bug fixes related to single-end sequencing experiments
  - Documentation updates
  
-#### v1.1.0
+#### v1.1.0 (April 8, 2018)
 
  - Reports include number of filtered reads per host, rather than in aggregate
  - Static binary dependency for [komplexity](https://github.com/eclarke/komplexity) for easier deployment
  - Remove max length filter for contigs
  
-#### v1.0.0
+#### v1.0.0 (March 22, 2018)
 
  - First stable release!
  - Support for single-end sequencing experiments
