@@ -21,12 +21,12 @@ Sunbeam currently automates the following tasks:
 * Mapping of reads to target genomes; and
 * ORF prediction using [Prodigal](https://github.com/hyattpd/Prodigal).
 
-Sunbeam was designed to be modular and extensible. Some extensions include:
+Sunbeam was designed to be modular and extensible. Some extensions have been built for:
 
-- [IGV](https://github.com/sunbeam-labs/sbx-igv) for viewing read alignments
+- [IGV](https://github.com/sunbeam-labs/sbx_igv) for viewing read alignments
 - [KrakenHLL](https://github.com/zhaoc1/sbx_krakenhll), an alternate read classifier
-- [Kaiju](https://github.com/sunbeam-labs/sbx-kaiju), a read classifier that uses BWA rather than kmers
-- [Anvi'o](https://github.com/sunbeam-labs/sbx-anvio), a downstream analysis pipeline that does lots of stuff!
+- [Kaiju](https://github.com/sunbeam-labs/sbx_kaiju), a read classifier that uses BWA rather than kmers
+- [Anvi'o](https://github.com/sunbeam-labs/sbx_anvio), a downstream analysis pipeline that does lots of stuff!
 
 To get started, see our [documentation](http://sunbeam.readthedocs.io)!
 
