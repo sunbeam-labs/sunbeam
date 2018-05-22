@@ -1,8 +1,13 @@
 import warnings
 warnings.filterwarnings('ignore', '.*experimental.*')
 from pathlib import Path
-from collections import Counter
+from collections import Counter, OrderedDict
+import re
+import os
+import sys
 
+import pandas
+from io import StringIO
 from Bio import SeqIO
 from Bio import SearchIO
 from Bio.SeqRecord import SeqRecord
@@ -50,13 +55,13 @@ def parse_decontam_log(f):
     vals = f.readline().rstrip().split('\t')
     return(OrderedDict(zip(keys,vals)))
 
-def summarize_qual_decontam(tfile, dfile):
+def summarize_qual_decontam(tfile, dfile, paired_end):
     """Return a dataframe for summary information for trimmomatic and decontam rule"""
     tname = os.path.basename(tfile).split('.out')[0]
     dname = os.path.basename(dfile).split('.txt')[0]
     with open(tfile) as tf:
         with open(dfile) as jf:
-            if Cfg['all']['paired_end']:
+            if paired_end:
                 trim_data = parse_trim_summary_paired(tf)
             else:
                 trim_data = parse_trim_summary_single(tf)

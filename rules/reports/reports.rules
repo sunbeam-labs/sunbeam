@@ -3,7 +3,7 @@
 # ReportGeneration rules
 
 import pandas
-from io import StringIO
+
 from collections import OrderedDict
 from sunbeamlib import reports
 
@@ -24,10 +24,12 @@ rule preprocess_report:
     output:
         str(QC_FP/'reports'/'preprocess_summary.tsv')
     run:
-        summary_list = [reports.summarize_qual_decontam(q, d) for q, d in 
-                       zip(input.trim_files, input.decontam_files)]
-        reports = pandas.concat(summary_list)
-        reports.to_csv(output[0], sep='\t', index_label='Samples')
+        paired_end = Cfg['all']['paired_end']
+        summary_list = [
+            reports.summarize_qual_decontam(q, d, paired_end) for q, d in 
+            zip(input.trim_files, input.decontam_files)]
+        _reports = pandas.concat(summary_list)
+        _reports.to_csv(output[0], sep='\t', index_label='Samples')
 
 
 rule fastqc_report:
