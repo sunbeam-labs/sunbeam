@@ -68,12 +68,11 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
     elements = []
     variant_idx = []
 
+    # A special case when paired-end and only two files:
+    # invariant regions may be sample names (since only one sample)
+    potential_single_sample = len(fnames) == 1 and paired_end
+
     for i, parts in enumerate(zip(*splits)):
-        # A special case when paired-end and only two files:
-        # invariant regions may be sample names (since only one sample)
-        if len(parts) == 2 and paired_end:
-            potential_single_sample = True
-            
         items = set(parts)
         # If they're all the same, it's a common part; so add it to the element
         # list unchanged
