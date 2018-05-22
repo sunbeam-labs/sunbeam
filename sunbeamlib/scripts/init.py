@@ -4,7 +4,7 @@ import argparse
 import ruamel.yaml
 from pathlib import Path
 
-from .list_samples import build_sample_list
+from .list_samples import build_sample_list, MissingMatePairError, SampleFormatError
 from sunbeamlib import config
     
 def main(argv=sys.argv):
@@ -94,12 +94,16 @@ def main(argv=sys.argv):
                     is_single_end = args.single_end)
                 sys.stderr.write(
                     "New sample list written to {}\n".format(samplelist_file))
-        except ValueError as e:
+        except SampleFormatError as e:
             raise SystemExit(
-                "Error: could not create sample list (reason: {}). Provide a "
-                "format string using --format, use `sunbeam list_samples` or "
-                "create manually (see user guide).".format(e))
-
+                "Error: could not create sample list. Specify correct sample filename"
+                " format using --format.\n  Reason: {}".format(e))
+        except MissingMatePairError as e:
+            raise SystemExit(
+                "Error: assuming paired-end reads, but could not find mates. Specify "
+                "--single-end if not paired-end, or provide sample name format "
+                "using --format."
+                "\n  Reason: {}".format(e))
         
 def check_existing(path, force=False):
     if path.is_dir():
