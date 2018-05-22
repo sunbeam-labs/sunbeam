@@ -57,7 +57,6 @@ Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
 Samples = build_sample_list(Cfg['all']['samplelist_fp'], Cfg['all']['paired_end'])
 Pairs = ['1', '2'] if Cfg['all']['paired_end'] else ['1']
-print(Samples)
 
 # Collect host (contaminant) genomes
 sys.stderr.write("Collecting host/contaminant genomes... ")
