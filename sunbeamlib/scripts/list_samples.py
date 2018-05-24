@@ -6,7 +6,7 @@ import csv
 import ruamel.yaml
 from snakemake.utils import listfiles
 
-from sunbeamlib import guess_format_string
+from sunbeamlib import guess_format_string, SampleFormatError, MissingMatePairError
 
 def main(argv=sys.argv):
 
@@ -29,10 +29,16 @@ def main(argv=sys.argv):
     args = parser.parse_args(argv)
     try:
         build_sample_list(args.data_fp, args.format, sys.stdout, args.single_end)
-    except ValueError as e:
+    except SampleFormatError as e:
         raise SystemExit(
-            "Could not build sample list. Specify correct filename format using "
-            "--format. \n\tReason: {}".format(e))
+            "Error: could not build sample list. Specify correct sample filename"
+            " format using --format. \n\tReason: {}".format(e))
+    except MissingMatePairError as e:
+        raise SystemExit(
+            "Detected paired-end reads, but could not find mates. Specify "
+            "--single-end if not paired-end, or provide sample name format "
+            "using --format."
+            "\n\tReason: {}".format(e))
 
 def build_sample_list(data_fp, format_str, output_file, is_single_end):
 
@@ -47,8 +53,19 @@ def build_sample_list(data_fp, format_str, output_file, is_single_end):
         
     samples = find_samples(data_fp, format_str)
 
+    # Check for mate pairs if single end
+    if not is_single_end:
+        no_match = []
+        for sample, reads in samples.items():
+            if '2' not in reads:
+                no_match.append(sample)
+        if len(no_match) > 0:
+            raise MissingMatePairError(
+                "missing mate pairs for samples: {} ".format(
+                    ", ".join(no_match)))
+
     if len(samples) == 0:
-        raise ValueError("no samples matching the given format found.")
+        raise ("no samples matching the given format found.")
 
     sys.stderr.write("Found {} samples in {}.\n".format(len(samples), data_fp))
     fieldnames = ["sample", "1", "2"]
@@ -67,8 +84,7 @@ def find_samples(data_fp, filename_fmt):
        Samples = {
          'sample1': {
            '1': 'path/to/sample1_R1.fastq.gz',
-           '2': 'path/to/sample1_R2.fastq.gz',
-           'paired_end': True
+           '2': 'path/to/sample1_R2.fastq.gz', #optional
          }, ...
        }
     """
@@ -86,5 +102,6 @@ def find_samples(data_fp, filename_fmt):
         else:
             Samples[wcards['sample']]['1'] = fpath
     return Samples
+
 
         

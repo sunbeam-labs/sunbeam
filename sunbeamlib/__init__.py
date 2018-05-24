@@ -54,34 +54,41 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
     """
     
     if isinstance(fnames, str):
-        raise ValueError("need a list of filenames, not a string")
+        raise SampleFormatError("need a list of filenames, not a string")
     if len(fnames) == 1:
-        raise ValueError("need a list of filenames, not just one")
+        raise SampleFormatError("need a list of filenames, not just one")
     if len(set(fnames)) == 1:
-        raise ValueError("all filenames are the same")
+        raise SampleFormatError("all filenames are the same")
     
     splits = [re.split(split_pattern, fname) for fname in fnames]
 
     if len(set([len(p) for p in splits])) > 1:
-        raise ValueError("files have inconsistent numbers of _ or . characters")
+        raise SampleFormatError("files have inconsistent numbers of _ or . characters")
 
     elements = []
     variant_idx = []
+
+    # A special case when paired-end and only two files:
+    # invariant regions may be sample names (since only one sample)
+    potential_single_sample = len(fnames) == 1 and paired_end
 
     for i, parts in enumerate(zip(*splits)):
         items = set(parts)
         # If they're all the same, it's a common part; so add it to the element
         # list unchanged
-        if len(items) == 1:
+        if items.issubset({"fastq", ".", "_", "gz", "fq"}):
+            elements.append(parts[0])
+        elif len(items) == 1 and not potential_single_sample:
             elements.append(parts[0])
         else:
             if paired_end:
                 # If all the items in a split end with 1 or 2, and only have
                 # one char preceding that that's the same among all items,
-                # then it's like a read-pair identifier.
+                # OR all the items are 1 or 2 and the only things in a split,
+                # then it's likely a read-pair identifier.
                 if set(_[-1] for _ in items) == {'1', '2'}:
                     prefixes = set(_[:-1] for _ in items)
-                    if len(prefixes) == 1 and all(len(p) == 1 for p in prefixes):
+                    if prefixes == {''} or (len(prefixes) == 1 and all(len(p) == 1 for p in prefixes)):
                         prefix = parts[0][:-1]
                         elements.append(prefix)
                         elements.append("{rp}")
@@ -95,7 +102,11 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
     elements[_min:_max+1] = ["{sample}"]
     return "".join(elements)
 
+class MissingMatePairError(Exception):
+    pass
 
+class SampleFormatError(Exception):
+    pass
 
 def _verify_path(fp):
     if not fp:

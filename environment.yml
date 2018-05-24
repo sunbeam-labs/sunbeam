@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - eclarke
 dependencies:
-  - snakemake
+  - snakemake=4.8.1
   - ruamel.yaml
   - biopython
   - trimmomatic

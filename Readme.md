@@ -21,10 +21,51 @@ Sunbeam currently automates the following tasks:
 * Mapping of reads to target genomes; and
 * ORF prediction using [Prodigal](https://github.com/hyattpd/Prodigal).
 
-Sunbeam was designed to be modular and extensible. We have a few pre-built
-extensions available that handle visualization tasks, including contig
-assembly graphs, read alignments, and taxonomic classifications.
+Sunbeam was designed to be modular and extensible. Some extensions have been built for:
 
-To get started, see our [documentation!](https://sunbeam.readthedocs.io)
+- [IGV](https://github.com/sunbeam-labs/sbx_igv) for viewing read alignments
+- [KrakenHLL](https://github.com/zhaoc1/sbx_krakenhll), an alternate read classifier
+- [Kaiju](https://github.com/sunbeam-labs/sbx_kaiju), a read classifier that uses BWA rather than kmers
+- [Anvi'o](https://github.com/sunbeam-labs/sbx_anvio), a downstream analysis pipeline that does lots of stuff!
 
+To get started, see our [documentation](http://sunbeam.readthedocs.io)!
+
+
+------
+
+### Changelog:
+
+#### v1.2.0 (May 2, 2018)
+
+ - Low-complexity reads are now removed by default rather than masked
+ - Bug fixes related to single-end sequencing experiments
+ - Documentation updates
+ 
+#### v1.1.0 (April 8, 2018)
+
+ - Reports include number of filtered reads per host, rather than in aggregate
+ - Static binary dependency for [komplexity](https://github.com/eclarke/komplexity) for easier deployment
+ - Remove max length filter for contigs
+ 
+#### v1.0.0 (March 22, 2018)
+
+ - First stable release!
+ - Support for single-end sequencing experiments
+ - Low-complexity read masking via [komplexity](https://github.com/eclarke/komplexity)
+ - Support for extensions
+ - Documentation on [ReadTheDocs.io](http://sunbeam.readthedocs.io)
+ - Better assembler (megahit)
+ - Better ORF finder (prodigal)
+ - Can remove reads from any number of host/contaminant genomes
+ - Semantic versioning checks
+ - Integration tests and continuous deployment
+
+-------
+
+### Contributors
+
+- Erik Clarke ([@eclarke](https://github.com/eclarke))
+- Chunyu Zhao ([@zhaoc1](https://github.com/zhaoc1))
+- Jesse Connell ([@ressy](https://github.com/ressy))
+- Louis Taylor ([@louiejtaylor](https://github.com/louiejtaylor))
 

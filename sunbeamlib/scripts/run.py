@@ -33,9 +33,10 @@ def main(argv=sys.argv):
                 args.sunbeam_dir))
         sys.exit(1)
         
-    snakemake_args = ['--snakefile', snakefile] + remaining
-    
-    cmd = subprocess.run(['snakemake'] + snakemake_args)
+    snakemake_args = ['snakemake', '--snakefile', str(snakefile)] + remaining
+    print("Running: "+" ".join(snakemake_args))
+
+    cmd = subprocess.run(snakemake_args)
     
     sys.exit(cmd.returncode)
     

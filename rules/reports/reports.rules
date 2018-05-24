@@ -3,47 +3,14 @@
 # ReportGeneration rules
 
 import pandas
-from io import StringIO
+
 from collections import OrderedDict
+from sunbeamlib import reports
 
 rule all_reports:
     input:
         TARGET_REPORT
 
-def parse_trim_summary_paired(f):
-    for line in f.readlines():
-        if line.startswith('Input Read'):
-            vals = re.findall('\D+\: (\d+)', line)
-            keys = ('input', 'both_kept','fwd_only','rev_only','dropped')
-            return(OrderedDict(zip(keys, vals)))
-
-def parse_trim_summary_single(f):
-    for line in f:
-        if line.startswith('Input Read'):
-            vals = re.findall('\D+\: (\d+)', line)
-            keys = ('input', 'kept', 'dropped')
-            return(OrderedDict(zip(keys, vals)))
-
-def parse_decontam_log(f):
-    keys = f.readline().rstrip().split('\t')
-    vals = f.readline().rstrip().split('\t')
-    return(OrderedDict(zip(keys,vals)))
-
-def summarize_qual_decontam(tfile, dfile):
-    """Return a dataframe for summary information for trimmomatic and decontam rule"""
-    tname = os.path.basename(tfile).split('.out')[0]
-    dname = os.path.basename(dfile).split('.txt')[0]
-    with open(tfile) as tf:
-        with open(dfile) as jf:
-            if Cfg['all']['paired_end']:
-                trim_data = parse_trim_summary_paired(tf)
-            else:
-                trim_data = parse_trim_summary_single(tf)
-                
-            decontam_data = parse_decontam_log(jf)
-    sys.stderr.write("trim data: {}\n".format(trim_data))
-    sys.stderr.write("decontam data: {}\n".format(decontam_data))
-    return(pandas.DataFrame(OrderedDict(trim_data, **(decontam_data)), index=[tname]))
 
 rule preprocess_report:
     """Combines the information from multiple preprocessing steps"""
@@ -57,25 +24,13 @@ rule preprocess_report:
     output:
         str(QC_FP/'reports'/'preprocess_summary.tsv')
     run:
-        summary_list = [summarize_qual_decontam(q, d) for q, d in 
-                       zip(input.trim_files, input.decontam_files)]
-        reports = pandas.concat(summary_list)
-        reports.to_csv(output[0], sep='\t', index_label='Samples')
+        paired_end = Cfg['all']['paired_end']
+        summary_list = [
+            reports.summarize_qual_decontam(q, d, paired_end) for q, d in 
+            zip(input.trim_files, input.decontam_files)]
+        _reports = pandas.concat(summary_list)
+        _reports.to_csv(output[0], sep='\t', index_label='Samples')
 
-def parse_fastqc_quality(filename):
-    with open(filename) as f:
-        report = f.read()
-    tableString = re.search(
-        '\>\>Per base sequence quality.*?\n(.*?)\n\>\>END_MODULE',
-        report, re.DOTALL).group(1)
-
-    f_s = StringIO(tableString)
-    df = pandas.read_csv(
-        f_s, sep='\t', usecols=['#Base', 'Mean'], index_col='#Base')
-    sample_name = os.path.basename(filename.split('_fastqc')[0])
-    df.columns=[sample_name]
-    f_s.close()
-    return(df)
 
 rule fastqc_report:
     """ make fastqc reports """
@@ -86,6 +41,6 @@ rule fastqc_report:
     output:
         str(QC_FP/'reports'/'fastqc_quality.tsv')
     run:
-        quality_list = [parse_fastqc_quality(file) for file in input.files]
+        quality_list = [reports.parse_fastqc_quality(file) for file in input.files]
         quality_table = pandas.concat(quality_list, axis=1).transpose()
         quality_table.to_csv(output[0],sep="\t",index_label="Samples")
