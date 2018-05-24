@@ -16,7 +16,7 @@ rule build_genome_index:
 rule align_to_genome:
     input:
         reads = expand(
-            str(QC_FP/'decontam'/'{{sample}}_{rp}.fastq.gz'),
+            str(QC_FP/'cleaned'/'{{sample}}_{rp}.fastq.gz'),
             rp = Pairs),
         index = str(Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb')
     output:
