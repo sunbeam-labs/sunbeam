@@ -56,6 +56,7 @@ rule final_filter:
             vsearch --sortbylength {input} \
             --minseqlength {params.len} \
             --maxseqlength -1 \
+            --notrunclabels \
             --output {input}.{params.len}f &> {log} && \
             cp {input}.{params.len}f {output}
         else
