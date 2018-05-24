@@ -94,7 +94,12 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
                 # then it's likely a read-pair identifier.
                 if set(_[-1] for _ in items) == {'1', '2'}:
                     prefixes = set(_[:-1] for _ in items)
-                    if prefixes == {''} or (len(prefixes) == 1 and all(len(p) == 1 for p in prefixes)):
+                    print(prefixes)
+                    NO_PREFIX = prefixes == {''}
+                    ALL_SAME_PREFIX = len(prefixes) == 1
+                    ONE_CHAR_PREFIX = all(len(p) == 1 for p in prefixes)
+                    I_OR_R_PREFIX = prefixes == {'I', 'R'}
+                    if NO_PREFIX or (ALL_SAME_PREFIX and ONE_CHAR_PREFIX) or I_OR_R_PREFIX:
                         prefix = parts[0][:-1]
                         elements.append("{rp}")
                         elements.append(prefix)
