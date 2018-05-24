@@ -55,27 +55,33 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
     
     if isinstance(fnames, str):
         raise SampleFormatError("need a list of filenames, not a string")
-    if len(fnames) == 1:
-        raise SampleFormatError("need a list of filenames, not just one")
-    if len(set(fnames)) == 1:
+    if len(fnames) > 1 and len(set(fnames)) == 1:
         raise SampleFormatError("all filenames are the same")
+    if len(set(fnames)) == 0:
+        raise SampleFormatError("no files in directory!")
     
-    splits = [re.split(split_pattern, fname) for fname in fnames]
+    splits = [list(reversed(re.split(split_pattern, fname))) for fname in fnames]
+    print(splits)
 
+    if len(fnames) == 1:
+        sys.stderr.write("Only one sample found; defaulting to {sample}.fastq.gz\n")
+        return "{sample}.fastq.gz"
+    
     if len(set([len(p) for p in splits])) > 1:
-        raise SampleFormatError("files have inconsistent numbers of _ or . characters")
+        sys.stderr.write("Warning: samples have inconsistent numbers of _ or . characters\n")
 
     elements = []
     variant_idx = []
 
     # A special case when paired-end and only two files:
     # invariant regions may be sample names (since only one sample)
-    potential_single_sample = len(fnames) == 1 and paired_end
+    potential_single_sample = len(fnames) == 2 and paired_end
 
     for i, parts in enumerate(zip(*splits)):
         items = set(parts)
         # If they're all the same, it's a common part; so add it to the element
         # list unchanged
+        print(items)
         if items.issubset({"fastq", ".", "_", "gz", "fq"}):
             elements.append(parts[0])
         elif len(items) == 1 and not potential_single_sample:
@@ -90,17 +96,18 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
                     prefixes = set(_[:-1] for _ in items)
                     if prefixes == {''} or (len(prefixes) == 1 and all(len(p) == 1 for p in prefixes)):
                         prefix = parts[0][:-1]
-                        elements.append(prefix)
                         elements.append("{rp}")
+                        elements.append(prefix)
                         continue
             variant_idx.append(i)                        
             elements.append("{sample}")
-            
+    print(elements)
+    print(variant_idx)
     # Combine multiple variant elements
     _min = min(variant_idx)
     _max = max(variant_idx)
-    elements[_min:_max+1] = ["{sample}"]
-    return "".join(elements)
+    elements[_min+1:_max+2] = ["{sample}"]
+    return "".join(reversed(elements))
 
 class MissingMatePairError(Exception):
     pass

@@ -35,8 +35,8 @@ def main(argv=sys.argv):
             " format using --format. \n\tReason: {}".format(e))
     except MissingMatePairError as e:
         raise SystemExit(
-            "Detected paired-end reads, but could not find mates. Specify "
-            "--single-end if not paired-end, or provide sample name format "
+            "Assuming paired-end reads, but could not find mates. Specify "
+            "--single_end if not paired-end, or provide sample name format "
             "using --format."
             "\n\tReason: {}".format(e))
 
@@ -65,7 +65,7 @@ def build_sample_list(data_fp, format_str, output_file, is_single_end):
                     ", ".join(no_match)))
 
     if len(samples) == 0:
-        raise ("no samples matching the given format found.")
+        raise SampleFormatError("no samples matching the given format found.")
 
     sys.stderr.write("Found {} samples in {}.\n".format(len(samples), data_fp))
     fieldnames = ["sample", "1", "2"]
