@@ -35,6 +35,10 @@ To get started, see our [documentation](http://sunbeam.readthedocs.io)!
 
 ### Changelog:
 
+#### v1.2.1 (May 24, 2018)
+
+ - Minor bugfixes
+
 #### v1.2.0 (May 2, 2018)
 
  - Low-complexity reads are now removed by default rather than masked
