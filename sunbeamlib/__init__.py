@@ -61,7 +61,6 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
         raise SampleFormatError("no files in directory!")
     
     splits = [list(reversed(re.split(split_pattern, fname))) for fname in fnames]
-    print(splits)
 
     if len(fnames) == 1:
         sys.stderr.write("Only one sample found; defaulting to {sample}.fastq.gz\n")
@@ -81,7 +80,7 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
         items = set(parts)
         # If they're all the same, it's a common part; so add it to the element
         # list unchanged
-        print(items)
+
         if items.issubset({"fastq", ".", "_", "gz", "fq"}):
             elements.append(parts[0])
         elif len(items) == 1 and not potential_single_sample:
@@ -94,7 +93,6 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
                 # then it's likely a read-pair identifier.
                 if set(_[-1] for _ in items) == {'1', '2'}:
                     prefixes = set(_[:-1] for _ in items)
-                    print(prefixes)
                     NO_PREFIX = prefixes == {''}
                     ALL_SAME_PREFIX = len(prefixes) == 1
                     ONE_CHAR_PREFIX = all(len(p) == 1 for p in prefixes)
@@ -106,13 +104,14 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
                         continue
             variant_idx.append(i)                        
             elements.append("{sample}")
-    print(elements)
-    print(variant_idx)
     # Combine multiple variant elements
-    _min = min(variant_idx)
-    _max = max(variant_idx)
-    elements[_min+1:_max+2] = ["{sample}"]
-    return "".join(reversed(elements))
+    if len(variant_idx) > 0:
+        _min = min(variant_idx)
+        _max = max(variant_idx)
+        elements[_min+1:_max+2] = ["{sample}"]
+        return "".join(reversed(elements))
+    else:
+        raise SampleFormatError("No variable regions identified")
 
 class MissingMatePairError(Exception):
     pass

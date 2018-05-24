@@ -71,3 +71,41 @@ function test_pair_concordance {
 	fi
     done
 }
+
+# Test that we can guess a variety of sample names correctly
+# Correct behavior for only two samples
+function test_guess_with_two_samples {
+    mkdir -p $TEMPDIR/only_two_samples
+    touch $TEMPDIR/only_two_samples/sample_1.fastq.gz
+    touch $TEMPDIR/only_two_samples/sample_2.fastq.gz
+    sunbeam list_samples $TEMPDIR/only_two_samples 2> >(tee out.txt >&2)
+    grep '{sample}_{rp}.fastq.gz' out.txt
+}
+
+# Correct behavior for samples with inconsistent _ or .
+function test_guess_with_inconsistent_samples {
+    mkdir -p $TEMPDIR/inconsistent_samples
+    touch $TEMPDIR/inconsistent_samples/asdf_123_R1.fastq.gz
+    touch $TEMPDIR/inconsistent_samples/asdf_123_R2.fastq.gz
+    touch $TEMPDIR/inconsistent_samples/asddf_R1.fastq.gz
+    touch $TEMPDIR/inconsistent_samples/asddf_R2.fastq.gz
+    sunbeam list_samples $TEMPDIR/inconsistent_samples 2> >(tee out.txt >&2)
+    grep '{sample}_R{rp}.fastq.gz' out.txt
+    rm -r $TEMPDIR/inconsistent_samples
+}
+
+# Correct behavior for folders that still have index files
+function test_guess_with_index_files_present {
+    mkdir -p $TEMPDIR/idx_files_present
+    touch $TEMPDIR/idx_files_present/asdf_123_R1.fastq.gz
+    touch $TEMPDIR/idx_files_present/asdf_123_R2.fastq.gz
+    touch $TEMPDIR/idx_files_present/asddf_R1.fastq.gz
+    touch $TEMPDIR/idx_files_present/asddf_R2.fastq.gz
+    touch $TEMPDIR/idx_files_present/asdf_123_I1.fastq.gz
+    touch $TEMPDIR/idx_files_present/asdf_123_I2.fastq.gz
+    touch $TEMPDIR/idx_files_present/asddf_I1.fastq.gz
+    touch $TEMPDIR/idx_files_present/asddf_I2.fastq.gz
+    sunbeam list_samples $TEMPDIR/idx_files_present 2> >(tee out.txt >&2)
+    grep '{sample}_R{rp}.fastq.gz' out.txt
+#    rm -r $TEMPDIR/idx_files_present
+}
