@@ -98,7 +98,10 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
                     ONE_CHAR_PREFIX = all(len(p) == 1 for p in prefixes)
                     I_OR_R_PREFIX = prefixes == {'I', 'R'}
                     if NO_PREFIX or (ALL_SAME_PREFIX and ONE_CHAR_PREFIX) or I_OR_R_PREFIX:
-                        prefix = parts[0][:-1]
+                        if I_OR_R_PREFIX:
+                            prefix = 'R'
+                        else:
+                            prefix = parts[0][:-1]
                         elements.append("{rp}")
                         elements.append(prefix)
                         continue
