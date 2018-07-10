@@ -60,20 +60,27 @@ Pairs = ['1', '2'] if Cfg['all']['paired_end'] else ['1']
 
 # Collect host (contaminant) genomes
 sys.stderr.write("Collecting host/contaminant genomes... ")
-HostGenomeFiles = [f for f in Cfg['qc']['host_fp'].glob('*.fasta')]
-if not HostGenomeFiles:
-    sys.stderr.write(
-        "\n\nWARNING: No files detected in host genomes folder ({}). "
-        "If this is not intentional, make sure all files end in "
-        ".fasta and the folder is specified correctly.\n\n".format(
-            Cfg['qc']['host_fp']
-        ))
+if Cfg['qc']['host_fp'] == Cfg['all']['root']:
+    HostGenomeFiles = []
+else:
+    HostGenomeFiles = [f for f in Cfg['qc']['host_fp'].glob('*.fasta')]
+    if not HostGenomeFiles:
+        sys.stderr.write(
+            "\n\nWARNING: No files detected in host genomes folder ({}). "
+            "If this is not intentional, make sure all files end in "
+            ".fasta and the folder is specified correctly.\n\n".format(
+                Cfg['qc']['host_fp']
+            ))
 HostGenomes = {Path(g.name).stem: read_seq_ids(Cfg['qc']['host_fp'] / g) for g in HostGenomeFiles}
 sys.stderr.write("done.\n")
 
 sys.stderr.write("Collecting target genomes... ")
-GenomeFiles = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
-GenomeSegments = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GenomeFiles}
+if Cfg['mapping']['genomes_fp'] == Cfg['all']['root']:
+    GenomeFiles = []
+    GenomeSegments = {}
+else:
+    GenomeFiles = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
+    GenomeSegments = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GenomeFiles}
 sys.stderr.write("done.\n")
 
 # ---- Change your workdir to output_fp

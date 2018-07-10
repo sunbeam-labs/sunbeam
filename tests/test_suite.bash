@@ -109,3 +109,26 @@ function test_guess_with_index_files_present {
     grep '{sample}_R{rp}.fastq.gz' out.txt
 #    rm -r $TEMPDIR/idx_files_present
 }
+
+# Fix for #153
+# Empty strings for _fp entries in the config should result in the relevant
+# files being ignored, even if they would normally match the pattern used.
+function test_blank_fp_behavior {
+    # Move indexes to top-level
+    for file in $TEMPDIR/indexes/*; do
+        mv $file $TEMPDIR/indexes_${file##*/}
+    done
+    # Run sunbeam with a blank string for the mapping step's genomes path, and
+    # with fasta files lying around in the top-level directory.
+    sunbeam config modify --str 'mapping: {genomes_fp: ""}' \
+        $TEMPDIR/tmp_config.yml > $TEMPDIR/blank_fp_config.yml
+    sunbeam run --configfile $TEMPDIR/blank_fp_config.yml
+    # Move indexes back to original location
+    for file in $TEMPDIR/indexes_*; do
+        mv $file ${file/indexes_/indexes\//}
+    done
+    # These files should *not* exist, because we don't accept the top-level
+    # directory as a genomes_fp directory.
+    [ ! -f $TEMPDIR/sunbeam_output/mapping/indexes_human/coverage.csv ]
+    [ ! -f $TEMPDIR/sunbeam_output/mapping/indexes_phix174/coverage.csv ]
+}
