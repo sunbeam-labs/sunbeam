@@ -57,16 +57,26 @@ def main(argv=sys.argv):
     args = parser.parse_args(argv)
 
     # Create project folder if it doesn't exist
-    project_fp = args.project_fp.resolve()
+    project_fp_exists = False
+    project_fp = args.project_fp
+    
+    try:
+        project_fp = args.project_fp.resolve()
+        project_fp_exists = project_fp.exists()
+    except FileNotFoundError:
+        pass
+    
+    if not project_fp_exists:
+        sys.stderr.write(
+            "Creating project folder at {}...\n".format(args.project_fp))
+        project_fp.mkdir(parents=True, exist_ok=True)
+    
 
     # Check if files already exist
     config_file = check_existing(project_fp/args.output, args.force)
     samplelist_file = check_existing(project_fp/"samples.csv", args.force)
     
-    if not project_fp.exists():
-        sys.stderr.write(
-            "Creating project folder at {}...\n".format(args.project_fp))
-        project_fp.mkdir(parents=True, exist_ok=True)
+
 
     # Create config file        
     cfg = config.new(
