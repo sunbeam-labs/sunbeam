@@ -29,7 +29,7 @@ runs some tests to make sure everything was installed correctly.
    If you've never installed Conda before, you'll need to add it to your shell's
    path. If you're running Bash (the most common terminal shell), the following
    command will add it to your path: ``echo 'export
-   PATH=$PATH:$HOME/miniconda3/bin` > ~/.bashrc``
+   PATH=$PATH:$HOME/miniconda3/bin' > ~/.bashrc``
 
 If you see "Tests failed", check out our :ref:`troubleshooting` section or file an issue
 on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.
