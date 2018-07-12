@@ -65,6 +65,7 @@ def check_config(cfg):
     new_cfg = dict()
     for section, values in cfg.items():
         new_cfg[section] = validate_paths(values, root)
+    new_cfg['all']['root'] = root
     return new_cfg
 
 
