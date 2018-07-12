@@ -19,11 +19,10 @@ def get_coverage_stats(genome_name, bamfiles, sample_names, output_fp):
     output_rows = []
     for bamfile, sample in sorted(zip(bamfiles, sample_names)):
         # Get coverage depth at each position, even if zero across whole segment
-        p = subprocess.Popen(["samtools", "depth", "-aa", bamfile], stdout=subprocess.PIPE)
-        stdout, stderr = p.communicate()
-        # Organize into a list of depths for each segment
-        lines = str(stdout, 'ascii').splitlines()
-        reader = csv.reader(lines, delimiter='\t')
+        args = ["samtools", "depth", "-aa", bamfile]
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, universal_newlines=True)
+        # Organize into a list of depths for each segment, streaming in text
+        reader = csv.reader(p.stdout, delimiter='\t')
         data = {}
         for row in reader:
             if not data.get(row[0]):
