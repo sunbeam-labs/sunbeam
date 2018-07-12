@@ -133,35 +133,53 @@ function test_blank_fp_behavior {
     [ ! -f $TEMPDIR/sunbeam_output/mapping/indexes_phix174/coverage.csv ]
 }
 
-# Test that mapping reports an aligning read pair for a contrived example.
+# Test that mapping reports aligning read pairs for a contrived example.
 # This could maybe be rolled into test_all (as the annotation check already is)
 # if the data setup were reorganized.
 function test_mapping {
-    # Create a single read pair using a line from the human genome fasta.
-    r1=$TEMPDIR/data_files/PCMP_stub_human_R1.fastq.gz
-    r2=$TEMPDIR/data_files/PCMP_stub_human_R2.fastq.gz
+    # Create two read pairs using lines from the human genome fasta.
+    r1_1=$TEMPDIR/data_files/PCMP_stub_human_R1.fastq.gz
+    r2_1=$TEMPDIR/data_files/PCMP_stub_human_R2.fastq.gz
+    r1_2=$TEMPDIR/data_files/PCMP_stub2_human_R1.fastq.gz
+    r2_2=$TEMPDIR/data_files/PCMP_stub2_human_R2.fastq.gz
     human=$TEMPDIR/indexes/human.fasta
     (
         echo "@read0"
         sed -n 2p $human
         echo "+"
         sed -n 's:.:G:g;2p' $human
-    ) | gzip > $r1
+    ) | gzip > $r1_1
     (
         echo "@read0"
         sed -n 2p $human | rev | tr '[ACTG]' '[TGAC]'
         echo "+"
         sed -n 's:.:G:g;2p' $human
-    ) | gzip > $r2
-    # Run sunbeam mapping rules with this one sample defined.
-    echo "stub_human,$r1,$r2" > $TEMPDIR/samples_test_mapping.csv
+    ) | gzip > $r2_1
+    (
+        echo "@read0"
+        sed -n 15p $human | cut -c 1-40
+        echo "+"
+        sed -n 's:.:G:g;2p' $human | cut -c 1-40
+    ) | gzip > $r1_2
+    (
+        echo "@read0"
+        sed -n 15p $human | cut -c 1-40 | rev | tr '[ACTG]' '[TGAC]'
+        echo "+"
+        sed -n 's:.:G:g;2p' $human | cut -c 1-40
+    ) | gzip > $r2_2
+    # Run sunbeam mapping rules with these two samples defined.
+    (
+	    echo "stub_human,$r1_1,$r2_1"
+	    echo "stub2_human,$r1_2,$r2_2"
+    ) > $TEMPDIR/samples_test_mapping.csv
     sunbeam config modify --str 'all: {samplelist_fp: "samples_test_mapping.csv"}' \
         $TEMPDIR/tmp_config.yml > $TEMPDIR/test_mapping_config.yml
-    # There should be a single line in the human coverage summary and none at
-    # all in the phix174 summary.
+    # There should be two lines in the human coverage summary and none at all
+    # in the phix174 summary.  The human.csv lines should be sorted in standard
+    # alphanumeric order; stub2_human will come before stub_human.
     sunbeam run --configfile $TEMPDIR/test_mapping_config.yml all_mapping
     md5sum --check --status <(
-    echo "500f06298d4113458360e07fa48e7b63  $TEMPDIR/sunbeam_output/mapping/human/coverage.csv"
+    echo "c624406eb2582cac5e0cfb160c79a900  $TEMPDIR/sunbeam_output/mapping/human/coverage.csv"
     echo "1aee435ade0310a6b3c63d44cbdc2029  $TEMPDIR/sunbeam_output/mapping/phix174/coverage.csv"
     )
 }
