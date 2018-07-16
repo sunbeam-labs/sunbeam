@@ -32,7 +32,6 @@ rule align_to_genome:
         {input.reads} -o {output}
         """
 
-
 rule samtools_convert:
     input:
         str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.sam')
@@ -46,15 +45,25 @@ rule samtools_convert:
         samtools sort -@ {threads} > {output}
         """
 
-rule samtools_get_coverage:
-    input:
-        expand(
-            str(MAPPING_FP/'{{genome}}'/'{sample}.bam'), sample=Samples.keys())
+def _sorted_csvs(w):
+    pattern = str(MAPPING_FP/'intermediates'/w.genome/'{sample}.csv')
+    paths = sorted(expand(pattern, sample=Samples.keys()))
+    return(paths)
+
+rule samtools_summarize_coverage:
+    input: _sorted_csvs
     output:
         str(MAPPING_FP/'{genome}'/'coverage.csv')
+    shell: "(head -n 1 {input[0]}; tail -q -n +2 {input}) > {output}"
+
+rule samtools_get_coverage:
+    input:
+        str(MAPPING_FP/'{genome}'/'{sample}.bam')
+    output:
+        str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.csv')
     run:
         samtools.get_coverage_stats(
-            wildcards.genome, input, Samples.keys(), output[0])
+            wildcards.genome, input[0], wildcards.sample, output[0])
 
 rule samtools_index:
     input: str(MAPPING_FP/'{genome}'/'{sample}.bam')
@@ -72,5 +81,3 @@ rule samtools_mpileup:
         samtools mpileup -gf {input.genome} {input.bam} | \
         bcftools call -Ob -v -c - > {output}
         """
-
-    
