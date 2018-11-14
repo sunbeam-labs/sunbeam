@@ -188,7 +188,7 @@ function test_mapping {
 # Make sure samples.csv contains the correct number of samples.
 
 function test_sunbeam_get {
-	mkdir -p $TMPDIR/test_sunbeam_get
+	mkdir -p $TEMPDIR/test_sunbeam_get
 	sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get SRP159164
 	a=`wc -l $TEMPDIR/test_sunbeam_get/samples.csv`
 	if [ "$a" -ne "34" ]; then
