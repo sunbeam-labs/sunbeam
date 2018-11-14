@@ -87,11 +87,15 @@ sys.stderr.write("done.\n")
 workdir: str(Cfg['all']['output_fp'])
 
 # ---- Set up output paths for the various steps
+DOWNLOAD_FP = output_subdir(Cfg, 'download')
 QC_FP = output_subdir(Cfg, 'qc')
 ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
 ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
+
+# ---- Download rules
+include: "rules/download/download.rules"
 
 
 # ---- Targets rules
@@ -136,5 +140,3 @@ rule samples:
     message: "Samples to be processed:"
     run:
         [print(sample) for sample in sorted(list(Samples.keys()))]
-
-
