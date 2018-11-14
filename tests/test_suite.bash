@@ -183,3 +183,15 @@ function test_mapping {
     echo "1aee435ade0310a6b3c63d44cbdc2029  $TEMPDIR/sunbeam_output/mapping/phix174/coverage.csv"
     )
 }
+
+# Test for sunbeam get
+# Make sure samples.csv contains the correct number of samples.
+
+function test_sunbeam_get {
+	mkdir -p $TMPDIR/test_sunbeam_get
+	sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get SRP159164
+	a=`wc -l $TEMPDIR/test_sunbeam_get/samples.csv`
+	if [ "$a" -ne "34" ]; then
+		exit 1
+	fi
+}
