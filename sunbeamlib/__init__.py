@@ -16,7 +16,7 @@ from Bio import SeqIO
 
 __version__ = str(Version.coerce(get_distribution('sunbeam').version))
 
-def build_sample_list(samplelist_fp, paired_end):
+def load_sample_list(samplelist_fp, paired_end):
     """
     Build a list of samples from a sample list file.
     :param samplelist_fp: a Path to a whitespace-delimited samplelist file,
