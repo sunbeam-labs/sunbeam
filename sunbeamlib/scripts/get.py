@@ -100,7 +100,7 @@ def main(argv=sys.argv):
         if args.defaults:
             defaults = ruamel.yaml.safe_load(args.defaults)
             cfg = config.update(cfg, defaults)
-        paired = layout == "paired":
+        paired = layout == "paired"
         sample_file = samplelists[layout].name
         cfg = config.update(cfg, {"all":{"paired_end":paired, "download_reads":True}})
         with config_file.open('w') as out:
@@ -125,7 +125,7 @@ def build_sample_list_sra(accessions, args):
     :param args: arguments from command-line
     """
 
-    samples = find_samples_sra(accessions)
+    samples = find_samples_sra(accessions)#, args.project_fp)
 
     # How many rows do we have for each entry?  Simple case is just one or two,
     # but it's possible we'll have both.
@@ -162,6 +162,7 @@ def build_sample_list_sra(accessions, args):
                 "not %s" % bad_lens)
     return(files)
 
+#def find_samples_sra(accessions, dir_proj, dir_fp="sunbeam_output/download"):
 def find_samples_sra(accessions, dir_fp="download"):
     """
     Build a dict of samples from SRA accession numbers.
@@ -186,6 +187,7 @@ def find_samples_sra(accessions, dir_fp="download"):
     # (using given path) as values.
     samp_parse = lambda txt: re.match('^([0-9A-Za-z]+)[_\.]', txt).group(1)
     prepend_fp = lambda files: [str(dir_fp/fp) for fp in files]
+#    prepend_fp = lambda files: [str(dir_proj/dir_fp/fp) for fp in files]
     dictify = lambda files: {str(i+1): v for i, v in zip(range(len(files)), files)}
     try:
         Samples = {samp_parse(d[0]): dictify(prepend_fp(d)) for d in data}

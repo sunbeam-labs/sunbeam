@@ -55,7 +55,7 @@ for sbx in sbxs:
 # Setting up config files and samples
 Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
-Samples = load_sample_list(Cfg['all']['samplelist_fp'], Cfg['all']['paired_end'], Cfg['all']['download_reads'])
+Samples = load_sample_list(Cfg['all']['samplelist_fp'], Cfg['all']['paired_end'], Cfg['all']['download_reads'], Cfg["all"]['root']/Cfg['all']['output_fp'])
 Pairs = ['1', '2'] if Cfg['all']['paired_end'] else ['1']
 
 # Collect host (contaminant) genomes
@@ -87,12 +87,14 @@ sys.stderr.write("done.\n")
 workdir: str(Cfg['all']['output_fp'])
 
 # ---- Set up output paths for the various steps
-DOWNLOAD_FP = output_subdir(Cfg, 'download')
+DOWNLOAD_FP = Path(Cfg['all']['output_fp']/'download')
 QC_FP = output_subdir(Cfg, 'qc')
 ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
 ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
+
+print(DOWNLOAD_FP)
 
 # ---- Download rules
 if Cfg['all']['download_reads']:

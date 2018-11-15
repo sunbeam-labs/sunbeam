@@ -2,25 +2,27 @@
 #
 # Rules to download SRA data
 
+ruleorder: download_paired > download_unpaired
+
 rule download_paired:
-	output:
-		r1 = lambda wildcards: Samples[wildcards.sample]['1'],
-		r2 = lambda wildcards: Samples[wildcards.sample]['2']
-	params:
-		accession = '{sample}',
-		outdir = str(DOWNLOAD_FP)
-	shell:
-		"""
-		grabseqs sra -r 3 -o {params.outdir} {params.sample}
-		"""
+    output:
+        r1 = str(DOWNLOAD_FP/'{sample}_1.fastq.gz'),
+        r2 = str(DOWNLOAD_FP/'{sample}_2.fastq.gz')
+    params:
+        accession = '{sample}',
+        outdir = str(DOWNLOAD_FP)
+    shell:
+        """
+        grabseqs sra -r 3 -o {params.outdir} {params.accession}
+        """
 
 rule download_unpaired:
-	output:
-		lambda wildcards: Samples[wildcards.sample]['1']
-	params:
-		accession = '{sample}',
-		outdir = str(DOWNLOAD_FP)		
-	shell:
-		"""
-		grabseqs sra -r 3 -o {params.outdir} {params.sample}
-		"""
+    output:
+        str(DOWNLOAD_FP/'{sample}_1.fastq.gz')
+    params:
+        accession = '{sample}',
+        outdir = str(DOWNLOAD_FP)		
+    shell:
+        """
+        grabseqs sra -r 3 -o {params.outdir} {params.accession}
+        """

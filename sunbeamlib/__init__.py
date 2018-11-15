@@ -16,7 +16,7 @@ from Bio import SeqIO
 
 __version__ = str(Version.coerce(get_distribution('sunbeam').version))
 
-def load_sample_list(samplelist_fp, paired_end, download):
+def load_sample_list(samplelist_fp, paired_end, download=False, root_proj = ''):
     """
     Build a list of samples from a sample list file.
     :param samplelist_fp: a Path to a whitespace-delimited samplelist file,
@@ -30,7 +30,7 @@ def load_sample_list(samplelist_fp, paired_end, download):
             sample = row['sample']
             try:
                 if download:
-                    r1 = _verify_download_path(row['1'])
+                    r1 = _verify_download_path(row['1'], root_proj)
                 else:
                     r1 = _verify_path(row['1'])
             except ValueError:
@@ -40,7 +40,7 @@ def load_sample_list(samplelist_fp, paired_end, download):
             if paired_end:
                 try:
                     if download:
-                        r2 = _verify_download_path(row['2'])
+                        r2 = _verify_download_path(row['2'], root_proj)
                     else:
                         r2 = _verify_path(row['2'])
                 except ValueError:
@@ -128,10 +128,10 @@ class MissingMatePairError(Exception):
 class SampleFormatError(Exception):
     pass
 
-def _verify_download_path(fp):
+def _verify_download_path(fp, root_proj):
     if not fp:
         raise ValueError("Missing filename")
-    path = Path(fp)
+    path = Path(root_proj/fp)
     return str(path.resolve())
 
 def _verify_path(fp):
