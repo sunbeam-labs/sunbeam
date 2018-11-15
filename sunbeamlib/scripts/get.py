@@ -89,7 +89,7 @@ def main(argv=sys.argv):
     for layout in samplelists.keys(): # one paired, one unpaired, or one of each
         # Create config file
         if multiple_configs:
-            config_file = check_existing(Path(str(project_fp)+layout+"_"+str(Path(project_fp/args.output).name)), args.force)
+            config_file = check_existing(project_fp/Path(layout+"_"+str(Path(project_fp/args.output).name)), args.force)
 #            config_file = check_existing(Path(str(project_fp/args.output)+"_"+layout), args.force)
         else:
             config_file = check_existing(project_fp/args.output, args.force)
