@@ -201,9 +201,7 @@ function test_sunbeam_get {
 
 function test_get_paired_unpaired {
     mkdir -p $TEMPDIR/test_get_paired_unpaired
-    sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_get_paired_unpaired --data_acc ERP020555
-    rc=$?
-    if [[ "$rc" -eq "0" ]];then
+    if `sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_get_paired_unpaired --data_acc ERP020555`;then
         exit 1
     fi
 }
