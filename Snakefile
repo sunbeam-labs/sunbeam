@@ -55,7 +55,7 @@ for sbx in sbxs:
 # Setting up config files and samples
 Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
-Samples = load_sample_list(Cfg['all']['samplelist_fp'], Cfg['all']['paired_end'])
+Samples = load_sample_list(Cfg['all']['samplelist_fp'], Cfg['all']['paired_end'], Cfg['all']['download_reads'])
 Pairs = ['1', '2'] if Cfg['all']['paired_end'] else ['1']
 
 # Collect host (contaminant) genomes
@@ -95,7 +95,7 @@ CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
 
 # ---- Download rules
-if Cfg['all']['download']:
+if Cfg['all']['download_reads']:
 	include: "rules/download/download.rules"
 
 
