@@ -46,8 +46,7 @@ def main(argv=sys.argv):
         type=argparse.FileType("r"))
 
     samplelist = parser.add_argument_group("sample list options")
-    samplelist.add_argument(
-        "--sra_acc", metavar="PATH",
+    samplelist.add_argument("--data_acc", metavar="PATH", nargs="+",
         help="list of SRA accession numbers")
 
     args = parser.parse_args(argv)
@@ -73,7 +72,7 @@ def main(argv=sys.argv):
 
     # Create sample list(s).  One or two depending on paired/unpaired
     # situation.
-    samplelists = build_sample_list_sra(accessions = args.data_acc)
+    samplelists = build_sample_list_sra(args.data_acc, args)
     for fp in samplelists.values():
         sys.stderr.write("New sample list written to {}\n".format(fp))
     
