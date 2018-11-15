@@ -103,7 +103,6 @@ def main(argv=sys.argv):
 
 def _write_samples_csv(samples, fp):
     fieldnames = ["sample", "1", "2"]
-    print(samples)
     with fp.open('w') as out:
         writer = csv.DictWriter(out, fieldnames=fieldnames)
         for sample in samples.keys():
@@ -178,8 +177,9 @@ def find_samples_sra(accessions, dir_fp="download"):
     # (using given path) as values.
     samp_parse = lambda txt: re.match('^([0-9A-Za-z]+)[_\.]', txt).group(1)
     prepend_fp = lambda files: [str(dir_fp/fp) for fp in files]
+    dictify = lambda files: {str(i+1): v for i, v in zip(range(len(files)), files)}
     try:
-        Samples = {samp_parse(d[0]): prepend_fp(d) for d in data}
+        Samples = {samp_parse(d[0]): dictify(prepend_fp(d)) for d in data}
     except AttributeError:
         raise SystemExit("SRA file name did not match expected pattern")
     return(Samples)
