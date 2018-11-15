@@ -100,12 +100,9 @@ def main(argv=sys.argv):
         if args.defaults:
             defaults = ruamel.yaml.safe_load(args.defaults)
             cfg = config.update(cfg, defaults)
-        if layout == "paired":
-            paired = "true"
-        else:
-            paired = "false"
+        paired = layout == "paired":
         sample_file = samplelists[layout].name
-        cfg = config.update(cfg, {"all":{"paired":paired, "download_reads":"true"}})
+        cfg = config.update(cfg, {"all":{"paired_end":paired, "download_reads":True}})
         with config_file.open('w') as out:
             config.dump(cfg, out)
         sys.stderr.write("New config file written to {}\n".format(config_file))
