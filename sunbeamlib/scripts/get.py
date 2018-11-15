@@ -9,7 +9,7 @@ from .init import check_existing
 import subprocess
 import io
 import re
-    
+
 def main(argv=sys.argv):
 
     try:
@@ -22,7 +22,7 @@ def main(argv=sys.argv):
     description_str = (
         "Initialize a new Sunbeam project in a given directory, creating "
         "a new config file and sample list from SRA accessions.")
-    
+
     parser = argparse.ArgumentParser(
         "get", description=description_str)
     parser.add_argument(
@@ -57,13 +57,13 @@ def main(argv=sys.argv):
     # Create project folder if it doesn't exist
     project_fp_exists = False
     project_fp = args.project_fp
-    
+
     try:
         project_fp = args.project_fp.resolve()
         project_fp_exists = project_fp.exists()
     except FileNotFoundError:
         pass
-    
+
     if not project_fp_exists:
         sys.stderr.write(
             "Creating project folder at {}...\n".format(args.project_fp))
@@ -76,31 +76,32 @@ def main(argv=sys.argv):
     samplelists = build_sample_list_sra(accessions = args.data_acc)
     for fp in samplelists.values():
         sys.stderr.write("New sample list written to {}\n".format(fp))
-    
+
     ### Config(s)
 
     # TODO from here on, update config-handling to handle possible mixed
     # unpaired/paired case.  (Append suffix to existing args.output in that
     # case, between name and .yml?)
 
+    # Louis thought: gonna append for now since I don't know how to parse Path objects
+
     # Check if files already exist
-    config_file = check_existing(project_fp/args.output, args.force)
-
-    # Create config file        
-    cfg = config.new(
-        conda_fp=conda_prefix,
-        project_fp=project_fp,
-        template=args.template)
-
-    if args.defaults:
-        defaults = ruamel.yaml.safe_load(args.defaults)
-        cfg = config.update(cfg, defaults)
-
-    with config_file.open('w') as out:
-        config.dump(cfg, out)
-
-    sys.stderr.write("New config file written to {}\n".format(config_file))
-
+    multiple_configs = len(samplelists.values()) != 1
+    for rp in samplelists.keys(): # one paired, one unpaired
+        # Create config file
+        cfg = config.new(
+            conda_fp=conda_prefix,
+            project_fp=project_fp,
+            template=args.template)
+        if args.defaults:
+            defaults = ruamel.yaml.safe_load(args.defaults)
+            cfg = config.update(cfg, defaults)
+         with config_file.open('w') as out:
+            config.dump(cfg, out)
+        sys.stderr.write("New config file written to {}\n".format(config_file))
+    if multiple_configs:
+        raise Exception("Found both paired and unpaired reads. Wrote two sample lists "
+                        "and config files, with '_paired' or '_single' appended.")
 
 def _write_samples_csv(samps, fp):
     fieldnames = ["sample", "1", "2"]
