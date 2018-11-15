@@ -1,0 +1,12 @@
+2018-11-15 21:11:13 UTC [     info] Starting Sunbeam installation...
+2018-11-15 21:11:13 UTC [     info]     Conda path:   /home/louistaylor/miniconda3
+2018-11-15 21:11:13 UTC [     info]     Sunbeam src:  /media/THING2/louis/17_SunbeamPaper/sunbeam
+2018-11-15 21:11:13 UTC [     info]     Sunbeam env:  'sunbeam-tmp.LwBkLXdGMP'
+2018-11-15 21:11:21 UTC [  warning] Found pre-existing Conda installation in /home/louistaylor/miniconda2.
+2018-11-15 21:11:21 UTC [  warning] Ignoring specified Conda path in favor of existing Conda install.
+2018-11-15 21:11:21 UTC [     info] Conda already installed.
+2018-11-15 21:11:21 UTC [     info] Creating Sunbeam environment...
+
+CondaError: KeyboardInterrupt
+
+2018-11-15 21:18:40 UTC [    error] Error in /home/louistaylor/THING2/17_SunbeamPaper/sunbeam/install.sh in function debug_capture on line 50

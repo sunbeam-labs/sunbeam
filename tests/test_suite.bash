@@ -189,7 +189,7 @@ function test_mapping {
 
 function test_sunbeam_get {
     mkdir -p $TEMPDIR/test_sunbeam_get
-    sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get SRP159164
+    sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get --data_acc SRP159164
     a=`wc -l $TEMPDIR/test_sunbeam_get/samples.csv`
     if [ "$a" -ne "34" ]; then
         exit 1
@@ -201,7 +201,7 @@ function test_sunbeam_get {
 
 function test_get_paired_unpaired {
     mkdir -p $TEMPDIR/test_get_paired_unpaired
-    sunbeam get --forxe --output sunbeam_config_SRA.yml $TEMPDIR/test_get_paired_unpaired
+    sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_get_paired_unpaired --data_acc ERP020555
     rc=$?
     if [[ "$rc" -eq "0" ]];then
         exit 1
