@@ -11,18 +11,26 @@ rule download_paired:
     params:
         accession = '{sample}',
         outdir = str(DOWNLOAD_FP)
+    threads:
+        Cfg['download']['threads']
+    shadow: "shallow"
     shell:
         """
-        grabseqs sra -r 3 -o {params.outdir} {params.accession}
+        mkdir -p {params.outdir}
+        grabseqs sra -r 3 -t {threads} -o {params.outdir} {params.accession}
         """
 
 rule download_unpaired:
     output:
-        str(DOWNLOAD_FP/'{sample}_1.fastq.gz')
+        str(DOWNLOAD_FP/'{sample}.fastq.gz')
     params:
         accession = '{sample}',
-        outdir = str(DOWNLOAD_FP)		
+        outdir = str(DOWNLOAD_FP)
+    threads:
+        Cfg['download']['threads']	
+    shadow: "shallow"
     shell:
         """
-        grabseqs sra -r 3 -o {params.outdir} {params.accession}
+        mkdir -p {params.outdir}
+        grabseqs sra -r 3 -t {threads} -o {params.outdir} {params.accession}
         """

@@ -87,7 +87,7 @@ sys.stderr.write("done.\n")
 workdir: str(Cfg['all']['output_fp'])
 
 # ---- Set up output paths for the various steps
-DOWNLOAD_FP = Path(Cfg['all']['output_fp']/'download')
+DOWNLOAD_FP = output_subdir(Cfg, 'download')
 QC_FP = output_subdir(Cfg, 'qc')
 ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
 ANNOTATION_FP = output_subdir(Cfg, 'annotation')

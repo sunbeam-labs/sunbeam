@@ -79,3 +79,6 @@ mapping:
   samtools_opts: ""
   threads: 4
 
+download:
+  suffix: download
+  threads: 4
