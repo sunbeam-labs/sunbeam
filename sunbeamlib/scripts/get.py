@@ -70,7 +70,6 @@ def main(argv=sys.argv):
 
     # Check if files already exist
     config_file = check_existing(project_fp/args.output, args.force)
-    samplelist_file = check_existing(project_fp/"samples.csv", args.force)
 
     # Create config file        
     cfg = config.new(
@@ -88,13 +87,10 @@ def main(argv=sys.argv):
     sys.stderr.write("New config file written to {}\n".format(config_file))
 
     # Create sample list
-    try:
-        with samplelist_file.open('w') as out:
-            build_sample_list_sra(accessions = args.data_acc output_file = out)
-            sys.stderr.write(
-                "New sample list written to {}\n".format(samplelist_file))
+    samplelist_file = build_sample_list_sra(accessions = args.data_acc)
+    sys.stderr.write("New sample list written to {}\n".format(samplelist_file))
 
-def build_sample_list_sra(accessions, output_file):
+def build_sample_list_sra(accessions, args):
     """
     Create samples CSV file with all samples from given SRA accessions.
 
@@ -104,26 +100,25 @@ def build_sample_list_sra(accessions, output_file):
 
     samples = find_samples_sra(accessions)
 
+    samplelist_file = check_existing(args.project_fp/"samples.csv", args.force)
+
     # How many rows do we have for each entry?  Simple case is just one or two,
     # but it's possible we'll have both.
     lengths = {len(fqs) for fqs in samples.values()}
     fmt = "Found {} samples, {}.\n"
-    if lengths == {1}:
-        # OK, unpaired.
-        is_single_end = True
+    if lengths == {1} or lengths == {2}:
+        # OK, either all paired or all unpaired.
         sys.stderr.write(fmt.format(len(samples), ["paired", "unpaired"][is_single_end]))
-        # TODO write CSV
-    elif lengths == {2}:
-        # OK, paired-end.
-        is_single_end = False
-        sys.stderr.write(fmt.format(len(samples), ["paired", "unpaired"][is_single_end]))
-        # TODO write CSV
+        fieldnames = ["sample", "1", "2"]
+        with samplelist_file.open('w') as out:
+            writer = csv.DictWriter(output_file, fieldnames=fieldnames)
+            for sample in samples.keys():
+                writer.writerow({'sample':sample, **samples[sample]})
     elif lengths == {1,2}:
         # A mix of both.  Sunbeam just does one or the other so the user must
         # choose.
         # TODO raise Warning and write the two sets separately.
         sys.stderr.write("Found {} samples.\n".format(len(samples)))
-        pass
     else:
         # ??? bail.
         bad_lens = [x for x in lengths if x not in [1,2]]
@@ -135,7 +130,6 @@ def build_sample_list_sra(accessions, output_file):
     writer = csv.DictWriter(output_file, fieldnames=fieldnames)
     for sample in samples.keys():
         writer.writerow({'sample':sample, **samples[sample]})
-
 
 def find_samples_sra(accessions, dir_fp="download"):
     """
