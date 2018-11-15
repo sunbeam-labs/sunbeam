@@ -52,6 +52,8 @@ def main(argv=sys.argv):
 
     args = parser.parse_args(argv)
 
+    ### Project Directory
+
     # Create project folder if it doesn't exist
     project_fp_exists = False
     project_fp = args.project_fp
@@ -66,7 +68,20 @@ def main(argv=sys.argv):
         sys.stderr.write(
             "Creating project folder at {}...\n".format(args.project_fp))
         project_fp.mkdir(parents=True, exist_ok=True)
+
+    ### Sample list(s)
+
+    # Create sample list(s).  One or two depending on paired/unpaired
+    # situation.
+    samplelists = build_sample_list_sra(accessions = args.data_acc)
+    for fp in samplelists.values():
+        sys.stderr.write("New sample list written to {}\n".format(fp))
     
+    ### Config(s)
+
+    # TODO from here on, update config-handling to handle possible mixed
+    # unpaired/paired case.  (Append suffix to existing args.output in that
+    # case, between name and .yml?)
 
     # Check if files already exist
     config_file = check_existing(project_fp/args.output, args.force)
@@ -86,50 +101,58 @@ def main(argv=sys.argv):
 
     sys.stderr.write("New config file written to {}\n".format(config_file))
 
-    # Create sample list
-    samplelist_file = build_sample_list_sra(accessions = args.data_acc)
-    sys.stderr.write("New sample list written to {}\n".format(samplelist_file))
+
+def _write_samples_csv(samps, fp):
+    fieldnames = ["sample", "1", "2"]
+    with fp.open('w') as out:
+        writer = csv.DictWriter(out, fieldnames=fieldnames)
+        for sample in samples.keys():
+            writer.writerow({'sample':sample, **samples[sample]})
 
 def build_sample_list_sra(accessions, args):
     """
     Create samples CSV file with all samples from given SRA accessions.
 
     :param accessions: list of SRA accession strings
-    :param output_file: path to CSV file to write
+    :param args: arguments from command-line
     """
 
     samples = find_samples_sra(accessions)
-
-    samplelist_file = check_existing(args.project_fp/"samples.csv", args.force)
 
     # How many rows do we have for each entry?  Simple case is just one or two,
     # but it's possible we'll have both.
     lengths = {len(fqs) for fqs in samples.values()}
     fmt = "Found {} samples, {}.\n"
+    cases = ["paired", "unpaired"]
+    files = {}
     if lengths == {1} or lengths == {2}:
         # OK, either all paired or all unpaired.
-        sys.stderr.write(fmt.format(len(samples), ["paired", "unpaired"][is_single_end]))
-        fieldnames = ["sample", "1", "2"]
-        with samplelist_file.open('w') as out:
-            writer = csv.DictWriter(output_file, fieldnames=fieldnames)
-            for sample in samples.keys():
-                writer.writerow({'sample':sample, **samples[sample]})
+        case = cases[lengths[0]]
+        sys.stderr.write(fmt.format(len(samples), case))
+        fp = check_existing(args.project_fp/"samples.csv", args.force)
+        files[case] = fp
+        _write_samples_csv(samples, fp)
     elif lengths == {1,2}:
         # A mix of both.  Sunbeam just does one or the other so the user must
         # choose.
-        # TODO raise Warning and write the two sets separately.
-        sys.stderr.write("Found {} samples.\n".format(len(samples)))
+        sys.stderr.write(fmt.format(len(samples), "both paired and unpaired"))
+        sys.stderr.write("config file and samples will be available with both"
+                "_paired and _unpaired suffixes.  These can be run separately"
+                "with sunbeam run by passing the appropriate config file.")
+        for case in cases:
+            fp = args.project_fp/("samples_%s.csv" % case)
+            fp = check_existing(fp, args.force)
+            len_exp = cases.index(case) + 1
+            samps = {k: v for k, v in samples.items() if len(v) == len_exp}
+            _write_samples_csv(samps, fp)
+            files[case] = fp
     else:
         # ??? bail.
         bad_lens = [x for x in lengths if x not in [1,2]]
         bad_lens = ', '.join([str(x) for x in bad_lens])
         raise SystemExit("SRA metadata must specify 1 or 2 files per sample;"
                 "not %s" % bad_lens)
-
-    fieldnames = ["sample", "1", "2"]
-    writer = csv.DictWriter(output_file, fieldnames=fieldnames)
-    for sample in samples.keys():
-        writer.writerow({'sample':sample, **samples[sample]})
+    return(files)
 
 def find_samples_sra(accessions, dir_fp="download"):
     """
