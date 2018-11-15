@@ -9,6 +9,7 @@ from .init import check_existing
 import subprocess
 import io
 import re
+import csv
     
 def main(argv=sys.argv):
 
@@ -100,9 +101,9 @@ def main(argv=sys.argv):
 
     sys.stderr.write("New config file written to {}\n".format(config_file))
 
-
-def _write_samples_csv(samps, fp):
+def _write_samples_csv(samples, fp):
     fieldnames = ["sample", "1", "2"]
+    print(samples)
     with fp.open('w') as out:
         writer = csv.DictWriter(out, fieldnames=fieldnames)
         for sample in samples.keys():
@@ -122,11 +123,11 @@ def build_sample_list_sra(accessions, args):
     # but it's possible we'll have both.
     lengths = {len(fqs) for fqs in samples.values()}
     fmt = "Found {} samples, {}.\n"
-    cases = ["paired", "unpaired"]
+    cases = ["unpaired", "paired"]
     files = {}
     if lengths == {1} or lengths == {2}:
         # OK, either all paired or all unpaired.
-        case = cases[lengths[0]]
+        case = cases[list(lengths)[0] - 1]
         sys.stderr.write(fmt.format(len(samples), case))
         fp = check_existing(args.project_fp/"samples.csv", args.force)
         files[case] = fp
