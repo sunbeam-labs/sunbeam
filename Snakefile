@@ -16,7 +16,7 @@ from pathlib import Path, PurePath
 from snakemake.utils import update_config, listfiles
 from snakemake.exceptions import WorkflowError
 
-from sunbeamlib import build_sample_list, read_seq_ids
+from sunbeamlib import load_sample_list, read_seq_ids
 from sunbeamlib.config import *
 from sunbeamlib.reports import *
 
@@ -55,7 +55,7 @@ for sbx in sbxs:
 # Setting up config files and samples
 Cfg = check_config(config)
 Blastdbs = process_databases(Cfg['blastdbs'])
-Samples = build_sample_list(Cfg['all']['samplelist_fp'], Cfg['all']['paired_end'])
+Samples = load_sample_list(Cfg['all']['samplelist_fp'], Cfg['all']['paired_end'], Cfg['all']['download_reads'], Cfg["all"]['root']/Cfg['all']['output_fp'])
 Pairs = ['1', '2'] if Cfg['all']['paired_end'] else ['1']
 
 # Collect host (contaminant) genomes
@@ -87,11 +87,18 @@ sys.stderr.write("done.\n")
 workdir: str(Cfg['all']['output_fp'])
 
 # ---- Set up output paths for the various steps
+DOWNLOAD_FP = output_subdir(Cfg, 'download')
 QC_FP = output_subdir(Cfg, 'qc')
 ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
 ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
+
+print(DOWNLOAD_FP)
+
+# ---- Download rules
+if Cfg['all']['download_reads']:
+	include: "rules/download/download.rules"
 
 
 # ---- Targets rules
@@ -136,5 +143,3 @@ rule samples:
     message: "Samples to be processed:"
     run:
         [print(sample) for sample in sorted(list(Samples.keys()))]
-
-

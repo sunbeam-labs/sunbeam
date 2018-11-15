@@ -22,6 +22,7 @@ all:
   output_fp: "sunbeam_output"
   samplelist_fp: "samples.csv"
   paired_end: true
+  download_reads: false
   version: "{SB_VERSION}"
 
 # Quality control
@@ -78,3 +79,6 @@ mapping:
   samtools_opts: ""
   threads: 4
 
+download:
+  suffix: download
+  threads: 4
