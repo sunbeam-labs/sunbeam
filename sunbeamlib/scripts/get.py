@@ -136,8 +136,8 @@ def build_sample_list_sra(accessions, args):
         # choose.
         sys.stderr.write(fmt.format(len(samples), "both paired and unpaired"))
         sys.stderr.write("config file and samples will be available with both"
-                "_paired and _unpaired suffixes.  These can be run separately"
-                "with sunbeam run by passing the appropriate config file.")
+                " _paired and _unpaired suffixes.  These can be run separately"
+                " with sunbeam run by passing the appropriate config file.")
         for case in cases:
             fp = args.project_fp/("samples_%s.csv" % case)
             fp = check_existing(fp, args.force)
