@@ -21,10 +21,10 @@ def main(argv=sys.argv):
 
     description_str = (
         "Initialize a new Sunbeam project in a given directory, creating "
-        "a new config file and (optionally) a sample list.")
+        "a new config file and sample list from SRA accessions.")
     
     parser = argparse.ArgumentParser(
-        "init", description=description_str)
+        "get", description=description_str)
     parser.add_argument(
         "project_fp", type=Path,
         help="project directory (will be created if it does not exist)")
