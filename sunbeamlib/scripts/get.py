@@ -85,10 +85,13 @@ def main(argv=sys.argv):
 
     # Louis thought: gonna append for now since I don't know how to parse Path objects
 
-    # Check if files already exist
     multiple_configs = len(samplelists.values()) != 1
-    for rp in samplelists.keys(): # one paired, one unpaired
+    for layout in samplelists.keys(): # one paired, one unpaired, or one of each
         # Create config file
+        if multiple_configs:
+            config_file = check_existing(project_fp/args.output+"_"+layout, args.force)
+        else:
+            config_file = check_existing(project_fp/args.output, args.force)
         cfg = config.new(
             conda_fp=conda_prefix,
             project_fp=project_fp,
@@ -96,7 +99,13 @@ def main(argv=sys.argv):
         if args.defaults:
             defaults = ruamel.yaml.safe_load(args.defaults)
             cfg = config.update(cfg, defaults)
-         with config_file.open('w') as out:
+        if layout == "paired":
+            paired = "true"
+        else:
+            paired = "false"
+        sample_file = samplelists[layout].name
+        cfg = config.update(cfg, {"all":{"paired":paired, "download_reads":"true"}})
+        with config_file.open('w') as out:
             config.dump(cfg, out)
         sys.stderr.write("New config file written to {}\n".format(config_file))
     if multiple_configs:
