@@ -9,7 +9,8 @@ from .init import check_existing
 import subprocess
 import io
 import re
-
+import csv
+    
 def main(argv=sys.argv):
 
     try:
@@ -46,8 +47,7 @@ def main(argv=sys.argv):
         type=argparse.FileType("r"))
 
     samplelist = parser.add_argument_group("sample list options")
-    samplelist.add_argument(
-        "--sra_acc", metavar="PATH",
+    samplelist.add_argument("--data_acc", metavar="PATH", nargs="+",
         help="list of SRA accession numbers")
 
     args = parser.parse_args(argv)
@@ -73,7 +73,7 @@ def main(argv=sys.argv):
 
     # Create sample list(s).  One or two depending on paired/unpaired
     # situation.
-    samplelists = build_sample_list_sra(accessions = args.data_acc)
+    samplelists = build_sample_list_sra(args.data_acc, args)
     for fp in samplelists.values():
         sys.stderr.write("New sample list written to {}\n".format(fp))
 
@@ -103,7 +103,7 @@ def main(argv=sys.argv):
         raise Exception("Found both paired and unpaired reads. Wrote two sample lists "
                         "and config files, with '_paired' or '_single' appended.")
 
-def _write_samples_csv(samps, fp):
+def _write_samples_csv(samples, fp):
     fieldnames = ["sample", "1", "2"]
     with fp.open('w') as out:
         writer = csv.DictWriter(out, fieldnames=fieldnames)
@@ -124,11 +124,11 @@ def build_sample_list_sra(accessions, args):
     # but it's possible we'll have both.
     lengths = {len(fqs) for fqs in samples.values()}
     fmt = "Found {} samples, {}.\n"
-    cases = ["paired", "unpaired"]
+    cases = ["unpaired", "paired"]
     files = {}
     if lengths == {1} or lengths == {2}:
         # OK, either all paired or all unpaired.
-        case = cases[lengths[0]]
+        case = cases[list(lengths)[0] - 1]
         sys.stderr.write(fmt.format(len(samples), case))
         fp = check_existing(args.project_fp/"samples.csv", args.force)
         files[case] = fp
@@ -138,8 +138,8 @@ def build_sample_list_sra(accessions, args):
         # choose.
         sys.stderr.write(fmt.format(len(samples), "both paired and unpaired"))
         sys.stderr.write("config file and samples will be available with both"
-                "_paired and _unpaired suffixes.  These can be run separately"
-                "with sunbeam run by passing the appropriate config file.")
+                " _paired and _unpaired suffixes.  These can be run separately"
+                " with sunbeam run by passing the appropriate config file.\n")
         for case in cases:
             fp = args.project_fp/("samples_%s.csv" % case)
             fp = check_existing(fp, args.force)
@@ -179,8 +179,9 @@ def find_samples_sra(accessions, dir_fp="download"):
     # (using given path) as values.
     samp_parse = lambda txt: re.match('^([0-9A-Za-z]+)[_\.]', txt).group(1)
     prepend_fp = lambda files: [str(dir_fp/fp) for fp in files]
+    dictify = lambda files: {str(i+1): v for i, v in zip(range(len(files)), files)}
     try:
-        Samples = {samp_parse(d[0]): prepend_fp(d) for d in data}
+        Samples = {samp_parse(d[0]): dictify(prepend_fp(d)) for d in data}
     except AttributeError:
         raise SystemExit("SRA file name did not match expected pattern")
     return(Samples)
