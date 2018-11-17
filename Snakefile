@@ -58,6 +58,7 @@ Blastdbs = process_databases(Cfg['blastdbs'])
 Samples = load_sample_list(Cfg['all']['samplelist_fp'], Cfg['all']['paired_end'], Cfg['all']['download_reads'], Cfg["all"]['root']/Cfg['all']['output_fp'])
 Pairs = ['1', '2'] if Cfg['all']['paired_end'] else ['1']
 
+
 # Collect host (contaminant) genomes
 sys.stderr.write("Collecting host/contaminant genomes... ")
 if Cfg['qc']['host_fp'] == Cfg['all']['root']:
@@ -94,7 +95,6 @@ ANNOTATION_FP = output_subdir(Cfg, 'annotation')
 CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
 
-print(DOWNLOAD_FP)
 
 # ---- Download rules
 if Cfg['all']['download_reads']:
@@ -112,6 +112,7 @@ include: "rules/qc/decontaminate.rules"
 
 # ---- Assembly rules
 include: "rules/assembly/assembly.rules"
+include: "rules/assembly/coverage.rules"
 
 
 # ---- Contig annotation rules

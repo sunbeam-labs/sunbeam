@@ -21,7 +21,20 @@ rule megahit_paired:
         out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
     shell:
         """
-        megahit -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue || \
+        ## turn off bash strict mode
+        set +o pipefail
+
+        ## sometimes the error is due to lack of memory
+        exitcode=0
+        megahit -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue || exitcode=$?
+        
+        if [ $exitcode -eq 255 ]
+        then
+            echo "Empty contigs"
+        elif [ $exitcode -gt 1 ]
+        then
+            echo "Check your memory"
+        fi
         if [ ! -a {output} ]; then touch {output}; fi
         """
           
@@ -34,7 +47,20 @@ rule megahit_unpaired:
         out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
     shell:
         """
-        megahit -r {input} -o {params.out_fp} --continue || \
+        ## turn off bash strict mode
+        set +o pipefail
+
+        ## sometimes the error is due to lack of memory
+        exitcode=0
+        megahit -r {input} -o {params.out_fp} --continue || exitcode=$?
+
+        if [ $exitcode -eq 255 ]
+        then
+            echo "Empty contigs"
+        elif [ $exitcode -gt 1 ]
+        then
+            echo "Check your memory"
+        fi
         if [ ! -a {output} ]; then touch {output}; fi
         """
 
