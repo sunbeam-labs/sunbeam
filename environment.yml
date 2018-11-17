@@ -25,3 +25,4 @@ dependencies:
   - komplexity=0.3.6
   - rust-bio-tools
   - grabseqs=0.2.1
+  - minimap2
