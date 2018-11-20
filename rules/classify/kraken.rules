@@ -2,6 +2,12 @@
 #
 # Rules for running Kraken
 
+rule Classified:
+    input:
+        str(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv')
+    output:
+        str(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv')
+
 rule all_classify:
     input:
         TARGET_CLASSIFY
