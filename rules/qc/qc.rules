@@ -2,6 +2,12 @@
 #
 # Illumina quality control rules
 
+rule QualityControled:
+    input:
+        str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')
+    output:
+        str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')
+
 rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
     input:
