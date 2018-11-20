@@ -79,18 +79,11 @@ def main(argv=sys.argv):
 
     ### Config(s)
 
-    # TODO from here on, update config-handling to handle possible mixed
-    # unpaired/paired case.  (Append suffix to existing args.output in that
-    # case, between name and .yml?)
-
-    # Louis thought: gonna append for now since I don't know how to parse Path objects
-
     multiple_configs = len(samplelists.values()) != 1
     for layout in samplelists.keys(): # one paired, one unpaired, or one of each
         # Create config file
         if multiple_configs:
             config_file = check_existing(project_fp/Path(layout+"_"+str(Path(project_fp/args.output).name)), args.force)
-#            config_file = check_existing(Path(str(project_fp/args.output)+"_"+layout), args.force)
         else:
             config_file = check_existing(project_fp/args.output, args.force)
         cfg = config.new(
@@ -162,7 +155,6 @@ def build_sample_list_sra(accessions, args):
                 "not %s" % bad_lens)
     return(files)
 
-#def find_samples_sra(accessions, dir_proj, dir_fp="sunbeam_output/download"):
 def find_samples_sra(accessions, dir_fp="download"):
     """
     Build a dict of samples from SRA accession numbers.
@@ -187,7 +179,6 @@ def find_samples_sra(accessions, dir_fp="download"):
     # (using given path) as values.
     samp_parse = lambda txt: re.match('^([0-9A-Za-z]+)[_\.]', txt).group(1)
     prepend_fp = lambda files: [str(dir_fp/fp) for fp in files]
-#    prepend_fp = lambda files: [str(dir_proj/dir_fp/fp) for fp in files]
     dictify = lambda files: {str(i+1): v for i, v in zip(range(len(files)), files)}
     try:
         Samples = {samp_parse(d[0]): dictify(prepend_fp(d)) for d in data}
