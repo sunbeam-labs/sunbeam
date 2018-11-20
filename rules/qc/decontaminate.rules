@@ -10,9 +10,7 @@ rule Decontaminated:
 
 rule all_decontam:
     input:
-        expand(
-            str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'),
-            sample=Samples.keys(), rp=Pairs)
+        expand(rules.Decontaminated.output, sample=Samples.keys(), rp=Pairs)
 
 ruleorder: build_host_index > build_genome_index
         
