@@ -95,7 +95,12 @@ def main(argv=sys.argv):
             cfg = config.update(cfg, defaults)
         paired = layout == "paired"
         sample_file = samplelists[layout].name
-        cfg = config.update(cfg, {"all":{"paired_end":paired, "download_reads":True}})
+        cfg_new = {"all": {
+            "paired_end": paired,
+            "samplelist_fp": samplelists[layout].name,
+            "download_reads": True
+            }}
+        cfg = config.update(cfg, cfg_new)
         with config_file.open('w') as out:
             config.dump(cfg, out)
         sys.stderr.write("New config file written to {}\n".format(config_file))
