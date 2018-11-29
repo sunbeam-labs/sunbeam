@@ -190,14 +190,24 @@ function test_mapping {
 function test_sunbeam_get {
     mkdir -p $TEMPDIR/test_sunbeam_get
     sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get --data_acc SRP021545
-    a=`wc -l < $TEMPDIR/test_sunbeam_get/samples.csv`
-    test "$a" -eq 89
+    test `wc -l < $TEMPDIR/test_sunbeam_get/samples.csv` -eq 89
 }
 
 # Test for sunbeam get -- study with paired and unpaired samples
 # Make sure Sunbeam exits with nonzero exit code if a study contains paired and unpaired reads
+# Both sets should be written separately to a config/samples.csv pair of files
 
-#function test_get_paired_unpaired {
-#    mkdir -p $TEMPDIR/test_get_paired_unpaired
-#    sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_get_paired_unpaired --data_acc ERP020555 && exit 0 || exit 0
-#}
+function test_get_paired_unpaired {
+    dp=$TEMPDIR/test_get_paired_unpaired
+    mkdir -p $dp
+    # "!" because we *expect* this to exit nonzero.
+    ! sunbeam get --force --output sunbeam_config_SRA.yml $dp --data_acc ERP020555
+    # Check contents of the two config files
+    grep '^  samplelist_fp: samples_unpaired.csv$' $dp/unpaired_sunbeam_config_SRA.yml
+    grep '^  paired_end: false$'                   $dp/unpaired_sunbeam_config_SRA.yml
+    grep '^  samplelist_fp: samples_paired.csv$'   $dp/paired_sunbeam_config_SRA.yml
+    grep '^  paired_end: true$'                    $dp/paired_sunbeam_config_SRA.yml
+    # Check contents of the two samples csv files
+    test `wc -l < $dp/samples_unpaired.csv` -eq  1
+    test `wc -l < $dp/samples_paired.csv`   -eq  13
+}
