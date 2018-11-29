@@ -189,11 +189,9 @@ function test_mapping {
 
 function test_sunbeam_get {
     mkdir -p $TEMPDIR/test_sunbeam_get
-    sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get --data_acc SRP159164
-    a=`wc -l $TEMPDIR/test_sunbeam_get/samples.csv`
-    if [ "$a" -ne "34" ]; then
-        exit 1
-    fi
+    sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get --data_acc SRP021545
+    a=`wc -l < $TEMPDIR/test_sunbeam_get/samples.csv`
+    test "$a" -eq 89
 }
 
 # Test for sunbeam get -- study with paired and unpaired samples
