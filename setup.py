@@ -10,7 +10,6 @@ setup(
     entry_points={'console_scripts': [
         'sunbeam = sunbeamlib.scripts.command:main',
         'sunbeam_init = sunbeamlib.scripts.init:main',
-        'sunbeam_get = sunbeamlib.scripts.get:main',
         'sunbeam_mod_config = sunbeamlib.scripts.config:main'
     ]},
     classifiers=[
