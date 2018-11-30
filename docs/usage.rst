@@ -174,7 +174,7 @@ Further usage information is available by typing ``sunbeam init --help``.
 Creating a new project using data from SRA
 ----------------------
 
-If you'd like to analyze public data from [NCBI SRA](https://www.ncbi.nlm.nih.gov/sra/),
+If you'd like to analyze public data from `NCBI SRA <https://www.ncbi.nlm.nih.gov/sra/>`_,
 we provide a feature in ``sunbeam init`` to use SRA as a data source instead of
 files already on local disk. Run ``sunbeam init`` with ``--data_acc`` instead
 of ``--data_fp``, giving one or more SRA accession numbers.
