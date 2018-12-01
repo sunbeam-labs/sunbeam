@@ -174,14 +174,14 @@ Further usage information is available by typing ``sunbeam init --help``.
 Creating a new project using data from SRA
 ----------------------
 
-If you'd like to analyze public data from [NCBI SRA](https://www.ncbi.nlm.nih.gov/sra/),
-we provide a utility, ``sunbeam get``, to create a new config file--run ``sunbeam get``
-instead of ``sunbeam init``. The utility takes two arguments: the project path, and one
-or more SRA accession numbers to `--data_acc`. 
+If you'd like to analyze public data from `NCBI SRA <https://www.ncbi.nlm.nih.gov/sra/>`_,
+we provide a feature in ``sunbeam init`` to use SRA as a data source instead of
+files already on local disk. Run ``sunbeam init`` with ``--data_acc`` instead
+of ``--data_fp``, giving one or more SRA accession numbers.
 
 .. code-block:: shell
 
-   sunbeam get /path/to/my_project --data_acc SRP#######
+   sunbeam init /path/to/my_project --data_acc SRP#######
 
 You can pass any number of SRA run identifiers (SRR/ERR - one sample), SRA project 
 identifiers (SRP/ERP - one or more samples), or BioProject identifiers (PRJNA - one 
@@ -190,15 +190,13 @@ analyzing the 34 samples from ``SRP159164`` plus the single sample ``ERR1759004`
 
 .. code-block:: shell
 
-   sunbeam get /path/to/my_project --data_acc SRP159164 ERR1759004
+   sunbeam init /path/to/my_project --data_acc SRP159164 ERR1759004
    
 Sometimes, SRA projects contain both paired and unpaired reads. If this is the case,
 two config files and sample lists will be output--one prepended with "paired\_"and
 one prepended with "unpaired\_" (as Sunbeam runs on either paired or unpaired reads, 
 but not both). Sunbeam uses the SRA metadata to call reads as paired- or single-end so 
 it is only as accurate as the SRA metadata.
-
-Further usage information is available by typing ``sunbeam get --help``.
 
 Configuration
 =============
