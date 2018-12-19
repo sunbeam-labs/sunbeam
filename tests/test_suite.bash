@@ -174,11 +174,20 @@ function test_mapping {
     ) > $TEMPDIR/samples_test_mapping.csv
     sunbeam config modify --str 'all: {samplelist_fp: "samples_test_mapping.csv"}' \
         $TEMPDIR/tmp_config.yml > $TEMPDIR/test_mapping_config.yml
+    # Move human host files to top-level, since we're using that genome for
+    # mapping in this test and shouldn't decontaminate using it as well.
+    for file in $TEMPDIR/hosts/human*; do
+        mv $file $TEMPDIR/hosts_${file##*/}
+    done
+    sunbeam run --configfile $TEMPDIR/test_mapping_config.yml all_mapping
+    # Move human host files back to original location
+    for file in $TEMPDIR/hosts_*; do
+        mv $file ${file/hosts_/hosts\//}
+    done
     # There should be two lines in the human coverage summary and none at all
     # in the phix174 summary.  The human.csv lines should be sorted in standard
     # alphanumeric order; stub2_human will come before stub_human.
-    sunbeam run --configfile $TEMPDIR/test_mapping_config.yml all_mapping
-    md5sum --check --status <(
+    md5sum --check <(
     echo "c624406eb2582cac5e0cfb160c79a900  $TEMPDIR/sunbeam_output/mapping/human/coverage.csv"
     echo "1aee435ade0310a6b3c63d44cbdc2029  $TEMPDIR/sunbeam_output/mapping/phix174/coverage.csv"
     )
