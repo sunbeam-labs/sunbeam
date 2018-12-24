@@ -28,7 +28,7 @@ rule run_blastn:
         -outfmt 5 \
         -num_threads {threads} \
         -evalue 1e-10 \
-        -max_target_seqs 1 \
+        -max_target_seqs 5000 \
         -out {output} \
         """
 
