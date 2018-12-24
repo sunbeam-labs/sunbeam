@@ -100,3 +100,19 @@ rule _test_blastpx_report:
     input:
         expand(str(ANNOTATION_FP/'{blastpx}'/'card'/'prodigal'/'report.tsv'),
         blastpx=['blastx','blastp'])
+
+rule clean_xml:
+    input:
+        expand(str(ANNOTATION_FP/'summary'/'{sample}.tsv'), sample=Samples.keys())
+    params:
+        blastn_fp = str(ANNOTATION_FP/'blastn'),
+        blastp_fp = str(ANNOTATION_FP/'blastp'),
+        blastx_fp = str(ANNOTATION_FP/'blastx')
+    output:
+        touch(".xml_cleaned")
+    shell:
+        """
+        if [ -d {params.blastn_fp} ]; then rm -r {params.blastn_fp}; fi && \
+        if [ -d {params.blastp_fp} ]; then rm -r {params.blastp_fp}; fi && \
+        if [ -d {params.blastx_fp} ]; then rm -r {params.blastx_fp}; fi
+        """
