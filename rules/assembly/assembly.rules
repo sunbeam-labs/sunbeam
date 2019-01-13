@@ -4,16 +4,10 @@
 #
 # Requires Megahit.
 
-rule Assembled:
-    input:
-        str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa') 
-    output:
-        str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa')
-
 rule all_assembly:
     """Build contigs for all samples."""
     input:
-        expand(rules.Assembled.output, sample = Samples.keys())
+        TARGET_ASSEMBLY
 
 ruleorder: megahit_paired > megahit_unpaired
           
