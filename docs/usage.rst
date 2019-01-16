@@ -526,11 +526,3 @@ Quality control
 This   folder   contains  the   trimmed,   low-complexity   filtered  reads   in
 ``cleaned``. The ``decontam`` folder contains the cleaned reads that did not map
 to any contaminant or host genomes. In general, most downstream steps should reference the ``decontam`` reads.
-
-
-.. _troubleshooting:
-
-Troubleshooting
-===============
-
-Coming soon. For now we suggest browsing the closed issues tab on Github.
