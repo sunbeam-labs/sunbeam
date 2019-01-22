@@ -118,7 +118,7 @@ conda environment:
 You should see '(sunbeam)' in your prompt when you're in the environment. To leave
 the environment, run ``source deactivate`` or close the terminal.
 
-Creating a new project
+Creating a new project using local data
 ----------------------
 
 We provide a utility, ``sunbeam init``, to create a new config file and sample
@@ -171,6 +171,33 @@ part of the init command.
 Further usage information is available by typing ``sunbeam init --help``.
    
 
+Creating a new project using data from SRA
+----------------------
+
+If you'd like to analyze public data from `NCBI SRA <https://www.ncbi.nlm.nih.gov/sra/>`_,
+we provide a feature in ``sunbeam init`` to use SRA as a data source instead of
+files already on local disk. Run ``sunbeam init`` with ``--data_acc`` instead
+of ``--data_fp``, giving one or more SRA accession numbers.
+
+.. code-block:: shell
+
+   sunbeam init /path/to/my_project --data_acc SRP#######
+
+You can pass any number of SRA run identifiers (SRR/ERR - one sample), SRA project 
+identifiers (SRP/ERP - one or more samples), or BioProject identifiers (PRJNA - one 
+or more samples). For example, the below command will initialize a project for 
+analyzing the 34 samples from ``SRP159164`` plus the single sample ``ERR1759004``:
+
+.. code-block:: shell
+
+   sunbeam init /path/to/my_project --data_acc SRP159164 ERR1759004
+   
+Sometimes, SRA projects contain both paired and unpaired reads. If this is the case,
+two config files and sample lists will be output--one prepended with "paired\_"and
+one prepended with "unpaired\_" (as Sunbeam runs on either paired or unpaired reads, 
+but not both). Sunbeam uses the SRA metadata to call reads as paired- or single-end so 
+it is only as accurate as the SRA metadata.
+
 Configuration
 =============
 
@@ -192,6 +219,8 @@ all
   list_samples``.
 * ``paired_end``: 'true' or 'false' depending on whether you are using paired-
   or single-end reads.
+* ``download_reads``: 'true' or 'false' depending on whether you are using reads
+  from NCBI SRA.
 * ``version``: Automatically added for you by ``sunbeam init``. Ensures
   compatibility with the right version of Sunbeam.
 
@@ -299,6 +328,11 @@ mapping
 * ``samtools_opts``: a string added to the ``samtools view`` command during
   mapping. This is a good place to add '-F4' to keep only mapped reads and
   decrease the space these files occupy.
+
+download
+++++++++
+* ``suffix``: the name of the subfolder to create for download output (fastq.gz files)
+* ``threads``: number of threads to use for downloading (too many at once may make NCBI unhappy)
 
 
 .. _running:
@@ -492,11 +526,3 @@ Quality control
 This   folder   contains  the   trimmed,   low-complexity   filtered  reads   in
 ``cleaned``. The ``decontam`` folder contains the cleaned reads that did not map
 to any contaminant or host genomes. In general, most downstream steps should reference the ``decontam`` reads.
-
-
-.. _troubleshooting:
-
-Troubleshooting
-===============
-
-Coming soon. For now we suggest browsing the closed issues tab on Github.

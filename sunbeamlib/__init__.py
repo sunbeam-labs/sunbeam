@@ -16,7 +16,7 @@ from Bio import SeqIO
 
 __version__ = str(Version.coerce(get_distribution('sunbeam').version))
 
-def build_sample_list(samplelist_fp, paired_end):
+def load_sample_list(samplelist_fp, paired_end, download=False, root_proj = ''):
     """
     Build a list of samples from a sample list file.
     :param samplelist_fp: a Path to a whitespace-delimited samplelist file,
@@ -29,14 +29,20 @@ def build_sample_list(samplelist_fp, paired_end):
         for row in reader:
             sample = row['sample']
             try:
-                r1 = _verify_path(row['1'])
+                if download:
+                    r1 = _verify_download_path(row['1'], root_proj)
+                else:
+                    r1 = _verify_path(row['1'])
             except ValueError:
                 raise ValueError("Associated file for {} not found.".format(
                     sample))
             r2 = ''
             if paired_end:
                 try:
-                    r2 = _verify_path(row['2'])
+                    if download:
+                        r2 = _verify_download_path(row['2'], root_proj)
+                    else:
+                        r2 = _verify_path(row['2'])
                 except ValueError:
                     raise ValueError(
                         "Paired-end files specified, but mate pair for '{}' "
@@ -121,6 +127,12 @@ class MissingMatePairError(Exception):
 
 class SampleFormatError(Exception):
     pass
+
+def _verify_download_path(fp, root_proj):
+    if not fp:
+        raise ValueError("Missing filename")
+    path = Path(root_proj/fp)
+    return str(path.resolve())
 
 def _verify_path(fp):
     if not fp:
