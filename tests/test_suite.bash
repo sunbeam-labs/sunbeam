@@ -220,3 +220,14 @@ function test_get_paired_unpaired {
     test `wc -l < $dp/samples_unpaired.csv` -eq  1
     test `wc -l < $dp/samples_paired.csv`   -eq  13
 }
+
+# Fix for #185:
+# While the core Sunbeam rules keep a simple directory structure, using more
+# complicated nested subdirectories can complicate the wildcard/graph
+# resolution in Snakemake and result in unexpected wildcard patterns being
+# evaluated.  Enforcing a pattern on our sample names (no slashes allowed)
+# avoids this.
+function test_subdir_patterns {
+    # All we need to check is that the graph resolution works.
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_subdir -n
+}
