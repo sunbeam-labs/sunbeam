@@ -20,11 +20,6 @@ from sunbeamlib import load_sample_list, read_seq_ids
 from sunbeamlib.config import *
 from sunbeamlib.reports import *
 
-# Disallow slashes in our sample names during Snakemake's wildcard evaluation.
-# Slashes should always be interpreted as directory separators.
-wildcard_constraints:
-  sample="[^/]+"
-
 # Load config file
 if not config:
     raise SystemExit(

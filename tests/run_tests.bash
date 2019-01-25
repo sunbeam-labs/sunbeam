@@ -185,6 +185,7 @@ function build_test_data {
     cp -r raw $TEMPDIR
     cp -r truncated_taxonomy $TEMPDIR
     cp -r sbx_test $STARTING_DIR/$SBX_FP/sbx_test
+    cp -r sbx_test_subdir $STARTING_DIR/$SBX_FP/sbx_test_subdir
     cp seqid2taxid.map $TEMPDIR
 
     mkdir -p $TEMPDIR/hosts
