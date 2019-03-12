@@ -33,11 +33,11 @@ rule megahit_paired:
         if [ $exitcode -eq 255 ]
         then
             echo "Empty contigs"
+            touch {output}
         elif [ $exitcode -gt 1 ]
         then
             echo "Check your memory"
         fi
-        if [ ! -a {output} ]; then touch {output}; fi
         """
           
 rule megahit_unpaired:
@@ -61,11 +61,11 @@ rule megahit_unpaired:
         if [ $exitcode -eq 255 ]
         then
             echo "Empty contigs"
+            touch {output}
         elif [ $exitcode -gt 1 ]
         then
             echo "Check your memory"
         fi
-        if [ ! -a {output} ]; then touch {output}; fi
         """
 
 rule final_filter:
