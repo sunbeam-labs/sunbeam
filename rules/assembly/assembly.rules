@@ -10,7 +10,7 @@ rule all_assembly:
         TARGET_ASSEMBLY
 
 ruleorder: megahit_paired > megahit_unpaired
-          
+
 rule megahit_paired:
     input:
         r1 = str(QC_FP/'decontam'/'{sample}_1.fastq.gz'),
@@ -29,17 +29,17 @@ rule megahit_paired:
         ## sometimes the error is due to lack of memory
         exitcode=0
         megahit -t {threads} -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue || exitcode=$?
-        
+
         if [ $exitcode -eq 255 ]
         then
             echo "Empty contigs"
+            touch {output}
         elif [ $exitcode -gt 1 ]
         then
             echo "Check your memory"
         fi
-        if [ ! -a {output} ]; then touch {output}; fi
         """
-          
+
 rule megahit_unpaired:
     input:
         str(QC_FP/'decontam'/'{sample}_1.fastq.gz')
@@ -61,11 +61,11 @@ rule megahit_unpaired:
         if [ $exitcode -eq 255 ]
         then
             echo "Empty contigs"
+            touch {output}
         elif [ $exitcode -gt 1 ]
         then
             echo "Check your memory"
         fi
-        if [ ! -a {output} ]; then touch {output}; fi
         """
 
 rule final_filter:
