@@ -6,6 +6,12 @@ rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
     input:
         TARGET_QC
+    params:
+        title = Cfg['qc'].get('report_title', 'QC report'),
+        file_name = Cfg['qc'].get('report_name', 'qc_report.html'),
+        outdir = QC_FP
+    run:
+        shell("multiqc -i \"{params.title}\" -n {params.file_name} -o {params.outdir} {params.outdir}")
 
 ruleorder: adapter_removal_paired > adapter_removal_unpaired
         
