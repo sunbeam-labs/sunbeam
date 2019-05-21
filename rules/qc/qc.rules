@@ -6,12 +6,6 @@ rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
     input:
         TARGET_QC
-    params:
-        title = Cfg['qc'].get('report_title', 'QC report'),
-        file_name = Cfg['qc'].get('report_name', 'qc_report.html'),
-        outdir = QC_FP
-    run:
-        shell("multiqc -i \"{params.title}\" -n {params.file_name} -o {params.outdir} {params.outdir}")
 
 ruleorder: adapter_removal_paired > adapter_removal_unpaired
         
@@ -209,4 +203,16 @@ rule clean_qc:
         rm -r {params.komplexity_fp}
         """
         
+rule multiqc:
+    """Runs multiqc on different logs once every steps are done."""
+    input:
+        TARGET_FASTQC + TARGET_CLEAN
+    output:
+        QC_REPORT
+    params:
+        title = Cfg['qc'].get('report_title', 'QC report'),
+        outdir = QC_FP
+    run:
+        report_name = output[0].split('/')[-1]  # Get unique name from targets.rules file
+        shell("multiqc -i \"{params.title}\" -n {report_name} -o {params.outdir} {params.outdir}")
     

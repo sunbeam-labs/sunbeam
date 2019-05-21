@@ -13,7 +13,10 @@ TARGET_CLEAN = expand(
     str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'),
     sample = Samples.keys(), rp = Pairs)
 
-TARGET_QC = TARGET_CLEAN + TARGET_FASTQC
+# MultiQC report
+QC_REPORT = str(QC_FP/'qc_report.html')
+
+TARGET_QC = TARGET_CLEAN + TARGET_FASTQC + [QC_REPORT]
 
 # Remove host reads
 TARGET_DECONTAM = expand(
