@@ -13,10 +13,7 @@ TARGET_CLEAN = expand(
     str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'),
     sample = Samples.keys(), rp = Pairs)
 
-# MultiQC report
-QC_REPORT = str(QC_FP/'qc_report.html')
-
-TARGET_QC = TARGET_CLEAN + TARGET_FASTQC + [QC_REPORT]
+TARGET_QC = TARGET_CLEAN + TARGET_FASTQC
 
 # Remove host reads
 TARGET_DECONTAM = expand(
@@ -59,12 +56,15 @@ TARGET_ANNOTATE = expand(
 
 
 # ---- Reports
+# MultiQC report
+MULTIQC_REPORT = str(QC_FP/'reports'/'multiqc_report.html')
+
 TARGET_REPORT = [
     str(QC_FP/'reports'/'preprocess_summary.tsv'),
     str(QC_FP/'reports'/'fastqc_quality.tsv'),
-    str(ASSEMBLY_FP/'contigs_coverage.txt')
+    str(ASSEMBLY_FP/'contigs_coverage.txt'),
+    MULTIQC_REPORT
 ]
-
 
 # ---- All targets
 TARGET_ALL = (
