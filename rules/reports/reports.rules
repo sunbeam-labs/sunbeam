@@ -44,3 +44,17 @@ rule fastqc_report:
         quality_list = [reports.parse_fastqc_quality(file) for file in input.files]
         quality_table = pandas.concat(quality_list, axis=1).transpose()
         quality_table.to_csv(output[0],sep="\t",index_label="Samples")
+
+
+rule multiqc_report:
+    """Build multiqc report on qc step."""
+    input:
+        TARGET_FASTQC
+    output:
+        MULTIQC_REPORT
+    params:
+        title = Cfg['qc'].get('report_title', 'QC report'),
+        outdir = str(QC_FP/'reports')
+    run:
+        report_name = output[0].split('/')[-1]  # Get unique name from targets.rules file
+        shell("multiqc -i \"{params.title}\" -n {report_name} -o {params.outdir} {params.outdir}")

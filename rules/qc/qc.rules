@@ -208,5 +208,3 @@ rule clean_qc:
         rm -r {params.trimmomatic_fp} && \
         rm -r {params.komplexity_fp}
         """
-        
-    
