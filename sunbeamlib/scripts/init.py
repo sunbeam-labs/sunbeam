@@ -133,7 +133,7 @@ def write_samples_from_input(args, project_fp):
             except MissingMatePairError as e:
                 raise SystemExit(
                     "Error: assuming paired-end reads, but could not find mates. Specify "
-                    "--single-end if not paired-end, or provide sample name format "
+                    "--single_end if not paired-end, or provide sample name format "
                     "using --format."
                     "\n  Reason: {}".format(e))
             sys.stderr.write(
