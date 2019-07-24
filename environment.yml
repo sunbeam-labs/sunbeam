@@ -4,7 +4,7 @@ channels:
   - eclarke
   - louiejtaylor
 dependencies:
-  - snakemake=4.8.1
+  - snakemake=5.5.0
   - ruamel.yaml
   - biopython
   - trimmomatic=0.36
@@ -18,7 +18,7 @@ dependencies:
   - bwa>=0.7.17
   - pysam
   - pandas
-  - megahit
+  - megahit<1.2
   - prodigal
   - semantic_version
   - setuptools_scm

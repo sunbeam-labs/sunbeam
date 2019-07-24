@@ -21,6 +21,7 @@ jobs:
           name: install
           command: |
             bash install.sh -u lib -e sunbeam
+          no_output_timeout: 20m
 
       - run:
           name: run tests
