@@ -3,7 +3,14 @@ function test_all {
     sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p
 
     # Check contents
-    awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/sunbeam_output/annotation/summary/dummyecoli.tsv
+    annot_summary=sunbeam_output/annotation/summary/dummyecoli.tsv
+    awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/$annot_summary || (
+        # stderr will show up on the summary output for the test suite as well
+        # as in the .err file.  false will cause the shell to exit assuming -e
+        # is in effect here.
+        echo "Check failed on $annot_summary" > /dev/stderr
+        false
+    )
 
     # Check targets
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt 
