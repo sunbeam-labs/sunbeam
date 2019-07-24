@@ -55,6 +55,11 @@ function test_extensions {
     sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
 }
 
+# Test that we have the updated snakemake that uses "conda activate"
+function test_use_conda {
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml --use-conda sbx_test | grep "SBX_TEST"
+}
+
 # Test that single-end sequencing configurations work
 function test_single_end {
     rm -rf $TEMPDIR/sunbeam_output/qc
