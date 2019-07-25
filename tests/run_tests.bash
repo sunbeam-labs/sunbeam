@@ -1,8 +1,13 @@
 #!/bin/bash
 
+# setup
+
 set -e
 
 STARTING_DIR=$(pwd)
+
+CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
+source $CONDA_BASE/etc/profile.d/conda.sh # allows conda [de]activate in scripts
 
 # Ensure we're running in the correct directory
 case $BASH_SOURCE in
@@ -128,7 +133,7 @@ function setup {
     verbose "\n\t${GREEN}Conda environment${RESET}: ${SUNBEAM_ENV}\n"
 
     # Activate Sunbeam
-    source activate $SUNBEAM_ENV
+    conda activate $SUNBEAM_ENV
 
     # Move extensions out of the way temporarily
     if [ -d $SBX_FP ]; then
@@ -156,7 +161,7 @@ function cleanup {
 	    [ -f "${LOGFILE}.out" ] && rm "${LOGFILE}.out"
 	fi
     fi
-    source deactivate
+    conda deactivate
     # Remove Sunbeam environment if created
     if [ "$INSTALL_SUNBEAM" = true ]; then
 	verbose "Deleting temporary Sunbeam environment ${SUNBEAM_ENV} \n"

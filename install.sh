@@ -2,6 +2,9 @@
 
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
+CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
+source $CONDA_BASE/etc/profile.d/conda.sh # allows conda [de]activate in scripts
+
 read -r -d '' __usage <<-'EOF'
   -e --environment  [arg] Environment to install to. Default: "sunbeam"
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
@@ -109,13 +112,13 @@ function __test_sunbeam() {
 
 function activate_sunbeam () {
     set +o nounset
-    source activate $__sunbeam_env
+    conda activate $__sunbeam_env
     set -o nounset
 }
 
 function deactivate_sunbeam () {
     set +o nounset
-    source deactivate
+    conda deactivate
     set -o nounset
 }
 
@@ -220,9 +223,9 @@ if [[ $__old_path != *"${__conda_path}/bin"* ]]; then
     warning "To add it to your path, run "
     warning "   'echo \"export PATH=\$PATH:${__conda_path}/bin\" >> ~/.bashrc'"
     warning "and close and re-open your terminal session to apply."
-    warning "When finished, run 'source activate ${__sunbeam_env}' to begin."
+    warning "When finished, run 'conda activate ${__sunbeam_env}' to begin."
 else
-    info "Done. Run 'source activate ${__sunbeam_env}' to begin."
+    info "Done. Run 'conda activate ${__sunbeam_env}' to begin."
 fi
 
    
