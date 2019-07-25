@@ -99,9 +99,6 @@ function __test_env() {
 
 function __test_sunbeam() {
     if [[ $(__test_env) = true ]]; then
-        # Allow conda [de]activate in this script
-        CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
-        source $CONDA_BASE/etc/profile.d/conda.sh
 	activate_sunbeam
 	command -v sunbeam &> /dev/null && echo true || echo false
 	deactivate_sunbeam
@@ -110,13 +107,21 @@ function __test_sunbeam() {
     fi
 }
 
+function enable_conda_activate () {
+    # Allow conda [de]activate in this script
+    CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
+    source $CONDA_BASE/etc/profile.d/conda.sh
+}
+
 function activate_sunbeam () {
+    enable_conda_activate
     set +o nounset
     conda activate $__sunbeam_env
     set -o nounset
 }
 
 function deactivate_sunbeam () {
+    enable_conda_activate
     set +o nounset
     conda deactivate
     set -o nounset
@@ -186,10 +191,6 @@ else
     install_conda
     __env_changed=true
 fi
-
-# Allow conda [de]activate in this script
-CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
-source $CONDA_BASE/etc/profile.d/conda.sh
 
 # Create Conda environment for Sunbeam
 if [[ $__env_exists = true && $__update_env = false ]]; then
