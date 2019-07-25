@@ -28,12 +28,27 @@ Sunbeam was designed to be modular and extensible. Some extensions have been bui
 - [Kaiju](https://github.com/sunbeam-labs/sbx_kaiju), a read classifier that uses BWA rather than kmers
 - [Anvi'o](https://github.com/sunbeam-labs/sbx_anvio), a downstream analysis pipeline that does lots of stuff!
 
-To get started, see our [documentation](http://sunbeam.readthedocs.io)!
+More extensions can be found at the extension page: https://www.sunbeam-labs.org/
+
+**To get started, see our [documentation](http://sunbeam.readthedocs.io)!**
 
 
 ------
 
 ### Changelog:
+
+#### v2.0.1 (July 24, 2019)
+
+ - Increment Snakemake version requirement for compatibility with recent conda
+ - Specify earlier megahit version to ensure compatbility with existing assembly behavior
+ - Integration test improvements
+
+#### v2.0.0 (January 22, 2019)
+
+ - Start a project using resources directly from the SRA using `sunbeam init --data_acc [SRA ###]`. For more information, see [the docs](https://sunbeam.readthedocs.io/en/latest/usage.html#creating-a-new-project-using-data-from-sra)
+ - New extension website: https://www.sunbeam-labs.org/
+ - Improved documentation
+ - Numerous bugfixes and optimizations
 
 #### v1.2.1 (May 24, 2018)
 
@@ -72,4 +87,5 @@ To get started, see our [documentation](http://sunbeam.readthedocs.io)!
 - Chunyu Zhao ([@zhaoc1](https://github.com/zhaoc1))
 - Jesse Connell ([@ressy](https://github.com/ressy))
 - Louis Taylor ([@louiejtaylor](https://github.com/louiejtaylor))
+- Kyle Bittinger ([@kylebittinger](https://github.com/kylebittinger))
 
