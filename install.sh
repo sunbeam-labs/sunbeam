@@ -99,6 +99,9 @@ function __test_env() {
 
 function __test_sunbeam() {
     if [[ $(__test_env) = true ]]; then
+        # Allow conda [de]activate in this script
+        CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
+        source $CONDA_BASE/etc/profile.d/conda.sh
 	activate_sunbeam
 	command -v sunbeam &> /dev/null && echo true || echo false
 	deactivate_sunbeam
@@ -185,7 +188,6 @@ else
 fi
 
 # Allow conda [de]activate in this script
-conda init bash
 CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
 source $CONDA_BASE/etc/profile.d/conda.sh
 
