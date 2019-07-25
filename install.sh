@@ -2,9 +2,6 @@
 
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
-CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
-source $CONDA_BASE/etc/profile.d/conda.sh # allows conda [de]activate in scripts
-
 read -r -d '' __usage <<-'EOF'
   -e --environment  [arg] Environment to install to. Default: "sunbeam"
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
@@ -186,6 +183,10 @@ else
     install_conda
     __env_changed=true
 fi
+
+# Allow conda [de]activate in this script
+CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
+source $CONDA_BASE/etc/profile.d/conda.sh
 
 # Create Conda environment for Sunbeam
 if [[ $__env_exists = true && $__update_env = false ]]; then
