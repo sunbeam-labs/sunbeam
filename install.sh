@@ -107,15 +107,23 @@ function __test_sunbeam() {
     fi
 }
 
+function enable_conda_activate () {
+    # Allow conda [de]activate in this script
+    CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
+    source $CONDA_BASE/etc/profile.d/conda.sh
+}
+
 function activate_sunbeam () {
+    enable_conda_activate
     set +o nounset
-    source activate $__sunbeam_env
+    conda activate $__sunbeam_env
     set -o nounset
 }
 
 function deactivate_sunbeam () {
+    enable_conda_activate
     set +o nounset
-    source deactivate
+    conda deactivate
     set -o nounset
 }
 
@@ -220,9 +228,9 @@ if [[ $__old_path != *"${__conda_path}/bin"* ]]; then
     warning "To add it to your path, run "
     warning "   'echo \"export PATH=\$PATH:${__conda_path}/bin\" >> ~/.bashrc'"
     warning "and close and re-open your terminal session to apply."
-    warning "When finished, run 'source activate ${__sunbeam_env}' to begin."
+    warning "When finished, run 'conda activate ${__sunbeam_env}' to begin."
 else
-    info "Done. Run 'source activate ${__sunbeam_env}' to begin."
+    info "Done. Run 'conda activate ${__sunbeam_env}' to begin."
 fi
 
    
