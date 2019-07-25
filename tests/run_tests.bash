@@ -6,9 +6,6 @@ set -e
 
 STARTING_DIR=$(pwd)
 
-CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
-source $CONDA_BASE/etc/profile.d/conda.sh # allows conda [de]activate in scripts
-
 # Ensure we're running in the correct directory
 case $BASH_SOURCE in
     tests/*)
@@ -123,7 +120,10 @@ function setup {
     verbose "\n\t${GREEN}Test directory${RESET}: ${TEMPDIR}"
 
     export PATH=$PATH:$HOME/miniconda3/bin
-    
+    # Allow conda [de]activate
+    CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
+    source $CONDA_BASE/etc/profile.d/conda.sh
+
     # Install Sunbeam (maybe)
     if [ "$USE_TMPENV" = true ]; then
 	SUNBEAM_ENV="sunbeam-`basename $TEMPDIR`"

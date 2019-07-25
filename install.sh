@@ -185,6 +185,7 @@ else
 fi
 
 # Allow conda [de]activate in this script
+conda init bash
 CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
 source $CONDA_BASE/etc/profile.d/conda.sh
 
