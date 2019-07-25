@@ -27,3 +27,4 @@ dependencies:
   - grabseqs=0.3.4
   - minimap2
   - multiqc
+  - h5py # temp: patching missing dependency of biom-format (req'd by kraken-biom)
