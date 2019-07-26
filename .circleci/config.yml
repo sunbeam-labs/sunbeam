@@ -32,4 +32,16 @@ jobs:
           paths:
             - ~/miniconda3
           key: v1-dependencies-{{ checksum "environment.yml" }}
-           
+
+workflows:
+  version: 2
+  dailybuild:
+    triggers:
+      - schedule:
+          cron: "30 14 * * *"
+          filters:
+            branches:
+              only:
+                - circleci-improvements
+    jobs:
+      - build
