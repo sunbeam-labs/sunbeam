@@ -42,6 +42,6 @@ workflows:
           filters:
             branches:
               only:
-                - circleci-improvements
+                - ci
     jobs:
       - build
