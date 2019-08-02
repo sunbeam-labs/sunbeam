@@ -35,13 +35,15 @@ jobs:
 
 workflows:
   version: 2
-  dailybuild:
+  weeklybuild:
     triggers:
       - schedule:
-          cron: "30 14 * * *"
+          cron: "30 14 * * 3"
           filters:
             branches:
               only:
                 - ci
+                - dev
+                - stable
     jobs:
       - build
