@@ -196,6 +196,7 @@ function build_test_data {
     mkdir -p $TEMPDIR/hosts
     cp indexes/*.fasta $TEMPDIR/hosts
     python generate_dummy_data.py $TEMPDIR
+    python generate_dummy_data.py $TEMPDIR data_files_old_illumina /1 /2
     # Create a version of the config file customized for this tempdir
     sunbeam init \
 	    --force \

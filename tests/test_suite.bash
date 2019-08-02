@@ -16,6 +16,31 @@ function test_all {
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt 
 }
 
+# For #221: full test using old-style Illumina paired sequence IDs (/1 and /2)
+function test_all_old_illumina {
+    sunbeam init \
+            --force \
+            --output tmp_config_old_illumina.yml \
+            --defaults <(
+                sed s/sunbeam_output/sunbeam_output_old_illumina/ $TEMPDIR/tmp_config.yml
+                ) \
+            --data_fp $TEMPDIR/data_files_old_illumina \
+            $TEMPDIR
+    sunbeam run -- --configfile=$TEMPDIR/tmp_config_old_illumina.yml -p
+
+    # Check contents
+    annot_summary=sunbeam_output_old_illumina/annotation/summary/dummyecoli.tsv
+    awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/$annot_summary || (
+        # stderr will show up on the summary output for the test suite as well
+        # as in the .err file.  false will cause the shell to exit assuming -e
+        # is in effect here.
+        echo "Check failed on $annot_summary" > /dev/stderr
+        false
+    )
+
+    # Check targets
+    python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output_old_illumina tests/targets.txt
+}
 
 # Fix for #38: Make Cutadapt optional
 # Remove adapter sequences and check to make sure qc proceeds correctly
