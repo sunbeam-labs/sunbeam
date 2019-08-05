@@ -18,15 +18,20 @@ function test_all {
 
 # For #221: full test using old-style Illumina paired sequence IDs (/1 and /2)
 function test_all_old_illumina {
+    # init will always write to samples.csv so we'll stash the old one and then
+    # restore it.
+    mv $TEMPDIR/samples.csv $TEMPDIR/samples_orig.csv
     sunbeam init \
             --force \
             --output tmp_config_old_illumina.yml \
-            --defaults <(
-                sed s/sunbeam_output/sunbeam_output_old_illumina/ $TEMPDIR/tmp_config.yml
-                ) \
+            --defaults <(sed s/sunbeam_output/sunbeam_output_old_illumina/ $TEMPDIR/tmp_config.yml) \
             --data_fp $TEMPDIR/data_files_old_illumina \
             $TEMPDIR
+    # Add config entry for suffix to remove from sequence IDs, and run just
+    # like before.
+    sed -i 's/^qc:/qc:\n  seq_id_ending: "\/[12]"/' $TEMPDIR/tmp_config_old_illumina.yml
     sunbeam run -- --configfile=$TEMPDIR/tmp_config_old_illumina.yml -p
+    mv $TEMPDIR/samples_orig.csv $TEMPDIR/samples.csv
 
     # Check contents
     annot_summary=sunbeam_output_old_illumina/annotation/summary/dummyecoli.tsv
