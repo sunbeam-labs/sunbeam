@@ -42,7 +42,6 @@ workflows:
           filters:
             branches:
               only:
-                - ci
                 - dev
                 - stable
     jobs:
