@@ -37,6 +37,12 @@ More extensions can be found at the extension page: https://www.sunbeam-labs.org
 
 ### Changelog:
 
+#### v2.0.1 (July 24, 2019)
+
+ - Increment Snakemake version requirement for compatibility with recent conda
+ - Specify earlier megahit version to ensure compatbility with existing assembly behavior
+ - Integration test improvements
+
 #### v2.0.0 (January 22, 2019)
 
  - Start a project using resources directly from the SRA using `sunbeam init --data_acc [SRA ###]`. For more information, see [the docs](https://sunbeam.readthedocs.io/en/latest/usage.html#creating-a-new-project-using-data-from-sra)
