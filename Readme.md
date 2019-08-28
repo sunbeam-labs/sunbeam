@@ -37,6 +37,10 @@ More extensions can be found at the extension page: https://www.sunbeam-labs.org
 
 ### Changelog:
 
+#### v2.0.2 (August 28, 2019)
+
+ - Add implicit dependencies (samtools and bcftools) to environment file to make them explicit
+
 #### v2.0.1 (July 24, 2019)
 
  - Increment Snakemake version requirement for compatibility with recent conda
