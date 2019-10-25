@@ -86,14 +86,14 @@ function broke {
     msg "\nFailed command error output:\n`cat ${2}.err`\n"
     msg "${FAIL} (log: ${LOGFILE}.[out/err])\n"
     cleanup 1
-} 
+}
 
 function capture_output {
     msg "Running ${1}... "
     if [ -z ${TEMPDIR+x} ]; then
 	LOGFILE="${1}"
     else
-	LOGFILE="${TEMPDIR}/${1}"	
+	LOGFILE="${TEMPDIR}/${1}"
     fi
 
     set -o pipefail
@@ -114,17 +114,17 @@ function setup {
     if [ "$USE_TMPDIR" = true ]; then
 	TEMPDIR=`mktemp -d`
     fi
-    
+
     verbose "\n\t${GREEN}Test directory${RESET}: ${TEMPDIR}"
 
     export PATH=$PATH:$HOME/miniconda3/bin
-    
+
     # Install Sunbeam (maybe)
     if [ "$USE_TMPENV" = true ]; then
 	SUNBEAM_ENV="sunbeam-`basename $TEMPDIR`"
-	bash install.sh -e $SUNBEAM_ENV 
+	bash install.sh -e $SUNBEAM_ENV
     fi
-    
+
     verbose "\n\t${GREEN}Conda environment${RESET}: ${SUNBEAM_ENV}\n"
 
     # Activate Sunbeam
@@ -137,7 +137,7 @@ function setup {
     fi
     mkdir $SBX_FP
 }
-    
+
 function cleanup {
     local TMPRC=$?
     local RETCODE=$TMPRC
@@ -156,7 +156,7 @@ function cleanup {
 	    [ -f "${LOGFILE}.out" ] && rm "${LOGFILE}.out"
 	fi
     fi
-    source deactivate
+    conda deactivate
     # Remove Sunbeam environment if created
     if [ "$INSTALL_SUNBEAM" = true ]; then
 	verbose "Deleting temporary Sunbeam environment ${SUNBEAM_ENV} \n"
@@ -198,7 +198,7 @@ function build_test_data {
 	    --data_fp $TEMPDIR/data_files \
 	    $TEMPDIR
     popd
-    
+
     # Build fake kraken data
     pushd $TEMPDIR
     kraken-build --db mindb --add-to-library \
@@ -214,7 +214,7 @@ function build_test_data {
     mkdir -p local/blast
     cat raw/*.fna > local/blast/bacteria.fa
     makeblastdb -dbtype nucl -in local/blast/bacteria.fa
-    cp indexes/card.fa local/blast 
+    cp indexes/card.fa local/blast
     makeblastdb -dbtype prot -in local/blast/card.fa
     popd
 }
