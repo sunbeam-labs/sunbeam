@@ -37,6 +37,19 @@ More extensions can be found at the extension page: https://www.sunbeam-labs.org
 
 ### Changelog:
 
+#### Development Version (as of October 29, 2019)
+
+ - Integration test updates to schedule weekly builds (#222)
+ - Script updates to use conda commands instead of source commands (#220)
+ - Add h5py package explicitly to avoid dependency metadata problem (#219)
+ - Add multiQC to build QC report (#203)
+ - Use multithreading for cutadapt in QC (#202)
+ - Correct conda channel priority during install (#201)
+ - Update documentation to spell out requirements (#199)
+ - New megahit failure handling (#194)
+ - Enforce sample wildcard constraints in Snakemake rules (#190)
+ - Run megahit multithreaded (#189)
+
 #### v2.0.2 (August 28, 2019)
 
  - Add implicit dependencies (samtools and bcftools) to environment file to make them explicit
