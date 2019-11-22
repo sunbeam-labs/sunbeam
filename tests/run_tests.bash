@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# setup
+
 set -e
 
 STARTING_DIR=$(pwd)
@@ -118,7 +120,10 @@ function setup {
     verbose "\n\t${GREEN}Test directory${RESET}: ${TEMPDIR}"
 
     export PATH=$PATH:$HOME/miniconda3/bin
-    
+    # Allow conda [de]activate
+    CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
+    source $CONDA_BASE/etc/profile.d/conda.sh
+
     # Install Sunbeam (maybe)
     if [ "$USE_TMPENV" = true ]; then
 	SUNBEAM_ENV="sunbeam-`basename $TEMPDIR`"
@@ -128,7 +133,7 @@ function setup {
     verbose "\n\t${GREEN}Conda environment${RESET}: ${SUNBEAM_ENV}\n"
 
     # Activate Sunbeam
-    source activate $SUNBEAM_ENV
+    conda activate $SUNBEAM_ENV
 
     # Move extensions out of the way temporarily
     if [ -d $SBX_FP ]; then
@@ -156,7 +161,7 @@ function cleanup {
 	    [ -f "${LOGFILE}.out" ] && rm "${LOGFILE}.out"
 	fi
     fi
-    source deactivate
+    conda deactivate
     # Remove Sunbeam environment if created
     if [ "$INSTALL_SUNBEAM" = true ]; then
 	verbose "Deleting temporary Sunbeam environment ${SUNBEAM_ENV} \n"
@@ -185,6 +190,7 @@ function build_test_data {
     cp -r raw $TEMPDIR
     cp -r truncated_taxonomy $TEMPDIR
     cp -r sbx_test $STARTING_DIR/$SBX_FP/sbx_test
+    cp -r sbx_test_subdir $STARTING_DIR/$SBX_FP/sbx_test_subdir
     cp seqid2taxid.map $TEMPDIR
 
     mkdir -p $TEMPDIR/hosts

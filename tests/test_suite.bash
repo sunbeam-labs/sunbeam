@@ -3,7 +3,14 @@ function test_all {
     sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p
 
     # Check contents
-    awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/sunbeam_output/annotation/summary/dummyecoli.tsv
+    annot_summary=sunbeam_output/annotation/summary/dummyecoli.tsv
+    awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/$annot_summary || (
+        # stderr will show up on the summary output for the test suite as well
+        # as in the .err file.  false will cause the shell to exit assuming -e
+        # is in effect here.
+        echo "Check failed on $annot_summary" > /dev/stderr
+        false
+    )
 
     # Check targets
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt 
@@ -46,6 +53,11 @@ function test_version_check {
 # Test that we detect and run extensions
 function test_extensions {
     sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
+}
+
+# Test that we have the updated snakemake that uses "conda activate"
+function test_use_conda {
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml --use-conda sbx_test | grep "SBX_TEST"
 }
 
 # Test that single-end sequencing configurations work
@@ -174,32 +186,95 @@ function test_mapping {
     ) > $TEMPDIR/samples_test_mapping.csv
     sunbeam config modify --str 'all: {samplelist_fp: "samples_test_mapping.csv"}' \
         $TEMPDIR/tmp_config.yml > $TEMPDIR/test_mapping_config.yml
-    # There should be two lines in the human coverage summary and none at all
-    # in the phix174 summary.  The human.csv lines should be sorted in standard
-    # alphanumeric order; stub2_human will come before stub_human.
+    # Move human host files to top-level, since we're using that genome for
+    # mapping in this test and shouldn't decontaminate using it as well.
+    for file in $TEMPDIR/hosts/human*; do
+        mv $file $TEMPDIR/hosts_${file##*/}
+    done
     sunbeam run --configfile $TEMPDIR/test_mapping_config.yml all_mapping
-    md5sum --check --status <(
-    echo "c624406eb2582cac5e0cfb160c79a900  $TEMPDIR/sunbeam_output/mapping/human/coverage.csv"
-    echo "1aee435ade0310a6b3c63d44cbdc2029  $TEMPDIR/sunbeam_output/mapping/phix174/coverage.csv"
+    # Move human host files back to original location
+    for file in $TEMPDIR/hosts_*; do
+        mv $file ${file/hosts_/hosts\//}
+    done
+    # After the header line, there should be two lines in the human coverage
+    # summary and none at all in the phix174 summary.  The human.csv lines
+    # should be sorted in standard alphanumeric order; stub2_human will come
+    # before stub_human.
+    (
+	    csv_human=$TEMPDIR/sunbeam_output/mapping/human/coverage.csv
+	    csv_phix=$TEMPDIR/sunbeam_output/mapping/phix174/coverage.csv
+	    function col3 { cut -f3 -d, | tr '\n' : ; }
+	    test "Sample:stub2_human:stub_human:" == $(col3 < "$csv_human")
+	    test "Sample:" == $(col3 < "$csv_phix")
     )
 }
 
-# Test for sunbeam get
+# Test for sunbeam init for SRA
 # Make sure samples.csv contains the correct number of samples.
 
 function test_sunbeam_get {
     mkdir -p $TEMPDIR/test_sunbeam_get
-    sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get --data_acc SRP159164
-    a=`wc -l $TEMPDIR/test_sunbeam_get/samples.csv`
-    if [ "$a" -ne "34" ]; then
-        exit 1
-    fi
+    sunbeam init --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get --data_acc SRP021545
+    test `wc -l < $TEMPDIR/test_sunbeam_get/samples.csv` -eq 89
 }
 
-# Test for sunbeam get -- study with paired and unpaired samples
+# Test for sunbeam init for SRA -- study with paired and unpaired samples
 # Make sure Sunbeam exits with nonzero exit code if a study contains paired and unpaired reads
+# Both sets should be written separately to a config/samples.csv pair of files
 
-#function test_get_paired_unpaired {
-#    mkdir -p $TEMPDIR/test_get_paired_unpaired
-#    sunbeam get --force --output sunbeam_config_SRA.yml $TEMPDIR/test_get_paired_unpaired --data_acc ERP020555 && exit 0 || exit 0
-#}
+function test_get_paired_unpaired {
+    dp=$TEMPDIR/test_get_paired_unpaired
+    mkdir -p $dp
+    # "!" because we *expect* this to exit nonzero.
+    ! sunbeam init --force --output sunbeam_config_SRA.yml $dp --data_acc ERP020555
+    # Check contents of the two config files
+    grep '^  samplelist_fp: samples_unpaired.csv$' $dp/unpaired_sunbeam_config_SRA.yml
+    grep '^  paired_end: false$'                   $dp/unpaired_sunbeam_config_SRA.yml
+    grep '^  samplelist_fp: samples_paired.csv$'   $dp/paired_sunbeam_config_SRA.yml
+    grep '^  paired_end: true$'                    $dp/paired_sunbeam_config_SRA.yml
+    # Check contents of the two samples csv files
+    test `wc -l < $dp/samples_unpaired.csv` -eq  1
+    test `wc -l < $dp/samples_paired.csv`   -eq  13
+}
+
+# Fix for #185:
+# While the core Sunbeam rules keep a simple directory structure, using more
+# complicated nested subdirectories can complicate the wildcard/graph
+# resolution in Snakemake and result in unexpected wildcard patterns being
+# evaluated.  Enforcing a pattern on our sample names (no slashes allowed)
+# avoids this.
+function test_subdir_patterns {
+    # All we need to check is that the graph resolution works.
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_subdir -n
+}
+
+# Fix for #167:
+# Check that if megahit gives a nonzero exit code it is handled appropriately.
+# The two main cases are 255 (empty contigs) and anything else nonzero
+# (presumed to be memory-related in the assembly rules).
+# Checking for successful behavior is already handled in test_all.
+function test_assembly_failures {
+    # Up to just before the assembly rules, things should work fine.
+    sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_decontam
+    # Remove previous assembly files, if they exist.
+    rm -rf $TEMPDIR/sunbeam_output/assembly
+    # If megahit gives an exit code != 0 and != 255 it is an error.
+    mkdir -p "$TEMPDIR/megahit_137"
+    echo -e '#!/usr/bin/env bash\nexit 137' > $TEMPDIR/megahit_137/megahit
+    chmod +x $TEMPDIR/megahit_137/megahit
+    (
+    export PATH="$TEMPDIR/megahit_137:$PATH"
+    # (This command should *not* exit successfully.)
+    ! txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
+    echo "$txt" | grep "Check your memory"
+    )
+    # If megahit exits with 255, it implies no contigs were built.
+    mkdir -p "$TEMPDIR/megahit_255"
+    echo -e '#!/usr/bin/env bash\nexit 255' > $TEMPDIR/megahit_255/megahit
+    chmod +x $TEMPDIR/megahit_255/megahit
+    (
+    export PATH="$TEMPDIR/megahit_255:$PATH"
+    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
+    echo "$txt" | grep "Empty contigs"
+    )
+}

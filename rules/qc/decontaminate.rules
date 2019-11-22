@@ -2,15 +2,11 @@ import subprocess
 from sunbeamlib.decontam import get_mapped_reads
 from collections import OrderedDict
 
-rule Decontaminated:
-    input:
-       str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz')
-    output:
-       str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz')
-
 rule all_decontam:
     input:
-        expand(rules.Decontaminated.output, sample=Samples.keys(), rp=Pairs)
+        expand(
+            str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'),
+            sample=Samples.keys(), rp=Pairs)
 
 ruleorder: build_host_index > build_genome_index
         

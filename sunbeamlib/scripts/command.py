@@ -6,15 +6,13 @@ from sunbeamlib.scripts.run import main as Run
 from sunbeamlib.scripts.init import main as Init
 from sunbeamlib.scripts._config import main as Config
 from sunbeamlib.scripts.list_samples import main as ListSamples
-from sunbeamlib.scripts.get import main as Get
 
 def main():
 
     usage_str = "%(prog)s [-h/--help,-v/--version] <subcommand>"
     description_str = (
         "subcommands:\n"
-        "  init         \tCreate a new config file for a project using local data.\n"
-        "  get          \tCreate a new config file for a project using SRA data.\n"
+        "  init         \tCreate a new config file for a project using local or SRA data.\n"
         "  run          \tExecute the pipeline.\n"
         "  config       \tModify or update config files.\n"
         "  list_samples \tMake a list of samples from a directory.\n"
@@ -44,8 +42,6 @@ def main():
         Config(remaining)
     elif args.command == "list_samples":
         ListSamples(remaining)
-    elif args.command == "get":
-        Get(remaining)
     else:
         parser.print_help()
         sys.stderr.write("Unrecognized command.\n")

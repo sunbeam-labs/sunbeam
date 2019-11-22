@@ -2,12 +2,6 @@
 #
 # Illumina quality control rules
 
-rule QualityControled:
-    input:
-        str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')
-    output:
-        str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')
-
 rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
     input:
@@ -23,6 +17,8 @@ rule adapter_removal_unpaired:
     log: str(QC_FP/'log'/'cutadapt'/'{sample}.log') 
     output:
         str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz')
+    threads:
+        Cfg['qc']['threads']
     run:
         fwd_adapters = Cfg['qc'].get('fwd_adapters')
         rev_adapters = Cfg['qc'].get('rev_adapters')
@@ -38,6 +34,7 @@ rule adapter_removal_unpaired:
                     "-g {adapter}", adapter=Cfg['qc']['rev_adapters']))
             shell("""
             cutadapt --discard-trimmed -O {overlap} \
+            --cores {threads} \
             {fwd_adapter_str} {rev_adapter_str} \
             -o {params.tmp} \
             {input} \
@@ -58,6 +55,8 @@ rule adapter_removal_paired:
     output:
         gr1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
         gr2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
+    threads:
+        Cfg['qc']['threads']
     run:
         fwd_adapters = Cfg['qc']['fwd_adapters']
         rev_adapters = Cfg['qc']['rev_adapters']
@@ -73,6 +72,7 @@ rule adapter_removal_paired:
                     "-B {adapter}", adapter=Cfg['qc']['rev_adapters']))
             shell("""
             cutadapt --discard-trimmed -O {overlap} \
+            --cores {threads} \
             {fwd_adapter_str} {rev_adapter_str} \
             -o {params.r1} -p {params.r2} \
             {input.r1} {input.r2} \
@@ -208,5 +208,3 @@ rule clean_qc:
         rm -r {params.trimmomatic_fp} && \
         rm -r {params.komplexity_fp}
         """
-        
-    

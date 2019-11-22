@@ -1,0 +1,12 @@
+# Check that Snakemake can resolve nested subdirectories as expected when
+# building the DAG.  (Note that since this is all rule-dependency-related we
+# don't actually need any actions defined here.) See test_subdir_patterns.
+rule sbx_test_subdir:
+    input:
+         expand(str(QC_FP/'decontam'/'full'/'{sample}_{rp}.fastq.gz'), sample=Samples.keys(), rp=Pairs)
+
+rule sample_reads:
+    input:
+        str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz')
+    output:
+        str(QC_FP/'decontam'/'full'/'{sample}_{rp}.fastq.gz')
