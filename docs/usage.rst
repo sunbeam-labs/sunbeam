@@ -389,8 +389,12 @@ In addition, since Sunbeam is really just a set of `snakemake
   ``exclude`` config option).
 * ``-p`` prints the actual shell command executed for each rule, which is very
   helpful for debugging purposes.
+* ``--cores`` specifies the total number of cores used by Sunbeam. For example,
+  if you run Sunbeam with ``--cores 100`` and each rule/processing step uses 
+  20 threads, it will run 5 rules at once.
 
 .. _cluster:
+
 Cluster options
 ---------------
 
