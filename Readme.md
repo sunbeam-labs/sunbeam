@@ -4,12 +4,12 @@
 
 [![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev) [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=latest)](http://sunbeam.readthedocs.io/en/latest/?badge=latest)
 
-
 Sunbeam is a pipeline written in [snakemake](http://snakemake.readthedocs.io)
 that simplifies and automates many of the steps in metagenomic sequencing
 analysis. It uses [conda](http://conda.io) to manage dependencies, so it
 doesn't have pre-existing dependencies or admin privileges, and can be deployed
-on most Linux workstations and clusters.
+on most Linux workstations and clusters. To read more, check out [our paper
+in Microbiome](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-019-0658-x).
 
 Sunbeam currently automates the following tasks:
 
@@ -32,6 +32,9 @@ More extensions can be found at the extension page: https://www.sunbeam-labs.org
 
 **To get started, see our [documentation](http://sunbeam.readthedocs.io)!**
 
+If you use the Sunbeam pipeline in your research, please cite: *EL Clarke, LJ Taylor,
+C Zhao et al. Sunbeam: an extensible pipeline for analyzing metagenomic
+sequencing experiments. Microbiome 7:46 (2019)*
 
 ------
 
