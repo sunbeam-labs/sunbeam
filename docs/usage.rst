@@ -334,6 +334,18 @@ download
 * ``suffix``: the name of the subfolder to create for download output (fastq.gz files)
 * ``threads``: number of threads to use for downloading (too many at once may make NCBI unhappy)
 
+.. _dbs:
+
+Building Databses
+=================
+
+A detailed discussion on building databases for tools used by Sunbeam, while important,
+is beyond the scope of this document. Please see the following resources for more details:
+
+* `BLAST databases <https://www.ncbi.nlm.nih.gov/books/NBK279688/>`_
+* `kraken databases <https://ccb.jhu.edu/software/kraken/MANUAL.html#kraken-databases>`_
+* `kraken2 databases <https://ccb.jhu.edu/software/kraken2/index.shtml?t=manual>`_ (used in
+Sunbeam v3.0 and higher)
 
 .. _running:
 
@@ -395,7 +407,6 @@ rules executing in parallel, we would use the following command on our cluster:
 The ``-w 90`` flag is provided to account for filesystem latency that often
 causes issues on clusters. It asks Snakemake to wait for 90 seconds before
 complaining that an expected output file is missing.
-
 
 Outputs
 =======
