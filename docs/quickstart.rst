@@ -85,7 +85,10 @@ Contig annotation
 Sunbeam can automatically BLAST your contigs against any number of
 nucleotide or protein databases and summarize the top hits. Download or create
 your BLAST databases, then add the paths to your config file, following the
-instructions on here: :ref:`blastdbs`.
+instructions on here: :ref:`blastdbs`. For some general advice on database
+building, check out the `Sunbeam databases repository
+<https://github.com/zhaoc1/sunbeam_databases>`_ and for specific links please
+see the usage section: :ref:`dbs`.
 
 Reference mapping
 -----------------
