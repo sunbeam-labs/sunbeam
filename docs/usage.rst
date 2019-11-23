@@ -344,8 +344,7 @@ is beyond the scope of this document. Please see the following resources for mor
 
 * `BLAST databases <https://www.ncbi.nlm.nih.gov/books/NBK279688/>`_
 * `kraken databases <https://ccb.jhu.edu/software/kraken/MANUAL.html#kraken-databases>`_
-* `kraken2 databases <https://ccb.jhu.edu/software/kraken2/index.shtml?t=manual>`_ (used in
-Sunbeam v3.0 and higher)
+* `kraken2 databases <https://ccb.jhu.edu/software/kraken2/index.shtml?t=manual>`_ (used in Sunbeam v3.0 and higher)
 
 .. _running:
 
