@@ -7,4 +7,4 @@ source $CONDA_BASE/etc/profile.d/conda.sh
 
 # Dump environment contents
 conda activate sunbeam
-conda list --export
+conda list --explicit
