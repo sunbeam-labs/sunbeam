@@ -35,7 +35,7 @@ qc:
   trailing: 3
   slidingwindow: [4,15]
   minlen: 36
-  adapter_fp: "{CONDA_FP}/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  adapter_template: "$CONDA_PREFIX/share/trimmomatic/adapters/NexteraPE-PE.fa"
   # Cutadapt
   fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']

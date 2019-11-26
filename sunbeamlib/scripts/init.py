@@ -15,11 +15,11 @@ from sunbeamlib import config
 def main(argv=sys.argv):
     """Create a blank config file with the given name."""
 
-    conda_prefix = get_conda_prefix()
+#    conda_prefix = get_conda_prefix()
     args = parse_args(argv)
     project_fp = setup_project_folder(args)
     samplelists = write_samples_from_input(args, project_fp)
-    write_config(args, conda_prefix, project_fp, samplelists)
+    write_config(args, project_fp, samplelists)
 
 def get_conda_prefix():
     try:
@@ -141,7 +141,7 @@ def write_samples_from_input(args, project_fp):
         samplelists = {["paired", "unpaired"][args.single_end]: samplelist_file}
     return samplelists
 
-def write_config(args, conda_prefix, project_fp, samplelists):
+def write_config(args, project_fp, samplelists):
     multiple_configs = len(samplelists.values()) != 1
     for layout in samplelists.keys(): # one paired, one unpaired, or one of each
         if multiple_configs:
@@ -149,7 +149,6 @@ def write_config(args, conda_prefix, project_fp, samplelists):
         else:
             config_file = check_existing(project_fp/args.output, args.force)
         cfg = config.new(
-            conda_fp=conda_prefix,
             project_fp=project_fp,
             template=args.template)
         defaults = {}

@@ -238,7 +238,7 @@ qc
 * ``slidingwindow``: (trimmomatic) the [width, avg. quality] of the sliding
   window
 * ``minlength``: (trimmomatic) drop reads smaller than this length
-* ``adapter_fp``: (trimmomatic) path to the Illumina paired-end adaptors
+* ``adapter_template``: (trimmomatic) path to the Illumina paired-end adaptors (templated with ``$CONDA_ENV``)
   (autofilled)
 * ``fwd_adaptors``: (cutadapt) custom forward adaptor sequences to remove
   using cutadapt. Replace with "" to skip.
