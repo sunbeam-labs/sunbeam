@@ -29,7 +29,7 @@ function test_all_old_illumina {
             $TEMPDIR
     # Add config entry for suffix to remove from sequence IDs, and run just
     # like before.
-    sed -i 's/^qc:/qc:\n  seq_id_ending: "\/[12]"/' $TEMPDIR/tmp_config_old_illumina.yml
+    sed -i 's/^  seq_id_ending: ""$/  seq_id_ending: "\/[12]"/' $TEMPDIR/tmp_config_old_illumina.yml
     sunbeam run -- --configfile=$TEMPDIR/tmp_config_old_illumina.yml -p
     mv $TEMPDIR/samples_orig.csv $TEMPDIR/samples.csv
 
