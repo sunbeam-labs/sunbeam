@@ -42,9 +42,16 @@ sequencing experiments. *Microbiome* 7:46 (2019)
 
 ### Changelog:
 
-#### Development Version (as of October 29, 2019)
+#### Development version (as of November 26, 2019)
 
+ - Coming soon!
+
+#### v2.1.0 (November 26, 2019)
+
+ - Updates to documentation (#169, #230, #231)
+ - Fix missing samtools (#224)
  - Integration test updates to schedule weekly builds (#222)
+ - Fix issues with old paired-end illumina adapters (#221)
  - Script updates to use conda commands instead of source commands (#220)
  - Add h5py package explicitly to avoid dependency metadata problem (#219)
  - Add multiQC to build QC report (#203)

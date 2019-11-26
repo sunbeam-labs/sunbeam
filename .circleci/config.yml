@@ -24,6 +24,11 @@ jobs:
           no_output_timeout: 20m
 
       - run:
+          name: dump_env
+          command: |
+            bash .circleci/dump_conda_env.bash
+
+      - run:
           name: run tests
           command: |
             bash tests/run_tests.bash -e sunbeam
