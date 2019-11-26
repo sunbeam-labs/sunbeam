@@ -16,7 +16,11 @@ def reverse_complement(dna):
 	reverseDna = [ dnadict[c] for c in dna ]
 	return ''.join(reverseDna[::-1])
 
-def write_fastq(genome_segment, locs, sample_name,file_fp):
+def write_fastq(genome_segment, locs, sample_name, file_fp, rp_suffix=None):
+	"""
+	rp_suffix: a pair of strings to append to R1 and R2 sequence IDs, for
+	example ["/1", "/2"].  By default nothing is appended.
+	"""
 	seqs1 = [] # read1: read out of forward strand
 	seqs2 = [] # read2: read out of reverse strand 
 	for loc in locs:
@@ -38,6 +42,8 @@ def write_fastq(genome_segment, locs, sample_name,file_fp):
 	file1 = gzip.open(file_fp + '/PCMP_'+sample_name+'_R1.fastq.gz', 'wt')
 	for i, seq in enumerate(seqs1):
 		header = "@D00728:28:C9W1KANXX:" + str(i)
+		if rp_suffix:
+			header += rp_suffix[0]
 		file1.write("%s\n" % header)
 		file1.write("%s\n" % seq)
 		file1.write("%s\n" % "+")
@@ -47,6 +53,8 @@ def write_fastq(genome_segment, locs, sample_name,file_fp):
 	file2 = gzip.open(file_fp + '/PCMP_'+sample_name+'_R2.fastq.gz', 'wt')
 	for i, seq in enumerate(seqs2):
 		header = "@D00728:28:C9W1KANXX:" + str(i)
+		if rp_suffix:
+			header += rp_suffix[1]
 		file2.write("%s\n" % header)
 		file2.write("%s\n" % seq)
 		file2.write("%s\n" % "+")
@@ -68,7 +76,7 @@ def write_random_fastq(sample_name, file_fp, numreads=4, readlen=100):
                 f.write('+\n')
                 f.write('%s\n' % ('G'*readlen))
 
-def generate_dummyfastq(rootpath):
+def generate_dummyfastq(rootpath, fastq_fn = "data_files", rp_suffix=None):
 
 	raw_fp = rootpath + "/raw"
 
@@ -87,19 +95,23 @@ def generate_dummyfastq(rootpath):
 	genome_segment_e = lines_e[1]
 	genome_segment_b = lines_b[1]
 
-	fastq_fp = rootpath + "/data_files"
+	fastq_fp = rootpath + "/" + fastq_fn
 	if not os.path.exists(fastq_fp):
 		os.makedirs(fastq_fp)
 
-	write_fastq(genome_segment_e, locs, "dummyecoli", fastq_fp)
-	write_fastq(genome_segment_b, locs, "dummybfragilis",fastq_fp)
+	write_fastq(genome_segment_e, locs, "dummyecoli", fastq_fp, rp_suffix)
+	write_fastq(genome_segment_b, locs, "dummybfragilis",fastq_fp, rp_suffix)
 	write_random_fastq('random', fastq_fp)
 
 
 if __name__ == '__main__':
-	if len(sys.argv) == 2:
+	if len(sys.argv) > 1:
 		rootpath = sys.argv[1]
+		rp_suffix = None
+		fastq_fn = "data_files"
+		if len(sys.argv) == 5:
+			fastq_fn = sys.argv[2]
+			rp_suffix = sys.argv[3:5]
 	else:
-                raise SystemExit("Must specify an output directory")
-
-	generate_dummyfastq(rootpath)
+		raise SystemExit("Must specify an output directory")
+	generate_dummyfastq(rootpath, fastq_fn, rp_suffix)

@@ -2,16 +2,31 @@
 #
 # Illumina quality control rules
 
+from sunbeamlib import qc
+
 rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
     input:
         TARGET_QC
 
 ruleorder: adapter_removal_paired > adapter_removal_unpaired
-        
+
+rule sample_intake:
+    input:
+        lambda wildcards: Samples[wildcards.sample][wildcards.rp]
+    output:
+        str(QC_FP/'00_samples'/'{sample}_{rp}.fastq.gz')
+    params:
+        suffix = Cfg['qc'].get('seq_id_ending')
+    run:
+        if params.suffix:
+            qc.strip_seq_id_suffix(input[0], output[0], params.suffix)
+        else:
+            Path(output[0]).symlink_to(input[0])
+
 rule adapter_removal_unpaired:
     input:
-        lambda wildcards: Samples[wildcards.sample]['1']
+        str(QC_FP/'00_samples'/'{sample}_1.fastq.gz')
     params:
         tmp = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq'),
     log: str(QC_FP/'log'/'cutadapt'/'{sample}.log') 
@@ -46,8 +61,8 @@ rule adapter_removal_unpaired:
     
 rule adapter_removal_paired:
     input:
-        r1 = lambda wildcards: Samples[wildcards.sample]['1'],
-        r2 = lambda wildcards: Samples[wildcards.sample]['2']
+        r1 = str(QC_FP/'00_samples'/'{sample}_1.fastq.gz'),
+        r2 = str(QC_FP/'00_samples'/'{sample}_2.fastq.gz')
     params:
         r1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
         r2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
