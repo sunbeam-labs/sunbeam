@@ -230,9 +230,10 @@ qc
 * ``suffix``: the name of the subfolder to hold outputs from the
   quality-control steps
 * ``threads``: the number of threads to use for rules in this section
-* ``seq_id_ending``: if your reads are named differently, a string defining the
-  suffix. For example, if your paired read ids are ``@D00728:28:C9W1KANXX:0/1`` and 
-  ``@D00728:28:C9W1KANXX:0/2``, this entry of your config file would be: 
+* ``seq_id_ending``: if your reads are named differently, a regular expression
+  string defining the pattern of the suffix. For example, if your paired read
+  ids are ``@D00728:28:C9W1KANXX:0/1`` and ``@D00728:28:C9W1KANXX:0/2``, this
+  entry of your config file would be:
   ``seq_id_ending: "/[12]"``
 * ``java_heapsize``: the memory available to Trimmomatic
 * ``leading``: (trimmomatic) remove the leading bases of a read if below this
