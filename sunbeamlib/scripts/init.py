@@ -15,7 +15,6 @@ from sunbeamlib import config
 def main(argv=sys.argv):
     """Create a blank config file with the given name."""
 
-#    conda_prefix = get_conda_prefix()
     args = parse_args(argv)
     project_fp = setup_project_folder(args)
     samplelists = write_samples_from_input(args, project_fp)
