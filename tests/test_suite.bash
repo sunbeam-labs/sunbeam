@@ -279,7 +279,3 @@ function test_assembly_failures {
     )
 }
 
-# Make sure sunbeam config update works properly
-#function test_extensions {
-#    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
-#}
