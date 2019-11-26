@@ -230,6 +230,10 @@ qc
 * ``suffix``: the name of the subfolder to hold outputs from the
   quality-control steps
 * ``threads``: the number of threads to use for rules in this section
+* ``seq_id_ending``: if your reads are named differently, a string defining the
+  suffix. For example, if your paired read ids are ``@D00728:28:C9W1KANXX:0/1`` and 
+  ``@D00728:28:C9W1KANXX:0/2``, this entry of your config file would be: 
+  ``seq_id_ending: "/[12]"``
 * ``java_heapsize``: the memory available to Trimmomatic
 * ``leading``: (trimmomatic) remove the leading bases of a read if below this
   quality
@@ -334,6 +338,17 @@ download
 * ``suffix``: the name of the subfolder to create for download output (fastq.gz files)
 * ``threads``: number of threads to use for downloading (too many at once may make NCBI unhappy)
 
+.. _dbs:
+
+Building Databses
+=================
+
+A detailed discussion on building databases for tools used by Sunbeam, while important,
+is beyond the scope of this document. Please see the following resources for more details:
+
+* `BLAST databases <https://www.ncbi.nlm.nih.gov/books/NBK279688/>`_
+* `kraken databases <https://ccb.jhu.edu/software/kraken/MANUAL.html#kraken-databases>`_
+* `kraken2 databases <https://ccb.jhu.edu/software/kraken2/index.shtml?t=manual>`_ (used in Sunbeam v3.0 and higher)
 
 .. _running:
 
@@ -377,8 +392,12 @@ In addition, since Sunbeam is really just a set of `snakemake
   ``exclude`` config option).
 * ``-p`` prints the actual shell command executed for each rule, which is very
   helpful for debugging purposes.
+* ``--cores`` specifies the total number of cores used by Sunbeam. For example,
+  if you run Sunbeam with ``--cores 100`` and each rule/processing step uses 
+  20 threads, it will run 5 rules at once.
 
 .. _cluster:
+
 Cluster options
 ---------------
 
@@ -396,7 +415,6 @@ The ``-w 90`` flag is provided to account for filesystem latency that often
 causes issues on clusters. It asks Snakemake to wait for 90 seconds before
 complaining that an expected output file is missing.
 
-
 Outputs
 =======
 
@@ -407,35 +425,35 @@ databases, one nucleotide ('bacteria') and one protein ('card').
 .. code-block:: shell
 
    sunbeam_output
-	├── annotation
-	│   ├── blastn
-	│   │   └── bacteria
-	│   │       └── contig
-	│   ├── blastp
-	│   │   └── card
-	│   │       └── prodigal
-	│   ├── blastx
-	│   │   └── card
-	│   │       └── prodigal
-	│   ├── genes
-	│   │   └── prodigal
-	│   │       └── log
-	│   └── summary
-	├── assembly
-	│   ├── contigs
-	├── classify
-	│   └── kraken
-	│       └── raw
-	├── mapping
-   	│   └── genome1
-	└── qc
-	    ├── cleaned
-	    ├── decontam
-	    ├── log
-	    │   ├── decontam
-	    │   ├── cutadapt
-	    │   └── trimmomatic
-	    └── reports
+	├ annotation
+	│   ├ blastn
+	│   │   └ bacteria
+	│   │       └ contig
+	│   ├ blastp
+	│   │   └ card
+	│   │       └ prodigal
+	│   ├ blastx
+	│   │   └ card
+	│   │       └ prodigal
+	│   ├ genes
+	│   │   └ prodigal
+	│   │       └ log
+	│   └ summary
+	├ assembly
+	│   ├ contigs
+	├ classify
+	│   └ kraken
+	│       └ raw
+	├ mapping
+   	│   └ genome1
+	└ qc
+	    ├ cleaned
+	    ├ decontam
+	    ├ log
+	    │   ├ decontam
+	    │   ├ cutadapt
+	    │   └ trimmomatic
+	    └ reports
 
 In order of appearance, the folders contain the following:
 
@@ -445,20 +463,20 @@ Contig annotation
 .. code-block:: shell
 
    sunbeam_output
-	├── annotation
-	│   ├── blastn
-	│   │   └── bacteria
-	│   │       └── contig
-	│   ├── blastp
-	│   │   └── card
-	│   │       └── prodigal
-	│   ├── blastx
-	│   │   └── card
-	│   │       └── prodigal
-	│   ├── genes
-	│   │   └── prodigal
-	│   │       └── log
-	│   └── summary
+	├ annotation
+	│   ├ blastn
+	│   │   └ bacteria
+	│   │       └ contig
+	│   ├ blastp
+	│   │   └ card
+	│   │       └ prodigal
+	│   ├ blastx
+	│   │   └ card
+	│   │       └ prodigal
+	│   ├ genes
+	│   │   └ prodigal
+	│   │       └ log
+	│   └ summary
    
 This contains the BLAST results in XML from the assembled contigs. ``blastn``
 contains the results from directly BLASTing the contig nucleotide sequences
@@ -476,8 +494,8 @@ Contig assembly
 
 .. code-block:: shell
 
-   	├── assembly
-	│   ├── contigs
+   	├ assembly
+	│   ├ contigs
 
 
 This contains the assembled contigs for each sample under 'contigs'.
@@ -487,9 +505,9 @@ Taxonomic classification
 
 .. code-block:: shell
    
-	├── classify
-	│   └── kraken
-	│       └── raw
+	├ classify
+	│   └ kraken
+	│       └ raw
 
 This contains the taxonomic outputs from Kraken, both the raw output as well as
 summarized results. The primary output file is ``all_samples.tsv``, which is a
@@ -501,8 +519,8 @@ Alignment to genomes
 
 .. code-block:: shell
 
-   	├── mapping
-   	│   └── genome1
+   	├ mapping
+   	│   └ genome1
 
 
 Alignment files (in BAM format) to each target genome are contained in
@@ -513,16 +531,17 @@ Quality control
 
 .. code-block:: shell
 
-   	└── qc
-	    ├── cleaned
-	    ├── decontam
-	    ├── log
-	    │   ├── decontam
-	    │   ├── cutadapt
-	    │   └── trimmomatic
-	    └── reports
+   	└ qc
+	    ├ cleaned
+	    ├ decontam
+	    ├ log
+	    │   ├ decontam
+	    │   ├ cutadapt
+	    │   └ trimmomatic
+	    └ reports
 
 
 This   folder   contains  the   trimmed,   low-complexity   filtered  reads   in
 ``cleaned``. The ``decontam`` folder contains the cleaned reads that did not map
 to any contaminant or host genomes. In general, most downstream steps should reference the ``decontam`` reads.
+

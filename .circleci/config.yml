@@ -24,6 +24,11 @@ jobs:
           no_output_timeout: 20m
 
       - run:
+          name: dump_env
+          command: |
+            bash .circleci/dump_conda_env.bash
+
+      - run:
           name: run tests
           command: |
             bash tests/run_tests.bash -e sunbeam
@@ -32,4 +37,20 @@ jobs:
           paths:
             - ~/miniconda3
           key: v1-dependencies-{{ checksum "environment.yml" }}
-           
+
+workflows:
+  version: 2
+  weeklybuild:
+    triggers:
+      - schedule:
+          cron: "30 14 * * 3"
+          filters:
+            branches:
+              only:
+                - dev
+                - stable
+    jobs:
+      - build
+  default:
+    jobs:
+      - build

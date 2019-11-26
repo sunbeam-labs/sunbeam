@@ -4,12 +4,12 @@
 
 [![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev) [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=latest)](http://sunbeam.readthedocs.io/en/latest/?badge=latest)
 
-
 Sunbeam is a pipeline written in [snakemake](http://snakemake.readthedocs.io)
 that simplifies and automates many of the steps in metagenomic sequencing
 analysis. It uses [conda](http://conda.io) to manage dependencies, so it
 doesn't have pre-existing dependencies or admin privileges, and can be deployed
-on most Linux workstations and clusters.
+on most Linux workstations and clusters. To read more, check out [our paper
+in Microbiome](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-019-0658-x).
 
 Sunbeam currently automates the following tasks:
 
@@ -32,10 +32,35 @@ More extensions can be found at the extension page: https://www.sunbeam-labs.org
 
 **To get started, see our [documentation](http://sunbeam.readthedocs.io)!**
 
+If you use the Sunbeam pipeline in your research, please cite: 
+
+EL Clarke, LJ Taylor, C Zhao *et al.* Sunbeam: an
+extensible pipeline for analyzing metagenomic
+sequencing experiments. *Microbiome* 7:46 (2019)
 
 ------
 
 ### Changelog:
+
+#### Development version (as of November 26, 2019)
+
+ - Coming soon!
+
+#### v2.1.0 (November 26, 2019)
+
+ - Updates to documentation (#169, #230, #231)
+ - Fix missing samtools (#224)
+ - Integration test updates to schedule weekly builds (#222)
+ - Fix issues with old paired-end illumina adapters (#221)
+ - Script updates to use conda commands instead of source commands (#220)
+ - Add h5py package explicitly to avoid dependency metadata problem (#219)
+ - Add multiQC to build QC report (#203)
+ - Use multithreading for cutadapt in QC (#202)
+ - Correct conda channel priority during install (#201)
+ - Update documentation to spell out requirements (#199)
+ - New megahit failure handling (#194)
+ - Enforce sample wildcard constraints in Snakemake rules (#190)
+ - Run megahit multithreaded (#189)
 
 #### v2.0.2 (August 28, 2019)
 
