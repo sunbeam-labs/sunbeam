@@ -19,9 +19,7 @@ that simplifies and automates many of the steps in metagenomic sequencing
 analysis. Sunbeam requires a reasonably modern GNU/Linux computer with bash, 
 Python 2.6+, internet access (to retrieve dependencies), 4Gb of RAM, and at 
 least 3Gb of disk space. RAM and disk space requirements may increase depending 
-on the databases and tasks you choose to run, and the size of your data. For 
-more information, check out the `Sunbeam paper in Microbiome 
-<https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-019-0658-x>`_.
+on the databases and tasks you choose to run, and the size of your data.
 
 Sunbeam currently automates the following tasks:
 
@@ -41,12 +39,6 @@ assembly graphs, read alignments, and taxonomic classifications.
 
 To get started, see our :ref:`quickstart`!
 
-If you use Sunbeam in your research, please cite:
-
-EL Clarke, LJ Taylor, C Zhao *et al.* Sunbeam: an
-extensible pipeline for analyzing metagenomic
-sequencing experiments. *Microbiome* 7:46 (2019)
-
 .. toctree::
    :hidden:
    :maxdepth: 2
@@ -55,4 +47,4 @@ sequencing experiments. *Microbiome* 7:46 (2019)
    quickstart.rst
    usage.rst
    extensions.rst
-   citation.rst
+
