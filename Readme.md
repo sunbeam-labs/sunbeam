@@ -37,6 +37,29 @@ More extensions can be found at the extension page: https://www.sunbeam-labs.org
 
 ### Changelog:
 
+#### Development Version (as of October 29, 2019)
+
+ - Integration test updates to schedule weekly builds (#222)
+ - Script updates to use conda commands instead of source commands (#220)
+ - Add h5py package explicitly to avoid dependency metadata problem (#219)
+ - Add multiQC to build QC report (#203)
+ - Use multithreading for cutadapt in QC (#202)
+ - Correct conda channel priority during install (#201)
+ - Update documentation to spell out requirements (#199)
+ - New megahit failure handling (#194)
+ - Enforce sample wildcard constraints in Snakemake rules (#190)
+ - Run megahit multithreaded (#189)
+
+#### v2.0.2 (August 28, 2019)
+
+ - Add implicit dependencies (samtools and bcftools) to environment file to make them explicit
+
+#### v2.0.1 (July 24, 2019)
+
+ - Increment Snakemake version requirement for compatibility with recent conda
+ - Specify earlier megahit version to ensure compatbility with existing assembly behavior
+ - Integration test improvements
+
 #### v2.0.0 (January 22, 2019)
 
  - Start a project using resources directly from the SRA using `sunbeam init --data_acc [SRA ###]`. For more information, see [the docs](https://sunbeam.readthedocs.io/en/latest/usage.html#creating-a-new-project-using-data-from-sra)
