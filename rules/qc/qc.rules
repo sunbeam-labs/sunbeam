@@ -17,7 +17,7 @@ rule sample_intake:
     output:
         str(QC_FP/'00_samples'/'{sample}_{rp}.fastq.gz')
     params:
-        suffix = Cfg['qc'].get('seq_id_ending')
+        suffix = Cfg['qc']['seq_id_ending']
     run:
         if params.suffix:
             qc.strip_seq_id_suffix(input[0], output[0], params.suffix)

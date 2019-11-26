@@ -28,6 +28,8 @@ all:
 # Quality control
 qc:
   suffix: qc
+  # Sample intake
+  seq_id_ending: ""
   # Trimmomatic
   threads: 4
   java_heapsize: 512M
