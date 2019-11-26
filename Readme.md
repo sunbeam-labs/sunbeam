@@ -28,7 +28,7 @@ Sunbeam was designed to be modular and extensible. Some extensions have been bui
 - [Kaiju](https://github.com/sunbeam-labs/sbx_kaiju), a read classifier that uses BWA rather than kmers
 - [Anvi'o](https://github.com/sunbeam-labs/sbx_anvio), a downstream analysis pipeline that does lots of stuff!
 
-More extensions can be found at the extension page: https://www.sunbeam-labs.org/
+More extensions can be found at the extension page: https://www.sunbeam-labs.org/.
 
 **To get started, see our [documentation](http://sunbeam.readthedocs.io)!**
 
@@ -44,10 +44,11 @@ sequencing experiments. *Microbiome* 7:46 (2019)
 
 #### Development version (as of November 26, 2019)
 
- - Coming soon!
+ - Updated the path to the Illumina adapter sequences from hardcoded to templated (fixes #150 and #152)
 
 #### v2.1.0 (November 26, 2019)
 
+ - Added a build manifest, which is run every time on integration testing and can be fed into conda by users to install the most recent successful dependencies
  - Updates to documentation (#169, #230, #231)
  - Fix missing samtools (#224)
  - Integration test updates to schedule weekly builds (#222)

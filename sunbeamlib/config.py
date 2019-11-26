@@ -122,7 +122,7 @@ def update(config_str, new, strict=False):
     return config
 
 def new(
-        conda_fp, project_fp,
+        project_fp,
         version=__version__,
         template=None):
     if template:
@@ -131,7 +131,6 @@ def new(
         config = resource_stream(
             "sunbeamlib", "data/default_config.yml").read().decode()
     return config.format(
-        CONDA_FP=conda_fp,
         PROJECT_FP=project_fp,
         SB_VERSION=version)
 
