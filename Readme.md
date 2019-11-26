@@ -44,10 +44,11 @@ sequencing experiments. *Microbiome* 7:46 (2019)
 
 #### Development version (as of November 26, 2019)
 
- - Coming soon!
+ - Updated the path to the Illumina adapter sequences from hardcoded to templated (fixes #150 and #152)
 
 #### v2.1.0 (November 26, 2019)
 
+ - Added a build manifest, which is run every time on integration testing and can be fed into conda by users to install the most recent successful dependencies
  - Updates to documentation (#169, #230, #231)
  - Fix missing samtools (#224)
  - Integration test updates to schedule weekly builds (#222)

@@ -309,3 +309,15 @@ function test_assembly_failures {
     )
 }
 
+# For #150 and #152: make sure sunbeam config update works
+function test_sunbeam_config_update {
+    # make a new config file
+    cp $TEMPDIR/tmp_config.yml $TEMPDIR/tmp_config_test_config_update.yml
+
+    # Add config entry for suffix to remove from sequence IDs, and run just
+    # like before.
+    sed -i 's/download_reads: false:/download_reads: BROKEN/' $TEMPDIR/tmp_config_old_illumina.yml
+    sunbeam config update $TEMPDIR/tmp_config_test_config_update.yml
+    test `cat $TEMPDIR/tmp_config_test_config_update.yml | grep "BROKEN" | wc -l` -eq 0
+
+}
