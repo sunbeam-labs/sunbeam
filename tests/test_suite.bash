@@ -335,7 +335,8 @@ function test_extension_config_update {
     cp $TEMPDIR/tmp_config.yml $TEMPDIR/tmp_config_extension_config_update.yml
 
     # Remove extension config entry
-    sed -i 's/sbx_test: ""//' $TEMPDIR/tmp_config_extension_config_update.yml
+    sed -i 's/sbx_test://' $TEMPDIR/tmp_config_extension_config_update.yml
+    sed -i 's/  test_param: ""//' $TEMPDIR/tmp_config_extension_config_update.yml
 
     # Update it again
     sunbeam config update $TEMPDIR/tmp_config_extension_config_update.yml

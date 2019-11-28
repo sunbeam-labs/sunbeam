@@ -128,8 +128,23 @@ def new(
     if template:
         config = template.read()
     else:
-        config = resource_stream(
-            "sunbeamlib", "data/default_config.yml").read().decode()
+        config = str(resource_stream(
+            "sunbeamlib", "data/default_config.yml").read().decode())
+        # add config from extensions
+        sunbeam_dir = Path(os.getenv("SUNBEAM_DIR", os.getcwd()))
+        for sbx in os.listdir(sunbeam_dir/"extensions"):
+            try:
+                sbx_files = os.listdir(sunbeam_dir/"extensions"/sbx)
+            except NotADirectoryError:
+                continue
+            if 'config.yml' in sbx_files:
+                # append it to the existing config
+                sbx_config_fp = sunbeam_dir/"extensions"/sbx/"config.yml"
+                sbx_configfile = open(sbx_config_fp)
+                sbx_config = "\n"+sbx_configfile.read()+"\n"
+                sbx_configfile.close()
+                config = str(config + sbx_config)
+
     return config.format(
         PROJECT_FP=project_fp,
         SB_VERSION=version)
