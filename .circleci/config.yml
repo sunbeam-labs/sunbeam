@@ -31,7 +31,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            bash tests/run_tests.bash -e sunbeam
+            bash tests/run_tests.bash -e sunbeam -v
 
       - save_cache:
           paths:
