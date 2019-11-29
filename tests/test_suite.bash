@@ -328,7 +328,7 @@ function test_extension_config_init {
         echo "Tests running on CircleCI, adding config for sbx_test"
         echo "sbx_test:" > $SUNBEAM_DIR/extensions/sbx_test/config.yml
         echo "  test_param: ''" >> $SUNBEAM_DIR/extensions/sbx_test/config.yml
-        #exit 1
+        exit 1
     fi
 
 
@@ -337,15 +337,8 @@ function test_extension_config_init {
             --output tmp_config_inclsbx.yml \
             --data_fp $TEMPDIR/data_files \
             $TEMPDIR
-    echo "where are the extensions??"
-    echo $SUNBEAM_DIR 
-    ls $SUNBEAM_DIR/extensions/
-    ls $SUNBEAM_DIR/extensions/sbx_test/
-    ls
-    ls tests/sbx_test
 
-    cat $TEMPDIR/tmp_config_inclsbx.yml
-    echo "sbx_test found in config " `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` " time(s)" 
+    echo "sbx_test found in config" `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` "time(s)" 
     test `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` -eq 1
 
 }
@@ -365,6 +358,6 @@ function test_extension_config_update {
     # Update it again
     sunbeam config update -i $TEMPDIR/tmp_config_extension_config_update.yml
 
-    echo "sbx_test found in config " `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:"` " time(s)"
+    echo "sbx_test found in config" `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:"` "time(s)"
     test `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:" | wc -l` -eq 1
 }
