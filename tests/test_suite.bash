@@ -329,6 +329,10 @@ function test_extension_config_init {
             --output tmp_config_inclsbx.yml \
             --data_fp $TEMPDIR/data_files \
             $TEMPDIR
+    echo "where are the extensions??"
+    echo $SUNBEAM_DIR 
+    ls $SUNBEAM_DIR/extensions/
+    ls $SUNBEAM_DIR/extensions/sbx_test/
 
     cat $TEMPDIR/tmp_config_inclsbx.yml
     echo "sbx_test found in config " `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` " time(s)" 
