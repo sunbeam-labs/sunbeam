@@ -326,7 +326,8 @@ function test_extension_config_init {
 
     if [ `echo $HOME | grep "/home/circleci" | wc -l` -eq 1 ]; then
         echo "Tests running on CircleCI, adding config for sbx_test"
-        echo "sbx_test:\n  test_param: ''" > $SUNBEAM_DIR/extensions/sbx_test/config.yml
+        echo "sbx_test:" > $SUNBEAM_DIR/extensions/sbx_test/config.yml
+        echo "  test_param: ''" >> $SUNBEAM_DIR/extensions/sbx_test/config.yml
         #exit 1
     fi
 
