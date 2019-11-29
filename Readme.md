@@ -44,6 +44,7 @@ sequencing experiments. *Microbiome* 7:46 (2019)
 
 #### Development version (as of November 26, 2019)
 
+ - `sunbeam init` and `sunbeam config update` now add options for extensions you've installed to your default config file! (#247)
  - Updated the path to the Illumina adapter sequences from hardcoded to templated (fixes #150 and #152)
 
 #### v2.1.0 (November 26, 2019)
