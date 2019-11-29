@@ -119,6 +119,7 @@ def update(config_str, new, strict=False):
         config = _update_dict_strict(config, new)
     else:
         config = _update_dict(config, new)
+        config = _update_dict(config, ruamel.yaml.round_trip_load(extension_config()))
     return config
 
 def new(
