@@ -324,18 +324,23 @@ function test_sunbeam_config_update {
 # For #247: test to see whether extension config is included in the main configfile on initialization
 function test_extension_config_init {
 
-    cat $TEMPDIR/tmp_config.yml
-    echo "sbx_test found in config " `cat $TEMPDIR/tmp_config.yml | grep "sbx_test:" | wc -l` " time(s)" 
-    test `cat $TEMPDIR/tmp_config.yml | grep "sbx_test:" | wc -l` -eq 1
+    sunbeam init \
+            --force \
+            --output tmp_config_inclsbx.yml \
+            --data_fp $TEMPDIR/data_files \
+            $TEMPDIR
+
+    cat $TEMPDIR/tmp_config_inclsbx.yml
+    echo "sbx_test found in config " `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` " time(s)" 
+    test `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` -eq 1
 
 }
 
 # For #247: make sure `sunbeam config update` includes extension info
 function test_extension_config_update {
 
-    # Make a new config file
-    echo "initial config instances of 'test'"
-    cp $TEMPDIR/tmp_config.yml $TEMPDIR/tmp_config_extension_config_update.yml
+    # Make a config file copy
+    cp $TEMPDIR/tmp_config_inclsbx.yml $TEMPDIR/tmp_config_extension_config_update.yml
     cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "test"
 
     # Remove extension config entry
