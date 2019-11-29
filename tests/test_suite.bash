@@ -324,7 +324,7 @@ function test_sunbeam_config_update {
 # For #247: test to see whether extension config is included in the main configfile on initialization
 function test_extension_config_init {
 
-    if `echo $HOME | grep "/home/circleci" | wc -l` -eq 1; then
+    if [ `echo $HOME | grep "/home/circleci" | wc -l` -eq 1 ]; then
         echo "Tests running on CircleCI, adding config for sbx_test"
         cat "sbx_test:\n  test_param: ''" > $SUNBEAM_DIR/extensions/sbx_test/config.yml
         #exit 1
