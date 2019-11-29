@@ -322,7 +322,12 @@ with groups of samples to co-assemble.::
     threads: 4
       group_file: ''
 
-Users can simply copy this example section to the end of their
+As of version 3.0, config options from extensions are automatically included
+in config files made using ``sunbeam init`` and ``sunbeam config update``. This
+functionality depends on the extension's configuration file being named
+``config.yml``.
+
+In version <3.0, users can copy this example section to the end of their
 configuration file, using ``cat``::
 
   cat config.yml >> /path/to/user/sunbeam_config.yml
