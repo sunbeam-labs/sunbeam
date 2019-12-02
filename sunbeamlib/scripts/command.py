@@ -6,7 +6,6 @@ from sunbeamlib.scripts.run import main as Run
 from sunbeamlib.scripts.init import main as Init
 from sunbeamlib.scripts._config import main as Config
 from sunbeamlib.scripts.list_samples import main as ListSamples
-from sunbeamlib.scripts.extend import main as Extend
 
 def main():
 
@@ -43,8 +42,6 @@ def main():
         Config(remaining)
     elif args.command == "list_samples":
         ListSamples(remaining)
-    elif args.command == "extend":
-        Extend(remaining)
     else:
         parser.print_help()
         sys.stderr.write("Unrecognized command.\n")

@@ -102,17 +102,6 @@ If things go awry and updating doesn't work, simply uninstall and reinstall Sunb
 
 Then follow the installation_ instructions above.
 
-Installing Sunbeam extensions
------------------------------
-
-As of version 3.0, Sunbeam extensions can be installed by running ``sunbeam extend``
-followed by the URL of the extension's GitHub repo::
-
-    sunbeam extend https://github.com/sunbeam-labs/sbx_kaiju/
-
-For Sunbeam versions prior to 3.0, follow the instructions on the extension to 
-install.
-
 Setup
 =====
 
