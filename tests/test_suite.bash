@@ -374,7 +374,6 @@ function test_all_sunbeam_extend {
         $TEMPDIR
 
     sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config_extended.yml -p final_report
-    #sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config.yml -p final_report
 
     test `ls $TEMPDIR/sunbeam_output/reports/ | grep "final_report.html" | wc -l` -eq 1
 
