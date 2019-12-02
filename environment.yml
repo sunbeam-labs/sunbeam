@@ -13,7 +13,6 @@ dependencies:
   - kraken2
   - kraken-biom
   - vsearch
-  - jellyfish=1.1.11=1
   - cutadapt
   - bwa>=0.7.17
   - pysam
