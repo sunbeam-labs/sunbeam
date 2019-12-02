@@ -363,11 +363,18 @@ function test_extension_config_update {
 
 # For #251: test sunbeam extend
 
-function test_sunbeam_extend {
+function test_all_sunbeam_extend {
 
     sunbeam extend https://github.com/sunbeam-labs/sbx_report
 
-    sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config.yml -p final_report
+    sunbeam init \
+        --force \
+        --output tmp_config_extended.yml \
+        --data_fp $TEMPDIR/data_files \
+        $TEMPDIR
+
+    sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config_extended.yml -p final_report
+    #sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config.yml -p final_report
 
     test `ls $TEMPDIR/sunbeam_output/reports/ | grep "final_report.html" | wc -l` -eq 1
 
