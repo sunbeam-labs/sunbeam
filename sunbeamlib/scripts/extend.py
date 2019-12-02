@@ -35,7 +35,7 @@ def main(argv=sys.argv):
 
     git_clone_args = ["git","clone",args.github_url,str(extensions_dir/extension_name)]
 
-    print("Installing: "+extension_name+" from "+args.github_url))
+    print("Installing: "+extension_name+" from "+args.github_url)
 
     cmd = subprocess.run(git_clone_args)
     
