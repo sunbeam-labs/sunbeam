@@ -21,13 +21,6 @@ files to facilitate the installation of software dependencies, to
 specify parameters in the configuration file, and to give instructions
 to users.
 
-In Sunbeam version 3.0 and higher, extensions can be installed using the
-``sunbeam extend`` command, followed by the GitHub URL of the 
-extension you're installing. For example, to install an extension to
-run the kaiju classifier, you would run::
-
-    sunbeam extend https://github.com/sunbeam-labs/sbx_kaiju/
-
 Sunbeam extensions are installed by placing the extension directory in
 the ``extensions/`` subdirectory of the Sunbeam software.  Once the
 extension is in place, Sunbeam will find the *rules* file and
