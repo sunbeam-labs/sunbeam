@@ -360,3 +360,21 @@ function test_extension_config_update {
     echo "sbx_test found in config" `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:"` "time(s)"
     test `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:" | wc -l` -eq 1
 }
+
+# For #251: test sunbeam extend
+
+function test_all_sunbeam_extend {
+
+    sunbeam extend https://github.com/sunbeam-labs/sbx_report
+
+    sunbeam init \
+        --force \
+        --output tmp_config_extended.yml \
+        --data_fp $TEMPDIR/data_files \
+        $TEMPDIR
+
+    sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config_extended.yml -p final_report
+
+    test `ls $TEMPDIR/sunbeam_output/reports/ | grep "final_report.html" | wc -l` -eq 1
+
+}
