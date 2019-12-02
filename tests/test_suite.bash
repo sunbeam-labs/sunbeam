@@ -367,7 +367,7 @@ function test_sunbeam_extend {
 
     sunbeam extend https://github.com/sunbeam-labs/sbx_report
 
-    sunbeam run --configfile=$TEMPDIR/tmp_config.yml -p final_report
+    sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config.yml -p final_report
 
     test `ls $TEMPDIR/sunbeam_output/reports/ | grep "final_report.html" | wc -l` -eq 1
 
