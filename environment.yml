@@ -10,7 +10,7 @@ dependencies:
   - trimmomatic=0.36
   - fastqc
   - blast
-  - kraken=1.0
+  - kraken2
   - kraken-biom
   - vsearch
   - jellyfish=1.1.11=1

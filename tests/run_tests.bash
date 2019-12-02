@@ -208,14 +208,14 @@ function build_test_data {
     
     # Build fake kraken data
     pushd $TEMPDIR
-    kraken-build --db mindb --add-to-library \
+    kraken2-build --db mindb --add-to-library \
 		 raw/GCF_Bfragilis_10k_genomic.fna
-    kraken-build --db mindb --add-to-library \
+    kraken2-build --db mindb --add-to-library \
 		 raw/GCF_Ecoli_10k_genomic.fna
     mv truncated_taxonomy mindb/taxonomy
     cp seqid2taxid.map mindb
-    kraken-build --db mindb --build --kmer-len 16 --minimizer-len 1
-    kraken-build --db mindb --clean
+    kraken2-build --db mindb --build --kmer-len 16 --minimizer-len 1 --minimizer-spaces 0
+    kraken2-build --db mindb --clean
 
     # Build fake blast database
     mkdir -p local/blast

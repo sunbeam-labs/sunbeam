@@ -45,6 +45,7 @@ sequencing experiments. *Microbiome* 7:46 (2019)
 #### Development version (as of November 26, 2019)
 
  - Updated the path to the Illumina adapter sequences from hardcoded to templated (fixes #150 and #152)
+ - Use the updated kraken2 classifier instead of kraken
 
 #### v2.1.0 (November 26, 2019)
 
