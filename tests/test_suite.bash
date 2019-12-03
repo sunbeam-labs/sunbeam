@@ -365,7 +365,7 @@ function test_extension_config_update {
 
 function test_all_sunbeam_extend {
 
-    sunbeam extend https://github.com/sunbeam-labs/sbx_report
+    sunbeam extend https://github.com/sunbeam-labs/sbx_coassembly
 
     sunbeam init \
         --force \
@@ -373,8 +373,8 @@ function test_all_sunbeam_extend {
         --data_fp $TEMPDIR/data_files \
         $TEMPDIR
 
-    sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config_extended.yml -p final_report
+    sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config_extended.yml -p all_coassemble
 
-    test `ls $TEMPDIR/sunbeam_output/reports/ | grep "final_report.html" | wc -l` -eq 1
+    test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
 
 }
