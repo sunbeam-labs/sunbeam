@@ -152,7 +152,7 @@ def extension_config():
             # append it to the existing config
             sbx_config_fp = sunbeam_dir/"extensions"/sbx/"config.yml"
             sbx_configfile = open(sbx_config_fp)
-            sbx_config = "\n"+sbx_configfile.read()+"\n"
+            sbx_config = "\n"+sbx_configfile.read()
             sbx_configfile.close() 
             config = str(config + sbx_config)
     return config
