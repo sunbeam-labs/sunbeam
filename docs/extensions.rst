@@ -21,6 +21,13 @@ files to facilitate the installation of software dependencies, to
 specify parameters in the configuration file, and to give instructions
 to users.
 
+In Sunbeam version 3.0 and higher, extensions can be installed using the
+``sunbeam extend`` command, followed by the GitHub URL of the 
+extension you're installing. For example, to install an extension to
+run the kaiju classifier, you would run::
+
+    sunbeam extend https://github.com/sunbeam-labs/sbx_kaiju/
+
 Sunbeam extensions are installed by placing the extension directory in
 the ``extensions/`` subdirectory of the Sunbeam software.  Once the
 extension is in place, Sunbeam will find the *rules* file and
@@ -322,7 +329,12 @@ with groups of samples to co-assemble.::
     threads: 4
       group_file: ''
 
-Users can simply copy this example section to the end of their
+As of version 3.0, config options from extensions are automatically included
+in config files made using ``sunbeam init`` and ``sunbeam config update``. This
+functionality depends on the extension's configuration file being named
+``config.yml``.
+
+In version <3.0, users can copy this example section to the end of their
 configuration file, using ``cat``::
 
   cat config.yml >> /path/to/user/sunbeam_config.yml

@@ -308,3 +308,69 @@ function test_assembly_failures {
     echo "$txt" | grep "Empty contigs"
     )
 }
+
+# For #150 and #152: make sure sunbeam config update works
+function test_sunbeam_config_update {
+    # Make a new config file
+    cp $TEMPDIR/tmp_config.yml $TEMPDIR/tmp_config_test_config_update.yml
+
+    # Break config
+    sed -i 's/download_reads: false:/download_reads: BROKEN/' $TEMPDIR/tmp_config_test_config_update.yml
+    sunbeam config update $TEMPDIR/tmp_config_test_config_update.yml
+    test `cat $TEMPDIR/tmp_config_test_config_update.yml | grep "BROKEN" | wc -l` -eq 0
+
+}
+
+# For #247: test to see whether extension config is included in the main configfile on initialization
+function test_extension_config_init {
+
+    if [ `echo $HOME | grep "/home/circleci" | wc -l` -eq 1 ]; then
+        echo "Tests running on CircleCI, adding config for sbx_test"
+        echo "sbx_test:" > $SUNBEAM_DIR/extensions/sbx_test/config.yml
+        echo "  test_param: ''" >> $SUNBEAM_DIR/extensions/sbx_test/config.yml
+    fi
+
+
+    sunbeam init \
+            --force \
+            --output tmp_config_inclsbx.yml \
+            --data_fp $TEMPDIR/data_files \
+            $TEMPDIR
+
+    echo "sbx_test found in config" `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` "time(s)" 
+    test `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` -eq 1
+
+}
+
+# For #247: make sure `sunbeam config update` includes extension info
+function test_extension_config_update {
+
+    # Make a config file copy
+    cp $TEMPDIR/tmp_config_inclsbx.yml $TEMPDIR/tmp_config_extension_config_update.yml
+    cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "test"
+
+    # Remove extension config entry
+    sed -i 's/sbx_test://' $TEMPDIR/tmp_config_extension_config_update.yml
+    sed -i "s/  test_param: ''//" $TEMPDIR/tmp_config_extension_config_update.yml
+    echo "edited config instances of 'test':" `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "test" | wc -l`
+
+    # Update it again
+    sunbeam config update -i $TEMPDIR/tmp_config_extension_config_update.yml
+
+    echo "sbx_test found in config" `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:"` "time(s)"
+    test `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:" | wc -l` -eq 1
+}
+
+# For #251: test sunbeam extend
+
+function test_all_sunbeam_extend {
+
+    sunbeam extend https://github.com/sunbeam-labs/sbx_coassembly
+
+    sunbeam config update -i $TEMPDIR/tmp_config.yml
+
+    sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config.yml -p all_coassemble
+
+    test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
+
+}
