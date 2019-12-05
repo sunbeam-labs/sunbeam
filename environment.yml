@@ -10,7 +10,7 @@ dependencies:
   - trimmomatic=0.36
   - fastqc
   - blast
-  - kraken<2
+  - kraken2
   - kraken-biom
   - vsearch
   - cutadapt
@@ -29,3 +29,4 @@ dependencies:
   - h5py # temp: patching missing dependency of biom-format (req'd by kraken-biom)
   - samtools>=1.9
   - bcftools>=1.9
+  - git
