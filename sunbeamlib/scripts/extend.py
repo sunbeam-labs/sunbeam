@@ -29,7 +29,7 @@ def main(argv=sys.argv):
                 args.sunbeam_dir))
         sys.exit(1)
 
-    extension_name = args.github_url.split("/")[-1]
+    extension_name = [p for p in args.github_url.split("/") if len(p) > 0][-1]
     if extension_name.endswith(".git"):
         extension_name = extension_name[:-4]
 

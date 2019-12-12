@@ -379,8 +379,8 @@ function test_all_sunbeam_extend {
 
 function test_extend_trailing_slash {
 
-    sunbeam extend https://github.com/sunbeam-labs/sbx_subsample/
+    sunbeam extend https://github.com/sunbeam-labs/sbx_metaphlan/
 
-    ls $SUNBEAM_DIR/extensions/sbx_subsample/
+    rm -rf $SUNBEAM_DIR/extensions/sbx_metaphlan/
 
 }
