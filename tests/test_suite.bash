@@ -375,7 +375,7 @@ function test_all_sunbeam_extend {
 
 }
 
-# For #261: handle URLs with a traling slash
+# For #261: handle URLs with a trailing slash
 
 function test_extend_trailing_slash {
 
