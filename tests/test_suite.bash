@@ -374,3 +374,13 @@ function test_all_sunbeam_extend {
     test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
 
 }
+
+# For #261: handle URLs with a traling slash
+
+function test_extend_trailing_slash {
+
+    sunbeam extend https://github.com/sunbeam-labs/sbx_metaphlan/
+
+    rm -rf $SUNBEAM_DIR/extensions/sbx_metaphlan/
+
+}
