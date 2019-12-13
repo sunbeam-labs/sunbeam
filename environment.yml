@@ -4,7 +4,7 @@ channels:
   - eclarke
   - louiejtaylor
 dependencies:
-  - snakemake=5.5.0
+  - snakemake=5.6.0
   - ruamel.yaml
   - biopython
   - trimmomatic=0.36

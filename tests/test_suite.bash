@@ -82,7 +82,7 @@ function test_version_check {
 
 # Test that we detect and run extensions
 function test_extensions {
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p sbx_test | grep "SBX_TEST"
 }
 
 # Test that we have the updated snakemake that uses "conda activate"
@@ -103,7 +103,7 @@ function test_single_end {
 # Test that paired-end qc rules produce files with the same number of reads
 function test_pair_concordance {
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml all_decontam
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p all_decontam
     for r1 in $TEMPDIR/sunbeam_output/qc/cleaned/*_1.fastq.gz; do
 	r1_lines=$(zcat $r1 | wc -l)
 	r2=${r1%_1.fastq.gz}_2.fastq.gz
@@ -330,7 +330,6 @@ function test_extension_config_init {
         echo "  test_param: ''" >> $SUNBEAM_DIR/extensions/sbx_test/config.yml
     fi
 
-
     sunbeam init \
             --force \
             --output tmp_config_inclsbx.yml \
@@ -353,10 +352,8 @@ function test_extension_config_update {
     sed -i 's/sbx_test://' $TEMPDIR/tmp_config_extension_config_update.yml
     sed -i "s/  test_param: ''//" $TEMPDIR/tmp_config_extension_config_update.yml
     echo "edited config instances of 'test':" `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "test" | wc -l`
-
     # Update it again
     sunbeam config update -i $TEMPDIR/tmp_config_extension_config_update.yml
-
     echo "sbx_test found in config" `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:"` "time(s)"
     test `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:" | wc -l` -eq 1
 }
@@ -364,13 +361,8 @@ function test_extension_config_update {
 # For #251: test sunbeam extend
 
 function test_all_sunbeam_extend {
-
     sunbeam extend https://github.com/sunbeam-labs/sbx_coassembly
-
     sunbeam config update -i $TEMPDIR/tmp_config.yml
-
     sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config.yml -p all_coassemble
-
     test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
-
 }
