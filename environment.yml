@@ -7,7 +7,7 @@ dependencies:
   - snakemake<5.7.0
   - ruamel.yaml
   - biopython
-  - trimmomatic=0.36
+  - trimmomatic=0.39
   - fastqc
   - blast
   - kraken2
