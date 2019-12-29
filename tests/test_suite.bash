@@ -82,7 +82,7 @@ function test_version_check {
 
 # Test that we detect and run extensions
 function test_extensions {
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p sbx_test | grep "SBX_TEST"
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
 }
 
 # Test that we have the updated snakemake that uses "conda activate"
@@ -103,7 +103,7 @@ function test_single_end {
 # Test that paired-end qc rules produce files with the same number of reads
 function test_pair_concordance {
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p all_decontam
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml all_decontam
     for r1 in $TEMPDIR/sunbeam_output/qc/cleaned/*_1.fastq.gz; do
 	r1_lines=$(zcat $r1 | wc -l)
 	r2=${r1%_1.fastq.gz}_2.fastq.gz
