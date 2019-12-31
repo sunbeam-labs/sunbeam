@@ -4,10 +4,10 @@ channels:
   - eclarke
   - louiejtaylor
 dependencies:
-  - snakemake=5.5.0
+  - snakemake<5.7.0
   - ruamel.yaml
   - biopython
-  - trimmomatic=0.36
+  - trimmomatic=0.39
   - fastqc
   - blast
   - kraken2
@@ -23,10 +23,9 @@ dependencies:
   - setuptools_scm
   - komplexity=0.3.6
   - rust-bio-tools
-  - grabseqs=0.3.4
+  - grabseqs=0.6.1
   - minimap2
   - multiqc
-  - h5py # temp: patching missing dependency of biom-format (req'd by kraken-biom)
   - samtools>=1.9
   - bcftools>=1.9
   - git

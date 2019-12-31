@@ -47,12 +47,13 @@ See how people are using Sunbeam:
 
 ### Changelog:
 
-#### Development version (as of December 2, 2019)
+#### Development version (future 3.0 release; as of December 2, 2019)
 
  - New command `sunbeam extend` to automatically install Sunbeam extensions! Use like `sunbeam extend https://github.com/sunbeam-labs/sbx_report`
  - `sunbeam init` and `sunbeam config update` now add options for extensions you've installed to your default config file! (#247)
  - Updated the path to the Illumina adapter sequences from hardcoded to templated (fixes #150 and #152)
  - Use the updated kraken2 classifier instead of kraken
+ - Update other dependencies (trimmomatic -> 0.3.9; grabseqs -> 0.6.1; snakemake -> <5.7.0)
 
 #### v2.1.0 (November 26, 2019)
 

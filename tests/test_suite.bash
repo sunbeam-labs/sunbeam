@@ -330,7 +330,6 @@ function test_extension_config_init {
         echo "  test_param: ''" >> $SUNBEAM_DIR/extensions/sbx_test/config.yml
     fi
 
-
     sunbeam init \
             --force \
             --output tmp_config_inclsbx.yml \
@@ -353,10 +352,8 @@ function test_extension_config_update {
     sed -i 's/sbx_test://' $TEMPDIR/tmp_config_extension_config_update.yml
     sed -i "s/  test_param: ''//" $TEMPDIR/tmp_config_extension_config_update.yml
     echo "edited config instances of 'test':" `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "test" | wc -l`
-
     # Update it again
     sunbeam config update -i $TEMPDIR/tmp_config_extension_config_update.yml
-
     echo "sbx_test found in config" `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:"` "time(s)"
     test `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:" | wc -l` -eq 1
 }
@@ -364,15 +361,10 @@ function test_extension_config_update {
 # For #251: test sunbeam extend
 
 function test_all_sunbeam_extend {
-
     sunbeam extend https://github.com/sunbeam-labs/sbx_coassembly
-
     sunbeam config update -i $TEMPDIR/tmp_config.yml
-
     sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config.yml -p all_coassemble
-
     test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
-
 }
 
 # For #261: handle URLs with a trailing slash
