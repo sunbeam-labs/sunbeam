@@ -1,9 +1,16 @@
 # -*- mode: Snakemake -*-
 
-from sunbeamlib import samtools
+from sunbeamlib import samtools, mapping
 
 rule all_mapping:
     input: TARGET_MAPPING
+
+rule only_mapping:
+    input:
+        expand(
+            str(MAPPING_FP/"{genome}"/'mapping_flagstats.csv'),
+            genome=GenomeSegments.keys()
+        )
 
 rule build_genome_index:
     input:
@@ -45,6 +52,25 @@ rule samtools_convert:
         samtools sort -@ {threads} > {output}
         """
 
+rule samtools_flagstats:
+    input:
+        str(MAPPING_FP/'{genome}'/'{sample}.bam')
+    output:
+        str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.flagstats')
+    shell:
+        "samtools flagstats {input} > {output}"
+
+rule mapping_flagstats:
+    input:
+        expand(
+            str(MAPPING_FP/"intermediates"/"{genome}"/"{sample}.flagstats"),
+            genome=GenomeSegments.keys(), sample=Samples.keys()
+        )
+    output:
+        str(MAPPING_FP/'{genome}'/'mapping_flagstats.csv')
+    run:
+        mapping.generate_mapping_flagstats(input, output[0])
+
 def _sorted_csvs(w):
     pattern = str(MAPPING_FP/'intermediates'/w.genome/'{sample}.csv')
     paths = sorted(expand(pattern, sample=Samples.keys()))
@@ -70,7 +96,7 @@ rule samtools_index:
     output: str(MAPPING_FP/'{genome}'/'{sample}.bam.bai')
     shell: "samtools index {input} {output}"
 
-           
+
 rule samtools_mpileup:
     input:
         bam = str(MAPPING_FP/'{genome}'/'{sample}.bam'),
