@@ -56,7 +56,7 @@ rule samtools_flagstats:
     input:
         str(MAPPING_FP/'{genome}'/'{sample}.bam')
     output:
-        str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.flagstats')
+        temp(str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.flagstats'))
     shell:
         "samtools flagstats {input} > {output}"
 

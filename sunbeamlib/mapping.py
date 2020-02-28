@@ -48,5 +48,5 @@ def generate_mapping_flagstats(flagstats_file_paths, output_file_path, sep=','):
     with open(output_file_path, "w") as output_file:
         print(sep.join(FLAGSTATS_TABLE_HEADER), file=output_file)
         for file_path in flagstats_file_paths:
-            sample_name = os.path.basename(file_path)
+            sample_name = os.path.basename(file_path).split('.flagstats')[0]
             print(sep.join([sample_name] + FlagstatsParser(file_path).get_list()), file=output_file)
