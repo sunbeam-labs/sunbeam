@@ -34,4 +34,6 @@ qc/cleaned/random_2.fastq.gz
 qc/reports/multiqc_report.html
 
 mapping/human/coverage.csv
+mapping/human/mapping_flagstat.csv
 mapping/phix174/coverage.csv
+mapping/phix174/mapping_flagstat.csv

@@ -1,13 +1,13 @@
 import os
 from unittest import TestCase
 
-from sunbeamlib.mapping import FlagstatsParser
+from sunbeamlib.mapping import FlagstatParser
 
 
-class TestFlagstatsParser(TestCase):
+class TestFlagstatParser(TestCase):
 
     def test_parse(self):
-        file_path = os.path.join(os.path.dirname(__file__), "test_file.flagstats")
+        file_path = os.path.join(os.path.dirname(__file__), "test_file.flagstat")
         expected_list = [
             "6013502", "0",
             "7562", "0",
@@ -23,5 +23,5 @@ class TestFlagstatsParser(TestCase):
             "65898", "0",
             "36723", "0",
         ]
-        tested_list = FlagstatsParser(file_path).get_list()
+        tested_list = FlagstatParser(file_path).get_list()
         self.assertListEqual(tested_list, expected_list)
