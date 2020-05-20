@@ -63,8 +63,8 @@ rule samtools_flagstat:
 rule mapping_flagstat:
     input:
         expand(
-            str(MAPPING_FP/"intermediates"/"{genome}"/"{sample}.flagstat"),
-            genome=GenomeSegments.keys(), sample=Samples.keys()
+            str(MAPPING_FP/"intermediates"/"{{genome}}"/"{sample}.flagstat"),
+            sample=Samples.keys()
         )
     output:
         str(MAPPING_FP/'{genome}'/'mapping_flagstat.csv')
