@@ -29,3 +29,4 @@ dependencies:
   - samtools>=1.9
   - bcftools>=1.9
   - git
+  - blis #temp dependency until rust-bio-tools patch goes through
