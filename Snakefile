@@ -53,7 +53,7 @@ elif pkg_major < cfg_major:
         "`sunbeam init` and update it using `sunbeam_mod_config`\n")
 
 # Load extensions
-sbxs = list(listfiles(sunbeam_dir+"/extensions/{sbx_folder}/{sbx}.rules")) #+ list(listfiles(sunbeam_dir+"/extensions/{sbx_folder}/{sbx}.smk")) #commented to break test
+sbxs = list(listfiles(sunbeam_dir+"/extensions/{sbx_folder}/{sbx}.rules")) + list(listfiles(sunbeam_dir+"/extensions/{sbx_folder}/{sbx}.smk")) #commented to break test
 for sbx in sbxs:
     sys.stderr.write("Found extension {sbx} in folder {sbx_folder}\n".format(**sbx[1]))
 
