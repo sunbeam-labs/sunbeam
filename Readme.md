@@ -47,8 +47,9 @@ See how people are using Sunbeam:
 
 ### Changelog:
 
-#### Development version (future 3.0 release; as of December 2, 2019)
+#### Development version (future 3.0 release; as of April 1, 2020)
 
+ - Support use of .smk file extensions in Sunbeam extensions (in addition to .rules)
  - Support [mamba](https://github.com/mamba-org/mamba) as an alternate package dependency solver at install time, for faster installs
  - New command `sunbeam extend` to automatically install Sunbeam extensions! Use like `sunbeam extend https://github.com/sunbeam-labs/sbx_report`
  - `sunbeam init` and `sunbeam config update` now add options for extensions you've installed to your default config file! (#247)
