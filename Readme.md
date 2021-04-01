@@ -49,6 +49,7 @@ See how people are using Sunbeam:
 
 #### Development version (future 3.0 release; as of December 2, 2019)
 
+ - Support [mamba](https://github.com/mamba-org/mamba) as an alternate package dependency solver at install time, for faster installs
  - New command `sunbeam extend` to automatically install Sunbeam extensions! Use like `sunbeam extend https://github.com/sunbeam-labs/sbx_report`
  - `sunbeam init` and `sunbeam config update` now add options for extensions you've installed to your default config file! (#247)
  - Updated the path to the Illumina adapter sequences from hardcoded to templated (fixes #150 and #152)
