@@ -226,17 +226,23 @@ function test_mapping {
     for file in $TEMPDIR/hosts_*; do
         mv $file ${file/hosts_/hosts\//}
     done
-    # After the header line, there should be two lines in the human coverage
-    # summary and none at all in the phix174 summary.  The human.csv lines
-    # should be sorted in standard alphanumeric order; stub2_human will come
-    # before stub_human.
+    # After the header line, there should be two lines in the human and phix
+    # coverage summaries, with two reads mapping for human and none for phix.
+    # The lines should be sorted in standard alphanumeric order; stub2_human
+    # will come before stub_human.
     (
 	    csv_human=$TEMPDIR/sunbeam_output/mapping/human/coverage.csv
 	    csv_phix=$TEMPDIR/sunbeam_output/mapping/phix174/coverage.csv
 	    function col3 { cut -f3 -d, | tr '\n' : ; }
+	    function col5 { cut -f5 -d, | tr '\n' : ; }
 	    test "Sample:stub2_human:stub_human:" == $(col3 < "$csv_human")
-	    test "Sample:" == $(col3 < "$csv_phix")
-    )
+	    test "Max:2:2:" == $(col5 < "$csv_human")
+	    test "Sample:stub2_human:stub_human:" == $(col3 < "$csv_phix")
+	    test "Max:0:0:" == $(col5 < "$csv_phix")
+    ) || (
+	    echo "Unexpected coverage.csv content from mapping rules" > /dev/stderr
+	    false
+	)
 }
 
 # Test for sunbeam init for SRA

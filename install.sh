@@ -7,6 +7,7 @@ read -r -d '' __usage <<-'EOF'
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
   -c --conda  [arg]       Location of Conda installation. Default: ${PREFIX}
   -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
+  -m --mamba              Install and use mamba in base environment as alternative dependency solver
   -v --verbose            Show subcommand output
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
@@ -64,6 +65,7 @@ __sunbeam_dir="${arg_s:-$(readlink -f ${__dir})}"
 __sunbeam_env="${arg_e:-sunbeam}"
 __update_lib=false
 __update_env=false
+__install_mamba=false
 if [[ "${arg_u}" = "all" || "${arg_u}" = "env" ]]; then
     __update_lib=true
     __update_env=true
@@ -71,11 +73,19 @@ elif [[ "${arg_u}" = "lib" ]]; then
     __update_lib=true
 fi
 
+if [[ "${arg_m:?}" = "1" ]]; then
+    __install_mamba=true
+fi
+
 __old_path=$PATH
 PATH=$PATH:${__conda_path}/bin
 
 function __test_conda() {
     command -v conda &> /dev/null && echo true || echo false
+}
+
+function __test_mamba() {
+    command -v mamba &> /dev/null && echo true || echo false
 }
 
 function __detect_conda_install() {
@@ -140,7 +150,12 @@ function install_conda () {
 }
 
 function install_environment () {
-    debug_capture conda env update --name=$__sunbeam_env \
+    if [[ $(__test_mamba) = true ]]; then
+        cmd=mamba
+    else
+        cmd=conda
+    fi
+    debug_capture $cmd env update --name=$__sunbeam_env \
 			  --quiet --file environment.yml
     if [[ $(__test_env) != true ]]; then
 	installation_error "Environment creation"
@@ -171,6 +186,8 @@ info "    Sunbeam env:  '${__sunbeam_env}'"
 debug "Components detected:"
 __conda_installed=$(__test_conda)
 debug "    Conda:       ${__conda_installed}"
+__mamba_installed=$(__test_mamba)
+debug "    Mamba:       ${__mamba_installed}"
 __env_exists=$(__test_env)
 debug "    Environment: ${__env_exists}"
 __sunbeam_installed=$(__test_sunbeam)
@@ -190,6 +207,12 @@ else
     info "Installing Conda..."
     install_conda
     __env_changed=true
+fi
+
+# Install mamba if necessary
+if [[ $__install_mamba = true ]]; then
+    info "Installing mamba..."
+    conda install --yes --quiet -n base -c conda-forge mamba
 fi
 
 # Create Conda environment for Sunbeam
