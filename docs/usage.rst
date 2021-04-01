@@ -261,9 +261,9 @@ qc
 * ``adapter_template``: (trimmomatic) path to the Illumina paired-end adaptors (templated with ``$CONDA_ENV``)
   (autofilled)
 * ``fwd_adaptors``: (cutadapt) custom forward adaptor sequences to remove
-  using cutadapt. Replace with "" to skip.
+  using cutadapt. Replace with ``""`` to skip.
 * ``rev_adaptors``: (cutadapt) custom reverse adaptor sequences to remove
-  using cutadapt. Replace with "" to skip.
+  using cutadapt. Replace with ``""`` to skip.
 * ``mask_low_complexity``: [true/false] mask low-complexity sequences with Ns
 * ``kz_threshold``: a value between 0 and 1 to determine the low-complexity boundary (1 is most stringent). Ignored if not masking low-complexity sequences.
 * ``kz_window``: window size to use (in bp) for local complexity
