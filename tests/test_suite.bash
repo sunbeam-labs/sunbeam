@@ -382,3 +382,8 @@ function test_extend_trailing_slash {
     rm -rf $SUNBEAM_DIR/extensions/sbx_metaphlan/
 
 }
+
+# Test that we detect and run extension rules using the smk extension (#196)
+function test_extension_smk {
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_smk | grep "SBX_TEST_SMK"
+}
