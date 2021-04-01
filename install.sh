@@ -80,6 +80,14 @@ fi
 __old_path=$PATH
 PATH=$PATH:${__conda_path}/bin
 
+function __git_dir_exists() {
+    if [ -d ".git" ]; then
+      echo true
+    else
+      echo false
+    fi
+}
+
 function __test_conda() {
     command -v conda &> /dev/null && echo true || echo false
 }
@@ -172,6 +180,10 @@ function install_env_vars () {
 
 function install_sunbeamlib () {
     activate_sunbeam
+    if [[ $(__git_dir_exists) != true ]]; then
+      installation_error "Sunbeam requires a git clone \
+(instead of a compressed archive) to detect its version"
+    fi
     debug_capture pip install --upgrade $__sunbeam_dir 2>&1
     if [[ $(__test_sunbeam) != true ]]; then
 	installation_error "Library installation"
