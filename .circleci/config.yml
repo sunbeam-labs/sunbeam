@@ -26,7 +26,11 @@ jobs:
       - run:
           name: dump_env
           command: |
-            bash .circleci/dump_conda_env.bash
+            bash .circleci/dump_conda_env.bash | tee /tmp/pkgs.txt
+
+      - store_artifacts:
+          path: /tmp/pkgs.txt
+          destination: conda-env
 
       - run:
           name: run tests
