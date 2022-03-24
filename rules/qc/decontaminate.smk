@@ -1,7 +1,3 @@
-import subprocess
-from sunbeamlib.decontam import get_mapped_reads
-from collections import OrderedDict
-
 rule all_decontam:
     input:
         expand(
@@ -18,6 +14,8 @@ rule build_host_index:
     params:
         host='{host}',
         index_fp=str(Cfg['qc']['host_fp'])
+    conda:
+        "../../envs/bwa.yml"
     shell:
         "cd {Cfg[qc][host_fp]} && bwa index {input}"
 
@@ -34,6 +32,8 @@ rule align_to_host:
     params:
         sam = temp(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.sam')),
         index_fp = str(Cfg['qc']['host_fp'])
+    conda:
+        "../../envs/bwa_samtools.yml"
     shell:
         """
         bwa mem -M -t {threads} \
@@ -51,15 +51,10 @@ rule get_mapped_reads:
     params:
         pct_id =  Cfg['qc']['pct_id'],
         frac = Cfg['qc']['frac']
-    run:
-        with open(output.ids, 'w') as out:
-            last = None
-            for read_id in get_mapped_reads(input[0], params.pct_id, params.frac):
-                if read_id == last:
-                    continue
-                else:
-                    out.write(read_id + '\n')
-                    last = read_id
+    conda:
+        "../../envs/biopython_pysam.yml"
+    script:
+        "../../scripts/qc/get_mapped_reads.py"
 
 rule aggregate_reads:
     input:
@@ -68,11 +63,8 @@ rule aggregate_reads:
             host=HostGenomes.keys())
     output:
         temp(str(QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids')),
-    run:
-        if len(input) == 0:
-            shell("touch {output}")
-        else:
-            shell("cat {input} > {output}")
+    script:
+        "../../scripts/qc/aggregate_reads.py"
 
 rule filter_reads:
     input:
@@ -82,24 +74,7 @@ rule filter_reads:
     output:
         reads = str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'),
         log = str(QC_FP/'log'/'decontam'/'{sample}_{rp}.txt')
-    run:
-        original = int(str(subprocess.getoutput(
-            "zcat {} | wc -l".format(input.reads))).strip())//4
-        host = int(subprocess.getoutput(
-            "cat {} | wc -l".format(input.hostreads)).strip())
-        nonhost = int(original-host)
-        shell("""
-        gzip -dc {input.reads} | \
-        rbt fastq-filter {input.hostreads} | \
-        gzip > {output.reads}
-        """)
-        
-        hostdict = OrderedDict()
-        for hostid in input.hostids:
-            hostname = os.path.basename(os.path.dirname(hostid))
-            hostcts = int(subprocess.getoutput("cat {} | wc -l".format(hostid)).strip())
-            hostdict[hostname] = hostcts
-        
-        with open(output.log, 'w') as log:
-            log.write("{}\n".format("\t".join(list(hostdict.keys()) + ["host","nonhost"] )))
-            log.write("{}\n".format("\t".join( map(str, list(hostdict.values()) + [host, nonhost]) )))
+    conda:
+        "../../envs/rust-bio-tools.yml"
+    script:
+        "../../scripts/qc/filter_reads.py"

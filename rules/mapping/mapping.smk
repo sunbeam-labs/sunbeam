@@ -1,7 +1,5 @@
 # -*- mode: Snakemake -*-
 
-from sunbeamlib import samtools
-
 rule all_mapping:
     input: TARGET_MAPPING
 
@@ -10,6 +8,8 @@ rule build_genome_index:
         str(Cfg['mapping']['genomes_fp']/'{genome}.fasta')
     output:
         str(Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb')
+    conda:
+        "../../envs/bwa.yml"
     shell:
         "cd {Cfg[mapping][genomes_fp]} && bwa index {input}"
 
@@ -25,6 +25,8 @@ rule align_to_genome:
         Cfg['mapping']['threads']
     params:
         index_fp = str(Cfg['mapping']['genomes_fp'])
+    conda:
+        "../../envs/bwa.yml"
     shell:
         """
         bwa mem -M -t {threads} \
@@ -39,6 +41,8 @@ rule samtools_convert:
         str(MAPPING_FP/'{genome}'/'{sample}.bam')
     threads:
         Cfg['mapping']['threads']
+    conda:
+        "../../envs/samtools.yml"
     shell:
         """
         samtools view -@ {threads} -b {Cfg[mapping][samtools_opts]} {input} | \
@@ -61,14 +65,18 @@ rule samtools_get_coverage:
         str(MAPPING_FP/'{genome}'/'{sample}.bam')
     output:
         str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.csv')
-    run:
-        samtools.get_coverage_stats(
-            wildcards.genome, input[0], wildcards.sample, output[0])
+    conda:
+        "../../envs/numpy.yml"
+    script:
+        "../../scripts/mapping/samtools_get_coverage.py"
 
 rule samtools_index:
     input: str(MAPPING_FP/'{genome}'/'{sample}.bam')
     output: str(MAPPING_FP/'{genome}'/'{sample}.bam.bai')
-    shell: "samtools index {input} {output}"
+    conda:
+        "../../envs/samtools.yml"
+    shell:
+        "samtools index {input} {output}"
 
            
 rule samtools_mpileup:
@@ -76,6 +84,8 @@ rule samtools_mpileup:
         bam = str(MAPPING_FP/'{genome}'/'{sample}.bam'),
         genome = str(Cfg['mapping']['genomes_fp']/'{genome}.fasta')
     output: str(MAPPING_FP/'{genome}'/'{sample}.raw.bcf')
+    conda:
+        "../../envs/bcftools_samtools.yml"
     shell:
         """
         samtools mpileup -gf {input.genome} {input.bam} | \

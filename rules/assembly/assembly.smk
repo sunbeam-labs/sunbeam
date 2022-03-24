@@ -21,6 +21,8 @@ rule megahit_paired:
         out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
     threads:
         Cfg['assembly']['threads']
+    conda:
+        "../../envs/megahit.yml"
     shell:
         """
         ## turn off bash strict mode
@@ -49,6 +51,8 @@ rule megahit_unpaired:
         out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
     threads:
         Cfg['assembly']['threads']
+    conda:
+        "../../envs/megahit.yml"
     shell:
         """
         ## turn off bash strict mode
@@ -77,22 +81,10 @@ rule final_filter:
         len = Cfg['assembly']['min_length']
     log:
         str(ASSEMBLY_FP/'log'/'vsearch'/'{sample}.log')
-    run:
-        filename = os.path.basename(input[0])
-        shell(
-        """
-        if [ -s {input} ]
-        then
-            vsearch --sortbylength {input} \
-            --minseqlength {params.len} \
-            --maxseqlength -1 \
-            --notrunclabels \
-            --output {input}.{params.len}f &> {log} && \
-            cp {input}.{params.len}f {output}
-        else
-            cp {input} {output} &> {log}
-        fi
-        """)
+    conda:
+        "../../envs/vsearch.yml"
+    script:
+        "../../scripts/assembly/final_filter.py"
 
 rule clean_assembly:
     input:

@@ -1,6 +1,6 @@
 import os
 import sys
-import collections
+from collections.abc import Mapping
 from pathlib import Path
 from pkg_resources import resource_stream
 
@@ -91,7 +91,7 @@ def process_databases(db_dict):
 
 def _update_dict(target, new):
     for k, v in new.items():
-        if isinstance(v, collections.Mapping):
+        if isinstance(v, Mapping):
             # We could use .get() here but ruamel.yaml's weird Mapping
             # subclass outputs errors to stdout if the key doesn't exist
             if k in target:
@@ -104,7 +104,7 @@ def _update_dict(target, new):
 
 def _update_dict_strict(target, new):
     for k, v in new.items():
-        if isinstance(v, collections.Mapping) and k in target.keys():
+        if isinstance(v, Mapping) and k in target.keys():
             target[k] = _update_dict_strict(target.get(k, {}), v)
         elif k in target.keys():
             target[k] = v
@@ -164,7 +164,7 @@ def load_defaults(default_name):
         ).read().decode())
     
 def dump(config, out=sys.stdout):
-    if isinstance(config, collections.Mapping):
+    if isinstance(config, Mapping):
         ruamel.yaml.round_trip_dump(config, out)
     else:
         out.write(config)

@@ -1,0 +1,4 @@
+channels:
+  - louiejtaylor
+dependencies:
+  - grabseqs
