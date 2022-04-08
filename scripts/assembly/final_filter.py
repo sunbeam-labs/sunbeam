@@ -9,7 +9,7 @@ then
     --minseqlength {b} \
     --maxseqlength -1 \
     --notrunclabels \
-    --output {a}.{b}f &> {c} && \
+    --output {a}.{b}f && \
     cp {a}.{b}f {d}
 else
     cp {a} {d} &> {c}

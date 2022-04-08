@@ -6,7 +6,7 @@ import csv
 import numpy
 
 input_fp = snakemake.input[0]
-sample = snakemake.wilcards.sample
+sample = snakemake.wildcards.sample
 output_fp = snakemake.output[0]
 
 with open(input_fp) as f:

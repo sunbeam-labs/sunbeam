@@ -117,7 +117,7 @@ function setup {
 	TEMPDIR=`mktemp -d`
     fi
     
-    verbose "\n\t${GREEN}Test directory${RESET}: ${TEMPDIR}"
+    verbose "\n\t${GREEN}Test directory${RESET}: ${TEMPDIR}\n"
 
     export PATH=$PATH:$HOME/miniconda3/bin
     # Allow conda [de]activate

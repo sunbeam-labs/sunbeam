@@ -88,6 +88,6 @@ rule samtools_mpileup:
         "../../envs/bcftools_samtools.yml"
     shell:
         """
-        samtools mpileup -gf {input.genome} {input.bam} | \
+        bcftools mpileup -f {input.genome} {input.bam} | \
         bcftools call -Ob -v -c - > {output}
         """

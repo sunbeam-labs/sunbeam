@@ -1,6 +1,6 @@
 # Test normal behavior
 function test_all {
-    sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p -c4 --use-conda
+    sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p --use-conda -c
 
     # Check contents
     annot_summary=sunbeam_output/annotation/summary/dummyecoli.tsv
@@ -30,7 +30,7 @@ function test_all_old_illumina {
     # Add config entry for suffix to remove from sequence IDs, and run just
     # like before.
     sed -i -r 's/^( +seq_id_ending: *).*$/\1"\/[12]"/' $TEMPDIR/tmp_config_old_illumina.yml
-    sunbeam run -- --configfile=$TEMPDIR/tmp_config_old_illumina.yml -p
+    sunbeam run -- --configfile=$TEMPDIR/tmp_config_old_illumina.yml -p --use-conda -c
     mv $TEMPDIR/samples_orig.csv $TEMPDIR/samples.csv
 
     # Check contents
@@ -52,7 +52,7 @@ function test_all_old_illumina {
 function test_optional_cutadapt {
     sed 's/adapters: \[.*\]/adapters: \[\]/g' $TEMPDIR/tmp_config.yml > $TEMPDIR/tmp_config_nocutadapt.yml
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run --configfile=$TEMPDIR/tmp_config_nocutadapt.yml all_decontam
+    sunbeam run --configfile=$TEMPDIR/tmp_config_nocutadapt.yml all_decontam --use-conda -c
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_1.fastq.gz ]
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_2.fastq.gz ]
 }
@@ -75,20 +75,20 @@ function test_version_check {
     sunbeam config modify --str 'all: {version: 9999.9.9}' \
 	    $TEMPDIR/tmp_config.yml > $TEMPDIR/too_high_config.yml
     # this should produce a nonzero exit code and fail if it does not
-    if sunbeam run --configfile $TEMPDIR/too_high_config.yml; then
+    if sunbeam run --configfile $TEMPDIR/too_high_config.yml --use-conda -c; then
 	exit 1
     fi
 }
 
 # Test that we detect and run extensions
 function test_extensions {
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test --use-conda -c | grep "SBX_TEST"
 }
 
 # Test that we have the updated snakemake that uses "conda activate"
-function test_use_conda {
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml --use-conda sbx_test | grep "SBX_TEST"
-}
+#function test_use_conda {
+#    sunbeam run --configfile $TEMPDIR/tmp_config.yml --use-conda -c sbx_test | grep "SBX_TEST"
+#}
 
 # Test that single-end sequencing configurations work
 function test_single_end {
@@ -103,7 +103,7 @@ function test_single_end {
 # Test that paired-end qc rules produce files with the same number of reads
 function test_pair_concordance {
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml all_decontam
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml all_decontam --use-conda -c
     for r1 in $TEMPDIR/sunbeam_output/qc/cleaned/*_1.fastq.gz; do
 	r1_lines=$(zcat $r1 | wc -l)
 	r2=${r1%_1.fastq.gz}_2.fastq.gz
@@ -164,7 +164,7 @@ function test_blank_fp_behavior {
     # with fasta files lying around in the top-level directory.
     sunbeam config modify --str 'mapping: {genomes_fp: ""}' \
         $TEMPDIR/tmp_config.yml > $TEMPDIR/blank_fp_config.yml
-    sunbeam run --configfile $TEMPDIR/blank_fp_config.yml
+    sunbeam run --configfile $TEMPDIR/blank_fp_config.yml --use-conda -c
     # Move indexes back to original location
     for file in $TEMPDIR/indexes_*; do
         mv $file ${file/indexes_/indexes\//}
@@ -221,7 +221,7 @@ function test_mapping {
     for file in $TEMPDIR/hosts/human*; do
         mv $file $TEMPDIR/hosts_${file##*/}
     done
-    sunbeam run --configfile $TEMPDIR/test_mapping_config.yml all_mapping
+    sunbeam run --configfile $TEMPDIR/test_mapping_config.yml all_mapping --use-conda -c
     # Move human host files back to original location
     for file in $TEMPDIR/hosts_*; do
         mv $file ${file/hosts_/hosts\//}
@@ -281,7 +281,7 @@ function test_get_paired_unpaired {
 # avoids this.
 function test_subdir_patterns {
     # All we need to check is that the graph resolution works.
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_subdir -n
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_subdir -n --use-conda -c
 }
 
 # Fix for #167:
@@ -291,7 +291,7 @@ function test_subdir_patterns {
 # Checking for successful behavior is already handled in test_all.
 function test_assembly_failures {
     # Up to just before the assembly rules, things should work fine.
-    sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_decontam
+    sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_decontam --use-conda -c
     # Remove previous assembly files, if they exist.
     rm -rf $TEMPDIR/sunbeam_output/assembly
     # If megahit gives an exit code != 0 and != 255 it is an error.
@@ -301,7 +301,7 @@ function test_assembly_failures {
     (
     export PATH="$TEMPDIR/megahit_137:$PATH"
     # (This command should *not* exit successfully.)
-    ! txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
+    ! txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly --use-conda -c)
     echo "$txt" | grep "Check your memory"
     )
     # If megahit exits with 255, it implies no contigs were built.
@@ -310,7 +310,7 @@ function test_assembly_failures {
     chmod +x $TEMPDIR/megahit_255/megahit
     (
     export PATH="$TEMPDIR/megahit_255:$PATH"
-    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
+    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly --use-conda -c)
     echo "$txt" | grep "Empty contigs"
     )
 }
@@ -369,7 +369,7 @@ function test_extension_config_update {
 function test_all_sunbeam_extend {
     sunbeam extend https://github.com/sunbeam-labs/sbx_coassembly
     sunbeam config update -i $TEMPDIR/tmp_config.yml
-    sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config.yml -p all_coassemble
+    sunbeam run --use-conda -c --configfile=$TEMPDIR/tmp_config.yml -p all_coassemble --use-conda -c
     test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
 }
 
@@ -385,5 +385,5 @@ function test_extend_trailing_slash {
 
 # Test that we detect and run extension rules using the smk extension (#196)
 function test_extension_smk {
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_smk | grep "SBX_TEST_SMK"
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_smk --use-conda -c | grep "SBX_TEST_SMK"
 }

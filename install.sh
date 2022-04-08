@@ -158,11 +158,13 @@ function install_conda () {
 }
 
 function install_environment () {
-    if [[ $(__test_mamba) = true ]]; then
-        cmd=mamba
-    else
+    #if [[ $(__test_mamba) = true ]]; then
+    #    cmd=mamba
+    #else
         cmd=conda
-    fi
+    #fi
+    #debug_capture $cmd env create --name=$__sunbeam_env \
+    #          --quiet --file environment.yml
     debug_capture $cmd env update --name=$__sunbeam_env \
 			  --quiet --file environment.yml
     if [[ $(__test_env) != true ]]; then
@@ -172,8 +174,10 @@ function install_environment () {
 
 function install_env_vars () {
     activate_sunbeam
+    mkdir -p ${CONDA_PREFIX}/etc/conda/activate.d
     echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}" > \
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
+    mkdir -p ${CONDA_PREFIX}/etc/conda/deactivate.d
     echo -ne "#/bin/sh\nunset SUNBEAM_DIR" > \
 	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
 }

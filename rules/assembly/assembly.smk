@@ -30,8 +30,14 @@ rule megahit_paired:
 
         ## sometimes the error is due to lack of memory
         exitcode=0
+        ls -al {params.out_fp} > /mnt/d/Penn/sunbeam/log.txt
+        if [ -d {params.out_fp} ]
+        then
+            rm -rf {params.out_fp}
+        fi
         megahit -t {threads} -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue || exitcode=$?
 
+        echo $exitcode
         if [ $exitcode -eq 255 ]
         then
             echo "Empty contigs"

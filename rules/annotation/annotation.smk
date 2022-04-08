@@ -23,7 +23,9 @@ rule aggregate_results:
     output:
         str(ANNOTATION_FP/'summary'/'{sample}.tsv')
     params:
-        dbs=list(Blastdbs['nucl'].keys()) + list(Blastdbs['prot'].keys())
+        dbs=list(Blastdbs['nucl'].keys()) + list(Blastdbs['prot'].keys()),
+        nucl = Blastdbs['nucl'],
+        prot = Blastdbs['prot'],
     conda:
         "../../envs/biopython.yml"
     script:
