@@ -369,7 +369,7 @@ function test_extension_config_update {
 function test_all_sunbeam_extend {
     sunbeam extend https://github.com/sunbeam-labs/sbx_coassembly
     sunbeam config update -i $TEMPDIR/tmp_config.yml
-    sunbeam run --use-conda -c --configfile=$TEMPDIR/tmp_config.yml -p all_coassemble --use-conda -c
+    sunbeam run --use-conda -c --configfile=$TEMPDIR/tmp_config.yml -p all_coassemble
     test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
 }
 
