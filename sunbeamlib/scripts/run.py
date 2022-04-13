@@ -32,8 +32,9 @@ def main(argv=sys.argv):
             "Error: could not find a Snakefile in directory '{}'\n".format(
                 args.sunbeam_dir))
         sys.exit(1)
-        
-    snakemake_args = ['snakemake', '--snakefile', str(snakefile)] + remaining
+    
+    conda_prefix = Path(args.sunbeam_dir)/".snakemake"
+    snakemake_args = ['snakemake', '--snakefile', str(snakefile), '--use-conda', '--conda-prefix', str(conda_prefix), '-c'] + remaining
     print("Running: "+" ".join(snakemake_args))
 
     cmd = subprocess.run(snakemake_args)

@@ -22,7 +22,7 @@ rule megahit_paired:
     threads:
         Cfg['assembly']['threads']
     conda:
-        "../../envs/megahit.yml"
+        "../../envs/assembly.yml"
     shell:
         """
         ## turn off bash strict mode
@@ -58,7 +58,7 @@ rule megahit_unpaired:
     threads:
         Cfg['assembly']['threads']
     conda:
-        "../../envs/megahit.yml"
+        "../../envs/assembly.yml"
     shell:
         """
         ## turn off bash strict mode
@@ -88,7 +88,7 @@ rule final_filter:
     log:
         str(ASSEMBLY_FP/'log'/'vsearch'/'{sample}.log')
     conda:
-        "../../envs/vsearch.yml"
+        "../../envs/assembly.yml"
     script:
         "../../scripts/assembly/final_filter.py"
 

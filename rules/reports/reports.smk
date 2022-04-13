@@ -19,7 +19,7 @@ rule preprocess_report:
     output:
         str(QC_FP/'reports'/'preprocess_summary.tsv')
     conda:
-        "../../envs/pandas.yml"
+        "../../envs/reports.yml"
     script:
         "../../scripts/reports/preprocess_report.py"
 
@@ -33,7 +33,7 @@ rule fastqc_report:
     output:
         str(QC_FP/'reports'/'fastqc_quality.tsv')
     conda:
-        "../../envs/pandas.yml"
+        "../../envs/reports.yml"
     script:
         "../../scripts/reports/fastqc_report.py"
 
@@ -48,6 +48,6 @@ rule multiqc_report:
         title = Cfg['qc'].get('report_title', 'QC report'),
         outdir = str(QC_FP/'reports')
     conda:
-        "../../envs/multiqc.yml"
+        "../../envs/reports.yml"
     script:
         "../../scripts/reports/multiqc_report.py"

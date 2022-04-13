@@ -15,7 +15,7 @@ rule download_paired:
         Cfg['download']['threads']
     shadow: "shallow"
     conda:
-        "../../envs/grabseqs.yml"
+        "../../envs/download.yml"
     shell:
         """
         mkdir -p {params.outdir}
@@ -32,7 +32,7 @@ rule download_unpaired:
         Cfg['download']['threads']	
     shadow: "shallow"
     conda:
-        "../../envs/grabseqs.yml"
+        "../../envs/download.yml"
     shell:
         """
         mkdir -p {params.outdir}

@@ -18,7 +18,7 @@ rule kraken2_classify_report:
     threads:
         Cfg['classify']['threads']
     #conda:
-    #    "../../envs/kraken2.yml"
+    #    "../../envs/classify.yml"
     shell:
         """
         kraken2 --gzip-compressed \
@@ -35,7 +35,7 @@ rule kraken2_biom:
     output:
         str(CLASSIFY_FP/'kraken'/'all_samples.biom')
     conda:
-        "../../envs/kraken-biom.yml"
+        "../../envs/classify.yml"
     shell:
         """
         kraken-biom --max D -o {output} {input}
@@ -47,7 +47,7 @@ rule classic_k2_biom:
     output:
         str(CLASSIFY_FP/'kraken'/'all_samples.tsv')
     conda:
-        "../../envs/kraken-biom.yml"
+        "../../envs/classify.yml"
     shell:
         """
         biom convert -i {input} -o {output} \

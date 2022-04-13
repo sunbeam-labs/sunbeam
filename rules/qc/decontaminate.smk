@@ -15,7 +15,7 @@ rule build_host_index:
         host='{host}',
         index_fp=str(Cfg['qc']['host_fp'])
     conda:
-        "../../envs/bwa.yml"
+        "../../envs/qc.yml"
     shell:
         "cd {Cfg[qc][host_fp]} && bwa index {input}"
 
@@ -33,7 +33,7 @@ rule align_to_host:
         sam = temp(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.sam')),
         index_fp = str(Cfg['qc']['host_fp'])
     conda:
-        "../../envs/bwa_samtools.yml"
+        "../../envs/qc.yml"
     shell:
         """
         bwa mem -M -t {threads} \
@@ -52,7 +52,7 @@ rule get_mapped_reads:
         pct_id =  Cfg['qc']['pct_id'],
         frac = Cfg['qc']['frac']
     conda:
-        "../../envs/biopython_pysam.yml"
+        "../../envs/qc.yml"
     script:
         "../../scripts/qc/get_mapped_reads.py"
 
@@ -75,6 +75,6 @@ rule filter_reads:
         reads = str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'),
         log = str(QC_FP/'log'/'decontam'/'{sample}_{rp}.txt')
     conda:
-        "../../envs/rust-bio-tools.yml"
+        "../../envs/qc.yml"
     script:
         "../../scripts/qc/filter_reads.py"

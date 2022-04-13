@@ -27,7 +27,7 @@ rule aggregate_results:
         nucl = Blastdbs['nucl'],
         prot = Blastdbs['prot'],
     conda:
-        "../../envs/biopython.yml"
+        "../../envs/annotation.yml"
     script:
         "../../scripts/annotation/aggregate_results.py"
 

@@ -30,7 +30,7 @@ rule contigs_mapping:
     threads: 
         Cfg['mapping']['threads']
     conda:
-        "../../envs/minimap2_samtools.yml"
+        "../../envs/assembly.yml"
     shell:
         """
         minimap2 -ax sr -t {threads} {input.contig} {input.reads} | \
@@ -45,7 +45,7 @@ rule mapping_depth:
     output:
         depth = str(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.depth')
     conda:
-        "../../envs/samtools.yml"
+        "../../envs/assembly.yml"
     shell:
         """
         samtools depth -aa {input.bam} > {output.depth}
@@ -58,7 +58,7 @@ rule get_coverage:
     output:
         str(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.csv')
     conda:
-        "../../envs/numpy.yml"
+        "../../envs/assembly.yml"
     script:
         "../../scripts/assembly/get_coverage.py"
 

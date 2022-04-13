@@ -21,7 +21,7 @@ rule run_blastn:
     threads: 
         Cfg['blast']['threads']
     conda:
-        "../../envs/blast.yml"
+        "../../envs/annotation.yml"
     shell:
         """
         blastn \
@@ -44,7 +44,7 @@ rule run_blastp:
     threads:
         Cfg['blast']['threads']
     conda:
-        "../../envs/blast.yml"
+        "../../envs/annotation.yml"
     shell:
         """
         blastp \
@@ -67,7 +67,7 @@ rule run_blastx:
     threads:
         Cfg['blast']['threads']
     conda:
-        "../../envs/blast.yml"
+        "../../envs/annotation.yml"
     shell:
         """
         blastx \
@@ -89,7 +89,7 @@ rule blast_report:
     output:
         str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'{query}'/'report.tsv')
     conda:
-        "../../envs/biopython.yml"
+        "../../envs/annotation.yml"
     script:
         "../../scripts/annotation/blast_report.py"
 

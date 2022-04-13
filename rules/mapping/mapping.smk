@@ -9,7 +9,7 @@ rule build_genome_index:
     output:
         str(Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb')
     conda:
-        "../../envs/bwa.yml"
+        "../../envs/mapping.yml"
     shell:
         "cd {Cfg[mapping][genomes_fp]} && bwa index {input}"
 
@@ -26,7 +26,7 @@ rule align_to_genome:
     params:
         index_fp = str(Cfg['mapping']['genomes_fp'])
     conda:
-        "../../envs/bwa.yml"
+        "../../envs/mapping.yml"
     shell:
         """
         bwa mem -M -t {threads} \
@@ -42,7 +42,7 @@ rule samtools_convert:
     threads:
         Cfg['mapping']['threads']
     conda:
-        "../../envs/samtools.yml"
+        "../../envs/mapping.yml"
     shell:
         """
         samtools view -@ {threads} -b {Cfg[mapping][samtools_opts]} {input} | \
@@ -66,7 +66,7 @@ rule samtools_get_coverage:
     output:
         str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.csv')
     conda:
-        "../../envs/numpy.yml"
+        "../../envs/mapping.yml"
     script:
         "../../scripts/mapping/samtools_get_coverage.py"
 
@@ -74,7 +74,7 @@ rule samtools_index:
     input: str(MAPPING_FP/'{genome}'/'{sample}.bam')
     output: str(MAPPING_FP/'{genome}'/'{sample}.bam.bai')
     conda:
-        "../../envs/samtools.yml"
+        "../../envs/mapping.yml"
     shell:
         "samtools index {input} {output}"
 
@@ -85,7 +85,7 @@ rule samtools_mpileup:
         genome = str(Cfg['mapping']['genomes_fp']/'{genome}.fasta')
     output: str(MAPPING_FP/'{genome}'/'{sample}.raw.bcf')
     conda:
-        "../../envs/bcftools_samtools.yml"
+        "../../envs/mapping.yml"
     shell:
         """
         bcftools mpileup -f {input.genome} {input.bam} | \

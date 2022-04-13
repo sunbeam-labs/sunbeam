@@ -19,7 +19,7 @@ rule sample_intake:
     params:
         suffix = Cfg['qc']['seq_id_ending']
     conda:
-        "../../envs/bwa.yml"
+        "../../envs/qc.yml"
     script:
         "../../scripts/qc/sample_intake.py"
 
@@ -34,7 +34,7 @@ rule adapter_removal_unpaired:
     threads:
         Cfg['qc']['threads']
     conda:
-        "../../envs/cutadapt.yml"
+        "../../envs/qc.yml"
     script:
         "../../scripts/qc/adapter_removal_unpaired.py"
     
@@ -52,7 +52,7 @@ rule adapter_removal_paired:
     threads:
         Cfg['qc']['threads']
     conda:
-        "../../envs/cutadapt.yml"
+        "../../envs/qc.yml"
     script:
         "../../scripts/qc/adapter_removal_paired.py"
 
@@ -70,7 +70,7 @@ rule trimmomatic_unpaired:
     threads:
         Cfg['qc']['threads']
     conda:
-        "../../envs/trimmomatic.yml"
+        "../../envs/qc.yml"
     shell:
         """
         trimmomatic \
@@ -101,7 +101,7 @@ rule trimmomatic_paired:
     threads:
         Cfg['qc']['threads']
     conda:
-        "../../envs/trimmomatic.yml"
+        "../../envs/qc.yml"
     shell:
         """
         trimmomatic \
@@ -129,7 +129,7 @@ rule fastqc:
     params:
         outdir = str(QC_FP/'reports')
     conda:
-        "../../envs/fastqc.yml"
+        "../../envs/qc.yml"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract"
 
@@ -141,7 +141,7 @@ rule find_low_complexity:
     output:
         str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids')
     conda:
-        "../../envs/komplexity.yml"
+        "../../envs/qc.yml"
     shell:
         """
         for rp in {input}; do
@@ -157,7 +157,7 @@ rule remove_low_complexity:
     output:
         str(QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz')
     conda:
-        "../../envs/rust-bio-tools.yml"
+        "../../envs/qc.yml"
     shell:
         """
         gzip -dc {input.reads} | rbt fastq-filter {input.ids} |\

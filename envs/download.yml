@@ -1,0 +1,5 @@
+name: download
+channels:
+  - louiejtaylor
+dependencies:
+  - grabseqs
