@@ -144,6 +144,31 @@ rule run_diamond:
         --out {output} \
         || if [ $? == 1 ]; then echo "Caught empty query error from diamond" && touch {output}; fi
         """
+
+rule run_diamond:
+    """Run DIAMOND on untranslated genes against a target db and write to blast tabular format."""
+    input:
+        genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_nucl.fa'),
+        db=lambda wildcard: Blastdbs['prot'][wildcard.db],
+        indeces=rules.build_diamond_db.output
+    output:
+        str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.btfbutnotrn')
+    threads:
+        Cfg['blast']['threads']
+    conda:
+        "../../envs/annotation.yml"
+    shell:
+        """
+        cat {input.genes} && \
+        diamond blastx \
+        -q {input.genes} \
+        --db {input.db} \
+        --outfmt 6 \
+        --threads {threads} \
+        --evalue 1e-10 \
+        --max-target-seqs 2475 \
+        --out {output}
+        """
         
 rule blast_report:
     """Create a summary of results from a BLAST call."""
