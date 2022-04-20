@@ -4,4 +4,5 @@ channels:
 dependencies:
   - biopython
   - blast
+  - diamond
   - prodigal

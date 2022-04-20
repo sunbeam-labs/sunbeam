@@ -13,10 +13,10 @@ rule aggregate_results:
     input:
         contigs=str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'),
         contig_results=expand(
-            str(ANNOTATION_FP/'blastn'/'{db}'/'contig'/'{{sample}}.xml'),
+            str(ANNOTATION_FP/'blastn'/'{db}'/'contig'/'{{sample}}.btf'),
             db=Blastdbs['nucl']),
         gene_results=expand(
-            str(ANNOTATION_FP/'{blastpx}'/'{db}'/'{orf_finder}'/'{{sample}}.xml'),
+            str(ANNOTATION_FP/'{blastpx}'/'{db}'/'{orf_finder}'/'{{sample}}.btf'),
             blastpx=['blastp','blastx'],
             db=Blastdbs['prot'],
             orf_finder=['prodigal'])
