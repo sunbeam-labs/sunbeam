@@ -102,7 +102,7 @@ rule run_blastx:
         genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_nucl.fa'),
         db=lambda wildcard: Blastdbs['prot'][wildcard.db]
     output:
-        str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.btf')
+        str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.btf_IGNORE_RULE')
     threads:
         Cfg['blast']['threads']
     conda:
@@ -112,11 +112,12 @@ rule run_blastx:
         blastx \
         -query {input.genes} \
         -db {input.db} \
-        -outfmt 5 \
+        -outfmt 7 \
         -num_threads {threads} \
         -evalue 1e-10 \
         -max_target_seqs 2475 \
         -out {output} \
+        && cat {output}
         """
 
 rule run_diamond:
@@ -126,14 +127,13 @@ rule run_diamond:
         db=lambda wildcard: Blastdbs['prot'][wildcard.db],
         indeces=rules.build_diamond_db.output
     output:
-        str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.btfbutnotrn')
+        str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.btf')
     threads:
         Cfg['blast']['threads']
     conda:
         "../../envs/annotation.yml"
     shell:
         """
-        cat {input.genes} && \
         diamond blastx \
         -q {input.genes} \
         --db {input.db} \
@@ -141,7 +141,8 @@ rule run_diamond:
         --threads {threads} \
         --evalue 1e-10 \
         --max-target-seqs 2475 \
-        --out {output}
+        --out {output} \
+        || if [ $? == 1 ]; then echo "Caught empty query error from diamond" && touch {output}; fi
         """
         
 rule blast_report:
