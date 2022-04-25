@@ -428,7 +428,6 @@ function test_extend_trailing_slash {
 
 # Test that we detect and run extension rules using the smk extension (#196)
 function test_extension_smk {
-    ls $TEMPDIR
     sunbeam run --configfile $TEMPDIR/tmp_config.yml -p sbx_test_smk | grep "SBX_TEST_SMK"
 
     echo "test_extension_smk passed" >> test_results
