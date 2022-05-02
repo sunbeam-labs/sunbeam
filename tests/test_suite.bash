@@ -298,27 +298,27 @@ function test_assembly_failures {
     rm -rf $TEMPDIR/sunbeam_output/assembly
 
     # If megahit exits with 255, it implies no contigs were built.
-    mkdir -p "$TEMPDIR/megahit_255"
-    echo -e '#!/usr/bin/env bash\nexit 255' > $TEMPDIR/megahit_255/megahit
-    chmod +x $TEMPDIR/megahit_255/megahit
-    (
-    export PATH="$TEMPDIR/megahit_255:$PATH"
-    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
-    echo "$txt" > /mnt/d/Penn/sunbeam/log.txt
-    echo "$txt" | grep "Empty contigs"
-    )
-
-#    # If megahit gives an exit code != 0 and != 255 it is an error.
-#    mkdir -p "$TEMPDIR/megahit_137"
-#    echo -e '#!/usr/bin/env bash\nexit 137' > $TEMPDIR/megahit_137/megahit
-#    chmod +x $TEMPDIR/megahit_137/megahit
+#    mkdir -p "$TEMPDIR/megahit_255"
+#    echo -e '#!/usr/bin/env bash\nexit 255' > $TEMPDIR/megahit_255/megahit
+#    chmod +x $TEMPDIR/megahit_255/megahit
 #    (
-#    export PATH="$TEMPDIR/megahit_137:$PATH"
-#    # (This command should *not* exit successfully.)
-#    ! txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
-#    echo "$txt" | grep "Check your memory"
+#    export PATH="$TEMPDIR/megahit_255:$PATH"
+#    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
+#    echo "$txt" > /mnt/d/Penn/sunbeam/log.txt
+#    echo "$txt" | grep "Empty contigs"
 #    )
-#}
+
+    # If megahit gives an exit code != 0 and != 255 it is an error.
+    mkdir -p "$TEMPDIR/megahit_137"
+    echo -e '#!/usr/bin/env bash\nexit 137' > $TEMPDIR/megahit_137/megahit
+    chmod +x $TEMPDIR/megahit_137/megahit
+    (
+    export PATH="$TEMPDIR/megahit_137:$PATH"
+    # (This command should *not* exit successfully.)
+    ! txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
+    echo "$txt" | grep "Check your memory"
+    )
+}
 
 # For #150 and #152: make sure sunbeam config update works
 function test_sunbeam_config_update {

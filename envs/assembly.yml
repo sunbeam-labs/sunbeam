@@ -7,4 +7,3 @@ dependencies:
   - minimap2
   - numpy
   - samtools
-  - vsearch
