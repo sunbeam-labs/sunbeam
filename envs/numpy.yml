@@ -1,6 +1,0 @@
-channels:
-  - bioconda
-  - conda-forge
-dependencies:
-  - numpy
-  - samtools

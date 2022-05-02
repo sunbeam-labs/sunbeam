@@ -216,6 +216,7 @@ function test_mapping {
     ) > $TEMPDIR/samples_test_mapping.csv
     sunbeam config modify --str 'all: {samplelist_fp: "samples_test_mapping.csv"}' \
         $TEMPDIR/tmp_config.yml > $TEMPDIR/test_mapping_config.yml
+
     # Move human host files to top-level, since we're using that genome for
     # mapping in this test and shouldn't decontaminate using it as well.
     for file in $TEMPDIR/hosts/human*; do
@@ -257,21 +258,22 @@ function test_sunbeam_get {
 # Test for sunbeam init for SRA -- study with paired and unpaired samples
 # Make sure Sunbeam exits with nonzero exit code if a study contains paired and unpaired reads
 # Both sets should be written separately to a config/samples.csv pair of files
+# sunbeam init --data_acc flag removed
 
-function test_get_paired_unpaired {
-    dp=$TEMPDIR/test_get_paired_unpaired
-    mkdir -p $dp
-    # "!" because we *expect* this to exit nonzero.
-    ! sunbeam init --force --output sunbeam_config_SRA.yml $dp --data_acc ERP020555
-    # Check contents of the two config files
-    grep '^  samplelist_fp: samples_unpaired.csv$' $dp/unpaired_sunbeam_config_SRA.yml
-    grep '^  paired_end: false$'                   $dp/unpaired_sunbeam_config_SRA.yml
-    grep '^  samplelist_fp: samples_paired.csv$'   $dp/paired_sunbeam_config_SRA.yml
-    grep '^  paired_end: true$'                    $dp/paired_sunbeam_config_SRA.yml
-    # Check contents of the two samples csv files
-    test `wc -l < $dp/samples_unpaired.csv` -eq  1
-    test `wc -l < $dp/samples_paired.csv`   -eq  13
-}
+#function test_get_paired_unpaired {
+#    dp=$TEMPDIR/test_get_paired_unpaired
+#    mkdir -p $dp
+#    # "!" because we *expect* this to exit nonzero.
+#    ! sunbeam init --force --output sunbeam_config_SRA.yml $dp --data_acc ERP020555
+#    # Check contents of the two config files
+#    grep '^  samplelist_fp: samples_unpaired.csv$' $dp/unpaired_sunbeam_config_SRA.yml
+#    grep '^  paired_end: false$'                   $dp/unpaired_sunbeam_config_SRA.yml
+#    grep '^  samplelist_fp: samples_paired.csv$'   $dp/paired_sunbeam_config_SRA.yml
+#    grep '^  paired_end: true$'                    $dp/paired_sunbeam_config_SRA.yml
+#    # Check contents of the two samples csv files
+#    test `wc -l < $dp/samples_unpaired.csv` -eq  1
+#    test `wc -l < $dp/samples_paired.csv`   -eq  13
+#}
 
 # Fix for #185:
 # While the core Sunbeam rules keep a simple directory structure, using more
@@ -289,22 +291,22 @@ function test_subdir_patterns {
 # The two main cases are 255 (empty contigs) and anything else nonzero
 # (presumed to be memory-related in the assembly rules).
 # Checking for successful behavior is already handled in test_all.
-#function test_assembly_failures {
-#    # Up to just before the assembly rules, things should work fine.
-#    sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_decontam
-#    # Remove previous assembly files, if they exist.
-#    rm -rf $TEMPDIR/sunbeam_output/assembly
+function test_assembly_failures {
+    # Up to just before the assembly rules, things should work fine.
+    sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_decontam
+    # Remove previous assembly files, if they exist.
+    rm -rf $TEMPDIR/sunbeam_output/assembly
 
-#    # If megahit exits with 255, it implies no contigs were built.
-#    mkdir -p "$TEMPDIR/megahit_255"
-#    echo -e '#!/usr/bin/env bash\nexit 255' > $TEMPDIR/megahit_255/megahit
-#    chmod +x $TEMPDIR/megahit_255/megahit
-#    (
-#    export PATH="$TEMPDIR/megahit_255:$PATH"
-#    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
-#    echo "$txt" > /mnt/d/Penn/sunbeam/log.txt
-#    echo "$txt" | grep "Empty contigs"
-#    )
+    # If megahit exits with 255, it implies no contigs were built.
+    mkdir -p "$TEMPDIR/megahit_255"
+    echo -e '#!/usr/bin/env bash\nexit 255' > $TEMPDIR/megahit_255/megahit
+    chmod +x $TEMPDIR/megahit_255/megahit
+    (
+    export PATH="$TEMPDIR/megahit_255:$PATH"
+    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
+    echo "$txt" > /mnt/d/Penn/sunbeam/log.txt
+    echo "$txt" | grep "Empty contigs"
+    )
 
 #    # If megahit gives an exit code != 0 and != 255 it is an error.
 #    mkdir -p "$TEMPDIR/megahit_137"

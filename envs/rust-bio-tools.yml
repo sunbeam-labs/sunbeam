@@ -1,6 +1,0 @@
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - conda-forge::gsl
-  - rust-bio-tools

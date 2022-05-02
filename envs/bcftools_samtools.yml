@@ -1,8 +1,0 @@
-channels:
-  - bioconda
-  #- conda-forge
-dependencies:
-  - conda-forge::libopenblas
-  - conda-forge::gsl
-  - bcftools
-  #- samtools=1.10
