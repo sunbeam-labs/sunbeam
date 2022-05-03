@@ -1,0 +1,11 @@
+name: mapping
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - bcftools
+  - bwa
+  - conda-forge::gsl         # bcftools
+  - conda-forge::libopenblas # bcftools
+  - numpy
+  - samtools

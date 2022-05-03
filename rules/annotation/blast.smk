@@ -20,6 +20,8 @@ rule run_blastn:
         db=lambda wildcard: Blastdbs['nucl'][wildcard.db] 
     threads: 
         Cfg['blast']['threads']
+    conda:
+        "../../envs/annotation.yml"
     shell:
         """
         blastn \
@@ -41,6 +43,8 @@ rule run_blastp:
         str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.xml')
     threads:
         Cfg['blast']['threads']
+    conda:
+        "../../envs/annotation.yml"
     shell:
         """
         blastp \
@@ -62,6 +66,8 @@ rule run_blastx:
         str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.xml')
     threads:
         Cfg['blast']['threads']
+    conda:
+        "../../envs/annotation.yml"
     shell:
         """
         blastx \
@@ -82,14 +88,10 @@ rule blast_report:
             sample=Samples.keys())
     output:
         str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'{query}'/'report.tsv')
-    run:
-        with open(output[0], 'w') as out:
-            writer = csv.DictWriter(
-	        out,
-	        fieldnames=['sample','query','hit'],
-                delimiter='\t')
-            writer.writeheader()
-            list(writer.writerow(result) for result in blast_summary(input))
+    conda:
+        "../../envs/annotation.yml"
+    script:
+        "../../scripts/annotation/blast_report.py"
 
 rule _test_blastpx:
     input:

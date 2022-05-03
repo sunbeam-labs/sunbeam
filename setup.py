@@ -4,6 +4,7 @@ setup(
     name="sunbeam",
     use_scm_version = True,
     setup_requires=['setuptools_scm'],
+    install_requires=['pysam'],
     packages=["sunbeamlib"],
     include_package_data=True,
     package_data={"sunbeamlib": ["sunbeamlib/data/*.yml"]},

@@ -18,11 +18,10 @@ rule sample_intake:
         str(QC_FP/'00_samples'/'{sample}_{rp}.fastq.gz')
     params:
         suffix = Cfg['qc']['seq_id_ending']
-    run:
-        if params.suffix:
-            qc.strip_seq_id_suffix(input[0], output[0], params.suffix)
-        else:
-            Path(output[0]).symlink_to(input[0])
+    conda:
+        "../../envs/qc.yml"
+    script:
+        "../../scripts/qc/sample_intake.py"
 
 rule adapter_removal_unpaired:
     input:
@@ -34,30 +33,10 @@ rule adapter_removal_unpaired:
         str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz')
     threads:
         Cfg['qc']['threads']
-    run:
-        fwd_adapters = Cfg['qc'].get('fwd_adapters')
-        rev_adapters = Cfg['qc'].get('rev_adapters')
-        if fwd_adapters or rev_adapters:
-            overlap = float('inf')
-            if fwd_adapters:
-                overlap = min(min(len(a) for a in fwd_adapters), overlap)
-                fwd_adapter_str = " ".join(expand(
-                    "-b {adapter}", adapter=Cfg['qc']['fwd_adapters']))
-            if rev_adapters:
-                overlap = min(min(len(a) for a in rev_adapters), overlap)
-                rev_adapter_str = " ".join(expand(
-                    "-g {adapter}", adapter=Cfg['qc']['rev_adapters']))
-            shell("""
-            cutadapt --discard-trimmed -O {overlap} \
-            --cores {threads} \
-            {fwd_adapter_str} {rev_adapter_str} \
-            -o {params.tmp} \
-            {input} \
-            > >(tee -a {log}) 2> >(tee -a {log} >&2) 
-            gzip {params.tmp}
-            """)
-        else:
-            shell("ln -s {input} {output}")
+    conda:
+        "../../envs/qc.yml"
+    script:
+        "../../scripts/qc/adapter_removal_unpaired.py"
     
 rule adapter_removal_paired:
     input:
@@ -72,33 +51,10 @@ rule adapter_removal_paired:
         gr2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
     threads:
         Cfg['qc']['threads']
-    run:
-        fwd_adapters = Cfg['qc']['fwd_adapters']
-        rev_adapters = Cfg['qc']['rev_adapters']
-        if fwd_adapters or rev_adapters:
-            overlap = float('inf')
-            if fwd_adapters:
-                overlap = min(min(len(a) for a in fwd_adapters), overlap)
-                fwd_adapter_str = " ".join(expand(
-                    "-b {adapter}", adapter=Cfg['qc']['fwd_adapters']))
-            if rev_adapters:
-                overlap = min(min(len(a) for a in rev_adapters), overlap)
-                rev_adapter_str = " ".join(expand(
-                    "-B {adapter}", adapter=Cfg['qc']['rev_adapters']))
-            shell("""
-            cutadapt --discard-trimmed -O {overlap} \
-            --cores {threads} \
-            {fwd_adapter_str} {rev_adapter_str} \
-            -o {params.r1} -p {params.r2} \
-            {input.r1} {input.r2} \
-            > >(tee -a {log}) 2> >(tee -a {log} >&2) 
-            gzip {params.r1}
-            gzip {params.r2}
-            """)
-        else:
-            shell("""
-            ln -s {input.r1} {output.gr1} && ln -s {input.r2} {output.gr2}
-            """)
+    conda:
+        "../../envs/qc.yml"
+    script:
+        "../../scripts/qc/adapter_removal_paired.py"
 
 ruleorder: trimmomatic_paired > trimmomatic_unpaired
         
@@ -113,6 +69,8 @@ rule trimmomatic_unpaired:
         sw_end = Cfg['qc']['slidingwindow'][1]
     threads:
         Cfg['qc']['threads']
+    conda:
+        "../../envs/qc.yml"
     shell:
         """
         trimmomatic \
@@ -142,6 +100,8 @@ rule trimmomatic_paired:
         sw_end = Cfg['qc']['slidingwindow'][1]
     threads:
         Cfg['qc']['threads']
+    conda:
+        "../../envs/qc.yml"
     shell:
         """
         trimmomatic \
@@ -168,6 +128,8 @@ rule fastqc:
             rp=Pairs)
     params:
         outdir = str(QC_FP/'reports')
+    conda:
+        "../../envs/qc.yml"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract"
 
@@ -178,6 +140,8 @@ rule find_low_complexity:
             rp=Pairs)
     output:
         str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids')
+    conda:
+        "../../envs/qc.yml"
     shell:
         """
         for rp in {input}; do
@@ -192,6 +156,8 @@ rule remove_low_complexity:
         ids = str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids')
     output:
         str(QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz')
+    conda:
+        "../../envs/qc.yml"
     shell:
         """
         gzip -dc {input.reads} | rbt fastq-filter {input.ids} |\

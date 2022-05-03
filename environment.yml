@@ -1,33 +1,35 @@
 channels:
   - conda-forge
   - bioconda
-  - eclarke
-  - louiejtaylor
+  #- eclarke
+  #- louiejtaylor
 dependencies:
-  - snakemake<5.7.0
+  #- snakemake<5.7.0 #snakemake-minimal?
+  - snakemake>5.7.0
+  #- snakemake-minimal
   - ruamel.yaml
   - biopython
-  - trimmomatic=0.39
-  - fastqc
-  - blast
+  #- trimmomatic=0.39 #
+  #- fastqc           # Redundant?
+  #- cutadapt         #
+  #- blast
   - kraken2
-  - kraken-biom
-  - vsearch
-  - cutadapt
-  - bwa>=0.7.17
-  - pysam
-  - pandas
-  - megahit<1.2,>1.1.2
-  - prodigal
+  #- kraken-biom
+  #- vsearch
+  #- bwa>=0.7.17
+  #- pysam
+  #- pandas
+  #- megahit<1.2,>1.1.2
+  #- prodigal
   - semantic_version
-  - setuptools_scm
-  - komplexity=0.3.6
-  - rust-bio-tools
-  - grabseqs=0.6.1
-  - minimap2
-  - multiqc
-  - samtools>=1.9
-  - bcftools>=1.9
+  #- setuptools_scm
+  #- komplexity=0.3.6
+  #- rust-bio-tools
+  #- grabseqs=0.6.1
+  #- minimap2
+  #- multiqc
+  #- samtools>=1.9
+  #- bcftools>=1.9
   - git
-  - blis #temp dependency until rust-bio-tools patch goes through
-  - mkl #temp dependency for rust-bio-tools
+  #- blis #temp dependency until rust-bio-tools patch goes through
+  #- mkl #temp dependency for rust-bio-tools

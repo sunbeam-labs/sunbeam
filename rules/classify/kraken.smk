@@ -17,6 +17,8 @@ rule kraken2_classify_report:
         paired_end = "--paired" if Cfg['all']['paired_end'] else ""
     threads:
         Cfg['classify']['threads']
+    #conda:
+    #    "../../envs/classify.yml"
     shell:
         """
         kraken2 --gzip-compressed \
@@ -32,6 +34,8 @@ rule kraken2_biom:
                sample=Samples.keys())
     output:
         str(CLASSIFY_FP/'kraken'/'all_samples.biom')
+    conda:
+        "../../envs/classify.yml"
     shell:
         """
         kraken-biom --max D -o {output} {input}
@@ -42,6 +46,8 @@ rule classic_k2_biom:
         str(CLASSIFY_FP/'kraken'/'all_samples.biom')
     output:
         str(CLASSIFY_FP/'kraken'/'all_samples.tsv')
+    conda:
+        "../../envs/classify.yml"
     shell:
         """
         biom convert -i {input} -o {output} \

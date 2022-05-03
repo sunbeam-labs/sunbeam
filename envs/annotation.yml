@@ -1,0 +1,7 @@
+name: annotation
+channels:
+  - bioconda
+dependencies:
+  - biopython
+  - blast
+  - prodigal

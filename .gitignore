@@ -13,8 +13,8 @@ tests/bacteria
 tests/local
 tests/data_files
 configs/respublica_config.yml
-*.yml
-*.yaml
+#*.yml
+#*.yaml
 *.egg-*
 docs/_build
 extensions/*

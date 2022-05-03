@@ -14,6 +14,8 @@ function test_all {
 
     # Check targets
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt 
+
+    echo "test_all passed" >> test_results
 }
 
 # For #221: full test using old-style Illumina paired sequence IDs (/1 and /2)
@@ -45,6 +47,8 @@ function test_all_old_illumina {
 
     # Check targets
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output_old_illumina tests/targets.txt
+
+    echo "test_all_old_illumina passed" >> test_results
 }
 
 # Fix for #38: Make Cutadapt optional
@@ -52,9 +56,11 @@ function test_all_old_illumina {
 function test_optional_cutadapt {
     sed 's/adapters: \[.*\]/adapters: \[\]/g' $TEMPDIR/tmp_config.yml > $TEMPDIR/tmp_config_nocutadapt.yml
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run --configfile=$TEMPDIR/tmp_config_nocutadapt.yml all_decontam
+    sunbeam run --configfile=$TEMPDIR/tmp_config_nocutadapt.yml -p all_decontam
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_1.fastq.gz ]
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_2.fastq.gz ]
+
+    echo "test_optional_cutadapt passed" >> test_results
 }
 
 # Fix for #54
@@ -67,6 +73,8 @@ function test_template_option {
     sunbeam init --force --output 54.yml --template $CONFIG_FP $TEMPDIR
     grep 'from_template:' $TEMPDIR/54.yml || exit 1
     popd
+
+    echo "test_template_option passed" >> test_results
 }
 
 
@@ -78,32 +86,34 @@ function test_version_check {
     if sunbeam run --configfile $TEMPDIR/too_high_config.yml; then
 	exit 1
     fi
+
+    echo "test_version_check passed" >> test_results
 }
 
 # Test that we detect and run extensions
 function test_extensions {
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
-}
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p sbx_test | grep "SBX_TEST"
 
-# Test that we have the updated snakemake that uses "conda activate"
-function test_use_conda {
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml --use-conda sbx_test | grep "SBX_TEST"
+    echo "test_extensions passed" >> test_results
 }
 
 # Test that single-end sequencing configurations work
 function test_single_end {
-    rm -rf $TEMPDIR/sunbeam_output/qc
+    rm -rf $TEMPDIR/sunbeam_output/qc # These interfere if all tests are run back to back
+    rm -rf $TEMPDIR/sunbeam_output/assembly/megahit # But these lines do nothing if this test is run by itself
     sunbeam config modify --str 'all: {paired_end: false}' \
 	    $TEMPDIR/tmp_config.yml > $TEMPDIR/single_end_config.yml
     sunbeam run --configfile $TEMPDIR/single_end_config.yml
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets_singleend.txt
+
+    echo "test_single_end passed" >> test_results
 }
 
 # Fix for #131
 # Test that paired-end qc rules produce files with the same number of reads
 function test_pair_concordance {
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml all_decontam
+    sunbeam run -- --configfile $TEMPDIR/tmp_config.yml -p all_decontam
     for r1 in $TEMPDIR/sunbeam_output/qc/cleaned/*_1.fastq.gz; do
 	r1_lines=$(zcat $r1 | wc -l)
 	r2=${r1%_1.fastq.gz}_2.fastq.gz
@@ -112,6 +122,8 @@ function test_pair_concordance {
 	    exit 1
 	fi
     done
+
+    echo "test_pair_concordance passed" >> test_results
 }
 
 # Test that we can guess a variety of sample names correctly
@@ -122,6 +134,8 @@ function test_guess_with_two_samples {
     touch $TEMPDIR/only_two_samples/sample_2.fastq.gz
     sunbeam list_samples $TEMPDIR/only_two_samples 2> >(tee out.txt >&2)
     grep '{sample}_{rp}.fastq.gz' out.txt
+
+    echo "test_guess_with_two_samples passed" >> test_results
 }
 
 # Correct behavior for samples with inconsistent _ or .
@@ -134,6 +148,8 @@ function test_guess_with_inconsistent_samples {
     sunbeam list_samples $TEMPDIR/inconsistent_samples 2> >(tee out.txt >&2)
     grep '{sample}_R{rp}.fastq.gz' out.txt
     rm -r $TEMPDIR/inconsistent_samples
+
+    echo "test_guess_with_inconsistent_samples passed" >> test_results
 }
 
 # Correct behavior for folders that still have index files
@@ -150,6 +166,8 @@ function test_guess_with_index_files_present {
     sunbeam list_samples $TEMPDIR/idx_files_present 2> >(tee out.txt >&2)
     grep '{sample}_R{rp}.fastq.gz' out.txt
 #    rm -r $TEMPDIR/idx_files_present
+
+    echo "test_guess_with_index_files_present passed" >> test_results
 }
 
 # Fix for #153
@@ -173,6 +191,8 @@ function test_blank_fp_behavior {
     # directory as a genomes_fp directory.
     [ ! -f $TEMPDIR/sunbeam_output/mapping/indexes_human/coverage.csv ]
     [ ! -f $TEMPDIR/sunbeam_output/mapping/indexes_phix174/coverage.csv ]
+
+    echo "test_blank_fp_behavior passed" >> test_results
 }
 
 # Test that mapping reports aligning read pairs for a contrived example.
@@ -216,12 +236,13 @@ function test_mapping {
     ) > $TEMPDIR/samples_test_mapping.csv
     sunbeam config modify --str 'all: {samplelist_fp: "samples_test_mapping.csv"}' \
         $TEMPDIR/tmp_config.yml > $TEMPDIR/test_mapping_config.yml
+
     # Move human host files to top-level, since we're using that genome for
     # mapping in this test and shouldn't decontaminate using it as well.
     for file in $TEMPDIR/hosts/human*; do
         mv $file $TEMPDIR/hosts_${file##*/}
     done
-    sunbeam run --configfile $TEMPDIR/test_mapping_config.yml all_mapping
+    sunbeam run --configfile $TEMPDIR/test_mapping_config.yml -p all_mapping
     # Move human host files back to original location
     for file in $TEMPDIR/hosts_*; do
         mv $file ${file/hosts_/hosts\//}
@@ -243,35 +264,43 @@ function test_mapping {
 	    echo "Unexpected coverage.csv content from mapping rules" > /dev/stderr
 	    false
 	)
+
+    echo "test_mapping passed" >> test_results
 }
 
 # Test for sunbeam init for SRA
 # Make sure samples.csv contains the correct number of samples.
+# sunbeam init --data_acc flag removed
 
-function test_sunbeam_get {
-    mkdir -p $TEMPDIR/test_sunbeam_get
-    sunbeam init --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get --data_acc SRP021545
-    test `wc -l < $TEMPDIR/test_sunbeam_get/samples.csv` -eq 89
-}
+#function test_sunbeam_get {
+#    mkdir -p $TEMPDIR/test_sunbeam_get
+#    sunbeam init --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get --data_acc SRP021545
+#    test `wc -l < $TEMPDIR/test_sunbeam_get/samples.csv` -eq 89
+#
+#    echo "test_sunbeam_get passed" >> test_results
+#}
 
 # Test for sunbeam init for SRA -- study with paired and unpaired samples
 # Make sure Sunbeam exits with nonzero exit code if a study contains paired and unpaired reads
 # Both sets should be written separately to a config/samples.csv pair of files
+# sunbeam init --data_acc flag removed
 
-function test_get_paired_unpaired {
-    dp=$TEMPDIR/test_get_paired_unpaired
-    mkdir -p $dp
-    # "!" because we *expect* this to exit nonzero.
-    ! sunbeam init --force --output sunbeam_config_SRA.yml $dp --data_acc ERP020555
-    # Check contents of the two config files
-    grep '^  samplelist_fp: samples_unpaired.csv$' $dp/unpaired_sunbeam_config_SRA.yml
-    grep '^  paired_end: false$'                   $dp/unpaired_sunbeam_config_SRA.yml
-    grep '^  samplelist_fp: samples_paired.csv$'   $dp/paired_sunbeam_config_SRA.yml
-    grep '^  paired_end: true$'                    $dp/paired_sunbeam_config_SRA.yml
-    # Check contents of the two samples csv files
-    test `wc -l < $dp/samples_unpaired.csv` -eq  1
-    test `wc -l < $dp/samples_paired.csv`   -eq  13
-}
+#function test_get_paired_unpaired {
+#    dp=$TEMPDIR/test_get_paired_unpaired
+#    mkdir -p $dp
+#    # "!" because we *expect* this to exit nonzero.
+#    ! sunbeam init --force --output sunbeam_config_SRA.yml $dp --data_acc ERP020555
+#    # Check contents of the two config files
+#    grep '^  samplelist_fp: samples_unpaired.csv$' $dp/unpaired_sunbeam_config_SRA.yml
+#    grep '^  paired_end: false$'                   $dp/unpaired_sunbeam_config_SRA.yml
+#    grep '^  samplelist_fp: samples_paired.csv$'   $dp/paired_sunbeam_config_SRA.yml
+#    grep '^  paired_end: true$'                    $dp/paired_sunbeam_config_SRA.yml
+#    # Check contents of the two samples csv files
+#    test `wc -l < $dp/samples_unpaired.csv` -eq  1
+#    test `wc -l < $dp/samples_paired.csv`   -eq  13
+#
+#    echo "test_get_paired_unpaired passed" >> test_results
+#}
 
 # Fix for #185:
 # While the core Sunbeam rules keep a simple directory structure, using more
@@ -281,7 +310,9 @@ function test_get_paired_unpaired {
 # avoids this.
 function test_subdir_patterns {
     # All we need to check is that the graph resolution works.
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_subdir -n
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p sbx_test_subdir -n
+
+    echo "test_subdir_patterns passed" >> test_results
 }
 
 # Fix for #167:
@@ -294,6 +325,18 @@ function test_assembly_failures {
     sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_decontam
     # Remove previous assembly files, if they exist.
     rm -rf $TEMPDIR/sunbeam_output/assembly
+
+    # If megahit exits with 255, it implies no contigs were built.
+#    mkdir -p "$TEMPDIR/megahit_255"
+#    echo -e '#!/usr/bin/env bash\nexit 255' > $TEMPDIR/megahit_255/megahit
+#    chmod +x $TEMPDIR/megahit_255/megahit
+#    (
+#    export PATH="$TEMPDIR/megahit_255:$PATH"
+#    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
+#    echo "$txt" > /mnt/d/Penn/sunbeam/log.txt
+#    echo "$txt" | grep "Empty contigs"
+#    )
+
     # If megahit gives an exit code != 0 and != 255 it is an error.
     mkdir -p "$TEMPDIR/megahit_137"
     echo -e '#!/usr/bin/env bash\nexit 137' > $TEMPDIR/megahit_137/megahit
@@ -304,15 +347,8 @@ function test_assembly_failures {
     ! txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
     echo "$txt" | grep "Check your memory"
     )
-    # If megahit exits with 255, it implies no contigs were built.
-    mkdir -p "$TEMPDIR/megahit_255"
-    echo -e '#!/usr/bin/env bash\nexit 255' > $TEMPDIR/megahit_255/megahit
-    chmod +x $TEMPDIR/megahit_255/megahit
-    (
-    export PATH="$TEMPDIR/megahit_255:$PATH"
-    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
-    echo "$txt" | grep "Empty contigs"
-    )
+
+    echo "test_assembly_failures passed" >> test_results
 }
 
 # For #150 and #152: make sure sunbeam config update works
@@ -325,6 +361,7 @@ function test_sunbeam_config_update {
     sunbeam config update $TEMPDIR/tmp_config_test_config_update.yml
     test `cat $TEMPDIR/tmp_config_test_config_update.yml | grep "BROKEN" | wc -l` -eq 0
 
+    echo "test_sunbeam_config_update passed" >> test_results
 }
 
 # For #247: test to see whether extension config is included in the main configfile on initialization
@@ -345,6 +382,7 @@ function test_extension_config_init {
     echo "sbx_test found in config" `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` "time(s)" 
     test `cat $TEMPDIR/tmp_config_inclsbx.yml | grep "sbx_test:" | wc -l` -eq 1
 
+    echo "test_extension_config_init passed" >> test_results
 }
 
 # For #247: make sure `sunbeam config update` includes extension info
@@ -362,6 +400,8 @@ function test_extension_config_update {
     sunbeam config update -i $TEMPDIR/tmp_config_extension_config_update.yml
     echo "sbx_test found in config" `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:"` "time(s)"
     test `cat $TEMPDIR/tmp_config_extension_config_update.yml | grep "sbx_test:" | wc -l` -eq 1
+
+    echo "test_extension_config_update passed" >> test_results
 }
 
 # For #251: test sunbeam extend
@@ -369,8 +409,10 @@ function test_extension_config_update {
 function test_all_sunbeam_extend {
     sunbeam extend https://github.com/sunbeam-labs/sbx_coassembly
     sunbeam config update -i $TEMPDIR/tmp_config.yml
-    sunbeam run --use-conda --configfile=$TEMPDIR/tmp_config.yml -p all_coassemble
+    sunbeam run -p all_coassemble --configfile=$TEMPDIR/tmp_config.yml
     test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
+
+    echo "test_all_sunbeam_extend passed" >> test_results
 }
 
 # For #261: handle URLs with a trailing slash
@@ -381,9 +423,13 @@ function test_extend_trailing_slash {
 
     rm -rf $SUNBEAM_DIR/extensions/sbx_metaphlan/
 
+    echo "test_extend_trailing_slash passed" >> test_results
 }
 
 # Test that we detect and run extension rules using the smk extension (#196)
 function test_extension_smk {
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_smk | grep "SBX_TEST_SMK"
+    ls $TEMPDIR
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p sbx_test_smk | grep "SBX_TEST_SMK"
+
+    echo "test_extension_smk passed" >> test_results
 }

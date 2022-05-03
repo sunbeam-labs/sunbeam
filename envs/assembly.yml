@@ -1,0 +1,9 @@
+name: assembly
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - megahit
+  - minimap2
+  - numpy
+  - samtools
