@@ -141,6 +141,9 @@ function setup {
 	mv $SBX_FP $OLD_SBX_FP
     fi
     mkdir $SBX_FP
+
+    # Clear test_results file
+    echo "Test Results" > test_results
 }
     
 function cleanup {

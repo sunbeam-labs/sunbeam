@@ -17,9 +17,10 @@ if fwd_adapters or rev_adapters:
     -o {e} \
     {f} \
     > {g} 2>&1
-    gzip {f}
+    gzip {f} || echo "Already zipped"
+    ln -s {f} {h}
     """.format(a=overlap, b=snakemake.threads, c=fwd_adapter_str, d=rev_adapter_str, e=snakemake.params.tmp, f=snakemake.input,
-            g=snakemake.log))
+            g=snakemake.log, h=snakemake.output))
 else:
     os.system("""
     ln -s {a} {b}

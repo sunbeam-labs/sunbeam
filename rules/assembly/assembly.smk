@@ -64,7 +64,7 @@ rule megahit_unpaired:
 
         ## sometimes the error is due to lack of memory
         exitcode=0
-        megahit -t {threads} -r {input} -o {params.out_fp} --continue || exitcode=$?
+        megahit -t {threads} -r {input} -o {params.out_fp} -f --continue || exitcode=$?
 
         if [ $exitcode -eq 255 ]
         then
