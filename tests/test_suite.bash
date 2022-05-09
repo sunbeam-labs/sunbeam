@@ -56,7 +56,7 @@ function test_all_old_illumina {
 function test_optional_cutadapt {
     sed 's/adapters: \[.*\]/adapters: \[\]/g' $TEMPDIR/tmp_config.yml > $TEMPDIR/tmp_config_nocutadapt.yml
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run --configfile=$TEMPDIR/tmp_config_nocutadapt.yml -p all_decontam
+    sunbeam run --configfile=$TEMPDIR/tmp_config_nocutadapt.yml all_decontam
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_1.fastq.gz ]
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_2.fastq.gz ]
 
@@ -92,7 +92,7 @@ function test_version_check {
 
 # Test that we detect and run extensions
 function test_extensions {
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p sbx_test | grep "SBX_TEST"
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
 
     echo "test_extensions passed" >> test_results
 }
@@ -113,7 +113,7 @@ function test_single_end {
 # Test that paired-end qc rules produce files with the same number of reads
 function test_pair_concordance {
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run -- --configfile $TEMPDIR/tmp_config.yml -p all_decontam
+    sunbeam run -- --configfile $TEMPDIR/tmp_config.yml all_decontam
     for r1 in $TEMPDIR/sunbeam_output/qc/cleaned/*_1.fastq.gz; do
 	r1_lines=$(zcat $r1 | wc -l)
 	r2=${r1%_1.fastq.gz}_2.fastq.gz
@@ -242,7 +242,7 @@ function test_mapping {
     for file in $TEMPDIR/hosts/human*; do
         mv $file $TEMPDIR/hosts_${file##*/}
     done
-    sunbeam run --configfile $TEMPDIR/test_mapping_config.yml -p all_mapping
+    sunbeam run --configfile $TEMPDIR/test_mapping_config.yml all_mapping
     # Move human host files back to original location
     for file in $TEMPDIR/hosts_*; do
         mv $file ${file/hosts_/hosts\//}
@@ -268,40 +268,6 @@ function test_mapping {
     echo "test_mapping passed" >> test_results
 }
 
-# Test for sunbeam init for SRA
-# Make sure samples.csv contains the correct number of samples.
-# sunbeam init --data_acc flag removed
-
-#function test_sunbeam_get {
-#    mkdir -p $TEMPDIR/test_sunbeam_get
-#    sunbeam init --force --output sunbeam_config_SRA.yml $TEMPDIR/test_sunbeam_get --data_acc SRP021545
-#    test `wc -l < $TEMPDIR/test_sunbeam_get/samples.csv` -eq 89
-#
-#    echo "test_sunbeam_get passed" >> test_results
-#}
-
-# Test for sunbeam init for SRA -- study with paired and unpaired samples
-# Make sure Sunbeam exits with nonzero exit code if a study contains paired and unpaired reads
-# Both sets should be written separately to a config/samples.csv pair of files
-# sunbeam init --data_acc flag removed
-
-#function test_get_paired_unpaired {
-#    dp=$TEMPDIR/test_get_paired_unpaired
-#    mkdir -p $dp
-#    # "!" because we *expect* this to exit nonzero.
-#    ! sunbeam init --force --output sunbeam_config_SRA.yml $dp --data_acc ERP020555
-#    # Check contents of the two config files
-#    grep '^  samplelist_fp: samples_unpaired.csv$' $dp/unpaired_sunbeam_config_SRA.yml
-#    grep '^  paired_end: false$'                   $dp/unpaired_sunbeam_config_SRA.yml
-#    grep '^  samplelist_fp: samples_paired.csv$'   $dp/paired_sunbeam_config_SRA.yml
-#    grep '^  paired_end: true$'                    $dp/paired_sunbeam_config_SRA.yml
-#    # Check contents of the two samples csv files
-#    test `wc -l < $dp/samples_unpaired.csv` -eq  1
-#    test `wc -l < $dp/samples_paired.csv`   -eq  13
-#
-#    echo "test_get_paired_unpaired passed" >> test_results
-#}
-
 # Fix for #185:
 # While the core Sunbeam rules keep a simple directory structure, using more
 # complicated nested subdirectories can complicate the wildcard/graph
@@ -310,7 +276,7 @@ function test_mapping {
 # avoids this.
 function test_subdir_patterns {
     # All we need to check is that the graph resolution works.
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p sbx_test_subdir -n
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_subdir -n
 
     echo "test_subdir_patterns passed" >> test_results
 }
@@ -409,7 +375,7 @@ function test_extension_config_update {
 function test_all_sunbeam_extend {
     sunbeam extend https://github.com/sunbeam-labs/sbx_coassembly
     sunbeam config update -i $TEMPDIR/tmp_config.yml
-    sunbeam run -p all_coassemble --configfile=$TEMPDIR/tmp_config.yml
+    sunbeam run all_coassemble --configfile=$TEMPDIR/tmp_config.yml
     test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
 
     echo "test_all_sunbeam_extend passed" >> test_results
@@ -429,7 +395,7 @@ function test_extend_trailing_slash {
 # Test that we detect and run extension rules using the smk extension (#196)
 function test_extension_smk {
     ls $TEMPDIR
-    sunbeam run --configfile $TEMPDIR/tmp_config.yml -p sbx_test_smk | grep "SBX_TEST_SMK"
+    sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_smk | grep "SBX_TEST_SMK"
 
     echo "test_extension_smk passed" >> test_results
 }
