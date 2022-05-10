@@ -20,7 +20,7 @@ jobs:
       - run:
           name: install
           command: |
-            bash install.sh -u lib -e sunbeam -m
+            bash install.sh -u lib -m
           no_output_timeout: 20m
 
       - run:
@@ -31,7 +31,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            bash tests/run_tests.bash -e sunbeam
+            bash tests/run_tests.bash -e sunbeam3
 
       - save_cache:
           paths:

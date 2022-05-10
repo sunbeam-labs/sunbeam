@@ -6,5 +6,5 @@ CONDA_BASE=$(conda info --base)
 source $CONDA_BASE/etc/profile.d/conda.sh
 
 # Dump environment contents
-conda activate sunbeam
+conda activate sunbeam3
 conda list --explicit
