@@ -15,7 +15,10 @@ rule preprocess_report:
             sample=sorted(Samples.keys())),
         decontam_files = expand(
             str(QC_FP/'log'/'decontam'/'{sample}_1.txt'),
-            sample=sorted(Samples.keys()))
+            sample=sorted(Samples.keys())),
+        komplexity_files = expand(
+            str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids'),
+            sample=sorted(Samples.keys())),
     output:
         str(QC_FP/'reports'/'preprocess_summary.tsv')
     conda:
