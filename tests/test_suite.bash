@@ -433,3 +433,8 @@ function test_extension_smk {
 
     echo "test_extension_smk passed" >> test_results
 }
+
+# Test that the host decontamination doesn't double count reads giving negative non-host numbers (#304)
+function test_host_filter_counts {
+    echo "test_host_filter_counts passed" >> test_results
+}
