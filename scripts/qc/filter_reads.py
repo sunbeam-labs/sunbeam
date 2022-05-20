@@ -11,7 +11,7 @@ for hostid in snakemake.input.hostids:
 
     with open(hostid) as f:
         for l in f.readlines():
-            net_hostlist.add(l)
+            net_hostlist.add(l) # Only adds unique ids
 
 original = int(str(subprocess.getoutput(
     "zcat {} | wc -l".format(snakemake.input.reads))).strip())//4
