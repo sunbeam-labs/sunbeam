@@ -262,6 +262,8 @@ function test_mapping {
 	    test "Max:0:0:" == $(col5 < "$csv_phix")
     ) || (
 	    echo "Unexpected coverage.csv content from mapping rules" > /dev/stderr
+        cat $csv_human
+        cat $csv_phix
 	    false
 	)
 
@@ -398,4 +400,44 @@ function test_extension_smk {
     sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test_smk | grep "SBX_TEST_SMK"
 
     echo "test_extension_smk passed" >> test_results
+}
+
+# Test that the host decontamination doesn't double count reads giving negative non-host numbers (#304)
+function test_host_filter_counts {
+    # Create two read pairs using lines from the human genome fasta.
+    r1_1=$TEMPDIR/data_files/PCMP_stub_human_R1.fastq.gz
+    r2_1=$TEMPDIR/data_files/PCMP_stub_human_R2.fastq.gz
+    human=$TEMPDIR/indexes/human.fasta
+    (
+        echo "@read0"
+        sed -n 2p $human
+        echo "+"
+        sed -n 's:.:G:g;2p' $human
+    ) | gzip > $r1_1
+    (
+        echo "@read0"
+        sed -n 2p $human | rev | tr '[ACTG]' '[TGAC]'
+        echo "+"
+        sed -n 's:.:G:g;2p' $human
+    ) | gzip > $r2_1
+    # Run sunbeam mapping rules with these two samples defined.
+    (
+	    echo "stub_human,$r1_1,$r2_1"
+    ) > $TEMPDIR/samples_test_mapping.csv
+    sunbeam config modify --str 'all: {samplelist_fp: "samples_test_mapping.csv"}' \
+        $TEMPDIR/tmp_config.yml > $TEMPDIR/test_mapping_config.yml
+
+    sunbeam run --configfile $TEMPDIR/test_mapping_config.yml -p preprocess_report
+    # Check that preprocess_summary counts one read for human and human_copy but only one read
+    # filtered in total
+	report=$TEMPDIR/sunbeam_output/qc/reports/preprocess_summary.tsv
+    contents="Samples input\tboth_kept\tfwd_only\trev_only\tdropped human_copy\thuman\tphix174\thost\tnonhost\nstub_human\t1\t1\t0\t0\t0\t1\t1\t0\t1\t0\n"
+    if [[ $(< $TEMPDIR/sunbeam_output/qc/reports/preprocess_summary.tsv) != "$contents" ]]; then
+        echo "pass"
+    else
+        echo "Unexpected preprocess_summary content from mapping rules" > /dev/stderr
+        false
+    fi
+    
+    echo "test_host_filter_counts passed" >> test_results
 }
