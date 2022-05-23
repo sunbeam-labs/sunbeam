@@ -94,7 +94,6 @@ function test_version_check {
 function test_extensions {
     sunbeam run --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
 
-
     echo "test_extensions passed" >> test_results
 }
 
