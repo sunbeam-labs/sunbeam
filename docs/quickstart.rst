@@ -15,10 +15,10 @@ install. We do not currently support non-Linux environments.
 
 .. code-block:: shell
 
-   git clone -b stable https://github.com/sunbeam-labs/sunbeam sunbeam-stable
-   cd sunbeam-stable
+   git clone -b stable https://github.com/sunbeam-labs/sunbeam sunbeam3-stable
+   cd sunbeam3-stable
    ./install.sh
-   tests/run_tests.bash -e sunbeam
+   tests/run_tests.bash -e sunbeam3
 
 This installs Sunbeam and all its dependencies, including the `Conda
 <https://conda.io/miniconda.html>`_ environment manager, if required. It then
@@ -46,7 +46,7 @@ Let's create a new Sunbeam project (we'll call it ``my_project``):
 
 .. code-block:: shell
 
-   source activate sunbeam
+   source activate sunbeam3
    sunbeam init my_project --data_fp /sequencing/project/reads
 
 Sunbeam will create a new folder called ``my_project`` and put two files

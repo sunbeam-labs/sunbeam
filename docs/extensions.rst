@@ -304,12 +304,42 @@ excellent instructions with more examples.
 Software dependencies
 =====================
 
-If your extension requires additional software to be installed, you
-can provide the names of `Conda packages <https://conda.io/docs/>`_
+If your extension requires additional software to be installed, there are a 
+couple ways to manage these dependencies. The preferred method is to create 
+an environment file named ``sbx_ext_name.yaml`` that looks something like 
+this::
+
+    name: sbx_metaspades_example
+    channels:
+      - bioconda
+      - other-channel
+    dependencies:
+      - spades
+      - other-package
+
+You then attach this environment to any rules that require any of the 
+listed dependencies with ``conda``::
+
+    rule run_metaspades:
+        input:
+            r1 = str(QC_FP/'decontam'/'{sample}_1.fastq.gz'),
+            r2 = str(QC_FP/'decontam'/'{sample}_2.fastq.gz')
+        output:
+            str(ASSEMBLY_FP/'metaspades'/'{sample}')
+        conda:
+            "sbx_metaspades_example.yaml"
+        shell:
+            "metaspades.py -1 {input.r1} -2 {input.r2} -o {output}"
+
+NOTE: If this method is used and then run with sunbeam version <3.0, the 
+``--use-conda`` flag has to be included in the ``sunbeam run`` command 
+(i.e. ``sunbeam run all_metaspades --use-conda --configfile /path/to/config``).
+
+Alternatively, you can provide the names of `Conda packages <https://conda.io/docs/>`_
 inside a file named ``requirements.txt``.  This file contains the
 package names, one per line.  To install Conda packages in this file,
 users of your extension will run the ``conda install`` command with
-this file as an additonal argument::
+this file as an additonal argument (while the sunbeam environment is active)::
 
     conda install --file requirements.txt
 

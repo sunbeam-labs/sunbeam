@@ -77,15 +77,11 @@ def parse_args(argv):
     samplelist.add_argument(
         "--single_end", action="store_true",
         help="fastq files are in single-end, not paired-end, format for --data_fp")
-    #samplelist.add_argument("--data_acc", metavar="ACC", nargs="+",
-    #    help="list of SRA-compatible accession numbers")
 
     # argparse doesn't support complete argument groups that are mutually
     # exclusive (need to do subparsers/subcommands) but this seems good enough:
     # https://stackoverflow.com/a/27675614
     args = parser.parse_args(argv)
-    #if args.data_fp and args.data_acc:
-    #    parser.error("--data_fp and --data_acc are mutually exclusive options")
     return args
 
 def setup_project_folder(args):
@@ -105,17 +101,6 @@ def setup_project_folder(args):
 
 def write_samples_from_input(args, project_fp):
     """Write sample list CSV from existing files."""
-    #if args.data_acc:
-    #    # SRA case: create one (for all unpaired or paired) or two (if both
-    #    # present) samples CSV files.
-    #    samplelists = build_sample_list_sra(
-    #            accessions = args.data_acc,
-    #            project_fp = project_fp,
-    #            force = args.force)
-    #    for fp in samplelists.values():
-    #        sys.stderr.write("New sample list written to {}\n".format(fp))
-    #else:
-    # filnames from local disk case: create one samples CSV file.
     samplelist_file = check_existing(project_fp/"samples.csv", args.force)
     if args.data_fp:
         try:
@@ -158,10 +143,6 @@ def write_config(args, project_fp, samplelists):
         defaults["all"] = defaults.get("all", {})
         defaults["all"]["paired_end"] = paired
         defaults["all"]["samplelist_fp"] = samplelists[layout].name
-        #if args.data_acc:
-        #    defaults["all"]["download_reads"] = True
-        # Convert cfg from raw text to dict, including any defaults we have
-        # set, and write to disk.
         cfg = config.update(cfg, defaults)
         with config_file.open('w') as out:
             config.dump(cfg, out)
