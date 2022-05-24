@@ -81,7 +81,7 @@ rule trimmomatic_unpaired:
         TRAILING:{Cfg[qc][trailing]} \
         SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
         MINLEN:{Cfg[qc][minlen]} \
-        > >(tee -a {log}) 2> >(tee -a {log} >&2)
+        > >(tee {log}) 2> >(tee {log} >&2)
         """
 
             
@@ -114,7 +114,7 @@ rule trimmomatic_paired:
         TRAILING:{Cfg[qc][trailing]} \
         SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
         MINLEN:{Cfg[qc][minlen]} \
-        > >(tee -a {log}) 2> >(tee -a {log} >&2)
+        > >(tee {log}) 2> >(tee {log} >&2)
         """
 
 rule fastqc:
