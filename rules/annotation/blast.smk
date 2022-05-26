@@ -96,6 +96,31 @@ rule run_blastp:
         -out {output} \
         """
 
+rule run_diamond_blastp:
+    """Run diamond blastp on translated genes against a target db and write to blast tabular format."""
+    input:
+        genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_prot.fa'),
+        db=lambda wildcard: Blastdbs['prot'][wildcard.db],
+        indeces=rules.build_diamond_db.output
+    output:
+        str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.btf_IGNORE_RULE')
+    threads:
+        Cfg['blast']['threads']
+    conda:
+        "../../envs/annotation.yml"
+    shell:
+        """
+        diamond blastp \
+        -q {input.genes} \
+        --db {input.db} \
+        --outfmt 6 \
+        --threads {threads} \
+        --evalue 1e-10 \
+        --max-target-seqs 2475 \
+        --out {output} \
+        || if [ $? == 1 ]; then echo "Caught empty query error from diamond" && touch {output}; fi
+        """
+
 rule run_blastx:
     """Run BLASTx on untranslated genes against a target db and write to blast tabular format."""
     input:
@@ -120,8 +145,8 @@ rule run_blastx:
         && cat {output}
         """
 
-rule run_diamond:
-    """Run DIAMOND on untranslated genes against a target db and write to blast tabular format."""
+rule run_diamond_blastx:
+    """Run diamond blastx on untranslated genes against a target db and write to blast tabular format."""
     input:
         genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_nucl.fa'),
         db=lambda wildcard: Blastdbs['prot'][wildcard.db],
