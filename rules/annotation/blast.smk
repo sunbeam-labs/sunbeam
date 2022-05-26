@@ -79,7 +79,7 @@ rule run_blastp:
         genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_prot.fa'),
         db=lambda wildcard: Blastdbs['prot'][wildcard.db]
     output:
-        str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.btf')
+        str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.btf_IGNORE_RULE')
     threads:
         Cfg['blast']['threads']
     conda:
@@ -103,7 +103,7 @@ rule run_diamond_blastp:
         db=lambda wildcard: Blastdbs['prot'][wildcard.db],
         indeces=rules.build_diamond_db.output
     output:
-        str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.btf_IGNORE_RULE')
+        str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.btf')
     threads:
         Cfg['blast']['threads']
     conda:
