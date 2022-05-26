@@ -28,3 +28,4 @@ gzip > {c}
 with open(snakemake.output.log, 'w') as log:
     log.write("{}\n".format("\t".join(list(hostdict.keys()) + ["host","nonhost"] )))
     log.write("{}\n".format("\t".join( map(str, list(hostdict.values()) + [host, nonhost]) )))
+
