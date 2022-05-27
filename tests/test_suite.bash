@@ -18,6 +18,11 @@ function test_all {
     echo "test_all passed" >> test_results
 }
 
+# Unit testing for all sunbeam scripts
+function test_scripts {
+    pytest tests/unit_tests/
+}
+
 # For #221: full test using old-style Illumina paired sequence IDs (/1 and /2)
 function test_all_old_illumina {
     # init will always write to samples.csv so we'll stash the old one and then
