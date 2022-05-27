@@ -2,23 +2,15 @@ import os
 import subprocess
 from collections import OrderedDict
 
+from filter_reads_f import count_host_reads, calculate_counts, write_log
+
 hostdict = OrderedDict()
 net_hostlist = set()
 for hostid in snakemake.input.hostids:
-    hostname = os.path.basename(os.path.dirname(hostid))
-    hostcts = int(subprocess.getoutput("cat {} | wc -l".format(hostid)).strip())
-    hostdict[hostname] = hostcts
+    count_host_reads(hostid, hostdict, net_hostlist)
 
-    with open(hostid) as f:
-        for l in f.readlines():
-            net_hostlist.add(l) # Only adds unique ids
+host, nonhost = calculate_counts(snakemake.input.reads, net_hostlist)
 
-original = int(str(subprocess.getoutput(
-    "zcat {} | wc -l".format(snakemake.input.reads))).strip())//4
-#host = int(subprocess.getoutput(
-#    "cat {} | wc -l".format(snakemake.input.hostreads)).strip())
-host = len(net_hostlist)
-nonhost = int(original-host)
 os.system("""
 gzip -dc {a} | \
 rbt fastq-filter {b} | \
@@ -26,6 +18,5 @@ gzip > {c}
 """.format(a=snakemake.input.reads, b=snakemake.input.hostreads, c=snakemake.output.reads))
 
 with open(snakemake.output.log, 'w') as log:
-    log.write("{}\n".format("\t".join(list(hostdict.keys()) + ["host","nonhost"] )))
-    log.write("{}\n".format("\t".join( map(str, list(hostdict.values()) + [host, nonhost]) )))
+    write_log(log, hostdict, host, nonhost)
 

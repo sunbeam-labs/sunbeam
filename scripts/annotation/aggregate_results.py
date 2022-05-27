@@ -14,6 +14,7 @@ gene_hits = {
     db: blast_hits(f for f in snakemake.input.gene_results if db in f)
     for db in snakemake.params.prot
 }
+
 with open(snakemake.output[0], 'w') as out:
     writer = csv.DictWriter(
         out,
