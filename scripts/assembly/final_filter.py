@@ -53,11 +53,8 @@ def write_fasta(f: TextIOWrapper, seqs: list):
     for desc, seq in seqs:
         f.write(f"{desc}\n{seq}\n")
 
-f = open(snakemake.input[0])
-g = open(f"{snakemake.input[0]}.{snakemake.params.len}f", "w")
-write_fasta(g, filter_seqs(parse_fasta(f), snakemake.params.len))
-
-f.close()
-g.close()
+with open(snakemake.input[0]) as f:
+    with open(f"{snakemake.input[0]}.{snakemake.params.len}f", "w") as g:
+        write_fasta(g, list(filter_seqs(parse_fasta(f), snakemake.params.len)))
 
 shutil.copyfile(f"{snakemake.input[0]}.{snakemake.params.len}f", snakemake.output[0])
