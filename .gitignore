@@ -18,3 +18,4 @@ configs/respublica_config.yml
 *.egg-*
 docs/_build
 extensions/*
+!extensions/.placeholder
