@@ -1,6 +1,6 @@
-annotation/blastn/bacteria/contig/dummybfragilis.xml
-annotation/blastn/bacteria/contig/dummyecoli.xml
-annotation/blastn/bacteria/contig/random.xml
+annotation/blastn/bacteria/contig/dummybfragilis.btf
+annotation/blastn/bacteria/contig/dummyecoli.btf
+annotation/blastn/bacteria/contig/random.btf
 
 annotation/summary/dummybfragilis.tsv
 annotation/summary/dummyecoli.tsv
