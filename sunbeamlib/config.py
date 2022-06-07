@@ -144,6 +144,8 @@ def extension_config():
     config = ""
     sunbeam_dir = Path(os.getenv("SUNBEAM_DIR", os.getcwd()))
     for sbx in os.listdir(sunbeam_dir/"extensions"):
+        if sbx == ".placeholder":
+            break
         try:
             sbx_files = os.listdir(sunbeam_dir/"extensions"/sbx)
         except NotADirectoryError:
