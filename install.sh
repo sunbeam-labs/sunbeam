@@ -222,11 +222,12 @@ else
     install_conda
     __env_changed=true
 fi
-conda config --set channel_priority strict # Set channel priority on new install
 
 # Install mamba
 info "Installing mamba..."
 conda install --yes --quiet -n base -c conda-forge mamba
+
+conda config --set channel_priority strict # Set channel priority on new install
 
 # Create Conda environment for Sunbeam
 if [[ $__env_exists = true && $__update_env = false ]]; then
