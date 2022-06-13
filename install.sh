@@ -7,7 +7,7 @@ read -r -d '' __usage <<-'EOF'
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
   -c --conda  [arg]       Location of Conda installation. Default: ${PREFIX}
   -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
-  -m --mamba              Install and use mamba in base environment as alternative dependency solver
+  -m --mamba              Use mamba in base environment as alternative dependency solver
   -v --verbose            Show subcommand output
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
@@ -222,12 +222,11 @@ else
     install_conda
     __env_changed=true
 fi
+conda config --set channel_priority strict # Set channel priority on new install
 
-# Install mamba if necessary
-if [[ $__install_mamba = true ]]; then
-    info "Installing mamba..."
-    conda install --yes --quiet -n base -c conda-forge mamba
-fi
+# Install mamba
+info "Installing mamba..."
+conda install --yes --quiet -n base -c conda-forge mamba
 
 # Create Conda environment for Sunbeam
 if [[ $__env_exists = true && $__update_env = false ]]; then
