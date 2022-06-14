@@ -2,5 +2,4 @@ name: classify
 channels:
   - bioconda
 dependencies:
-  #- kraken2
-  - kraken-biom
+  

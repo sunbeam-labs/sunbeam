@@ -17,8 +17,6 @@ rule kraken2_classify_report:
         paired_end = "--paired" if Cfg['all']['paired_end'] else ""
     threads:
         Cfg['classify']['threads']
-    #conda:
-    #    "../../envs/classify.yml"
     shell:
         """
         kraken2 --gzip-compressed \
@@ -37,7 +35,9 @@ rule kraken2_biom:
     conda:
         "../../envs/classify.yml"
     shell:
+        # Using pip to install because conda version is way outdated
         """
+        pip install kraken-biom && \
         kraken-biom --max D -o {output} {input}
         """
 
