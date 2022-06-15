@@ -5,7 +5,7 @@ channels:
   #- louiejtaylor
 dependencies:
   #- snakemake<5.7.0 #snakemake-minimal?
-  - snakemake>5.7.0
+  - snakemake>5.7.0, <=7.3.3
   #- snakemake-minimal
   - ruamel.yaml
   - biopython
