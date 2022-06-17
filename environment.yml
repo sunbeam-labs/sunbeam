@@ -1,35 +1,10 @@
 channels:
   - conda-forge
   - bioconda
-  #- eclarke
-  #- louiejtaylor
 dependencies:
-  #- snakemake<5.7.0 #snakemake-minimal?
-  - snakemake>5.7.0, <=7.3.3
-  #- snakemake-minimal
+  - bioconda::snakemake>5.7.0, <=7.3.3
   - ruamel.yaml
-  - biopython
-  #- trimmomatic=0.39 #
-  #- fastqc           # Redundant?
-  #- cutadapt         #
-  #- blast
-  - kraken2
-  #- kraken-biom
-  #- vsearch
-  #- bwa>=0.7.17
-  #- pysam
-  #- pandas
-  #- megahit<1.2,>1.1.2  # https://github.com/sunbeam-labs/sunbeam/issues/213
-  #- prodigal
+ # - biopython
+ # - kraken2
   - semantic_version
-  #- setuptools_scm
-  #- komplexity=0.3.6
-  #- rust-bio-tools
-  #- grabseqs=0.6.1
-  #- minimap2
-  #- multiqc
-  #- samtools>=1.9
-  #- bcftools>=1.9
-  - git
-  #- blis #temp dependency until rust-bio-tools patch goes through
-  #- mkl #temp dependency for rust-bio-tools
+ # - git
