@@ -163,8 +163,10 @@ function install_environment () {
     else
         cmd=conda
     fi
-    debug_capture $cmd env create --name=$__sunbeam_env \
-              --quiet --file environment.yml
+    #debug_capture $cmd env create --name=$__sunbeam_env \
+    #          --quiet --file environment.yml
+    debug_capture conda env create --name=$__sunbeam_env \
+                --quiet --file environment.yml
     if [[ $(__test_env) != true ]]; then
 	installation_error "Environment creation"
     fi

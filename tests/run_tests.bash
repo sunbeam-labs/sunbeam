@@ -134,7 +134,6 @@ function setup {
 
     # Activate Sunbeam
     conda activate $SUNBEAM_ENV
-    conda config --set channel_priority strict
 
     # Move extensions out of the way temporarily
     if [ -d $SBX_FP ]; then

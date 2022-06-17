@@ -43,7 +43,12 @@ def main(argv=sys.argv):
         print("--configfile flag not found, either it is missing (not ok) or was provided as --configfile=filename (ok)")
 
     conda_prefix = Path(args.sunbeam_dir)/".snakemake"
-    snakemake_args = ['snakemake', '--snakefile', str(snakefile), '-c', '--use-conda', '--conda-prefix', str(conda_prefix)] + remaining
+    snakemake_args = ['snakemake',
+        '--snakefile', str(snakefile),
+        '-c',
+        '--use-conda',
+        '--conda-prefix', str(conda_prefix),
+        '--conda-frontend', 'conda'] + remaining
     print("Running: "+" ".join(snakemake_args))
 
     cmd = subprocess.run(snakemake_args)
