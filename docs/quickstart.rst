@@ -15,7 +15,7 @@ install. We do not currently support non-Linux environments.
 
 .. code-block:: shell
 
-   git clone -b stable https://github.com/sunbeam-labs/sunbeam sunbeam3-stable
+   git clone -b stable git@github.com:sunbeam-labs/sunbeam.git sunbeam3-stable
    cd sunbeam3-stable
    ./install.sh
    tests/run_tests.bash -e sunbeam3
