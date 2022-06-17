@@ -4,7 +4,7 @@ channels:
 dependencies:
   - bioconda::snakemake>5.7.0, <=7.3.3
   - ruamel.yaml
- # - biopython
- # - kraken2
+  - biopython
+  - kraken2
   - semantic_version
  # - git
