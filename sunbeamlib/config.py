@@ -1,6 +1,6 @@
 import os
 import sys
-import collections
+from collections.abc import Mapping
 from pathlib import Path
 from pkg_resources import resource_stream
 
@@ -91,7 +91,7 @@ def process_databases(db_dict):
 
 def _update_dict(target, new):
     for k, v in new.items():
-        if isinstance(v, collections.Mapping):
+        if isinstance(v, Mapping):
             # We could use .get() here but ruamel.yaml's weird Mapping
             # subclass outputs errors to stdout if the key doesn't exist
             if k in target:
@@ -104,7 +104,7 @@ def _update_dict(target, new):
 
 def _update_dict_strict(target, new):
     for k, v in new.items():
-        if isinstance(v, collections.Mapping) and k in target.keys():
+        if isinstance(v, Mapping) and k in target.keys():
             target[k] = _update_dict_strict(target.get(k, {}), v)
         elif k in target.keys():
             target[k] = v
@@ -119,21 +119,45 @@ def update(config_str, new, strict=False):
         config = _update_dict_strict(config, new)
     else:
         config = _update_dict(config, new)
+        sbx_config = ruamel.yaml.round_trip_load(extension_config())
+        if sbx_config:
+            config = _update_dict(config, sbx_config)
     return config
 
 def new(
-        conda_fp, project_fp,
+        project_fp,
         version=__version__,
         template=None):
     if template:
         config = template.read()
     else:
-        config = resource_stream(
-            "sunbeamlib", "data/default_config.yml").read().decode()
+        config = str(resource_stream(
+            "sunbeamlib", "data/default_config.yml").read().decode())
+        # add config from extensions
+        config = config + extension_config()
+
     return config.format(
-        CONDA_FP=conda_fp,
         PROJECT_FP=project_fp,
         SB_VERSION=version)
+
+def extension_config():
+    config = ""
+    sunbeam_dir = Path(os.getenv("SUNBEAM_DIR", os.getcwd()))
+    for sbx in os.listdir(sunbeam_dir/"extensions"):
+        if sbx == ".placeholder":
+            break
+        try:
+            sbx_files = os.listdir(sunbeam_dir/"extensions"/sbx)
+        except NotADirectoryError:
+            continue
+        if 'config.yml' in sbx_files:
+            # append it to the existing config
+            sbx_config_fp = sunbeam_dir/"extensions"/sbx/"config.yml"
+            sbx_configfile = open(sbx_config_fp)
+            sbx_config = "\n"+sbx_configfile.read()
+            sbx_configfile.close() 
+            config = str(config + sbx_config)
+    return config
 
 def load_defaults(default_name):
     return ruamel.yaml.safe_load(
@@ -142,7 +166,7 @@ def load_defaults(default_name):
         ).read().decode())
     
 def dump(config, out=sys.stdout):
-    if isinstance(config, collections.Mapping):
+    if isinstance(config, Mapping):
         ruamel.yaml.round_trip_dump(config, out)
     else:
         out.write(config)

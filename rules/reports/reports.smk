@@ -2,11 +2,6 @@
 #
 # ReportGeneration rules
 
-import pandas
-
-from collections import OrderedDict
-from sunbeamlib import reports
-
 rule all_reports:
     input:
         TARGET_REPORT
@@ -20,16 +15,16 @@ rule preprocess_report:
             sample=sorted(Samples.keys())),
         decontam_files = expand(
             str(QC_FP/'log'/'decontam'/'{sample}_1.txt'),
-            sample=sorted(Samples.keys()))
+            sample=sorted(Samples.keys())),
+        komplexity_files = expand(
+            str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids'),
+            sample=sorted(Samples.keys())),
     output:
         str(QC_FP/'reports'/'preprocess_summary.tsv')
-    run:
-        paired_end = Cfg['all']['paired_end']
-        summary_list = [
-            reports.summarize_qual_decontam(q, d, paired_end) for q, d in 
-            zip(input.trim_files, input.decontam_files)]
-        _reports = pandas.concat(summary_list)
-        _reports.to_csv(output[0], sep='\t', index_label='Samples')
+    conda:
+        "../../envs/reports.yml"
+    script:
+        "../../scripts/reports/preprocess_report.py"
 
 
 rule fastqc_report:
@@ -40,10 +35,10 @@ rule fastqc_report:
             sample=Samples.keys(),rp=Pairs)
     output:
         str(QC_FP/'reports'/'fastqc_quality.tsv')
-    run:
-        quality_list = [reports.parse_fastqc_quality(file) for file in input.files]
-        quality_table = pandas.concat(quality_list, axis=1).transpose()
-        quality_table.to_csv(output[0],sep="\t",index_label="Samples")
+    conda:
+        "../../envs/reports.yml"
+    script:
+        "../../scripts/reports/fastqc_report.py"
 
 
 rule multiqc_report:
@@ -55,6 +50,7 @@ rule multiqc_report:
     params:
         title = Cfg['qc'].get('report_title', 'QC report'),
         outdir = str(QC_FP/'reports')
-    run:
-        report_name = output[0].split('/')[-1]  # Get unique name from targets.rules file
-        shell("multiqc -i \"{params.title}\" -n {report_name} -o {params.outdir} {params.outdir}")
+    conda:
+        "../../envs/reports.yml"
+    script:
+        "../../scripts/reports/multiqc_report.py"

@@ -53,7 +53,7 @@ elif pkg_major < cfg_major:
         "`sunbeam init` and update it using `sunbeam_mod_config`\n")
 
 # Load extensions
-sbxs = list(listfiles(sunbeam_dir+"/extensions/{sbx_folder}/{sbx}.rules"))
+sbxs = list(listfiles(sunbeam_dir+"/extensions/{sbx_folder}/{sbx}.rules")) + list(listfiles(sunbeam_dir+"/extensions/{sbx_folder}/{sbx}.smk")) #commented to break test
 for sbx in sbxs:
     sys.stderr.write("Found extension {sbx} in folder {sbx_folder}\n".format(**sbx[1]))
 
@@ -103,39 +103,39 @@ MAPPING_FP = output_subdir(Cfg, 'mapping')
 
 # ---- Download rules
 if Cfg['all']['download_reads']:
-	include: "rules/download/download.rules"
+	include: "rules/download/download.smk"
 
 
 # ---- Targets rules
-include: "rules/targets/targets.rules"
+include: "rules/targets/targets.smk"
 
 
 # ---- Quality control rules
-include: "rules/qc/qc.rules"
-include: "rules/qc/decontaminate.rules"
+include: "rules/qc/qc.smk"
+include: "rules/qc/decontaminate.smk"
 
 
 # ---- Assembly rules
-include: "rules/assembly/assembly.rules"
-include: "rules/assembly/coverage.rules"
+include: "rules/assembly/assembly.smk"
+include: "rules/assembly/coverage.smk"
 
 
 # ---- Contig annotation rules
-include: "rules/annotation/annotation.rules"
-include: "rules/annotation/blast.rules"
-include: "rules/annotation/orf.rules"
+include: "rules/annotation/annotation.smk"
+include: "rules/annotation/blast.smk"
+include: "rules/annotation/orf.smk"
 
 
 # ---- Classifier rules
-include: "rules/classify/kraken.rules"
+include: "rules/classify/kraken.smk"
 
 
 # ---- Mapping rules
-include: "rules/mapping/mapping.rules"
+include: "rules/mapping/mapping.smk"
 
 
 # ---- Reports rules
-include: "rules/reports/reports.rules"
+include: "rules/reports/reports.smk"
 
 for sbx_path, wildcards in sbxs:
     include: sbx_path

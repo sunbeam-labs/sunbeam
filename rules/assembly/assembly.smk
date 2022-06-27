@@ -21,6 +21,8 @@ rule megahit_paired:
         out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
     threads:
         Cfg['assembly']['threads']
+    conda:
+        "../../envs/assembly.yml"
     shell:
         """
         ## turn off bash strict mode
@@ -28,12 +30,16 @@ rule megahit_paired:
 
         ## sometimes the error is due to lack of memory
         exitcode=0
+        if [ -d {params.out_fp} ]
+        then
+            rm -rf {params.out_fp}
+        fi
         megahit -t {threads} -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue || exitcode=$?
 
         if [ $exitcode -eq 255 ]
         then
-            echo "Empty contigs"
             touch {output}
+            echo "Empty contigs"
         elif [ $exitcode -gt 1 ]
         then
             echo "Check your memory"
@@ -49,6 +55,8 @@ rule megahit_unpaired:
         out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
     threads:
         Cfg['assembly']['threads']
+    conda:
+        "../../envs/assembly.yml"
     shell:
         """
         ## turn off bash strict mode
@@ -56,7 +64,7 @@ rule megahit_unpaired:
 
         ## sometimes the error is due to lack of memory
         exitcode=0
-        megahit -t {threads} -r {input} -o {params.out_fp} --continue || exitcode=$?
+        megahit -t {threads} -r {input} -o {params.out_fp} -f --continue || exitcode=$?
 
         if [ $exitcode -eq 255 ]
         then
@@ -77,22 +85,10 @@ rule final_filter:
         len = Cfg['assembly']['min_length']
     log:
         str(ASSEMBLY_FP/'log'/'vsearch'/'{sample}.log')
-    run:
-        filename = os.path.basename(input[0])
-        shell(
-        """
-        if [ -s {input} ]
-        then
-            vsearch --sortbylength {input} \
-            --minseqlength {params.len} \
-            --maxseqlength -1 \
-            --notrunclabels \
-            --output {input}.{params.len}f &> {log} && \
-            cp {input}.{params.len}f {output}
-        else
-            cp {input} {output} &> {log}
-        fi
-        """)
+    conda:
+        "../../envs/assembly.yml"
+    script:
+        "../../scripts/assembly/final_filter.py"
 
 rule clean_assembly:
     input:

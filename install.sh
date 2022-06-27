@@ -3,10 +3,11 @@
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
 read -r -d '' __usage <<-'EOF'
-  -e --environment  [arg] Environment to install to. Default: "sunbeam"
+  -e --environment  [arg] Environment to install to. Default: "sunbeam3"
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
   -c --conda  [arg]       Location of Conda installation. Default: ${PREFIX}
   -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
+  -m --mamba              Use mamba in base environment as alternative dependency solver
   -v --verbose            Show subcommand output
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
@@ -61,9 +62,10 @@ function installation_error () {
 # Set variables
 __conda_path="${arg_c:-${HOME}/miniconda3}"
 __sunbeam_dir="${arg_s:-$(readlink -f ${__dir})}"
-__sunbeam_env="${arg_e:-sunbeam}"
+__sunbeam_env="${arg_e:-sunbeam3}"
 __update_lib=false
 __update_env=false
+__install_mamba=false
 if [[ "${arg_u}" = "all" || "${arg_u}" = "env" ]]; then
     __update_lib=true
     __update_env=true
@@ -71,11 +73,27 @@ elif [[ "${arg_u}" = "lib" ]]; then
     __update_lib=true
 fi
 
+if [[ "${arg_m:?}" = "1" ]]; then
+    __install_mamba=true
+fi
+
 __old_path=$PATH
 PATH=$PATH:${__conda_path}/bin
 
+function __git_dir_exists() {
+    if [ -d ".git" ]; then
+      echo true
+    else
+      echo false
+    fi
+}
+
 function __test_conda() {
     command -v conda &> /dev/null && echo true || echo false
+}
+
+function __test_mamba() {
+    command -v mamba &> /dev/null && echo true || echo false
 }
 
 function __detect_conda_install() {
@@ -140,8 +158,15 @@ function install_conda () {
 }
 
 function install_environment () {
-    debug_capture conda env update --name=$__sunbeam_env \
-			  --quiet --file environment.yml
+    if [[ $(__test_mamba) = true ]]; then
+        cmd=mamba
+    else
+        cmd=conda
+    fi
+    #debug_capture $cmd env create --name=$__sunbeam_env \
+    #          --quiet --file environment.yml
+    debug_capture conda env create --name=$__sunbeam_env \
+                --quiet --file environment.yml
     if [[ $(__test_env) != true ]]; then
 	installation_error "Environment creation"
     fi
@@ -149,14 +174,20 @@ function install_environment () {
 
 function install_env_vars () {
     activate_sunbeam
+    mkdir -p ${CONDA_PREFIX}/etc/conda/activate.d
     echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}" > \
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
+    mkdir -p ${CONDA_PREFIX}/etc/conda/deactivate.d
     echo -ne "#/bin/sh\nunset SUNBEAM_DIR" > \
 	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
 }
 
 function install_sunbeamlib () {
     activate_sunbeam
+    if [[ $(__git_dir_exists) != true ]]; then
+      installation_error "Sunbeam requires a git clone \
+(instead of a compressed archive) to detect its version"
+    fi
     debug_capture pip install --upgrade $__sunbeam_dir 2>&1
     if [[ $(__test_sunbeam) != true ]]; then
 	installation_error "Library installation"
@@ -171,6 +202,8 @@ info "    Sunbeam env:  '${__sunbeam_env}'"
 debug "Components detected:"
 __conda_installed=$(__test_conda)
 debug "    Conda:       ${__conda_installed}"
+__mamba_installed=$(__test_mamba)
+debug "    Mamba:       ${__mamba_installed}"
 __env_exists=$(__test_env)
 debug "    Environment: ${__env_exists}"
 __sunbeam_installed=$(__test_sunbeam)
@@ -191,6 +224,12 @@ else
     install_conda
     __env_changed=true
 fi
+
+# Install mamba
+info "Installing mamba..."
+conda install --yes --quiet -n base -c conda-forge mamba
+
+conda config --set channel_priority strict # Set channel priority on new install
 
 # Create Conda environment for Sunbeam
 if [[ $__env_exists = true && $__update_env = false ]]; then

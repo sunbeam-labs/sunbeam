@@ -1,32 +1,10 @@
 channels:
   - conda-forge
   - bioconda
-  - eclarke
-  - louiejtaylor
 dependencies:
-  - snakemake=5.5.0
+  - bioconda::snakemake>5.7.0, <=7.3.3
   - ruamel.yaml
   - biopython
-  - trimmomatic=0.36
-  - fastqc
-  - blast
-  - kraken=1.0
-  - kraken-biom
-  - vsearch
-  - jellyfish=1.1.11=1
-  - cutadapt
-  - bwa>=0.7.17
-  - pysam
-  - pandas
-  - megahit<1.2
-  - prodigal
+  - kraken2
   - semantic_version
-  - setuptools_scm
-  - komplexity=0.3.6
-  - rust-bio-tools
-  - grabseqs=0.3.4
-  - minimap2
-  - multiqc
-  - h5py # temp: patching missing dependency of biom-format (req'd by kraken-biom)
-  - samtools>=1.9
-  - bcftools>=1.9
+ # - git

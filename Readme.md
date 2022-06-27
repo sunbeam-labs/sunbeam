@@ -2,7 +2,7 @@
 
 # Sunbeam: a robust, extensible metagenomic sequencing pipeline 
 
-[![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev) [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=latest)](http://sunbeam.readthedocs.io/en/latest/?badge=latest)
+[![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev) [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=latest)](http://sunbeam.readthedocs.io/en/latest/?badge=latest) [![DOI:10.1186/s40168-019-0658-x](https://img.shields.io/badge/Published%20in-Microbiome-1abc9c.svg)](https://doi.org/10.1186/s40168-019-0658-x)
 
 Sunbeam is a pipeline written in [snakemake](http://snakemake.readthedocs.io)
 that simplifies and automates many of the steps in metagenomic sequencing
@@ -28,26 +28,38 @@ Sunbeam was designed to be modular and extensible. Some extensions have been bui
 - [Kaiju](https://github.com/sunbeam-labs/sbx_kaiju), a read classifier that uses BWA rather than kmers
 - [Anvi'o](https://github.com/sunbeam-labs/sbx_anvio), a downstream analysis pipeline that does lots of stuff!
 
-More extensions can be found at the extension page: https://www.sunbeam-labs.org/
+More extensions can be found at the extension page: https://www.sunbeam-labs.org/.
 
 **To get started, see our [documentation](http://sunbeam.readthedocs.io)!**
 
 If you use the Sunbeam pipeline in your research, please cite: 
 
-EL Clarke, LJ Taylor, C Zhao *et al.* Sunbeam: an
-extensible pipeline for analyzing metagenomic
-sequencing experiments. *Microbiome* 7:46 (2019)
+EL Clarke, LJ Taylor, C Zhao, A Connell, J Lee, FD Bushman, K Bittinger. Sunbeam: an
+extensible pipeline for analyzing metagenomic sequencing experiments. *Microbiome* 7:46 (2019)
+
+See how people are using Sunbeam:
+
+ - Shi, Z *et al.* [Segmented Filamentous Bacteria Prevent and Cure Rotavirus Infection.](https://www.sciencedirect.com/science/article/pii/S0092867419310797) *Cell* 179, 644-658.e13 (2019).
+ - Abbas, AA *et al.* [Redondoviridae, a Family of Small, Circular DNA Viruses of the Human Oro-Respiratory Tract Associated with Periodontitis and Critical Illness.](https://www.sciencedirect.com/science/article/pii/S1931312819301714) *Cell Host Microbe* 25, 719–729 (2019).
+ - Leiby, JS *et al.* [Lack of detection of a human placenta microbiome in samples from preterm and term deliveries.](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-018-0575-4) *Microbiome* 6, 1–11 (2018).
 
 ------
 
 ### Changelog:
 
-#### Development version (as of November 26, 2019)
+#### Development version (future 3.0 release; as of April 1, 2020)
 
- - Coming soon!
+ - Support use of .smk file extensions in Sunbeam extensions (in addition to .rules)
+ - Support [mamba](https://github.com/mamba-org/mamba) as an alternate package dependency solver at install time, for faster installs
+ - New command `sunbeam extend` to automatically install Sunbeam extensions! Use like `sunbeam extend https://github.com/sunbeam-labs/sbx_report`
+ - `sunbeam init` and `sunbeam config update` now add options for extensions you've installed to your default config file! (#247)
+ - Updated the path to the Illumina adapter sequences from hardcoded to templated (fixes #150 and #152)
+ - Use the updated kraken2 classifier instead of kraken
+ - Update other dependencies (trimmomatic -> 0.3.9; grabseqs -> 0.6.1; snakemake -> <5.7.0)
 
 #### v2.1.0 (November 26, 2019)
 
+ - Added a build manifest, which is run every time on integration testing and can be fed into conda by users to install the most recent successful dependencies
  - Updates to documentation (#169, #230, #231)
  - Fix missing samtools (#224)
  - Integration test updates to schedule weekly builds (#222)

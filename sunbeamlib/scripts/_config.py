@@ -80,7 +80,6 @@ def update(args):
     old_config.get('all', {}).pop('version', None)
 
     new_config = config.new(
-        conda_fp = config._find_conda_fp(),
         project_fp = old_config.get('all', {}).get('version', ''),
         template = args.template)
 
