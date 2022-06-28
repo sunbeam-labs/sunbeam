@@ -38,6 +38,7 @@ rule kraken2_biom:
         # Using pip to install because conda version is way outdated
         """
         pip install kraken-biom && \
+        pip install --upgrade numpy && \
         kraken-biom --max D -o {output} {input}
         """
 
