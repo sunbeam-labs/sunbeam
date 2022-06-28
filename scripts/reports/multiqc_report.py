@@ -1,5 +1,4 @@
 import os
-import shutil
 
 report_name = snakemake.output[0].split('/')[-1]  # Get unique name from targets.rules file
 
@@ -8,9 +7,6 @@ os.system("multiqc -f -i \"{a}\" -n {b} -o {c} {c}".format(
 # -f overwrites any previous reports instead of iterating the next one's name
 
 # Different versions of multiqc seem to be inconsistent with naming conventions
-if report_name in os.listdir(snakemake.params.outdir):
-    None
-else:
-    for fp in os.listdir(snakemake.params.outdir):
-        if 'multiqc' in fp:
-            shutil.copyfile(os.path.join(snakemake.params.outdir, fp), os.path.join(snakemake.params.outdir, report_name))
+for fp in os.listdir(snakemake.params.outdir):
+    if 'multiqc' in fp:
+        os.replace(os.path.join(snakemake.params.outdir, fp), snakemake.output[0])
