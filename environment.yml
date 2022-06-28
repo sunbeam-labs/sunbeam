@@ -4,7 +4,8 @@ channels:
 dependencies:
   - bioconda::snakemake>5.7.0, <=7.3.3
   - ruamel.yaml
-  - biopython
-  - kraken2
+  - biopython # Needed for building test data
+# - blast # Needed for building test data
+  - kraken2 # Needed for building test data
   - semantic_version
  # - git
