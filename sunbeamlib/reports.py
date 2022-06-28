@@ -55,21 +55,27 @@ def parse_decontam_log(f):
     vals = f.readline().rstrip().split('\t')
     return(OrderedDict(zip(keys,vals)))
 
-def summarize_qual_decontam(tfile, dfile, paired_end):
+def parse_komplexity_log(f):
+    return OrderedDict([('komplexity', len(f.readlines()))])
+
+def summarize_qual_decontam(tfile, dfile, kfile, paired_end):
     """Return a dataframe for summary information for trimmomatic and decontam rule"""
     tname = os.path.basename(tfile).split('.out')[0]
-    dname = os.path.basename(dfile).split('.txt')[0]
     with open(tfile) as tf:
         with open(dfile) as jf:
-            if paired_end:
-                trim_data = parse_trim_summary_paired(tf)
-            else:
-                trim_data = parse_trim_summary_single(tf)
-                
-            decontam_data = parse_decontam_log(jf)
+            with open(kfile) as kf:
+                if paired_end:
+                    trim_data = parse_trim_summary_paired(tf)
+                else:
+                    trim_data = parse_trim_summary_single(tf)
+                    
+                decontam_data = parse_decontam_log(jf)
+
+                komplexity_data = parse_komplexity_log(kf)
     sys.stderr.write("trim data: {}\n".format(trim_data))
     sys.stderr.write("decontam data: {}\n".format(decontam_data))
-    return(pandas.DataFrame(OrderedDict(trim_data, **(decontam_data)), index=[tname]))
+    sys.stderr.write("komplexity data: {}\n".format(komplexity_data))
+    return(pandas.DataFrame(OrderedDict(trim_data, **(decontam_data), **(komplexity_data)), index=[tname]))
 
 def parse_fastqc_quality(filename):
     with open(filename) as f:

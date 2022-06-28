@@ -15,6 +15,8 @@ rule prodigal:
         faa = str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_prot.fa'),
         fna = str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_nucl.fa'),
         log = str(ANNOTATION_FP/'genes'/'prodigal'/'log'/'{sample}.out')
+    conda:
+        "../../envs/annotation.yml"
     shell:
         """
         if [[ -s {input} ]]; then

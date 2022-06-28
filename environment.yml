@@ -1,31 +1,11 @@
 channels:
   - conda-forge
   - bioconda
-  - eclarke
-  - louiejtaylor
 dependencies:
-  - snakemake<5.7.0
+  - bioconda::snakemake>5.7.0, <=7.3.3
   - ruamel.yaml
-  - biopython
-  - trimmomatic=0.39
-  - fastqc
-  - blast
-  - kraken2
-  - kraken-biom
-  - vsearch
-  - cutadapt
-  - bwa>=0.7.17
-  - pysam
-  - pandas
-  - megahit<1.2
-  - prodigal
+  - biopython # Needed for building test data
+# - blast # Needed for building test data
+  - kraken2 # Needed for building test data
   - semantic_version
-  - setuptools_scm
-  - komplexity=0.3.6
-  - rust-bio-tools
-  - grabseqs=0.6.1
-  - minimap2
-  - multiqc
-  - samtools>=1.9
-  - bcftools>=1.9
-  - git
+ # - git

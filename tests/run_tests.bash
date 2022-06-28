@@ -117,7 +117,7 @@ function setup {
 	TEMPDIR=`mktemp -d`
     fi
     
-    verbose "\n\t${GREEN}Test directory${RESET}: ${TEMPDIR}"
+    verbose "\n\t${GREEN}Test directory${RESET}: ${TEMPDIR}\n"
 
     export PATH=$PATH:$HOME/miniconda3/bin
     # Allow conda [de]activate
@@ -141,6 +141,9 @@ function setup {
 	mv $SBX_FP $OLD_SBX_FP
     fi
     mkdir $SBX_FP
+
+    # Clear test_results file
+    echo "Test Results" > test_results
 }
     
 function cleanup {
@@ -191,6 +194,7 @@ function build_test_data {
     cp -r truncated_taxonomy $TEMPDIR
     cp -r sbx_test $STARTING_DIR/$SBX_FP/sbx_test
     cp -r sbx_test_subdir $STARTING_DIR/$SBX_FP/sbx_test_subdir
+    cp -r sbx_test_smk $STARTING_DIR/$SBX_FP/sbx_test_smk
     cp seqid2taxid.map $TEMPDIR
 
     mkdir -p $TEMPDIR/hosts

@@ -15,12 +15,12 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v3-dependencies-{{ checksum "environment.yml" }}
+          - v3-dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
 
       - run:
           name: install
           command: |
-            bash install.sh -u lib -e sunbeam
+            bash install.sh -u lib -m
           no_output_timeout: 20m
 
       - run:
@@ -31,12 +31,12 @@ jobs:
       - run:
           name: run tests
           command: |
-            bash tests/run_tests.bash -e sunbeam
+            bash tests/run_tests.bash -e sunbeam3
 
       - save_cache:
           paths:
             - ~/miniconda3
-          key: v3-dependencies-{{ checksum "environment.yml" }}
+          key: v3-dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
 
 workflows:
   version: 2

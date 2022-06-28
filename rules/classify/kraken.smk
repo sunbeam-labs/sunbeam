@@ -32,8 +32,13 @@ rule kraken2_biom:
                sample=Samples.keys())
     output:
         str(CLASSIFY_FP/'kraken'/'all_samples.biom')
+    conda:
+        "../../envs/classify.yml"
     shell:
+        # Using pip to install because conda version is way outdated
         """
+        pip install kraken-biom && \
+        pip install --upgrade numpy && \
         kraken-biom --max D -o {output} {input}
         """
 
@@ -42,6 +47,8 @@ rule classic_k2_biom:
         str(CLASSIFY_FP/'kraken'/'all_samples.biom')
     output:
         str(CLASSIFY_FP/'kraken'/'all_samples.tsv')
+    conda:
+        "../../envs/classify.yml"
     shell:
         """
         biom convert -i {input} -o {output} \
