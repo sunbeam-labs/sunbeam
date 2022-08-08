@@ -1,3 +1,5 @@
 name: classify
 channels:
   - bioconda
+dependencies:
+  - biom-format
