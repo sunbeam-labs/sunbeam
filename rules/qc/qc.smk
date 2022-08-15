@@ -43,8 +43,8 @@ rule adapter_removal_paired:
         r1 = QC_FP/'00_samples'/'{sample}_1.fastq.gz',
         r2 = QC_FP/'00_samples'/'{sample}_2.fastq.gz'
     params:
-        r1 = QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz',
-        r2 = QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz'
+        r1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
+        r2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
     log: QC_FP/'log'/'cutadapt'/'{sample}.log'
     output:
         gr1 = QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz',
