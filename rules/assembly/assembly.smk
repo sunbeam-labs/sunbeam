@@ -13,12 +13,12 @@ ruleorder: megahit_paired > megahit_unpaired
 
 rule megahit_paired:
     input:
-        r1 = str(QC_FP/'decontam'/'{sample}_1.fastq.gz'),
-        r2 = str(QC_FP/'decontam'/'{sample}_2.fastq.gz')
+        r1 = QC_FP/'decontam'/'{sample}_1.fastq.gz',
+        r2 = QC_FP/'decontam'/'{sample}_2.fastq.gz'
     output:
-        str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa')
+        ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa'
     params:
-        out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
+        out_fp = ASSEMBLY_FP/'megahit'/'{sample}_asm'
     threads:
         Cfg['assembly']['threads']
     conda:
@@ -48,11 +48,11 @@ rule megahit_paired:
 
 rule megahit_unpaired:
     input:
-        str(QC_FP/'decontam'/'{sample}_1.fastq.gz')
+        QC_FP/'decontam'/'{sample}_1.fastq.gz'
     output:
-        str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa')
+        ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa'
     params:
-        out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
+        out_fp = ASSEMBLY_FP/'megahit'/'{sample}_asm'
     threads:
         Cfg['assembly']['threads']
     conda:
@@ -78,13 +78,13 @@ rule megahit_unpaired:
 
 rule final_filter:
     input:
-        str(ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa')
+        ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa'
     output:
-        str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa')
+        ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'
     params:
         len = Cfg['assembly']['min_length']
     log:
-        str(ASSEMBLY_FP/'log'/'vsearch'/'{sample}.log')
+        ASSEMBLY_FP/'log'/'vsearch'/'{sample}.log'
     conda:
         "../../envs/assembly.yml"
     script:
@@ -92,7 +92,7 @@ rule final_filter:
 
 rule clean_assembly:
     input:
-        M = str(ASSEMBLY_FP/'megahit'),
+        M = ASSEMBLY_FP/'megahit',
     shell:
         """
         rm -rf {input.M} && echo "Cleanup assembly finished."
