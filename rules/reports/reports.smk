@@ -11,16 +11,16 @@ rule preprocess_report:
     """Combines the information from multiple preprocessing steps"""
     input:
         trim_files = expand(
-            str(QC_FP/'log'/'trimmomatic'/'{sample}.out'),
+            QC_FP/'log'/'trimmomatic'/'{sample}.out',
             sample=sorted(Samples.keys())),
         decontam_files = expand(
-            str(QC_FP/'log'/'decontam'/'{sample}_1.txt'),
+            QC_FP/'log'/'decontam'/'{sample}_1.txt',
             sample=sorted(Samples.keys())),
         komplexity_files = expand(
-            str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids'),
+            QC_FP/'log'/'komplexity'/'{sample}.filtered_ids',
             sample=sorted(Samples.keys())),
     output:
-        str(QC_FP/'reports'/'preprocess_summary.tsv')
+        QC_FP/'reports'/'preprocess_summary.tsv'
     conda:
         "../../envs/reports.yml"
     script:
@@ -31,10 +31,10 @@ rule fastqc_report:
     """ make fastqc reports """
     input:
         files = expand(
-            str(QC_FP/'reports'/'{sample}_{rp}_fastqc/fastqc_data.txt'),
+            QC_FP/'reports'/'{sample}_{rp}_fastqc/fastqc_data.txt',
             sample=Samples.keys(),rp=Pairs)
     output:
-        str(QC_FP/'reports'/'fastqc_quality.tsv')
+        QC_FP/'reports'/'fastqc_quality.tsv'
     conda:
         "../../envs/reports.yml"
     script:
@@ -49,7 +49,7 @@ rule multiqc_report:
         MULTIQC_REPORT
     params:
         title = Cfg['qc'].get('report_title', 'QC report'),
-        outdir = str(QC_FP/'reports')
+        outdir = QC_FP/'reports'
     conda:
         "../../envs/reports.yml"
     script:
