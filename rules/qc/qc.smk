@@ -27,7 +27,7 @@ rule adapter_removal_unpaired:
     input:
         QC_FP/'00_samples'/'{sample}_1.fastq.gz'
     params:
-        tmp = QC_FP/'01_cutadapt'/'{sample}_1.fastq',
+        tmp = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq'),
     log: QC_FP/'log'/'cutadapt'/'{sample}.log'
     output:
         QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'

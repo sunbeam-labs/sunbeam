@@ -52,7 +52,7 @@ rule megahit_unpaired:
     output:
         ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa'
     params:
-        out_fp = ASSEMBLY_FP/'megahit'/'{sample}_asm'
+        out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
     threads:
         Cfg['assembly']['threads']
     conda:
