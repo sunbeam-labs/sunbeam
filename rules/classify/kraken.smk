@@ -8,10 +8,10 @@ rule all_classify:
         
 rule kraken2_classify_report:
     input:
-        expand(str(QC_FP/'decontam'/'{{sample}}_{rp}.fastq.gz'),rp = Pairs)
+        expand(QC_FP/'decontam'/'{{sample}}_{rp}.fastq.gz',rp = Pairs)
     output:
-        raw = str(CLASSIFY_FP/'kraken'/'raw'/'{sample}-raw.tsv'),
-        report = str(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv')
+        raw = CLASSIFY_FP/'kraken'/'raw'/'{sample}-raw.tsv',
+        report = CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv'
     params:
         db = Cfg['classify']['kraken_db_fp'],
         paired_end = "--paired" if Cfg['all']['paired_end'] else ""
@@ -28,10 +28,10 @@ rule kraken2_classify_report:
 
 rule kraken2_biom:
     input:
-        expand(str(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv'),
+        expand(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv',
                sample=Samples.keys())
     output:
-        str(CLASSIFY_FP/'kraken'/'all_samples.biom')
+        CLASSIFY_FP/'kraken'/'all_samples.biom'
     shell:
         # Using pip to install because conda version is way outdated
         """
@@ -42,9 +42,9 @@ rule kraken2_biom:
 
 rule classic_k2_biom:
     input:
-        str(CLASSIFY_FP/'kraken'/'all_samples.biom')
+        CLASSIFY_FP/'kraken'/'all_samples.biom'
     output:
-        str(CLASSIFY_FP/'kraken'/'all_samples.tsv')
+        CLASSIFY_FP/'kraken'/'all_samples.tsv'
     conda:
         "../../envs/classify.yml"
     shell:
