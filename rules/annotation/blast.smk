@@ -21,9 +21,9 @@ rule build_diamond_db:
 rule run_blastn:
     """Run BLASTn against a given database and write the results to blast tabular format."""    
     input:
-        contigs=str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa')
+        contigs=ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'
     output:
-        str(ANNOTATION_FP/'blastn'/'{db}'/'{contigs}'/'{sample}.btf')
+        ANNOTATION_FP/'blastn'/'{db}'/'{contigs}'/'{sample}.btf'
     params:
         db=lambda wildcard: Blastdbs['nucl'][wildcard.db] 
     threads: 
@@ -45,11 +45,11 @@ rule run_blastn:
 rule run_diamond_blastp:
     """Run diamond blastp on translated genes against a target db and write to blast tabular format."""
     input:
-        genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_prot.fa'),
+        genes=ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_prot.fa',
         db=lambda wildcard: Blastdbs['prot'][wildcard.db],
         indeces=rules.build_diamond_db.output
     output:
-        str(ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.btf')
+        ANNOTATION_FP/'blastp'/'{db}'/'{orf_finder}'/'{sample}.btf'
     threads:
         Cfg['blast']['threads']
     conda:
@@ -70,11 +70,11 @@ rule run_diamond_blastp:
 rule run_diamond_blastx:
     """Run diamond blastx on untranslated genes against a target db and write to blast tabular format."""
     input:
-        genes=str(ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_nucl.fa'),
+        genes=ANNOTATION_FP/'genes'/'{orf_finder}'/'{sample}_genes_nucl.fa',
         db=lambda wildcard: Blastdbs['prot'][wildcard.db],
         indeces=rules.build_diamond_db.output
     output:
-        str(ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.btf')
+        ANNOTATION_FP/'blastx'/'{db}'/'{orf_finder}'/'{sample}.btf'
     threads:
         Cfg['blast']['threads']
     conda:
@@ -96,10 +96,10 @@ rule blast_report:
     """Create a summary of results from a BLAST call."""
     input:
         expand(
-            str(ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{{query}}'/'{sample}.btf'),
+            ANNOTATION_FP/'{{blast_prog}}'/'{{db}}'/'{{query}}'/'{sample}.btf',
             sample=Samples.keys())
     output:
-        str(ANNOTATION_FP/'{blast_prog}'/'{db}'/'{query}'/'report.tsv')
+        ANNOTATION_FP/'{blast_prog}'/'{db}'/'{query}'/'report.tsv'
     conda:
         "../../envs/annotation.yml"
     script:
@@ -107,11 +107,11 @@ rule blast_report:
 
 rule _test_blastpx:
     input:
-        expand(str(ANNOTATION_FP/'{blastpx}'/'card'/'prodigal'/'{sample}.btf'), 
+        expand(ANNOTATION_FP/'{blastpx}'/'card'/'prodigal'/'{sample}.btf', 
                blastpx=['blastx','blastp'], sample=Samples.keys())
     
 rule _test_blastpx_report:
     input:
-        expand(str(ANNOTATION_FP/'{blastpx}'/'card'/'prodigal'/'report.tsv'),
+        expand(ANNOTATION_FP/'{blastpx}'/'card'/'prodigal'/'report.tsv',
         blastpx=['blastx','blastp'])
 
