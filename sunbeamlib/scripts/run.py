@@ -47,8 +47,7 @@ def main(argv=sys.argv):
         '--snakefile', str(snakefile),
         '-c',
         '--use-conda',
-        '--conda-prefix', str(conda_prefix),
-        '--conda-frontend', 'conda'] + remaining
+        '--conda-prefix', str(conda_prefix)] + remaining
     print("Running: "+" ".join(snakemake_args))
 
     cmd = subprocess.run(snakemake_args)
