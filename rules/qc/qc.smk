@@ -141,7 +141,7 @@ rule find_low_complexity:
     output:
         QC_FP/'log'/'komplexity'/'{sample}.filtered_ids'
     conda:
-        "../../envs/qc.yml"
+        "../../envs/kz.yml"
     shell:
         """
         for rp in {input}; do
