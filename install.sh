@@ -226,8 +226,8 @@ else
 fi
 
 # Install mamba
-info "Installing mamba..."
-conda install --yes --quiet -n base -c conda-forge mamba
+#info "Installing mamba..."
+#conda install --yes --quiet -n base -c conda-forge mamba
 
 conda config --set channel_priority strict # Set channel priority on new install
 
