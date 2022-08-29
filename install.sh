@@ -7,7 +7,7 @@ read -r -d '' __usage <<-'EOF'
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
   -c --conda  [arg]       Location of Conda installation. Default: ${PREFIX}
   -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
-  -m --mamba              Use mamba in base environment as alternative dependency solver
+  -m --no_mamba           Don't use mamba in base environment as dependency solver
   -v --verbose            Show subcommand output
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
@@ -65,7 +65,7 @@ __sunbeam_dir="${arg_s:-$(readlink -f ${__dir})}"
 __sunbeam_env="${arg_e:-sunbeam3}"
 __update_lib=false
 __update_env=false
-__install_mamba=false
+__install_mamba=true
 if [[ "${arg_u}" = "all" || "${arg_u}" = "env" ]]; then
     __update_lib=true
     __update_env=true
@@ -74,7 +74,7 @@ elif [[ "${arg_u}" = "lib" ]]; then
 fi
 
 if [[ "${arg_m:?}" = "1" ]]; then
-    __install_mamba=true
+    __install_mamba=false
 fi
 
 __old_path=$PATH
@@ -226,8 +226,10 @@ else
 fi
 
 # Install mamba
-#info "Installing mamba..."
-#conda install --yes --quiet -n base -c conda-forge mamba
+if [[ $__install_mamba = true ]]; then
+    info "Installing mamba..."
+    conda install --yes --quiet -n base -c conda-forge mamba || (info "Mamba failed to install, this is usually because you have too many packages already installed to your base environment. Install again without mamba (--no_mamba) or try to fix conflicts in base env." && exit 1)
+fi
 
 conda config --set channel_priority strict # Set channel priority on new install
 
