@@ -30,13 +30,12 @@ rule kraken2_biom:
     input:
         expand(str(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv'),
                sample=Samples.keys())
+    conda:
+        "../../envs/classify.yml"
     output:
         str(CLASSIFY_FP/'kraken'/'all_samples.biom')
     shell:
-        # Using pip to install because conda version is way outdated
         """
-        pip install kraken-biom && \
-        pip install --upgrade numpy && \
         kraken-biom --max D -o {output} {input}
         """
 

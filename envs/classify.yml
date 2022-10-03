@@ -3,3 +3,4 @@ channels:
   - bioconda
 dependencies:
   - biom-format
+  - kraken-biom
