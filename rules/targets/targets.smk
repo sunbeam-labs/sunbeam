@@ -57,13 +57,13 @@ TARGET_ANNOTATE = expand(
 
 # ---- Reports
 # MultiQC report
-MULTIQC_REPORT = str(QC_FP/'reports'/'multiqc_report.html')
+#MULTIQC_REPORT = str(QC_FP/'reports'/'multiqc_report.html')
 
 TARGET_REPORT = [
     str(QC_FP/'reports'/'preprocess_summary.tsv'),
     str(QC_FP/'reports'/'fastqc_quality.tsv'),
     str(ASSEMBLY_FP/'contigs_coverage.txt'),
-    MULTIQC_REPORT
+    #MULTIQC_REPORT
 ]
 
 # ---- All targets
