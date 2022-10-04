@@ -6,6 +6,6 @@ channels:
 dependencies:
   - biom-format
   - kraken-biom
-  - conda-forge::libgfortran # kraken-biom
-  - anaconda::pathlib # kraken-biom
+#  - conda-forge::libgfortran # kraken-biom
+#  - anaconda::pathlib # kraken-biom
   - python>=3 # biom-format
