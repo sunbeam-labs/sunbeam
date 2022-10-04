@@ -6,3 +6,4 @@ dependencies:
   - biom-format
   - kraken-biom
   - pathlib # kraken-biom
+  - python>=3
