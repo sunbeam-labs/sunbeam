@@ -2,8 +2,10 @@ name: classify
 channels:
   - bioconda
   - anaconda
+  - conda-forge
 dependencies:
   - biom-format
   - kraken-biom
-  - pathlib # kraken-biom
-  - python>=3
+  - conda-forge::libgfortran # kraken-biom
+  - anaconda::pathlib # kraken-biom
+  - python>=3 # biom-format
