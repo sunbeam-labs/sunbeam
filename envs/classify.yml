@@ -1,6 +1,8 @@
 name: classify
 channels:
   - bioconda
+  - anaconda
 dependencies:
   - biom-format
   - kraken-biom
+  - pathlib # kraken-biom
