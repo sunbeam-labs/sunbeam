@@ -2,7 +2,8 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bioconda::snakemake>5.7.0, <=7.3.3
+#  - bioconda::snakemake>5.7.0, <=7.3.3
+  - bioconda::snakemake>=7.8.5
   - ruamel.yaml
   - biopython # Needed for building test data
 # - blast # Needed for building test data
