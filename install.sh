@@ -226,8 +226,12 @@ else
 fi
 
 # Install mamba
-info "Installing mamba..."
-conda install --yes --quiet -n base -c conda-forge mamba
+if [[ $__mamba_installed = true ]]; then
+    info "Mamba already installed."
+else
+    info "Installing mamba..."
+    conda install --yes --quiet -n base -c conda-forge mamba
+fi
 
 conda config --set channel_priority strict # Set channel priority on new install
 
