@@ -50,7 +50,7 @@ project = 'Sunbeam'
 copyright = '2019, Erik Clarke, Chunyu Zhao, Jesse Connell, Louis Taylor'
 author = 'Erik Clarke, Chunyu Zhao, Jesse Connell, Louis Taylor'
 
-import sunbeam3
+import sunbeam
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
