@@ -11,17 +11,17 @@ rule all_annotate:
 
 rule aggregate_results:
     input:
-        contigs=str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'),
+        contigs=ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa',
         contig_results=expand(
-            str(ANNOTATION_FP/'blastn'/'{db}'/'contig'/'{{sample}}.btf'),
+            ANNOTATION_FP/'blastn'/'{db}'/'contig'/'{{sample}}.btf',
             db=Blastdbs['nucl']),
         gene_results=expand(
-            str(ANNOTATION_FP/'{blastpx}'/'{db}'/'{orf_finder}'/'{{sample}}.btf'),
+            ANNOTATION_FP/'{blastpx}'/'{db}'/'{orf_finder}'/'{{sample}}.btf',
             blastpx=['blastp','blastx'],
             db=Blastdbs['prot'],
             orf_finder=['prodigal'])
     output:
-        str(ANNOTATION_FP/'summary'/'{sample}.tsv')
+        ANNOTATION_FP/'summary'/'{sample}.tsv'
     params:
         dbs=list(Blastdbs['nucl'].keys()) + list(Blastdbs['prot'].keys()),
         nucl = Blastdbs['nucl'],
@@ -34,10 +34,10 @@ rule aggregate_results:
 rule aggregate_all:
     input:
         expand(
-            str(ANNOTATION_FP/'summary'/'{sample}.tsv'),
+            ANNOTATION_FP/'summary'/'{sample}.tsv',
             sample=Samples.keys())
     output:
-        str(ANNOTATION_FP/'all_samples.tsv')
+        ANNOTATION_FP/'all_samples.tsv'
     run:
         with open(output[0], 'w') as out:
             out.writelines(open(input[0]).readlines())

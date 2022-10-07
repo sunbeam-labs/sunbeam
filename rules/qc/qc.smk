@@ -15,7 +15,7 @@ rule sample_intake:
     input:
         lambda wildcards: Samples[wildcards.sample][wildcards.rp]
     output:
-        str(QC_FP/'00_samples'/'{sample}_{rp}.fastq.gz')
+        QC_FP/'00_samples'/'{sample}_{rp}.fastq.gz'
     params:
         suffix = Cfg['qc']['seq_id_ending']
     conda:
@@ -25,12 +25,12 @@ rule sample_intake:
 
 rule adapter_removal_unpaired:
     input:
-        str(QC_FP/'00_samples'/'{sample}_1.fastq.gz')
+        QC_FP/'00_samples'/'{sample}_1.fastq.gz'
     params:
         tmp = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq'),
-    log: str(QC_FP/'log'/'cutadapt'/'{sample}.log') 
+    log: QC_FP/'log'/'cutadapt'/'{sample}.log'
     output:
-        str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz')
+        QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'
     threads:
         Cfg['qc']['threads']
     conda:
@@ -40,15 +40,15 @@ rule adapter_removal_unpaired:
     
 rule adapter_removal_paired:
     input:
-        r1 = str(QC_FP/'00_samples'/'{sample}_1.fastq.gz'),
-        r2 = str(QC_FP/'00_samples'/'{sample}_2.fastq.gz')
+        r1 = QC_FP/'00_samples'/'{sample}_1.fastq.gz',
+        r2 = QC_FP/'00_samples'/'{sample}_2.fastq.gz'
     params:
         r1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
         r2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
-    log: str(QC_FP/'log'/'cutadapt'/'{sample}.log') 
+    log: QC_FP/'log'/'cutadapt'/'{sample}.log'
     output:
-        gr1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
-        gr2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
+        gr1 = QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz',
+        gr2 = QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz'
     threads:
         Cfg['qc']['threads']
     conda:
@@ -60,10 +60,10 @@ ruleorder: trimmomatic_paired > trimmomatic_unpaired
         
 rule trimmomatic_unpaired:
     input:
-        str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz')
+        QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'
     output:
-        str(QC_FP/'02_trimmomatic'/'{sample}_1.fastq.gz')
-    log: str(QC_FP/'log'/'trimmomatic'/'{sample}.out')
+        QC_FP/'02_trimmomatic'/'{sample}_1.fastq.gz'
+    log: QC_FP/'log'/'trimmomatic'/'{sample}.out'
     params:
         sw_start = Cfg['qc']['slidingwindow'][0],
         sw_end = Cfg['qc']['slidingwindow'][1]
@@ -87,14 +87,14 @@ rule trimmomatic_unpaired:
             
 rule trimmomatic_paired:
     input:
-        r1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
-        r2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
+        r1 = QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz',
+        r2 = QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz'
     output:
-        pair_r1 = str(QC_FP/'02_trimmomatic'/'{sample}_1.fastq.gz'),
-        pair_r2 = str(QC_FP/'02_trimmomatic'/'{sample}_2.fastq.gz'),
-        unpair_r1 = temp(str(QC_FP/'02_trimmomatic'/'unpaired'/'{sample}_1_unpaired.fastq.gz')),
-        unpair_r2 = temp(str(QC_FP/'02_trimmomatic'/'unpaired'/'{sample}_2_unpaired.fastq.gz'))
-    log: str(QC_FP/'log'/'trimmomatic'/'{sample}.out'),
+        pair_r1 = QC_FP/'02_trimmomatic'/'{sample}_1.fastq.gz',
+        pair_r2 = QC_FP/'02_trimmomatic'/'{sample}_2.fastq.gz',
+        unpair_r1 = temp(QC_FP/'02_trimmomatic'/'unpaired'/'{sample}_1_unpaired.fastq.gz'),
+        unpair_r2 = temp(QC_FP/'02_trimmomatic'/'unpaired'/'{sample}_2_unpaired.fastq.gz')
+    log: QC_FP/'log'/'trimmomatic'/'{sample}.out',
     params:
         sw_start = Cfg['qc']['slidingwindow'][0],
         sw_end = Cfg['qc']['slidingwindow'][1]
@@ -120,14 +120,14 @@ rule trimmomatic_paired:
 rule fastqc:
     input:
         reads = expand(
-            str(QC_FP/"02_trimmomatic"/"{{sample}}_{rp}.fastq.gz"),
+            QC_FP/"02_trimmomatic"/"{{sample}}_{rp}.fastq.gz",
             rp=Pairs)
     output:
         expand(
-            str(QC_FP/'reports'/'{{sample}}_{rp}_fastqc/fastqc_data.txt'),
+            QC_FP/'reports'/'{{sample}}_{rp}_fastqc/fastqc_data.txt',
             rp=Pairs)
     params:
-        outdir = str(QC_FP/'reports')
+        outdir = QC_FP/'reports'
     conda:
         "../../envs/qc.yml"
     shell:
@@ -136,10 +136,10 @@ rule fastqc:
 rule find_low_complexity:
     input:
         expand(
-            str(QC_FP/'02_trimmomatic'/'{{sample}}_{rp}.fastq.gz'),
+            QC_FP/'02_trimmomatic'/'{{sample}}_{rp}.fastq.gz',
             rp=Pairs)
     output:
-        str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids')
+        QC_FP/'log'/'komplexity'/'{sample}.filtered_ids'
     conda:
         "../../envs/qc.yml"
     shell:
@@ -152,10 +152,10 @@ rule find_low_complexity:
 
 rule remove_low_complexity:
     input:
-        reads = str(QC_FP/'02_trimmomatic'/'{sample}_{rp}.fastq.gz'),
-        ids = str(QC_FP/'log'/'komplexity'/'{sample}.filtered_ids')
+        reads = QC_FP/'02_trimmomatic'/'{sample}_{rp}.fastq.gz',
+        ids = QC_FP/'log'/'komplexity'/'{sample}.filtered_ids'
     output:
-        str(QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz')
+        QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz'
     conda:
         "../../envs/qc.yml"
     shell:
@@ -166,21 +166,21 @@ rule remove_low_complexity:
 
 rule qc_final:
     input:
-        str(QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz')
+        QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz'
     output:
-        str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')
+        QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'
     shell:
         """cp {input} {output}"""
 
 rule clean_qc:
     input:
         expand(
-            str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'),
+            QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz',
             sample=Samples.keys(), rp=Pairs)
     params:
-        cutadapt_fp = str(QC_FP/'01_cutadapt'),
-        trimmomatic_fp = str(QC_FP/'02_trimmomatic'),
-        komplexity_fp = str(QC_FP/'03_komplexity')
+        cutadapt_fp = QC_FP/'01_cutadapt',
+        trimmomatic_fp = QC_FP/'02_trimmomatic',
+        komplexity_fp = QC_FP/'03_komplexity'
     output:
         touch(".qc_cleaned")
     shell:
