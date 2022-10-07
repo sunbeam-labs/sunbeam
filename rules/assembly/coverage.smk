@@ -6,27 +6,27 @@
 
 rule all_coverage:
     input:
-        str(ASSEMBLY_FP/'contigs_coverage.txt')
+        ASSEMBLY_FP/'contigs_coverage.txt'
 
 rule _contigs_mapping:
     input:
-        expand(str(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.depth'),
+        expand(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.depth',
                sample=Samples.keys())        
 
 rule _all_coverage:
     input:
-        expand(str(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.csv'),
+        expand(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.csv',
                sample=Samples.keys())
 
 rule contigs_mapping:
     input:
-        contig = str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'),
-        reads = expand(str(QC_FP/'decontam'/'{{sample}}_{rp}.fastq.gz'),rp = Pairs)
+        contig = ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa',
+        reads = expand(QC_FP/'decontam'/'{{sample}}_{rp}.fastq.gz',rp = Pairs)
     output:
-        bam = str(ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.bam'),
-        bai = str(ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.bam.bai')
+        bam = ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.bam',
+        bai = ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.bam.bai'
     params:
-        temp = temp(str(ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.tmp'))
+        temp = temp(ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.tmp')
     threads: 
         Cfg['mapping']['threads']
     conda:
@@ -40,10 +40,10 @@ rule contigs_mapping:
 
 rule mapping_depth:
     input:
-        bam = str(ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.bam'),
-        bai = str(ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.bam.bai')
+        bam = ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.bam',
+        bai = ASSEMBLY_FP/'contigs'/'minimap2'/'{sample}.sorted.bam.bai'
     output:
-        depth = str(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.depth')
+        depth = ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.depth'
     conda:
         "../../envs/assembly.yml"
     shell:
@@ -54,9 +54,9 @@ rule mapping_depth:
 
 rule get_coverage:
     input:
-        str(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.depth')
+        ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.depth'
     output:
-        str(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.csv')
+        ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.csv'
     conda:
         "../../envs/assembly.yml"
     script:
@@ -65,10 +65,10 @@ rule get_coverage:
 
 rule summarize_coverage:
     input:
-        expand(str(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.csv'), 
+        expand(ASSEMBLY_FP/'contigs'/'coverage'/'{sample}.csv', 
                sample = Samples.keys())
     output:
-        str(ASSEMBLY_FP/'contigs_coverage.txt')
+        ASSEMBLY_FP/'contigs_coverage.txt'
     shell:
         "(head -n 1 {input[0]}; tail -q -n +2 {input}) > {output}"
 

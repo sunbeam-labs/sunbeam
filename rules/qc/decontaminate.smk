@@ -1,19 +1,19 @@
 rule all_decontam:
     input:
         expand(
-            str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'),
+            QC_FP/'decontam'/'{sample}_{rp}.fastq.gz',
             sample=Samples.keys(), rp=Pairs)
 
 ruleorder: build_host_index > build_genome_index
         
 rule build_host_index:
     input:
-        str(Cfg['qc']['host_fp']/'{host}.fasta')
+        Cfg['qc']['host_fp']/'{host}.fasta'
     output:
-        str(Cfg['qc']['host_fp']/'{host}.fasta.amb')
+        Cfg['qc']['host_fp']/'{host}.fasta.amb'
     params:
         host='{host}',
-        index_fp=str(Cfg['qc']['host_fp'])
+        index_fp=Cfg['qc']['host_fp']
     conda:
         "../../envs/qc.yml"
     shell:
@@ -22,16 +22,16 @@ rule build_host_index:
 rule align_to_host:
     input:
         reads = expand(
-            str(QC_FP/'cleaned'/'{{sample}}_{rp}.fastq.gz'),
+            QC_FP/'cleaned'/'{{sample}}_{rp}.fastq.gz',
             rp = Pairs),
-        index = str(Cfg['qc']['host_fp']/'{host}.fasta.amb')
+        index = Cfg['qc']['host_fp']/'{host}.fasta.amb'
     output:
-        temp(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.bam'))
+        temp(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.bam')
     threads:
         Cfg['qc']['threads']
     params:
-        sam = temp(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.sam')),
-        index_fp = str(Cfg['qc']['host_fp'])
+        sam = temp(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.sam'),
+        index_fp = Cfg['qc']['host_fp']
     conda:
         "../../envs/qc.yml"
     shell:
@@ -45,9 +45,9 @@ rule align_to_host:
 
 rule get_mapped_reads:
     input:
-        str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.bam')
+        QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.bam'
     output:
-        ids = str(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.ids'),
+        ids = QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.ids',
     params:
         pct_id =  Cfg['qc']['pct_id'],
         frac = Cfg['qc']['frac']
@@ -59,21 +59,21 @@ rule get_mapped_reads:
 rule aggregate_reads:
     input:
         expand(
-            str(QC_FP/'decontam'/'intermediates'/'{host}'/'{{sample}}.ids'),
+            QC_FP/'decontam'/'intermediates'/'{host}'/'{{sample}}.ids',
             host=HostGenomes.keys())
     output:
-        temp(str(QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids')),
+        temp(QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids'),
     script:
         "../../scripts/qc/aggregate_reads.py"
 
 rule filter_reads:
     input:
-        hostreads = str(QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids'),
-        reads = str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'),
-        hostids = expand(str(QC_FP/'decontam'/'intermediates'/'{host}'/'{{sample}}.ids'), host=HostGenomes.keys())
+        hostreads = QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids',
+        reads = QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz',
+        hostids = expand(QC_FP/'decontam'/'intermediates'/'{host}'/'{{sample}}.ids', host=HostGenomes.keys())
     output:
-        reads = str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'),
-        log = str(QC_FP/'log'/'decontam'/'{sample}_{rp}.txt')
+        reads = QC_FP/'decontam'/'{sample}_{rp}.fastq.gz',
+        log = QC_FP/'log'/'decontam'/'{sample}_{rp}.txt'
     conda:
         "../../envs/qc.yml"
     script:

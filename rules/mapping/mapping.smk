@@ -5,9 +5,9 @@ rule all_mapping:
 
 rule build_genome_index:
     input:
-        str(Cfg['mapping']['genomes_fp']/'{genome}.fasta')
+        Cfg['mapping']['genomes_fp']/'{genome}.fasta'
     output:
-        str(Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb')
+        Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb'
     conda:
         "../../envs/mapping.yml"
     shell:
@@ -16,15 +16,15 @@ rule build_genome_index:
 rule align_to_genome:
     input:
         reads = expand(
-            str(QC_FP/'decontam'/'{{sample}}_{rp}.fastq.gz'),
+            QC_FP/'decontam'/'{{sample}}_{rp}.fastq.gz',
             rp = Pairs),
-        index = str(Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb')
+        index = Cfg['mapping']['genomes_fp']/'{genome}.fasta.amb'
     output:
-        temp(str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.sam'))
+        temp(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.sam')
     threads:
         Cfg['mapping']['threads']
     params:
-        index_fp = str(Cfg['mapping']['genomes_fp'])
+        index_fp = Cfg['mapping']['genomes_fp']
     conda:
         "../../envs/mapping.yml"
     shell:
@@ -36,9 +36,9 @@ rule align_to_genome:
 
 rule samtools_convert:
     input:
-        str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.sam')
+        MAPPING_FP/'intermediates'/'{genome}'/'{sample}.sam'
     output:
-        str(MAPPING_FP/'{genome}'/'{sample}.bam')
+        MAPPING_FP/'{genome}'/'{sample}.bam'
     threads:
         Cfg['mapping']['threads']
     conda:
@@ -50,29 +50,29 @@ rule samtools_convert:
         """
 
 def _sorted_csvs(w):
-    pattern = str(MAPPING_FP/'intermediates'/w.genome/'{sample}.csv')
+    pattern = MAPPING_FP/'intermediates'/w.genome/'{sample}.csv'
     paths = sorted(expand(pattern, sample=Samples.keys()))
     return(paths)
 
 rule samtools_summarize_coverage:
     input: _sorted_csvs
     output:
-        str(MAPPING_FP/'{genome}'/'coverage.csv')
+        MAPPING_FP/'{genome}'/'coverage.csv'
     shell: "(head -n 1 {input[0]}; tail -q -n +2 {input}) > {output}"
 
 rule samtools_get_coverage:
     input:
-        str(MAPPING_FP/'{genome}'/'{sample}.bam')
+        MAPPING_FP/'{genome}'/'{sample}.bam'
     output:
-        str(MAPPING_FP/'intermediates'/'{genome}'/'{sample}.csv')
+        MAPPING_FP/'intermediates'/'{genome}'/'{sample}.csv'
     conda:
         "../../envs/mapping.yml"
     script:
         "../../scripts/mapping/samtools_get_coverage.py"
 
 rule samtools_index:
-    input: str(MAPPING_FP/'{genome}'/'{sample}.bam')
-    output: str(MAPPING_FP/'{genome}'/'{sample}.bam.bai')
+    input: MAPPING_FP/'{genome}'/'{sample}.bam'
+    output: MAPPING_FP/'{genome}'/'{sample}.bam.bai'
     conda:
         "../../envs/mapping.yml"
     shell:
@@ -81,9 +81,9 @@ rule samtools_index:
            
 rule samtools_mpileup:
     input:
-        bam = str(MAPPING_FP/'{genome}'/'{sample}.bam'),
-        genome = str(Cfg['mapping']['genomes_fp']/'{genome}.fasta')
-    output: str(MAPPING_FP/'{genome}'/'{sample}.raw.bcf')
+        bam = MAPPING_FP/'{genome}'/'{sample}.bam',
+        genome = Cfg['mapping']['genomes_fp']/'{genome}.fasta'
+    output: MAPPING_FP/'{genome}'/'{sample}.raw.bcf'
     conda:
         "../../envs/mapping.yml"
     shell:
