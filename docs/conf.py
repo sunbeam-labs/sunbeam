@@ -17,9 +17,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
-sys.path.insert(0, os.path.abspath('.'))
+# import os
+# import sys
+# sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- General configuration ------------------------------------------------
@@ -50,7 +50,7 @@ project = 'Sunbeam'
 copyright = '2019, Erik Clarke, Chunyu Zhao, Jesse Connell, Louis Taylor'
 author = 'Erik Clarke, Chunyu Zhao, Jesse Connell, Louis Taylor'
 
-import sunbeam
+import sunbeam3
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
