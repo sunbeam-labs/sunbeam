@@ -56,7 +56,6 @@ TARGET_ANNOTATE = expand(
 
 
 # ---- Reports
-
 TARGET_REPORT = [
     str(QC_FP/'reports'/'preprocess_summary.tsv'),
     str(QC_FP/'reports'/'fastqc_quality.tsv'),
