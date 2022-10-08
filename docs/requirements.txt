@@ -1,1 +1,4 @@
 snakemake>=7.8.5
+biopython
+ruamel.yaml
+semantic_version
