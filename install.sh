@@ -7,8 +7,8 @@ read -r -d '' __usage <<-'EOF'
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
   -c --conda  [arg]       Location of Conda installation. Default: ${PREFIX}
   -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
-  -m --no_mamba           Don't use mamba in base environment as dependency solver
-  -v --verbose            Show subcommand output
+  -m --no_mamba           Don't use mamba in base environment as dependency solver.
+  -v --verbose            Show subcommand output.
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
 EOF
