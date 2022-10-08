@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 read -r -d '' __usage <<-'EOF'
-  -l --list               List all installed versions of sunbeam.
+  -l --list   [arg]       List all [installed] or all [available] versions of sunbeam.
   -s --switch [arg]       Switch to a new version of sunbeam (install if not installed).
+  -r --remove [arg]       Uninstall the specified version of sunbeam.
   -v --verbose            Show subcommand output.
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
