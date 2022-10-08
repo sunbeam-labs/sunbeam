@@ -50,6 +50,9 @@ project = 'Sunbeam'
 copyright = '2019, Erik Clarke, Chunyu Zhao, Jesse Connell, Louis Taylor'
 author = 'Erik Clarke, Chunyu Zhao, Jesse Connell, Louis Taylor'
 
+for dist in __import__('pkg_resources').working_set:
+   print(dist.project_name.replace('Python', ''))
+
 import sunbeamlib
 
 # The version info for the project you're documenting, acts as replacement for
