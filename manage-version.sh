@@ -54,3 +54,142 @@ function installation_error () {
     exit 1
 }
 
+# Set variables
+__version_tag=$(git describe --tags)
+__version_tag="${__version_tag:1}" # Remove the 'v' prefix
+__sunbeam_env="sunbeam${__version_tag}"
+
+function __git_dir_exists() {
+    if [ -d ".git" ]; then
+      echo true
+    else
+      echo false
+    fi
+}
+
+function __test_conda() {
+    command -v conda &> /dev/null && echo true || echo false
+}
+
+function __test_mamba() {
+    command -v mamba &> /dev/null && echo true || echo false
+}
+
+function __detect_conda_install() {
+    local discovered=$(__test_conda)
+    if [[ $discovered = true ]]; then
+	local conda_path="$(which conda)"
+	echo ${conda_path%'/bin/conda'}
+    fi
+}    
+
+function __test_env() {
+    if [[ $(__test_conda) = true ]]; then
+	$(conda env list \
+		 | cut -f1 -d' ' \
+		 | grep -Fxq $1 > /dev/null) && \
+	   echo true || echo false
+    else
+	echo false
+    fi
+}
+
+function __test_sunbeam() {
+    if [[ $(__test_env) = true ]]; then
+	activate_sunbeam
+	command -v sunbeam &> /dev/null && echo true || echo false
+	deactivate_sunbeam
+    else
+	echo false
+    fi
+}
+
+function enable_conda_activate () {
+    # Allow conda [de]activate in this script
+    CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
+    source $CONDA_BASE/etc/profile.d/conda.sh
+}
+
+function activate_sunbeam () {
+    enable_conda_activate
+    set +o nounset
+    conda activate $__sunbeam_env
+    set -o nounset
+}
+
+function deactivate_sunbeam () {
+    enable_conda_activate
+    set +o nounset
+    conda deactivate
+    set -o nounset
+}
+
+function install_conda () {
+    local tmpdir=$(mktemp -d)
+    debug "Downloading miniconda..."
+    debug_capture wget -nv ${__conda_url} -O ${tmpdir}/miniconda.sh 2>&1
+    debug "Installing miniconda..."
+    debug_capture bash ${tmpdir}/miniconda.sh -b -p ${__conda_path} 2>&1
+    if [[ $(__test_conda) != true ]]; then
+	installation_error "Environment creation"
+    fi
+    rm ${tmpdir}/miniconda.sh
+}
+
+function install_environment () {
+    if [[ $(__test_mamba) = true ]]; then
+        cmd=mamba
+    else
+        cmd=conda
+    fi
+    #debug_capture $cmd env create --name=$__sunbeam_env \
+    #          --quiet --file environment.yml
+    debug_capture conda env create --name=$__sunbeam_env \
+                --quiet --file environment.yml
+    if [[ $(__test_env) != true ]]; then
+	installation_error "Environment creation"
+    fi
+}
+
+if [[ "${arg_l}" = "installed" ]]; then
+    info "Installed sunbeam envs:"
+
+    conda env list |
+    while read line
+    do
+        if [[ "${line:0:7}" = "sunbeam" ]]; then
+            array_form=(${line})
+            echo "${array_form[0]}"
+        fi
+    done
+elif [[ "${arg_l}" = "available" ]]; then
+    git tag --list
+fi
+
+if [[ ! -z "${arg_s}" ]]; then
+    echo "YOU"
+fi
+
+if [[ ! -z "${arg_r}" ]]; then
+    __env_name="${arg_r}"
+    if [[ "${arg_r:0:7}" != "sunbeam" ]]; then
+        __env_name="sunbeam${arg_r}"
+    fi
+
+    if [[ $(__test_env ${__env_name}) == true ]]; then
+        info "Removing ${__env_name}"
+        conda env remove -n ${__env_name}
+        if [[ $(__test_env ${__env_name}) != true ]]; then
+            info "Removed ${__env_name}"
+        else
+            error "Failed to remove ${__env_name}"
+        fi
+    else
+        error "Can't find env ${__env_name}"
+    fi
+    
+fi
+
+   
+
+
