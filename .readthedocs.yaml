@@ -19,5 +19,5 @@ python:
 #      extra_requirements:
 #        - docs
     - method: pip
-      path: sunbeamlib
+      path: ./
   system_packages: true
