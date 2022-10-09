@@ -164,6 +164,7 @@ if [[ "${arg_l}" = "installed" ]]; then
     done
 elif [[ "${arg_l}" = "available" ]]; then
     git tag --list
+    git branch | while read line; do echo ${line}; done
 fi
 
 if [[ ! -z "${arg_s}" ]]; then
@@ -211,15 +212,13 @@ if [[ ! -z "${arg_s}" ]]; then
     fi
 
     # Switch conda env
-    
-    __env_name="${arg_s}"
-    if [[ "${arg_s:0:7}" != "sunbeam" ]]; then
-        __env_name="sunbeam${arg_s}"
-    fi
+    __env_tag=$(git describe --tag)
+    __env_name="sunbeam${__env_tag:1}"
+    enable_conda_activate
+    #conda deactivate
 
     if [[ "$CONDA_DEFAULT_ENV" = "${__env_name}" ]]; then
-        enable_conda_activate
-        #conda deactivate
+        info "Successfully switched to ${__env_name}"
     fi
 fi
 
