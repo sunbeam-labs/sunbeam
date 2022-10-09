@@ -23,8 +23,8 @@ Clone the stable branch of Sunbeam and run the installation script:
 
 .. code-block:: shell
 
-   git clone -b stable https://github.com/sunbeam-labs/sunbeam sunbeam-stable
-   cd sunbeam3-stable
+   git clone -b stable https://github.com/sunbeam-labs/sunbeam sunbeam
+   cd sunbeam
    bash install.sh
 
 The installer will check for and install the three components necessary for
@@ -34,8 +34,8 @@ environment, which will contain all the core dependencies. The third is the
 Sunbeam library, which provides the necessary commands to run Sunbeam.
 
 All of this is handled for you automatically. If Sunbeam is already installed,
-you can upgrade either or both the Sunbeam environment and library by passing
-``--upgrade [env/lib/all]`` to the install script.
+you can manage versions using the manage-version.sh script, as described below 
+in the updating_ section.
 
 If you don't have Conda installed prior to this, you will need to add a line
 (displayed during install) to your config file (usually in ``~/.bashrc`` or
@@ -56,6 +56,13 @@ installing or updating Sunbeam:
 If the tests fail, you should either refer to our troubleshooting_ guide or file
 an issue on our `Github page <https://github.com/sunbeam-labs/sunbeam/issues>`_.
 
+.. tip::
+
+  You can speed up the testing process by using the environment created during 
+  the install process with something like this 
+  'bash tests/run_tests.bash -e SUNBEAM_ENV_NAME'. Without this argument the 
+  script will create a temporary environment.
+
 .. _updating:
 Updating
 --------
@@ -73,11 +80,22 @@ upgrades, we will increment the patch or minor numbers (e.g. 1.0.0 ->
    git pull
    ./install.sh --upgrade all
 
-Sunbeam 3.0.0 is designed to be installable separately on a system that already 
+Sunbeam v3 is designed to be installable separately on a system that already 
 has sunbeam 2 installed. Follow the v3 installation instructions to run both versions 
 side by side.
 
-It's a good idea to re-run the tests after this to make sure everything is working.
+As of v3.1.0, the manage-version.sh script can be used to install and switch between 
+different versions using './manage-version.sh -s VERSION_ID'. You can see documentation on how to use this script running 
+'./manage-version.sh -h'.
+
+.. tip::
+
+  With './manage-version.sh -s VERSION_ID', you can use a version identifier 
+  (i.e. v3.1.0), dev, stable, or another branch name 
+  (i.e. 342-automate-switching-between-versions-of-sunbeam). 
+  './manage-version.sh -l available' will list available identifiers.
+
+It's a good idea to re-run the tests after using this to make sure everything is working.
 
 .. _uninstall:
 Uninstalling or reinstalling
@@ -88,8 +106,8 @@ If things go awry and updating doesn't work, simply uninstall and reinstall Sunb
    .. code-block:: shell
 
       source deactivate
-      conda env remove --name sunbeam3
-      rm -rf sunbeam-stable
+      ./manage-version.sh -r SUNBEAM_ENV_NAME
+      rm -rf sunbeam
 
 Then follow the installation_ instructions above.
 
@@ -115,10 +133,15 @@ conda environment:
 
 .. code-block:: shell
 
-   source activate sunbeam3
+   source activate SUNBEAM_ENV_NAME
 
-You should see '(sunbeam3)' in your prompt when you're in the environment. To leave
+You should see '(SUNBEAM_ENV_NAME)' in your prompt when you're in the environment. To leave
 the environment, run ``source deactivate`` or close the terminal.
+
+.. tip::
+
+  You can see a list of installed sunbeam environments using the command 
+  './manage-version.sh -l installed'.
 
 Creating a new project using local data
 ----------------------

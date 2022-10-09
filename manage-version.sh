@@ -151,6 +151,8 @@ function install_environment () {
     fi
 }
 
+debug_capture git pull
+
 if [[ "${arg_l}" = "installed" ]]; then
     info "Installed sunbeam envs:"
 
@@ -218,12 +220,10 @@ if [[ ! -z "${arg_s}" ]]; then
     conda deactivate
 
     if [[ $(__test_env ${__env_name}) == true ]]; then
-        info "Found existing environment for ${__env_name}, activating..."
-        conda activate ${__env_name}
+        info "Found existing environment, activate with 'conda activate ${__env_name}'"
     else
         info "Couldn't find environment for ${__env_name}, installing..."
         ./install.sh -e ${__env_name}
-        conda activate ${__env_name}
     fi
 
     if [[ "$CONDA_DEFAULT_ENV" = "${__env_name}" ]]; then
