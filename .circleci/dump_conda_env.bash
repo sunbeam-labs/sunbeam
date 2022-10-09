@@ -6,5 +6,6 @@ CONDA_BASE=$(conda info --base)
 source $CONDA_BASE/etc/profile.d/conda.sh
 
 # Dump environment contents
-conda activate sunbeam3
+TAG=$(git describe --tag)
+conda activate sunbeam${TAG:1}
 conda list --explicit
