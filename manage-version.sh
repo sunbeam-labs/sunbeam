@@ -215,10 +215,19 @@ if [[ ! -z "${arg_s}" ]]; then
     __env_tag=$(git describe --tag)
     __env_name="sunbeam${__env_tag:1}"
     enable_conda_activate
-    #conda deactivate
+    conda deactivate
+
+    if [[ $(__test_env ${__env_name}) == true ]]; then
+        conda activate ${__env_name}
+    else
+        ./install.sh -e ${__env_name}
+        conda activate ${__env_name}
+    fi
 
     if [[ "$CONDA_DEFAULT_ENV" = "${__env_name}" ]]; then
         info "Successfully switched to ${__env_name}"
+    else
+        error "Failed to switch to ${__env_name}"
     fi
 fi
 
