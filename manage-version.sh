@@ -113,7 +113,7 @@ function enable_conda_activate () {
 function activate_sunbeam () {
     enable_conda_activate
     set +o nounset
-    conda activate $__sunbeam_env
+    conda activate $1
     set -o nounset
 }
 
@@ -122,33 +122,6 @@ function deactivate_sunbeam () {
     set +o nounset
     conda deactivate
     set -o nounset
-}
-
-function install_conda () {
-    local tmpdir=$(mktemp -d)
-    debug "Downloading miniconda..."
-    debug_capture wget -nv ${__conda_url} -O ${tmpdir}/miniconda.sh 2>&1
-    debug "Installing miniconda..."
-    debug_capture bash ${tmpdir}/miniconda.sh -b -p ${__conda_path} 2>&1
-    if [[ $(__test_conda) != true ]]; then
-	installation_error "Environment creation"
-    fi
-    rm ${tmpdir}/miniconda.sh
-}
-
-function install_environment () {
-    if [[ $(__test_mamba) = true ]]; then
-        cmd=mamba
-    else
-        cmd=conda
-    fi
-    #debug_capture $cmd env create --name=$__sunbeam_env \
-    #          --quiet --file environment.yml
-    debug_capture conda env create --name=$__sunbeam_env \
-                --quiet --file environment.yml
-    if [[ $(__test_env) != true ]]; then
-	installation_error "Environment creation"
-    fi
 }
 
 debug_capture git pull
@@ -216,8 +189,7 @@ if [[ ! -z "${arg_s}" ]]; then
     # Switch conda env
     __env_tag=$(git describe --tag)
     __env_name="sunbeam${__env_tag:1}"
-    enable_conda_activate
-    conda deactivate
+    deactivate_sunbeam
 
     if [[ $(__test_env ${__env_name}) == true ]]; then
         info "Found existing environment, activate with 'conda activate ${__env_name}'"
@@ -226,11 +198,7 @@ if [[ ! -z "${arg_s}" ]]; then
         ./install.sh -e ${__env_name}
     fi
 
-    if [[ "$CONDA_DEFAULT_ENV" = "${__env_name}" ]]; then
-        info "Successfully switched to ${__env_name}"
-    else
-        error "Failed to switch to ${__env_name}"
-    fi
+    activate_sunbeam $__env_name
 fi
 
 if [[ ! -z "${arg_r}" ]]; then
