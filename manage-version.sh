@@ -167,13 +167,71 @@ elif [[ "${arg_l}" = "available" ]]; then
 fi
 
 if [[ ! -z "${arg_s}" ]]; then
-    echo "YOU"
+    # Switch to new branch
+    if [[ "${arg_s}" = "dev" ]]; then
+        info "Switching to branch dev ..."
+        git checkout dev
+    elif [[ "${arg_s}" = "stable" ]]; then
+        info "Switching to branch stable ..."
+        git checkout stable
+    else
+        __is_branch=false
+        __is_tag=false
+        __cleaned_name="${arg_s}"
+        if [[ "${arg_s:0:7}" = "sunbeam" ]]; then
+            __cleaned_name="${arg_s:7}"
+        fi
+        if [[ "${__cleaned_name:0:1}" = "v" ]]; then
+            __cleaned_name="${__cleaned_name:1}"
+        fi
+
+        git branch |
+        while read line
+        do
+            if [[ "${__cleaned_name}" = "${line}" ]]; then
+                info "Switching to branch ${__cleaned_name} ..."
+                git checkout $__cleaned_name
+                __is_branch=true
+                break
+            fi
+        done
+
+        git tag --list |
+        while read line
+        do
+            if [[ "$__cleaned_name" = "${line}" ]]; then
+                info "Switching to release v${__cleaned_name} ..."
+                git checkout tags/v${__cleaned_name} -b ${__cleaned_name}
+                __is_tag=true
+                break
+            fi
+        done
+
+        # Check if none of the cases were hit to throw error
+    fi
+
+    # Switch conda env
+    
+    __env_name="${arg_s}"
+    if [[ "${arg_s:0:7}" != "sunbeam" ]]; then
+        __env_name="sunbeam${arg_s}"
+    fi
+
+    if [[ "$CONDA_DEFAULT_ENV" = "${__env_name}" ]]; then
+        enable_conda_activate
+        #conda deactivate
+    fi
 fi
 
 if [[ ! -z "${arg_r}" ]]; then
     __env_name="${arg_r}"
     if [[ "${arg_r:0:7}" != "sunbeam" ]]; then
         __env_name="sunbeam${arg_r}"
+    fi
+
+    if [[ "$CONDA_DEFAULT_ENV" = "${__env_name}" ]]; then
+        enable_conda_activate
+        conda deactivate
     fi
 
     if [[ $(__test_env ${__env_name}) == true ]]; then
@@ -187,7 +245,6 @@ if [[ ! -z "${arg_r}" ]]; then
     else
         error "Can't find env ${__env_name}"
     fi
-    
 fi
 
    
