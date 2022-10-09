@@ -221,7 +221,7 @@ if [[ ! -z "${arg_s}" ]]; then
         info "Found existing environment for ${__env_name}, activating..."
         conda activate ${__env_name}
     else
-        info "Couldn't find environment for ${_env_name}, installing..."
+        info "Couldn't find environment for ${__env_name}, installing..."
         ./install.sh -e ${__env_name}
         conda activate ${__env_name}
     fi
