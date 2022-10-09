@@ -112,16 +112,18 @@ function enable_conda_activate () {
 
 function activate_sunbeam () {
     enable_conda_activate
-    set +o nounset
+    #set +o nounset
+    eval "$(conda shell.bash hook)"
     conda activate $1
-    set -o nounset
+    #set -o nounset
 }
 
 function deactivate_sunbeam () {
     enable_conda_activate
-    set +o nounset
+    #set +o nounset
+    eval "$(conda shell.bash hook)"
     conda deactivate
-    set -o nounset
+    #set -o nounset
 }
 
 debug_capture git pull
