@@ -226,9 +226,13 @@ else
 fi
 
 # Install mamba
-if [[ $__install_mamba = true ]]; then
-    info "Installing mamba..."
-    conda install --yes --quiet -n base -c conda-forge mamba || (info "Mamba failed to install, this is usually because you have too many packages already installed to your base environment. Install again without mamba (--no_mamba) or try to fix conflicts in base env." && exit 1)
+if [[ $__mamba_installed = true ]]; then
+    info "Mamba already installed."
+else
+    if [[ $__install_mamba = true ]]; then
+        info "Installing mamba..."
+        conda install --yes --quiet -n base -c conda-forge mamba || (info "Mamba failed to install, this is usually because you have too many packages already installed to your base environment. Install again without mamba (--no_mamba) or try to fix conflicts in base env." && exit 1)
+    fi
 fi
 
 conda config --set channel_priority strict # Set channel priority on new install
