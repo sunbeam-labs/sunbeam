@@ -54,34 +54,9 @@ function installation_error () {
     exit 1
 }
 
-# Set variables
-__version_tag=$(git describe --tags)
-__version_tag="${__version_tag:1}" # Remove the 'v' prefix
-__sunbeam_env="sunbeam${__version_tag}"
-
-function __git_dir_exists() {
-    if [ -d ".git" ]; then
-      echo true
-    else
-      echo false
-    fi
-}
-
 function __test_conda() {
     command -v conda &> /dev/null && echo true || echo false
 }
-
-function __test_mamba() {
-    command -v mamba &> /dev/null && echo true || echo false
-}
-
-function __detect_conda_install() {
-    local discovered=$(__test_conda)
-    if [[ $discovered = true ]]; then
-	local conda_path="$(which conda)"
-	echo ${conda_path%'/bin/conda'}
-    fi
-}    
 
 function __test_env() {
     if [[ $(__test_conda) = true ]]; then
@@ -89,16 +64,6 @@ function __test_env() {
 		 | cut -f1 -d' ' \
 		 | grep -Fxq $1 > /dev/null) && \
 	   echo true || echo false
-    else
-	echo false
-    fi
-}
-
-function __test_sunbeam() {
-    if [[ $(__test_env) = true ]]; then
-	activate_sunbeam
-	command -v sunbeam &> /dev/null && echo true || echo false
-	deactivate_sunbeam
     else
 	echo false
     fi
@@ -112,18 +77,16 @@ function enable_conda_activate () {
 
 function activate_sunbeam () {
     enable_conda_activate
-    #set +o nounset
-    eval "$(conda shell.bash hook)"
+    set +o nounset
     conda activate $1
-    #set -o nounset
+    set -o nounset
 }
 
 function deactivate_sunbeam () {
     enable_conda_activate
-    #set +o nounset
-    eval "$(conda shell.bash hook)"
+    set +o nounset
     conda deactivate
-    #set -o nounset
+    set -o nounset
 }
 
 debug_capture git pull
@@ -200,7 +163,7 @@ if [[ ! -z "${arg_s}" ]]; then
         ./install.sh -e ${__env_name}
     fi
 
-    activate_sunbeam $__env_name
+    #activate_sunbeam $__env_name # Only works within script, won't change user's context
 fi
 
 if [[ ! -z "${arg_r}" ]]; then
