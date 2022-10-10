@@ -20,7 +20,7 @@ jobs:
       - run:
           name: install
           command: |
-            bash install.sh -u lib
+            bash install.sh -u lib -v
           no_output_timeout: 20m
 
       - run:
@@ -31,7 +31,8 @@ jobs:
       - run:
           name: run tests
           command: |
-            bash tests/run_tests.bash -e sunbeam3
+            TAG=$(git describe --tag)
+            bash tests/run_tests.bash -e sunbeam${TAG:1}
           no_output_timeout: 20m
 
       - save_cache:

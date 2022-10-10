@@ -3,12 +3,12 @@
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
 read -r -d '' __usage <<-'EOF'
-  -e --environment  [arg] Environment to install to. Default: "sunbeam3"
+  -e --environment  [arg] Environment to install to. Default: "sunbeam" followed by the version tag (e.g. sunbeam3.0.1)
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
   -c --conda  [arg]       Location of Conda installation. Default: ${PREFIX}
   -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
-  -m --no_mamba           Don't use mamba in base environment as dependency solver
-  -v --verbose            Show subcommand output
+  -m --no_mamba           Don't use mamba in base environment as dependency solver.
+  -v --verbose            Show subcommand output.
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
 EOF
@@ -62,7 +62,9 @@ function installation_error () {
 # Set variables
 __conda_path="${arg_c:-${HOME}/miniconda3}"
 __sunbeam_dir="${arg_s:-$(readlink -f ${__dir})}"
-__sunbeam_env="${arg_e:-sunbeam3}"
+__version_tag=$(git describe --tags)
+__version_tag="${__version_tag:1}" # Remove the 'v' prefix
+__sunbeam_env="${arg_e:-sunbeam${__version_tag}}"
 __update_lib=false
 __update_env=false
 __install_mamba=true
@@ -163,10 +165,8 @@ function install_environment () {
     else
         cmd=conda
     fi
-    #debug_capture $cmd env create --name=$__sunbeam_env \
-    #          --quiet --file environment.yml
-    debug_capture conda env create --name=$__sunbeam_env \
-                --quiet --file environment.yml
+    debug_capture $cmd env create --name=$__sunbeam_env \
+              --quiet --file environment.yml
     if [[ $(__test_env) != true ]]; then
 	installation_error "Environment creation"
     fi
@@ -274,8 +274,12 @@ if [[ $__old_path != *"${__conda_path}/bin"* ]]; then
     warning "   'echo \"export PATH=\$PATH:${__conda_path}/bin\" >> ~/.bashrc'"
     warning "and close and re-open your terminal session to apply."
     warning "When finished, run 'conda activate ${__sunbeam_env}' to begin."
+    warning "Optionally, run 'bash tests/run_tests.bash -e ${__sunbeam_env}'"
+    warning "to make sure the installation is working properly."
 else
     info "Done. Run 'conda activate ${__sunbeam_env}' to begin."
+    info "Optionally, run 'bash tests/run_tests.bash -e ${__sunbeam_env}'"
+    info "to make sure the installation is working properly."
 fi
 
    
