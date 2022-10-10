@@ -2,6 +2,7 @@
 
 read -r -d '' __usage <<-'EOF'
   -l --list   [arg]       List all [installed] or all [available] versions of sunbeam.
+  -c --current            List environment for the code currently installed (current branch tag).
   -s --switch [arg]       Switch to a new version of sunbeam (install if not installed).
   -r --remove [arg]       Uninstall the specified version of sunbeam.
   -v --verbose            Show subcommand output.
@@ -90,6 +91,19 @@ function deactivate_sunbeam () {
 }
 
 debug_capture git pull
+
+# list current
+if [[ "${arg_c:?}" = "1" ]]; then
+    TAG=$(git describe --tag)
+    ENV_NAME="sunbeam${TAG:1}"
+    info "Environment for installed code is ${ENV_NAME}."
+    if [[ $(__test_env $ENV_NAME) = true ]]; then
+        info "Activate with 'conda activate ${ENV_NAME}'."
+    else
+        info "Environment doesn't exist, install by running './install.sh'."
+    fi
+    exit 0
+fi
 
 if [[ "${arg_l}" = "installed" ]]; then
     info "Installed sunbeam envs:"
