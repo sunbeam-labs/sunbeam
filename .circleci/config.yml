@@ -38,6 +38,41 @@ jobs:
           paths:
             - ~/miniconda3
           key: v3-dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
+          
+  build-osx:
+    macos:
+      xcode: 12.5.1
+    
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v3-dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
+
+      - run:
+          name: install
+          command: |
+            bash install.sh -u lib -v
+          no_output_timeout: 20m
+
+      - run:
+          name: dump_env
+          command: |
+            bash .circleci/dump_conda_env.bash
+
+      - run:
+          name: run tests
+          command: |
+            TAG=$(git describe --tag)
+            bash tests/run_tests.bash -e sunbeam${TAG:1}
+          no_output_timeout: 20m
+
+      - save_cache:
+          paths:
+            - ~/miniconda3
+          key: v3-dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
 
 workflows:
   version: 2
@@ -52,6 +87,8 @@ workflows:
                 - stable
     jobs:
       - build-docker
+      - build-osx
   default:
     jobs:
       - build-docker
+      - build-osx
