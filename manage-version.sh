@@ -148,7 +148,13 @@ if [[ ! -z "${arg_s}" ]]; then
             fi
         done
 
-        # Check if none of the cases were hit to throw error
+        # Check if no cases were hit
+        if [[ $__is_branch = false ]]; then
+            if [[ $__is_tag = false ]]; then
+                error "Couldn't find ${arg_s}. Make sure to use a valid branch name or version tag."
+                exit 1
+            fi
+        fi
     fi
 
     # Switch conda env
