@@ -47,9 +47,9 @@ jobs:
       - checkout
 
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v3-dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
+      #- restore_cache:
+      #    keys:
+      #    - v3-dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
 
       - run:
           name: install
