@@ -23,7 +23,7 @@ Clone the stable branch of Sunbeam and run the installation script:
 
 .. code-block:: shell
 
-   git clone -b stable https://github.com/sunbeam-labs/sunbeam sunbeam
+   git clone -b stable https://github.com/sunbeam-labs/sunbeam
    cd sunbeam
    bash install.sh
 
