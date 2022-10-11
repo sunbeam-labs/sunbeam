@@ -6,8 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6
-      - image: circleci/python:3.5
+      - image: cimg/python:3.10
 
     steps:
       - checkout
