@@ -15,9 +15,16 @@ install. We do not currently support non-Linux environments.
 
 .. code-block:: shell
 
-   git clone -b stable git@github.com:sunbeam-labs/sunbeam.git sunbeam
+   git clone -b stable https://github.com/sunbeam-labs/sunbeam.git
    cd sunbeam
    ./install.sh
+
+.. tip::
+
+   If you're planning on doing development work on sunbeam, use 
+   'git clone -b stable git@github.com:sunbeam-labs/sunbeam.git' instead. This will 
+   require having `SSH setup with your GitHub account <https://docs.github.com/en/authentication/connecting-to-github-with-ssh>`_ 
+   and the machine that you are installing sunbeam on.
 
 This installs Sunbeam and all its dependencies, including the `Conda
 <https://conda.io/miniconda.html>`_ environment manager, if required. It will finish 

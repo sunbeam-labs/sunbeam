@@ -2,7 +2,8 @@
 
 read -r -d '' __usage <<-'EOF'
   -l --list   [arg]       List all [installed] or all [available] versions of sunbeam.
-  -c --current            List environment for the code currently installed (current branch tag).
+  -a --active             List environment for the code currently installed (active branch tag).
+  -c --clean              Remove all auxiliary sunbeam conda environments.
   -s --switch [arg]       Switch to a new version of sunbeam (install if not installed).
   -r --remove [arg]       Uninstall the specified version of sunbeam.
   -v --verbose            Show subcommand output.
@@ -12,7 +13,8 @@ EOF
 
 read -r -d '' __helptext <<-'EOF'
  This script manages your sunbeam version, switching between versions, installing new 
- ones, or listing what's currently installed.
+ ones, or listing what's currently installed. Must be run from sunbeam root directory 
+ (the one that this script is in).
 EOF
 
 # Load BASH3Boilerplate for command-line parsing and logging
@@ -93,7 +95,7 @@ function deactivate_sunbeam () {
 debug_capture git pull
 
 # list current
-if [[ "${arg_c:?}" = "1" ]]; then
+if [[ "${arg_a:?}" = "1" ]]; then
     TAG=$(git describe --tag)
     ENV_NAME="sunbeam${TAG:1}"
     info "Environment for installed code is ${ENV_NAME}."
@@ -103,6 +105,15 @@ if [[ "${arg_c:?}" = "1" ]]; then
         info "Environment doesn't exist, install by running './install.sh'."
     fi
     exit 0
+fi
+
+if [[ "${arg_c:?}" = "1" ]]; then
+    PREFIX=$(pwd)
+    ls -d .snakemake/*/ |
+    while read line
+    do
+        conda env remove -p $PREFIX/$line
+    done
 fi
 
 if [[ "${arg_l}" = "installed" ]]; then
