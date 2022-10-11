@@ -23,7 +23,10 @@ branches/tags.
 Options
 =======
 
+-l --list [arg]
+---------
 
+List all [installed] or all [available] versions of sunbeam.
 
 .. _man-vm:
 Manual Version Management
