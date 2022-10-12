@@ -11,7 +11,11 @@ Overview
 ========
 
 This script enables users of sunbeam to easily install the necessary software 
-and environments to run sunbeam.
+and environments to run sunbeam. For the typical user, this script will be 
+called to perform the initial install of sunbeam and thereafter any upgrades 
+will be handled by the manage-version script. If you are doing development work 
+on sunbeam you will likely make use of this script more often, in particular 
+the --update argument.
 
 Options
 =======
