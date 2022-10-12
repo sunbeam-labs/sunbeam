@@ -5,12 +5,12 @@ manage-version.sh
 =================
 
 .. contents::
-   :depth: 3
+   :depth: 2
 
 Overview
 ========
 
-This script exists to enable users of sunbeam to easily switch between different 
+This script enables users of sunbeam to easily switch between different 
 versions of sunbeam; automatically managing the environments and the code  
 branches/tags. This is the preferred way to manage versions of your local 
 installation of sunbeam >=3.1.
@@ -18,7 +18,7 @@ installation of sunbeam >=3.1.
 .. tip::
 
     This script was implemented in v3.1.0, so using it to switch to any prior 
-    versions will then require referring to the man-vm_ section to switch 
+    versions will then require referring to the manual-version-management_ section to switch 
     versions again.
 
 The most common use case will be once you've had sunbeam installed for a while 
@@ -86,7 +86,7 @@ Run in debug mode.
 
 Display help message.
 
-.. _man-vm:
+.. _manual-version-management:
 Manual Version Management
 =========================
 

@@ -5,7 +5,7 @@ __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.s
 read -r -d '' __usage <<-'EOF'
   -e --environment  [arg] Environment to install to. Default: "sunbeam" followed by the version tag (e.g. sunbeam3.0.1)
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
-  -c --conda  [arg]       Location of Conda installation. Default: ${PREFIX}
+  -c --conda  [arg]       Location of Conda installation. Default: $CONDA_PREFIX
   -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
   -m --no_mamba           Don't use mamba in base environment as dependency solver.
   -v --verbose            Show subcommand output.
