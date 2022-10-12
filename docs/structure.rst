@@ -98,7 +98,7 @@ tests/
 
 This directory contains all of the testing framework and tests for sunbeam. The 
 framework is written mostly in bash with `test_suite.bash` holding the main 
-test suite and `run_tests.bash` to run it.
+test suite and `run_tests.bash` to run it. 
 
 Hidden Directories
 ------------------

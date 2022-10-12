@@ -7,11 +7,12 @@ Sunbeam Commands
 .. contents::
    :depth: 2
 
-sunbeam [-h | -v] <subcommand>
+.. code::
+    sunbeam [-h | -v] <subcommand>
 
--h/--help: Display help.
+    -h/--help: Display help.
 
--v/--version: Display version.
+    -v/--version: Display version.
 
 .. tip::
 
@@ -41,14 +42,14 @@ sunbeam init [-h] [-f] [--output FILE] [--defaults FILE] [--template FILE]
 
 --single_end: Fastq files are in single-end, not paired-end, format for --data_fp.
 
-project_fp: 
+project_fp: Project directory (will be created if it does not exist).
 
 run
 ===
 
 sunbeam run [-h] [-s PATH] -- <snakemake options>
 
--h: Display help.
+-h/--help: Display help.
 
 -s/--sunbeam_dir: Path to sunbeam installation.
 
