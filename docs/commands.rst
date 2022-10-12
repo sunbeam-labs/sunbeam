@@ -25,6 +25,9 @@ Sunbeam Commands
 init
 ====
 
+Initialize a new Sunbeam project in a given directory, creating a new config 
+file and (optionally) a sample list.
+
 .. code-block:: shell
 
     sunbeam init [-h] [-f] [--output FILE] [--defaults FILE] [--template FILE] [--data_fp PATH] [--format STR] [--single_end] project_fp
@@ -54,6 +57,8 @@ Sample list options:
 run
 ===
 
+Executes the Sunbeam pipeline by calling Snakemake.
+
 .. code-block:: shell
 
     sunbeam run [-h] [-s PATH] -- <snakemake options>
@@ -78,9 +83,18 @@ config
 update
 ******
 
+Updates a config file to be compatible with the active version of sunbeam.
+
 .. code-block:: shell
 
     sunbeam config update [-h] [-t FILE] [--strict] [-i | -o FILE] config_file
+
+Usage examples:
+
+1. To update a config file in place:
+    `sunbeam config update -i my_config.yml`
+2. To write an update copy to a new file:
+    `sunbeam config update old_config.yml -o new_config.yml`
 
 .. code-block:: shell
 
@@ -94,9 +108,18 @@ update
 modify
 ******
 
+Modifies a config file with the specified changes.
+
 .. code-block:: shell
 
     sunbeam config modify [-h] [-s STR | -f FILE] [-i | -o FILE] config_file
+
+Usage examples:
+
+1. To apply a set of defaults to an existing config file in place:
+    `sunbeam config modify -i -f defaults.yml my_config.yml`
+2. To change a single key:value pair in the 'mapping' section:
+    `sunbeam config modify -i -s 'mapping: {keep_unaligned: True}'`
 
 .. code-block:: shell
 
@@ -109,6 +132,8 @@ modify
 
 list_samples 
 ============
+
+List the samples found in the specified directory.
 
 .. code-block:: shell
 
@@ -123,6 +148,8 @@ list_samples
 
 extend
 ======
+
+Install the extension at the given URL.
 
 .. code-block:: shell
 

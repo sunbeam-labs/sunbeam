@@ -32,8 +32,7 @@ def get_conda_prefix():
 def parse_args(argv):
     description_str = (
         "Initialize a new Sunbeam project in a given directory, creating "
-        "a new config file and (optionally) a sample list.  The sample list "
-        "source can be either a folder of input files or a list of SRA accession numbers.")
+        "a new config file and (optionally) a sample list.")
     
     parser = argparse.ArgumentParser(
         "init", description=description_str)
@@ -57,8 +56,7 @@ def parse_args(argv):
         help="custom config file template, in YAML format", 
         type=argparse.FileType("r"))
 
-    samplelist = parser.add_argument_group("sample list options",
-            ("Options to automatically generate a sample list."))
+    samplelist = parser.add_argument_group("sample list options")
     
     samplelist.add_argument(
         "--data_fp", type=Path, metavar="PATH",
