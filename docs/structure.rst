@@ -98,7 +98,15 @@ tests/
 
 This directory contains all of the testing framework and tests for sunbeam. The 
 framework is written mostly in bash with `test_suite.bash` holding the main 
-test suite and `run_tests.bash` to run it. 
+test suite and `run_tests.bash` to run it. The first step in running the tests 
+is to create dummy data which is generated using `generate_dummy_data.py` and 
+any installed extensions are then moved temporarily to the `extensions/` 
+subdirectory to avoid any interference from them (extensions should each be 
+tested separately from sunbeam). Some tests will end by calling 
+`find_targets.py` to check that all of the files specified in `targets.txt` or 
+`targets_singleend.txt` are present. Unit tests for the `scripts/` directory 
+live in `unit_tests/` subdirectory. Other subdirectories are auxiliary fixtures 
+for running certain tests.
 
 Hidden Directories
 ------------------
@@ -106,14 +114,20 @@ Hidden Directories
 .circleci/
 **********
 
-
+This directory contains the `config.yml` file which defines the CI jobs to be 
+run by CircleCI as well as any scripts that are included in those jobs.
 
 .github/
 ********
 
-
+This directory contains the `PULL_REQUEST_TEMPLATE.md` file which defines a 
+template for any pull requests on the sunbeam repository. This is also where 
+definitions for any CI/CD workflows run through GitHub Actions would live.
 
 .snakemake/
 ***********
 
-This directory is created the first time you run sunbeam. 
+This directory is created the first time you run sunbeam. It will contain all 
+the auxiliary environments created by snakemake (each environment will be named 
+by a hash of the `.yml` file, so any changes to those files will result in a 
+new environment being built).
