@@ -63,28 +63,42 @@ by default.
 extensions/
 -----------
 
-This directory will contain 
+This directory will contain any extensions you install with `sunbeam extend` or 
+any extensions that you develop as well as a `.placeholder` file that is just 
+there to make sure the directory always exists. Any extensions should be in 
+their own directories that start with `sbx_`.
 
 rules/
 ------
 
-
+This directory contains all of the snakemake rules that get imported by the 
+main `Snakefile`. The rules are organized into subdirectories by function and 
+each subdirectory has an associated environment to run its rules in `envs/`.
 
 scripts/
 --------
 
-
+This directory contains any python code that needs to be executed by snakemake 
+rules. Again they are organized into subdirectories to match function and each 
+is named according to the rule that calls it.
 
 .. _sunbeamlib:
 sunbeamlib/
 -----------
 
-
+This directory contains the python library that acts as a wrapper for 
+snakemake. The python files in the root contain a number of utility functions 
+whiles those in `scripts/` define the commands for sunbeam. 
+`scripts/command.py` takes in `sunbeam [cmd]` and then routes it to the file 
+matching the given command. The `data/` directory contains the default config 
+file as well as some sample configs for running on a cluster.
 
 tests/
 ------
 
-
+This directory contains all of the testing framework and tests for sunbeam. The 
+framework is written mostly in bash with `test_suite.bash` holding the main 
+test suite and `run_tests.bash` to run it.
 
 Hidden Directories
 ------------------
