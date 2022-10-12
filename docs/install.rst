@@ -22,20 +22,20 @@ Options
 
 All available options for the command line, used with `./install.sh [options]`.
 
--e [arg] OR --environment [arg]
+-e/--environment [arg]
 +++++++++++++++++++++++++++++++
 
 Environment to install to. Default: "sunbeam" followed by the version tag 
 (e.g. sunbeam3.1.0). This version tag can get more complicated for non-release 
 branches and can be shown with `./manage-version.sh -a`.
 
--s [arg] OR --sunbeam_dir [arg]
+-s/--sunbeam_dir [arg]
 +++++++++++++++++++++++++++++++
 
 Location of Sunbeam source code. Default: root sunbeam directory. This should 
 rarely be changed. These scripts are intended to be run from the root dir.
 
--c [arg] OR --conda [arg]
+-c/--conda [arg]
 +++++++++++++++++++++++++
 
 Location of Conda installation. Default: $CONDA_PREFIX. If this variable 
@@ -47,7 +47,7 @@ doesn't point to your desired conda installation you can specify that here.
     installations or one where environment variables like $CONDA_PREFIX aren't 
     set correctly is a recipe for trouble.
 
--u [arg] OR --update [arg]
+-u/--update [arg]
 ++++++++++++++++++++++++++
 
 Update sunbeam [lib]rary, conda [env], or [all]. The sunbeam library is all 
@@ -56,7 +56,7 @@ changes to make to the environment you should be creating a new one using
 `./manage-version.sh -s ENV_NAME`. This way you will maintain the option to 
 easily switch back and forth if you make breaking changes in the new one.
 
--m OR --no_mamba
+-m/--no_mamba
 ++++++++++++++++
 
 Don't use mamba in base environment as dependency solver. It is the default 
@@ -64,17 +64,17 @@ option to use mamba because it is considerably faster than conda in solving new
 environments. However it can also sometimes be a pain to install, especially 
 with crowded 'base' environments.
 
--v OR --verbose
+-v/--verbose
 +++++++++++++++
 
 Show subcommand output.
 
--d OR --debug
+-d/--debug
 +++++++++++++
 
 Run in debug mode.
 
--h OR --help
+-h/--help
 ++++++++++++
 
 Display help message.

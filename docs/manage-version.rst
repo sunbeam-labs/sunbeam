@@ -31,7 +31,7 @@ Options
 
 All available options for the command line, used with `./manage-version.sh [options]`.
 
--l [arg] OR --list [arg]
+-l/--list [arg]
 ++++++++++++++++++++++++
 
 List all [installed] or all [available] versions of sunbeam. The [installed] 
@@ -39,13 +39,13 @@ argument will search your local conda environments for the prefix 'sunbeam'.
 The [available] argument will list available release tags and developement 
 branches.
 
--a OR --active
+-a/--active
 ++++++++++++++
 
 List environment for the code currently installed (active branch tag). I.e. 
 this will get the current git tag and display the appropriate environment.
 
--c OR --clean
+-c/--clean
 +++++++++++++
 
 Remove all auxiliary sunbeam conda environments. These will typically be stored 
@@ -57,7 +57,7 @@ developer and make changes to environment files often.
     The next time running sunbeam after `./manage-version.sh --clean` will 
     take longer because it has to remake some of the cleaned environments.
 
--s [arg] OR --switch [arg]
+-s/--switch [arg]
 ++++++++++++++++++++++++++
 
 Switch to a new version of sunbeam (install if not installed). This version 
@@ -65,23 +65,23 @@ argument can be 'dev', 'stable', any other branch name, or any version tag.
 A list of available versions can be listed with 
 `./manage-version.sh -l available`.
 
--r [arg] OR --remove [arg]
+-r/--remove [arg]
 ++++++++++++++++++++++++++
 
 Uninstall the specified version of sunbeam. A list of installed versions can 
 be shown with `./manage-version.sh -l installed`.
 
--v OR --verbose
+-v/--verbose
 +++++++++++++++
 
 Show subcommand output.
 
--d OR --debug
+-d/--debug
 +++++++++++++
 
 Run in debug mode.
 
--h OR --help
+-h/--help
 ++++++++++++
 
 Display help message.

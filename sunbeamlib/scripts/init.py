@@ -58,15 +58,7 @@ def parse_args(argv):
         type=argparse.FileType("r"))
 
     samplelist = parser.add_argument_group("sample list options",
-            ("Options to automatically generate a sample list. --data_fp (for "
-             "reading filenames from a specified folder) and --data_acc (for "
-             "fetching SRA accession numbers to be downloaded during a run) "
-             "are mutually exclusive.  If --data_acc is used, all SRA Run "
-             "(sample) entries corresponding to the given accession numbers "
-             "(e.g. PRJNA###, SAMN###, SRR###) will be used to create the "
-             "sample list.  Note in this case project_fp should either be "
-             "given before --data_acc or separated by a '--' to distinguish "
-             "it from an accession number."))
+            ("Options to automatically generate a sample list."))
     
     samplelist.add_argument(
         "--data_fp", type=Path, metavar="PATH",
