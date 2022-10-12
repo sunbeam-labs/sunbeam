@@ -58,6 +58,7 @@ sequencing experiments. *Microbiome* 7:46 (2019)
 
    quickstart.rst
    usage.rst
+   commands.rst
    structure.rst
    extensions.rst
    install.rst

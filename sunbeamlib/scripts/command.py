@@ -17,6 +17,7 @@ def main():
         "  run          \tExecute the pipeline.\n"
         "  config       \tModify or update config files.\n"
         "  list_samples \tMake a list of samples from a directory.\n"
+        "  extend       \tAdd an extension.\n"
     ).format(version=sunbeamlib.__version__)
 
     parser = argparse.ArgumentParser(
