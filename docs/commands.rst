@@ -45,7 +45,7 @@ Config file options:
 Sample list options:
 
 .. code-block:: shell
-    
+
     --data_fp: Path to folder containing `.fastq.gz` files.
     --format: Filename format for --data_fp (default: guessed).
     --single_end: Fastq files are in single-end, not paired-end, format for --data_fp.
@@ -54,76 +54,82 @@ Sample list options:
 run
 ===
 
-sunbeam run [-h] [-s PATH] -- <snakemake options>
+.. code-block:: shell
 
--h/--help: Display help.
+    sunbeam run [-h] [-s PATH] -- <snakemake options>
 
--s/--sunbeam_dir: Path to sunbeam installation.
+.. code-block:: shell
 
-<snakemake options>: You can pass further arguments to Snakemake after `--`, 
-e.g: `$ sunbeam run -- --cores 12`. See http://snakemake.readthedocs.io for 
-more information.
+    -h/--help: Display help.
+    -s/--sunbeam_dir: Path to sunbeam installation.
+    <snakemake options>: You can pass further arguments to Snakemake after `--`, e.g: `$ sunbeam run -- --cores 12`. See http://snakemake.readthedocs.io for more information.
 
 config
 ======
 
-sunbeam config [-h] {update,modify} ...
+.. code-block:: shell
 
--h/--help: Display help.
+    sunbeam config [-h] {update,modify} ...
+
+.. code-block:: shell
+
+    -h/--help: Display help.
 
 update
 ******
 
-sunbeam config update [-h] [-t FILE] [--strict] [-i | -o FILE] config_file
+.. code-block:: shell
 
--h/--help: Display help.
+    sunbeam config update [-h] [-t FILE] [--strict] [-i | -o FILE] config_file
 
--t/--template: Path to custom config file template, in YAML format.
+.. code-block:: shell
 
---strict: Remove keys that no longer exist in the new config file.
-
--i/--in_place: Alters config file in place.
-
--o/--out: Where to write modified config file.
-
-config_file: Existing config file to update.
+    -h/--help: Display help.
+    -t/--template: Path to custom config file template, in YAML format.
+    --strict: Remove keys that no longer exist in the new config file.
+    -i/--in_place: Alters config file in place.
+    -o/--out: Where to write modified config file.
+    config_file: Existing config file to update.
 
 modify
 ******
 
-sunbeam config modify [-h] [-s STR | -f FILE] [-i | -o FILE] config_file
+.. code-block:: shell
 
--h: Display help.
+    sunbeam config modify [-h] [-s STR | -f FILE] [-i | -o FILE] config_file
 
--s/--str: YAML string (e.g. 'blast: {threads: 4}').
+.. code-block:: shell
 
--f/--file: YAML file with new config values.
-
--i/--in_place: Alters config file in place.
-
--o/-out: Where to write modified config file.
-
-config_file: Existing config file to modify.
+    -h: Display help.
+    -s/--str: YAML string (e.g. 'blast: {threads: 4}').
+    -f/--file: YAML file with new config values.
+    -i/--in_place: Alters config file in place.
+    -o/-out: Where to write modified config file.
+    config_file: Existing config file to modify.
 
 list_samples 
 ============
 
-sunbeam list_samples [-h] [-s] [-f STR] data_fp
+.. code-block:: shell
 
--h/---help: Display help.
+    sunbeam list_samples [-h] [-s] [-f STR] data_fp
 
--s/--single_end: Samples are single-end (not paired-end).
+.. code-block:: shell
 
--f/--format: Filename format (e.g. {sample}_R{rp}.fastq.gz) (default: guessed).
-
-data_fp: Path to folder containing reads.
+    -h/---help: Display help.
+    -s/--single_end: Samples are single-end (not paired-end).
+    -f/--format: Filename format (e.g. {sample}_R{rp}.fastq.gz) (default: guessed).
+    data_fp: Path to folder containing reads.
 
 extend
 ======
 
-sunbeam extend [-h] [-s PATH] github_url
+.. code-block:: shell
 
--h/--help: Display help.
+    sunbeam extend [-h] [-s PATH] github_url
 
--s/--sunbeam_dir: Path to sunbeam installation.
+.. code-block:: shell
+
+    -h/--help: Display help.
+    -s/--sunbeam_dir: Path to sunbeam installation.
 
