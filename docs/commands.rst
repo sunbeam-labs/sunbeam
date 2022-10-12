@@ -8,10 +8,12 @@ Sunbeam Commands
    :depth: 2
 
 .. code-block:: shell
+    
     sunbeam [-h | -v] <subcommand>
 
-    -h/--help: Display help.
+.. code-block:: shell
 
+    -h/--help: Display help.
     -v/--version: Display version.
 
 .. tip::
@@ -26,7 +28,7 @@ init
 sunbeam init [-h] [-f] [--output FILE] [--defaults FILE] [--template FILE] 
 [--data_fp PATH] [--format STR] [--single_end] project_fp
 
-`-h/--help`: Display help.
+-h/--help: Display help.
 
 -f/--force: Overwrite files if they already exist.
 
