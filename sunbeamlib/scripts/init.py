@@ -6,7 +6,6 @@ from pathlib import Path
 
 from .list_samples import (
         build_sample_list,
-        build_sample_list_sra,
         MissingMatePairError,
         SampleFormatError,
         check_existing)
