@@ -25,26 +25,31 @@ Sunbeam Commands
 init
 ====
 
-sunbeam init [-h] [-f] [--output FILE] [--defaults FILE] [--template FILE] 
-[--data_fp PATH] [--format STR] [--single_end] project_fp
+.. code-block:: shell
 
--h/--help: Display help.
+    sunbeam init [-h] [-f] [--output FILE] [--defaults FILE] [--template FILE] [--data_fp PATH] [--format STR] [--single_end] project_fp
 
--f/--force: Overwrite files if they already exist.
+.. code-block:: shell
 
---output: Name of config file (default: sunbeam_config.yml).
+    -h/--help: Display help.
+    -f/--force: Overwrite files if they already exist.
+    --output: Name of config file (default: sunbeam_config.yml).
 
---defaults: Set of default values to use to populate config file.
+Config file options:
 
---template: Custom config file template, in YAML format.
+.. code-block:: shell
 
---data_fp: Path to folder containing `.fastq.gz` files.
+    --defaults: Set of default values to use to populate config file.
+    --template: Custom config file template, in YAML format.
 
---format: Filename format for --data_fp (default: guessed).
+Sample list options:
 
---single_end: Fastq files are in single-end, not paired-end, format for --data_fp.
-
-project_fp: Project directory (will be created if it does not exist).
+.. code-block:: shell
+    
+    --data_fp: Path to folder containing `.fastq.gz` files.
+    --format: Filename format for --data_fp (default: guessed).
+    --single_end: Fastq files are in single-end, not paired-end, format for --data_fp.
+    project_fp: Project directory (will be created if it does not exist).
 
 run
 ===
