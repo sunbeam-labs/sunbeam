@@ -7,7 +7,7 @@ Sunbeam Commands
 .. contents::
    :depth: 2
 
-.. code::
+.. code-block:: shell
     sunbeam [-h | -v] <subcommand>
 
     -h/--help: Display help.
