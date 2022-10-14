@@ -133,10 +133,6 @@ include: "rules/classify/kraken.smk"
 # ---- Mapping rules
 include: "rules/mapping/mapping.smk"
 
-
-# ---- Reports rules
-include: "rules/reports/reports.smk"
-
 for sbx_path, wildcards in sbxs:
     include: sbx_path
         
