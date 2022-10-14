@@ -39,6 +39,7 @@ TARGET_ASSEMBLY = [
         ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa',
         sample = Samples.keys()),
     ASSEMBLY_FP/'contigs_coverage.txt',
+]
 
 
 # ---- Mapping
