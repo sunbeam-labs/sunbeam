@@ -18,8 +18,8 @@ Sunbeam Commands
 
 .. tip::
 
-    This is the version given by `semantic_version` in sunbeamlib. For commits 
-    and branches this may differ from the version given by `git` that is used 
+    This is the version given by ``semantic_version`` in sunbeamlib. For commits 
+    and branches this may differ from the version given by ``git`` that is used 
     for things like environment naming.
 
 init
@@ -49,7 +49,7 @@ Sample list options:
 
 .. code-block:: shell
 
-    --data_fp: Path to folder containing `.fastq.gz` files.
+    --data_fp: Path to folder containing ``.fastq.gz`` files.
     --format: Filename format for --data_fp (default: guessed).
     --single_end: Fastq files are in single-end, not paired-end, format for --data_fp.
     project_fp: Project directory (will be created if it does not exist).
@@ -67,7 +67,7 @@ Executes the Sunbeam pipeline by calling Snakemake.
 
     -h/--help: Display help.
     -s/--sunbeam_dir: Path to sunbeam installation.
-    <snakemake options>: You can pass further arguments to Snakemake after `--`, e.g: `$ sunbeam run -- --cores 12`. See http://snakemake.readthedocs.io for more information.
+    <snakemake options>: You can pass further arguments to Snakemake after ``--``, e.g: ``$ sunbeam run -- --cores 12``. See http://snakemake.readthedocs.io for more information.
 
 config
 ======
@@ -92,9 +92,9 @@ Updates a config file to be compatible with the active version of sunbeam.
 Usage examples:
 
 1. To update a config file in place:
-    `sunbeam config update -i my_config.yml`
+    ``sunbeam config update -i my_config.yml``
 2. To write an update copy to a new file:
-    `sunbeam config update old_config.yml -o new_config.yml`
+    ``sunbeam config update old_config.yml -o new_config.yml``
 
 .. code-block:: shell
 
@@ -117,9 +117,9 @@ Modifies a config file with the specified changes.
 Usage examples:
 
 1. To apply a set of defaults to an existing config file in place:
-    `sunbeam config modify -i -f defaults.yml my_config.yml`
+    ``sunbeam config modify -i -f defaults.yml my_config.yml``
 2. To change a single key:value pair in the 'mapping' section:
-    `sunbeam config modify -i -s 'mapping: {keep_unaligned: True}'`
+    ``sunbeam config modify -i -s 'mapping: {keep_unaligned: True}'``
 
 .. code-block:: shell
 

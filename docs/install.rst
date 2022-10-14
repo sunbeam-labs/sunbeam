@@ -20,14 +20,14 @@ the --update argument.
 Options
 =======
 
-All available options for the command line, used with `./install.sh [options]`.
+All available options for the command line, used with ``./install.sh [options]``.
 
 -e/--environment [arg]
 +++++++++++++++++++++++++++++++
 
 Environment to install to. Default: "sunbeam" followed by the version tag 
 (e.g. sunbeam3.1.0). This version tag can get more complicated for non-release 
-branches and can be shown with `./manage-version.sh -a`.
+branches and can be shown with ``./manage-version.sh -a``.
 
 -s/--sunbeam_dir [arg]
 +++++++++++++++++++++++++++++++
@@ -53,7 +53,7 @@ doesn't point to your desired conda installation you can specify that here.
 Update sunbeam [lib]rary, conda [env], or [all]. The sunbeam library is all 
 code under the 'sunbeamlib/' directory. If you have major or incompatible 
 changes to make to the environment you should be creating a new one using 
-`./manage-version.sh -s ENV_NAME`. This way you will maintain the option to 
+``./manage-version.sh -s ENV_NAME``. This way you will maintain the option to 
 easily switch back and forth if you make breaking changes in the new one.
 
 -m/--no_mamba

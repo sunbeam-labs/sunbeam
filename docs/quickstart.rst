@@ -35,7 +35,7 @@ by printing instructions to continue that should look like:
    conda activate ENV_NAME
    tests/run_tests.bash -e ENV_NAME
 
- This runs some tests to make sure everything was installed correctly.
+This runs some tests to make sure everything was installed correctly.
 
 .. tip::
 

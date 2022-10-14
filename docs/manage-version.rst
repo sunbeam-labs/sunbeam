@@ -23,13 +23,13 @@ installation of sunbeam >=3.1.
 
 The most common use case will be once you've had sunbeam installed for a while 
 and new versions have come out, you can easily upgrade to the latest version 
-by running `./manage-version.sh -s stable`. This will update your code, install 
+by running ``./manage-version.sh -s stable``. This will update your code, install 
 the newest environment, and then give you instructions for how to activate it.
 
 Options
 =======
 
-All available options for the command line, used with `./manage-version.sh [options]`.
+All available options for the command line, used with ``./manage-version.sh [options]``.
 
 -l/--list [arg]
 ++++++++++++++++++++++++
@@ -49,12 +49,12 @@ this will get the current git tag and display the appropriate environment.
 +++++++++++++
 
 Remove all auxiliary sunbeam conda environments. These will typically be stored 
-in `$SUNBEAM_DIR/.snakemake/` and can take up space, especially if you're a 
+in ``$SUNBEAM_DIR/.snakemake/`` and can take up space, especially if you're a 
 developer and make changes to environment files often.
 
 .. tip::
 
-    The next time running sunbeam after `./manage-version.sh --clean` will 
+    The next time running sunbeam after ``./manage-version.sh --clean`` will 
     take longer because it has to remake some of the cleaned environments.
 
 -s/--switch [arg]
@@ -63,13 +63,13 @@ developer and make changes to environment files often.
 Switch to a new version of sunbeam (install if not installed). This version 
 argument can be 'dev', 'stable', any other branch name, or any version tag. 
 A list of available versions can be listed with 
-`./manage-version.sh -l available`.
+``./manage-version.sh -l available``.
 
 -r/--remove [arg]
 ++++++++++++++++++++++++++
 
 Uninstall the specified version of sunbeam. A list of installed versions can 
-be shown with `./manage-version.sh -l installed`.
+be shown with ``./manage-version.sh -l installed``.
 
 -v/--verbose
 +++++++++++++++
@@ -106,14 +106,14 @@ environments for that code.
 As an example, let's say you've just installed sunbeam following the quickstart 
 guide. At this point you should have code that is on the 'stable' branch and 
 an environment called something like 'sunbeamX.X.X'. You can verify this by 
-running `git status` and `echo $CONDA_DEFAULT_ENV` (provided your environment 
+running ``git status`` and ``echo $CONDA_DEFAULT_ENV`` (provided your environment 
 is activated).
 
 But now you want to switch to the developement branch. The first step is to 
-`git checkout dev`, switching your code to the dev branch. Next, run 
-`conda deactivate`, deactivating your current environment, then to create 
-the new 'dev' environment run, `./install.sh -e sunbeamX.X.X-dev` (you can 
-also use the proper env name given by `git describe --tag` but that will 
+``git checkout dev``, switching your code to the dev branch. Next, run 
+``conda deactivate``, deactivating your current environment, then to create 
+the new 'dev' environment run, ``./install.sh -e sunbeamX.X.X-dev`` (you can 
+also use the proper env name given by ``git describe --tag`` but that will 
 change will every commit). If the install script succeeds, it should finish by 
 giving instructions on how to activate your new environment and you're good to 
 go.
