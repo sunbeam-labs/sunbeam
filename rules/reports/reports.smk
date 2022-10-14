@@ -40,17 +40,3 @@ rule fastqc_report:
     script:
         "../../scripts/reports/fastqc_report.py"
 
-
-rule multiqc_report:
-    """Build multiqc report on qc step."""
-    input:
-        TARGET_FASTQC
-    output:
-        MULTIQC_REPORT
-    params:
-        title = Cfg['qc'].get('report_title', 'QC report'),
-        outdir = QC_FP/'reports'
-    conda:
-        "../../envs/reports.yml"
-    script:
-        "../../scripts/reports/multiqc_report.py"
