@@ -4,14 +4,14 @@ channels:
   - eclarke
   - conda-forge
 dependencies:
-  - biopython
-  - bwa
-  - cutadapt
-  - fastqc
+  - bioconda::biopython
+  - bioconda::bwa
+  - bioconda::cutadapt
+  - bioconda::fastqc
   - conda-forge::gsl # rust-bio-tools
-  - komplexity
+  - eclarke::komplexity
   - conda-forge::pandas # reports
-  - pysam
-  - rust-bio-tools
-  - samtools
-  - trimmomatic
+  - bioconda::pysam
+  - bioconda::rust-bio-tools
+  - bioconda::samtools
+  - bioconda::trimmomatic
