@@ -142,9 +142,9 @@ rule fastqc_report:
     output:
         QC_FP/'reports'/'fastqc_quality.tsv'
     conda:
-        "../../envs/reports.yml"
+        "../../envs/qc.yml"
     script:
-        "../../scripts/reports/fastqc_report.py"
+        "../../scripts/qc/fastqc_report.py"
 
 rule find_low_complexity:
     input:

@@ -10,6 +10,7 @@ dependencies:
   - fastqc
   - conda-forge::gsl # rust-bio-tools
   - komplexity
+  - conda-forge::pandas # reports
   - pysam
   - rust-bio-tools
   - samtools
