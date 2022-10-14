@@ -34,9 +34,11 @@ TARGET_CLASSIFY = [CLASSIFY_FP/'kraken'/'all_samples.tsv']
 
 # ---- Assembly
 # Assemble contigs
-TARGET_ASSEMBLY = expand(
-    ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa',
-    sample = Samples.keys())
+TARGET_ASSEMBLY = [
+    expand(
+        ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa',
+        sample = Samples.keys()),
+    ASSEMBLY_FP/'contigs_coverage.txt',
 
 
 # ---- Mapping
