@@ -47,7 +47,7 @@ See how people are using Sunbeam:
 
 ### Changelog:
 
-#### v3.1.0 (October 13, 2022)
+#### v3.1.0 (October 14, 2022)
 
  - Upgrade snakemake to v7.15.1, this fixed two issues with running jobs on the cluster
  - Add manage-versions.sh which manages versions of sunbeam automatically for users in a single repo
