@@ -6,7 +6,6 @@ from pathlib import Path
 
 from .list_samples import (
         build_sample_list,
-        build_sample_list_sra,
         MissingMatePairError,
         SampleFormatError,
         check_existing)
@@ -32,8 +31,7 @@ def get_conda_prefix():
 def parse_args(argv):
     description_str = (
         "Initialize a new Sunbeam project in a given directory, creating "
-        "a new config file and (optionally) a sample list.  The sample list "
-        "source can be either a folder of input files or a list of SRA accession numbers.")
+        "a new config file and (optionally) a sample list.")
     
     parser = argparse.ArgumentParser(
         "init", description=description_str)
@@ -57,16 +55,7 @@ def parse_args(argv):
         help="custom config file template, in YAML format", 
         type=argparse.FileType("r"))
 
-    samplelist = parser.add_argument_group("sample list options",
-            ("Options to automatically generate a sample list. --data_fp (for "
-             "reading filenames from a specified folder) and --data_acc (for "
-             "fetching SRA accession numbers to be downloaded during a run) "
-             "are mutually exclusive.  If --data_acc is used, all SRA Run "
-             "(sample) entries corresponding to the given accession numbers "
-             "(e.g. PRJNA###, SAMN###, SRR###) will be used to create the "
-             "sample list.  Note in this case project_fp should either be "
-             "given before --data_acc or separated by a '--' to distinguish "
-             "it from an accession number."))
+    samplelist = parser.add_argument_group("sample list options")
     
     samplelist.add_argument(
         "--data_fp", type=Path, metavar="PATH",

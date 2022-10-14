@@ -3,12 +3,12 @@
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
 read -r -d '' __usage <<-'EOF'
-  -e --environment  [arg] Environment to install to. Default: "sunbeam3"
+  -e --environment  [arg] Environment to install to. Default: "sunbeam" followed by the version tag (e.g. sunbeam3.0.1)
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
-  -c --conda  [arg]       Location of Conda installation. Default: ${PREFIX}
+  -c --conda  [arg]       Location of Conda installation. Default: $CONDA_PREFIX
   -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
-  -m --mamba              Use mamba in base environment as alternative dependency solver
-  -v --verbose            Show subcommand output
+  -m --no_mamba           Don't use mamba in base environment as dependency solver.
+  -v --verbose            Show subcommand output.
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
 EOF
@@ -62,10 +62,12 @@ function installation_error () {
 # Set variables
 __conda_path="${arg_c:-${HOME}/miniconda3}"
 __sunbeam_dir="${arg_s:-$(readlink -f ${__dir})}"
-__sunbeam_env="${arg_e:-sunbeam3}"
+__version_tag=$(git describe --tags)
+__version_tag="${__version_tag:1}" # Remove the 'v' prefix
+__sunbeam_env="${arg_e:-sunbeam${__version_tag}}"
 __update_lib=false
 __update_env=false
-__install_mamba=false
+__install_mamba=true
 if [[ "${arg_u}" = "all" || "${arg_u}" = "env" ]]; then
     __update_lib=true
     __update_env=true
@@ -74,7 +76,7 @@ elif [[ "${arg_u}" = "lib" ]]; then
 fi
 
 if [[ "${arg_m:?}" = "1" ]]; then
-    __install_mamba=true
+    __install_mamba=false
 fi
 
 __old_path=$PATH
@@ -163,10 +165,8 @@ function install_environment () {
     else
         cmd=conda
     fi
-    #debug_capture $cmd env create --name=$__sunbeam_env \
-    #          --quiet --file environment.yml
-    debug_capture conda env create --name=$__sunbeam_env \
-                --quiet --file environment.yml
+    debug_capture $cmd env create --name=$__sunbeam_env \
+              --quiet --file environment.yml
     if [[ $(__test_env) != true ]]; then
 	installation_error "Environment creation"
     fi
@@ -226,8 +226,14 @@ else
 fi
 
 # Install mamba
-info "Installing mamba..."
-conda install --yes --quiet -n base -c conda-forge mamba
+if [[ $__mamba_installed = true ]]; then
+    info "Mamba already installed."
+else
+    if [[ $__install_mamba = true ]]; then
+        info "Installing mamba..."
+        conda install --yes --quiet -n base -c conda-forge mamba || (info "Mamba failed to install, this is usually because you have too many packages already installed to your base environment. Install again without mamba (--no_mamba) or try to fix conflicts in base env." && exit 1)
+    fi
+fi
 
 conda config --set channel_priority strict # Set channel priority on new install
 
@@ -268,8 +274,12 @@ if [[ $__old_path != *"${__conda_path}/bin"* ]]; then
     warning "   'echo \"export PATH=\$PATH:${__conda_path}/bin\" >> ~/.bashrc'"
     warning "and close and re-open your terminal session to apply."
     warning "When finished, run 'conda activate ${__sunbeam_env}' to begin."
+    warning "Optionally, run 'bash tests/run_tests.bash -e ${__sunbeam_env}'"
+    warning "to make sure the installation is working properly."
 else
     info "Done. Run 'conda activate ${__sunbeam_env}' to begin."
+    info "Optionally, run 'bash tests/run_tests.bash -e ${__sunbeam_env}'"
+    info "to make sure the installation is working properly."
 fi
 
    

@@ -15,21 +15,33 @@ install. We do not currently support non-Linux environments.
 
 .. code-block:: shell
 
-   git clone -b stable git@github.com:sunbeam-labs/sunbeam.git sunbeam3-stable
-   cd sunbeam3-stable
+   git clone -b stable https://github.com/sunbeam-labs/sunbeam.git
+   cd sunbeam
    ./install.sh
-   tests/run_tests.bash -e sunbeam3
+
+.. tip::
+
+   If you're planning on doing development work on sunbeam, use 
+   'git clone -b stable git@github.com:sunbeam-labs/sunbeam.git' instead. This will 
+   require having `SSH setup with your GitHub account <https://docs.github.com/en/authentication/connecting-to-github-with-ssh>`_ 
+   and the machine that you are installing sunbeam on.
 
 This installs Sunbeam and all its dependencies, including the `Conda
-<https://conda.io/miniconda.html>`_ environment manager, if required. It then
-runs some tests to make sure everything was installed correctly.
+<https://conda.io/miniconda.html>`_ environment manager, if required. It will finish 
+by printing instructions to continue that should look like:
+
+.. code-block:: shell
+
+   conda activate ENV_NAME
+   tests/run_tests.bash -e ENV_NAME
+
+This runs some tests to make sure everything was installed correctly.
 
 .. tip::
 
    If you've never installed Conda before, you'll need to add it to your shell's
-   path. If you're running Bash (the most common terminal shell), the following
-   command will add it to your path: ``echo 'export
-   PATH=$PATH:$HOME/miniconda3/bin' > ~/.bashrc``
+   path. If you're running Bash (the most common terminal shell), the installation 
+   script should print the necessary command.
 
 If you see "Tests failed", check out our :ref:`troubleshooting` section or file an issue
 on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.

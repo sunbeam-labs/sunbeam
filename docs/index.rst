@@ -41,6 +41,10 @@ assembly graphs, read alignments, and taxonomic classifications.
 
 To get started, see our :ref:`quickstart`!
 
+.. tip::
+
+  To install sunbeam version 2, use the command `git clone git@github.com:sunbeam-labs/sunbeam.git --branch v2.1.0 sunbeam2` This can be used to install any specific release of sunbeam.
+
 If you use Sunbeam in your research, please cite:
 
 EL Clarke, LJ Taylor, C Zhao *et al.* Sunbeam: an
@@ -54,6 +58,10 @@ sequencing experiments. *Microbiome* 7:46 (2019)
 
    quickstart.rst
    usage.rst
+   commands.rst
+   structure.rst
    extensions.rst
+   install.rst
+   manage-version.rst
    citation.rst
 

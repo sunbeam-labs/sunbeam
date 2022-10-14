@@ -47,6 +47,21 @@ See how people are using Sunbeam:
 
 ### Changelog:
 
+#### v3.1.0 (October 13, 2022)
+
+ - Upgrade snakemake to v7.15.1, this fixed two issues with running jobs on the cluster
+ - Add manage-versions.sh which manages versions of sunbeam automatically for users in a single repo
+ - Fix build errors for previous versions of docs introduced when trying to add versioning info from sunbeamlib
+ - Improve the install script's decision making on when to use mamba vs conda and add informative errors
+ - Remove 'str' calls from snakemake that are no longer necessary (snakemake <5.7 requirement)
+ - Add 'Sunbeam Commands', 'Software Structure', 'install.sh', and 'manage-versions.sh' pages to docs
+
+#### v3.0.1 (August 11, 2022)
+
+ - Add biom-format to Kraken env
+ - Fix sunbeam init not picking up extension configs
+ - Fix multiqc naming issue that seemed to arise across different multiqc versions
+
 #### v3.0.0 (June 27, 2022)
 
  - Support use of .smk file extensions in Sunbeam extensions (in addition to .rules)
