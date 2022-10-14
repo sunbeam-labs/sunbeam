@@ -43,7 +43,7 @@ To get started, see our :ref:`quickstart`!
 
 .. tip::
 
-  To install sunbeam version 2, use the command `git clone git@github.com:sunbeam-labs/sunbeam.git --branch v2.1.0 sunbeam2` This can be used to install any specific release of sunbeam.
+  To install sunbeam version 2, use the command ``git clone git@github.com:sunbeam-labs/sunbeam.git --branch v2.1.0 sunbeam2`` This can be used to install any specific release of sunbeam.
 
 If you use Sunbeam in your research, please cite:
 
