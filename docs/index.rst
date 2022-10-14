@@ -31,7 +31,7 @@ Sunbeam currently automates the following tasks:
   <https://github.com/DerrickWood/kraken>`_;
 * Assembly of reads into contigs using `Megahit
   <https://github.com/voutcn/megahit>`_;
-* Contig annotation using BLAST[n/p] and `Diamond <https://github.com/bbuchfink/diamond>`;
+* Contig annotation using BLAST[n/p] and `Diamond <https://github.com/bbuchfink/diamond>`_;
 * Mapping of reads to target genomes; and
 * ORF prediction using `Prodigal <https://github.com/hyattpd/Prodigal>`_
 
