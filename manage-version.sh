@@ -165,7 +165,7 @@ if [[ ! -z "${arg_s}" ]]; then
         git tag --list |
         while read line
         do
-            if [[ "$__cleaned_name" = "${line}" ]]; then
+            if [[ "v$__cleaned_name" = "${line}" ]]; then
                 info "Switching to release v${__cleaned_name} ..."
                 git checkout tags/v${__cleaned_name} -b ${__cleaned_name}
                 __is_tag=true
