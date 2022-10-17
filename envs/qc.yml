@@ -5,6 +5,7 @@ channels:
   - conda-forge
 dependencies:
   - bioconda::biopython
+  - bioconda::bwa
   - bioconda::cutadapt
   - bioconda::fastqc
   - conda-forge::gsl # rust-bio-tools
@@ -12,4 +13,5 @@ dependencies:
   - conda-forge::pandas # reports
   - bioconda::pysam
   - bioconda::rust-bio-tools
+  - bioconda::samtools
   - bioconda::trimmomatic
