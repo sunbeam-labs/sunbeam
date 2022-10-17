@@ -61,12 +61,20 @@ Executes the Sunbeam pipeline by calling Snakemake.
 
 .. code-block:: shell
 
-    sunbeam run [-h] [-s PATH] -- <snakemake options>
+    sunbeam run [-h] [-s PATH] [--target_list [TARGETS, ...]] -- <snakemake options>
+
+Usage examples:
+
+1. To run all targets (not including extensions):
+   ``sunbeam run --configfile /path/to/sunbeam_config.yml``
+2. To specify multiple targets:
+   ``sunbeam run --configfile /path/to/sunbeam_config.yml --target_list all_qc all_assembly all_demic``
 
 .. code-block:: shell
 
     -h/--help: Display help.
     -s/--sunbeam_dir: Path to sunbeam installation.
+    --target_list: A list of targets to run successively.
     <snakemake options>: You can pass further arguments to Snakemake after ``--``, e.g: ``$ sunbeam run -- --cores 12``. See http://snakemake.readthedocs.io for more information.
 
 config
