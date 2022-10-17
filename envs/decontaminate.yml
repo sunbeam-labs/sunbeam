@@ -1,0 +1,9 @@
+name: decontaminate
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - bwa
+  - conda-forge::pandas # reports
+  - pysam
+  - samtools

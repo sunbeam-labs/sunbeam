@@ -15,7 +15,7 @@ rule build_host_index:
         host='{host}',
         index_fp=Cfg['qc']['host_fp']
     conda:
-        "../../envs/qc.yml"
+        "../../envs/decontaminate.yml"
     shell:
         "cd {Cfg[qc][host_fp]} && bwa index {input}"
 
@@ -33,7 +33,7 @@ rule align_to_host:
         sam = temp(QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.sam'),
         index_fp = Cfg['qc']['host_fp']
     conda:
-        "../../envs/qc.yml"
+        "../../envs/decontaminate.yml"
     shell:
         """
         bwa mem -M -t {threads} \
@@ -52,7 +52,7 @@ rule get_mapped_reads:
         pct_id =  Cfg['qc']['pct_id'],
         frac = Cfg['qc']['frac']
     conda:
-        "../../envs/qc.yml"
+        "../../envs/decontaminate.yml"
     script:
         "../../scripts/qc/get_mapped_reads.py"
 
@@ -75,7 +75,7 @@ rule filter_reads:
         reads = QC_FP/'decontam'/'{sample}_{rp}.fastq.gz',
         log = QC_FP/'log'/'decontam'/'{sample}_{rp}.txt'
     conda:
-        "../../envs/qc.yml"
+        "../../envs/decontaminate.yml"
     script:
         "../../scripts/qc/filter_reads.py"
 
@@ -94,6 +94,6 @@ rule preprocess_report:
     output:
         QC_FP/'reports'/'preprocess_summary.tsv'
     conda:
-        "../../envs/qc.yml"
+        "../../envs/decontaminate.yml"
     script:
         "../../scripts/qc/preprocess_report.py"
