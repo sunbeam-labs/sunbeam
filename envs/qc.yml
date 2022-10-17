@@ -10,5 +10,6 @@ dependencies:
   - conda-forge::gsl # rust-bio-tools
   - eclarke::komplexity
   - conda-forge::pandas # reports
+  - bioconda::pysam
   - bioconda::rust-bio-tools
   - bioconda::trimmomatic
