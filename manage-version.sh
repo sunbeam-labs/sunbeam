@@ -93,12 +93,12 @@ function deactivate_sunbeam() {
 }
 
 function git_checkout() {
+    if [[ `git status --porcelain --untracked-files=no` ]]; then
+        git commit -am "MANAGE-VERSION.SH AUTO COMMIT"
+    fi
     # If you're developing on this script, you can change the second checkout target to be 
     # the branch you're working on so that it will update the script to that instead of stable
     git checkout $1 ${2:- } && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
-    if [[ `git status --porcelain --untracked-files=no` ]]; then
-        git commit -am "Update manage-version.sh to latest stable version"
-    fi
 }
 
 debug_capture git fetch
@@ -143,11 +143,6 @@ fi
 
 if [[ ! -z "${arg_s}" ]]; then
     CURRENT_TAG=$(git describe --tag)
-
-    if [[ `git status --porcelain --untracked-files=no` ]]; then
-        error "Looks like you have made changes on this branch, please clean this up then try again."
-        exit 1
-    fi
     
     # Switch to new branch
     if [[ "${arg_s}" = "dev" ]]; then
