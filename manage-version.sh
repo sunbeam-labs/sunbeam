@@ -93,8 +93,9 @@ function deactivate_sunbeam() {
 }
 
 function git_checkout() {
-    if [[ `git status --porcelain --untracked-files=no` ]]; then
+    if [[ `git status --porcelain --untracked-files=no` = "M manage-version.sh" ]]; then
         git commit -am "MANAGE-VERSION.SH AUTO COMMIT"
+    elif [[ `git status --porcelain --untracked-files=no` = "" ]]
     fi
     # If you're developing on this script, you can change the second checkout target to be 
     # the branch you're working on so that it will update the script to that instead of stable
