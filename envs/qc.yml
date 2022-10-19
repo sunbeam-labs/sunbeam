@@ -1,16 +1,17 @@
 name: qc
 channels:
   - bioconda
-  - eclarke
-  #- conda-forge
+  #- eclarke
+  - conda-forge
 dependencies:
   - bioconda::biopython
   - bioconda::bwa
   - bioconda::cutadapt
   - bioconda::fastqc
   #- conda-forge::gsl # rust-bio-tools
-  - eclarke::komplexity
+  #- eclarke::komplexity
   - bioconda::pysam
   - bioconda::rust-bio-tools
   - bioconda::samtools
   - bioconda::trimmomatic
+  - conda-forge::pandas

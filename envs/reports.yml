@@ -1,5 +1,8 @@
 name: reports
 channels:
+  - eclarke
   - conda-forge
 dependencies:
-  - pandas
+  - komplexity
+  #- conda-forge::gsl # rust-bio-tools
+  #- bioconda::rust-bio-tools
