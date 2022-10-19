@@ -78,3 +78,22 @@ rule filter_reads:
         "../../envs/qc.yml"
     script:
         "../../scripts/qc/filter_reads.py"
+
+rule preprocess_report:
+    """Combines the information from multiple preprocessing steps"""
+    input:
+        trim_files = expand(
+            QC_FP/'log'/'trimmomatic'/'{sample}.out',
+            sample=sorted(Samples.keys())),
+        decontam_files = expand(
+            QC_FP/'log'/'decontam'/'{sample}_1.txt',
+            sample=sorted(Samples.keys())),
+        komplexity_files = expand(
+            QC_FP/'log'/'komplexity'/'{sample}.filtered_ids',
+            sample=sorted(Samples.keys())),
+    output:
+        QC_FP/'reports'/'preprocess_summary.tsv'
+    conda:
+        "../../envs/qc.yml"
+    script:
+        "../../scripts/qc/preprocess_report.py"

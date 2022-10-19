@@ -1,7 +1,0 @@
-name: reports
-channels:
-  - bioconda
-  - conda-forge
-dependencies:
-  - bioconda::multiqc=1.12
-  - conda-forge::pandas

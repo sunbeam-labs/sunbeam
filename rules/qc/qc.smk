@@ -133,6 +133,19 @@ rule fastqc:
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract"
 
+rule fastqc_report:
+    """ make fastqc reports """
+    input:
+        files = expand(
+            QC_FP/'reports'/'{sample}_{rp}_fastqc/fastqc_data.txt',
+            sample=Samples.keys(),rp=Pairs)
+    output:
+        QC_FP/'reports'/'fastqc_quality.tsv'
+    conda:
+        "../../envs/qc.yml"
+    script:
+        "../../scripts/qc/fastqc_report.py"
+
 rule find_low_complexity:
     input:
         expand(
@@ -141,7 +154,7 @@ rule find_low_complexity:
     output:
         QC_FP/'log'/'komplexity'/'{sample}.filtered_ids'
     conda:
-        "../../envs/qc.yml"
+        "../../envs/komplexity.yml"
     shell:
         """
         for rp in {input}; do

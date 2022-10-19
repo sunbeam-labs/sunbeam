@@ -4,9 +4,12 @@
 
 # ---- Quality control
 # FastQC reports
-TARGET_FASTQC = expand(
-    QC_FP/'reports'/'{sample}_{rp}_fastqc'/'fastqc_data.txt',
-    sample=Samples.keys(), rp=Pairs)
+TARGET_FASTQC = [
+    expand(
+        QC_FP/'reports'/'{sample}_{rp}_fastqc'/'fastqc_data.txt',
+        sample=Samples.keys(), rp=Pairs),
+    str(QC_FP/'reports'/'fastqc_quality.tsv'),
+]
 
 # Quality-control reads
 TARGET_CLEAN = expand(
@@ -16,9 +19,12 @@ TARGET_CLEAN = expand(
 TARGET_QC = TARGET_CLEAN + TARGET_FASTQC
 
 # Remove host reads
-TARGET_DECONTAM = expand(
-    QC_FP/'decontam'/'{sample}_{rp}.fastq.gz',
-    sample = Samples.keys(), rp = Pairs)
+TARGET_DECONTAM = [
+    expand(
+        QC_FP/'decontam'/'{sample}_{rp}.fastq.gz',
+        sample = Samples.keys(), rp = Pairs),
+    str(QC_FP/'reports'/'preprocess_summary.tsv'),
+]
 
 
 # ---- Classification
@@ -28,9 +34,12 @@ TARGET_CLASSIFY = [CLASSIFY_FP/'kraken'/'all_samples.tsv']
 
 # ---- Assembly
 # Assemble contigs
-TARGET_ASSEMBLY = expand(
-    ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa',
-    sample = Samples.keys())
+TARGET_ASSEMBLY = [
+    expand(
+        ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa',
+        sample = Samples.keys()),
+    ASSEMBLY_FP/'contigs_coverage.txt',
+]
 
 
 # ---- Mapping
@@ -55,13 +64,6 @@ TARGET_ANNOTATE = expand(
     sample=Samples.keys())
 
 
-# ---- Reports
-TARGET_REPORT = [
-    str(QC_FP/'reports'/'preprocess_summary.tsv'),
-    str(QC_FP/'reports'/'fastqc_quality.tsv'),
-    str(ASSEMBLY_FP/'contigs_coverage.txt'),
-]
-
 # ---- All targets
 TARGET_ALL = (
     TARGET_QC +
@@ -69,6 +71,5 @@ TARGET_ALL = (
     TARGET_CLASSIFY +
     TARGET_ASSEMBLY +
     TARGET_ANNOTATE +
-    TARGET_REPORT +
     TARGET_MAPPING
 )
