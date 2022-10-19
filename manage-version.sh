@@ -158,7 +158,7 @@ if [[ ! -z "${arg_s}" ]]; then
         do
             if [[ "${__cleaned_name}" = "${line}" ]]; then
                 info "Switching to branch ${__cleaned_name} ..."
-                git checkout $__cleaned_name && git checkout f602bf2 manage-version.sh
+                git checkout $__cleaned_name && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
                 __is_branch=true
                 break
             fi
@@ -170,6 +170,7 @@ if [[ ! -z "${arg_s}" ]]; then
             do
                 if [[ "v$__cleaned_name" = "${line}" ]]; then
                     info "Switching to release v${__cleaned_name} ..."
+                    info "${__is_branch}"
                     git checkout tags/v${__cleaned_name} -b ${__cleaned_name}
                     __is_tag=true
                     break
