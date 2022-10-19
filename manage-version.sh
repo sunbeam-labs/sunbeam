@@ -151,6 +151,7 @@ if [[ ! -z "${arg_s}" ]]; then
     if [[ git_status = false ]]; then
         error "Your git working tree is unclean. Run `git status` to see what files have been changed. If you don't need to keep any changes run `git stash` and then try this script again."
         exit 1
+    fi
     
     # Switch to new branch
     if [[ "${arg_s}" = "dev" ]]; then
