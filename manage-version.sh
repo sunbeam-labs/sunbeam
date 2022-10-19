@@ -162,16 +162,18 @@ if [[ ! -z "${arg_s}" ]]; then
             fi
         done
 
-        git tag --list |
-        while read line
-        do
-            if [[ "v$__cleaned_name" = "${line}" ]]; then
-                info "Switching to release v${__cleaned_name} ..."
-                git checkout tags/v${__cleaned_name} -b ${__cleaned_name}
-                __is_tag=true
-                break
-            fi
-        done
+        if [[ $__is_branch = false ]]; then # Avoid creating branch again if already exists
+            git tag --list |
+            while read line
+            do
+                if [[ "v$__cleaned_name" = "${line}" ]]; then
+                    info "Switching to release v${__cleaned_name} ..."
+                    git checkout tags/v${__cleaned_name} -b ${__cleaned_name}
+                    __is_tag=true
+                    break
+                fi
+            done
+        fi
 
         # Check if no cases were hit
         if [[ $__is_branch = false ]]; then
