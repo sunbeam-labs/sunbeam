@@ -22,6 +22,8 @@ def main(argv=sys.argv):
     parser.add_argument(
         "-s", "--sunbeam_dir", default=os.getenv("SUNBEAM_DIR", os.getcwd()),
         help="Path to Sunbeam installation")
+    parser.add_argument('--target_list', nargs='+', default=[],
+        help="List of sunbeam targets")
 
     # The remaining args (after --) are passed to Snakemake
     args, remaining = parser.parse_known_args(argv)
@@ -43,14 +45,28 @@ def main(argv=sys.argv):
         print("--configfile flag not found, either it is missing (not ok) or was provided as --configfile=filename (ok)")
 
     conda_prefix = Path(args.sunbeam_dir)/".snakemake"
-    snakemake_args = ['snakemake',
-        '--snakefile', str(snakefile),
-        '-c',
-        '--use-conda',
-        '--conda-prefix', str(conda_prefix)] + remaining
-    print("Running: "+" ".join(snakemake_args))
 
-    cmd = subprocess.run(snakemake_args)
+    if(args.target_list == []):
+        snakemake_args = ['snakemake',
+            '--snakefile', str(snakefile),
+            '-c',
+            '--use-conda',
+            '--conda-prefix', str(conda_prefix)] + remaining
+        print("Running: "+" ".join(snakemake_args))
+
+        cmd = subprocess.run(snakemake_args)
+    else:
+        for target in args.target_list:
+            print(f"Running sunbeam on target: {target}")
+            snakemake_args = ['snakemake',
+                '--snakefile', str(snakefile),
+                '-c',
+                '--use-conda',
+                '--conda-prefix', str(conda_prefix),
+                target] + remaining
+            print("Running: "+" ".join(snakemake_args))
+
+            cmd = subprocess.run(snakemake_args)
     
     sys.exit(cmd.returncode)
     

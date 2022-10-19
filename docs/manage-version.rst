@@ -13,13 +13,7 @@ Overview
 This script enables users of sunbeam to easily switch between different 
 versions of sunbeam; automatically managing the environments and the code  
 branches/tags. This is the preferred way to manage versions of your local 
-installation of sunbeam >=3.1.
-
-.. tip::
-
-    This script was implemented in v3.1.0, so using it to switch to any prior 
-    versions will then require referring to the manual-version-management_ section to switch 
-    versions again.
+installation of sunbeam.
 
 The most common use case will be once you've had sunbeam installed for a while 
 and new versions have come out, you can easily upgrade to the latest version 
@@ -62,7 +56,7 @@ developer and make changes to environment files often.
 
 Switch to a new version of sunbeam (install if not installed). This version 
 argument can be 'dev', 'stable', any other branch name, or any version tag. 
-A list of available versions can be listed with 
+A list of available versions can be shown with 
 ``./manage-version.sh -l available``.
 
 -r/--remove [arg]
@@ -113,8 +107,8 @@ But now you want to switch to the developement branch. The first step is to
 ``git checkout dev``, switching your code to the dev branch. Next, run 
 ``conda deactivate``, deactivating your current environment, then to create 
 the new 'dev' environment run, ``./install.sh -e sunbeamX.X.X-dev`` (you can 
-also use the proper env name given by ``git describe --tag`` but that will 
-change will every commit). If the install script succeeds, it should finish by 
+also use the suggested env name given by ``git describe --tag`` but that will 
+change every commit). If the install script succeeds, it should finish by 
 giving instructions on how to activate your new environment and you're good to 
 go.
 
@@ -122,3 +116,25 @@ go.
 
     Check out the code for manage-version.sh if you're ever unsure of how to 
     do something, it can be a good reference.
+
+Troubleshooting
+===============
+
+The manage-version.sh script uses `git` to manage the version of the code but 
+is itself part of the code. To keep the script functional no matter what 
+version you're switching to, it will do some git magic to first checkout the 
+new version and then immediately switch the version of the script to the 
+latest stable release. This means that whenever you switch to a version that 
+isn't the latest stable release there will be a staged change for the script 
+(you can see with `git status`). As long as you're not making other changes to 
+the code, this shouldn't be an issue.
+
+If you do make changes to a version, before switching you should either commit 
+or stash these changes but not the changes to manage-version.sh. Once you only 
+have the script as a change you can use the script as normal.
+
+If you do make a mistake and end up deleting or downgrading manage-version.sh, 
+either 1) run `git checkout stable manage-version.sh` OR 2) commit or stash 
+any changes you want to keep and run `git checkout stable` to get back to the 
+latest release (you can get the environment associated with this branch with 
+`./manage-version.sh -a`).
