@@ -165,7 +165,7 @@ if [[ ! -z "${arg_s}" ]]; then
                 break
             fi
         done
-
+        info "${__is_branch}"
         if [[ $__is_branch = false ]]; then # Avoid creating branch again if already exists
             git tag --list |
             while read line
