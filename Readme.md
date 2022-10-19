@@ -50,6 +50,7 @@ See how people are using Sunbeam:
 #### v3.1.1 (October 19, 2022)
 
  - Upgrade manage-version.sh to work with any version (before or after 3.1) and always keep itself on the latest version
+ - Allow multiple targets with `sunbeam run --target_list [TARGET, ...]`
 
 #### v3.1.0 (October 14, 2022)
 
