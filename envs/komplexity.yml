@@ -1,0 +1,6 @@
+name: komplexity
+channels:
+  - eclarke
+  - conda-forge # Required by komplexity recipe
+dependencies:
+  - komplexity
