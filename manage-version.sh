@@ -93,13 +93,9 @@ function deactivate_sunbeam() {
 }
 
 function git_checkout() {
-    if [[ `git status --porcelain --untracked-files=no` = "M manage-version.sh" ]]; then
-        git commit -am "MANAGE-VERSION.SH AUTO COMMIT"
-    elif [[ `git status --porcelain --untracked-files=no` = "" ]]
-    fi
     # If you're developing on this script, you can change the second checkout target to be 
     # the branch you're working on so that it will update the script to that instead of stable
-    git checkout $1 ${2:- } && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
+    git checkout -f $1 ${2:- } && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
 }
 
 debug_capture git fetch
@@ -144,6 +140,11 @@ fi
 
 if [[ ! -z "${arg_s}" ]]; then
     CURRENT_TAG=$(git describe --tag)
+
+    if [ `git status --porcelain --untracked-files=no` != "M manage-version.sh" ] && [ `git status --porcelain --untracked-files=no` != "" ]; then
+        error "You have local changes to this branch that will be overwritten by switching, please commit or stash them and try again (make sure to keep manage-version.sh at it's current version though, it's ok to have manage-version.sh listed as a change with `git status` when running this script)."
+        exit 1
+    fi
     
     # Switch to new branch
     if [[ "${arg_s}" = "dev" ]]; then
