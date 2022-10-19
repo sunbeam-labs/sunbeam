@@ -159,7 +159,9 @@ if [[ ! -z "${arg_s}" ]]; then
             if [[ "${__cleaned_name}" = "${line}" ]]; then
                 info "Switching to branch ${__cleaned_name} ..."
                 git checkout $__cleaned_name && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
+                info "HERE"
                 __is_branch=true
+                info "${__is_branch}"
                 break
             fi
         done
