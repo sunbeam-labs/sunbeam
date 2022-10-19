@@ -158,8 +158,7 @@ if [[ ! -z "${arg_s}" ]]; then
         do
             if [[ "${__cleaned_name}" = "${line}" ]]; then
                 info "Switching to branch ${__cleaned_name} ..."
-                git checkout $__cleaned_name
-                git checkout fc1e9d8 manage-version.sh
+                git checkout $__cleaned_name && git checkout f602bf2 manage-version.sh
                 __is_branch=true
                 break
             fi
