@@ -13,7 +13,7 @@ Overview
 This script enables users of sunbeam to easily switch between different 
 versions of sunbeam; automatically managing the environments and the code  
 branches/tags. This is the preferred way to manage versions of your local 
-installation of sunbeam >=3.1.
+installation of sunbeam.
 
 The most common use case will be once you've had sunbeam installed for a while 
 and new versions have come out, you can easily upgrade to the latest version 
