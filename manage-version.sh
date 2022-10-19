@@ -95,7 +95,7 @@ function deactivate_sunbeam() {
 function git_checkout() {
     # If you're developing on this script, you can change the second checkout target to be 
     # the branch you're working on so that it will update the script to that instead of stable
-    git checkout -f $1 ${2:- } && git checkout stable manage-version.sh
+    git checkout -f $1 ${2:- } && git checkout origin/stable manage-version.sh
 }
 
 debug_capture git fetch
