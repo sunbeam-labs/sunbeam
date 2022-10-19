@@ -45,11 +45,11 @@ if [[ "${arg_d:?}" = "1" ]]; then
     LOG_LEVEL="7"
 fi
 
-function debug_capture () {
+function debug_capture() {
     debug "$(echo -e "$(${@})")"
 }
 
-function installation_error () {
+function installation_error() {
     error "${1} failed!"
     if [[ "${arg_v:?}" != 1 && "${arg_d:?}" != 1 ]]; then
 	error "Try re-running with -v or -d, or file an issue on Github."
@@ -72,24 +72,30 @@ function __test_env() {
     fi
 }
 
-function enable_conda_activate () {
+function enable_conda_activate() {
     # Allow conda [de]activate in this script
     CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
     source $CONDA_BASE/etc/profile.d/conda.sh
 }
 
-function activate_sunbeam () {
+function activate_sunbeam() {
     enable_conda_activate
     set +o nounset
     conda activate $1
     set -o nounset
 }
 
-function deactivate_sunbeam () {
+function deactivate_sunbeam() {
     enable_conda_activate
     set +o nounset
     conda deactivate
     set -o nounset
+}
+
+function git_checkout() {
+    # If you're developing on this script, you can change the second checkout target to be 
+    # the branch you're working on so that it will update the script to that instead of stable
+    git checkout $1 ${2:- } && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
 }
 
 debug_capture git pull
@@ -138,10 +144,10 @@ if [[ ! -z "${arg_s}" ]]; then
     # Switch to new branch
     if [[ "${arg_s}" = "dev" ]]; then
         info "Switching to branch dev ..."
-        git checkout dev
+        git_checkout dev 
     elif [[ "${arg_s}" = "stable" ]]; then
         info "Switching to branch stable ..."
-        git checkout stable
+        git_checkout stable
     else
         __cleaned_name="${arg_s}"
         if [[ "${arg_s:0:7}" = "sunbeam" ]]; then
@@ -156,9 +162,7 @@ if [[ ! -z "${arg_s}" ]]; then
         do
             if [[ "${__cleaned_name}" = "${line}" ]]; then
                 info "Switching to branch ${__cleaned_name} ..."
-                # If you're developing on this script, you can change the second checkout target to be 
-                # the branch you're working on so that it will update the script to that instead of stable
-                git checkout $__cleaned_name && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
+                git_checkout $__cleaned_name
                 break
             fi
         done
@@ -171,7 +175,7 @@ if [[ ! -z "${arg_s}" ]]; then
                 if [[ "v$__cleaned_name" = "${line}" ]]; then
                     info "Switching to release v${__cleaned_name} ..."
                     info "${__is_branch}"
-                    git checkout tags/v${__cleaned_name} -b ${__cleaned_name}
+                    git_checkout tags/v${__cleaned_name} "-b ${__cleaned_name}"
                     __is_tag=true
                     break
                 fi
