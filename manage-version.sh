@@ -175,7 +175,6 @@ if [[ ! -z "${arg_s}" ]]; then
             do
                 if [[ "v$__cleaned_name" = "${line}" ]]; then
                     info "Switching to release v${__cleaned_name} ..."
-                    info "${__is_branch}"
                     git_checkout tags/v${__cleaned_name} "-b ${__cleaned_name}"
                     __is_tag=true
                     break
