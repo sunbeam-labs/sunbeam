@@ -133,7 +133,7 @@ elif [[ "${arg_l}" = "available" ]]; then
 fi
 
 if [[ ! -z "${arg_s}" ]]; then
-    STABLE_COMMIT=$(git rev-parse --short stable)
+    CURRENT_TAG=$(git describe --tag)
     
     # Switch to new branch
     if [[ "${arg_s}" = "dev" ]]; then
@@ -143,8 +143,6 @@ if [[ ! -z "${arg_s}" ]]; then
         info "Switching to branch stable ..."
         git checkout stable
     else
-        __is_branch=false
-        __is_tag=false
         __cleaned_name="${arg_s}"
         if [[ "${arg_s:0:7}" = "sunbeam" ]]; then
             __cleaned_name="${arg_s:7}"
@@ -159,14 +157,12 @@ if [[ ! -z "${arg_s}" ]]; then
             if [[ "${__cleaned_name}" = "${line}" ]]; then
                 info "Switching to branch ${__cleaned_name} ..."
                 git checkout $__cleaned_name && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
-                info "HERE"
-                __is_branch=true
-                info "${__is_branch}"
                 break
             fi
         done
-        info "${__is_branch}"
-        if [[ $__is_branch = false ]]; then # Avoid creating branch again if already exists
+        
+        NEW_TAG=$(git describe --tag)
+        if [[ $NEW_TAG = $CURRENT_TAG ]]; then # Avoid creating branch again if already exists
             git tag --list |
             while read line
             do
@@ -180,12 +176,10 @@ if [[ ! -z "${arg_s}" ]]; then
             done
         fi
 
-        # Check if no cases were hit
-        if [[ $__is_branch = false ]]; then
-            if [[ $__is_tag = false ]]; then
-                error "Couldn't find ${arg_s}. Make sure to use a valid branch name or version tag."
-                exit 1
-            fi
+        NEW_TAG=$(git describe --tag)
+        if [[ $NEW_TAG = $CURRENT_TAG ]]; then # Check if no cases were hit
+            error "Couldn't find ${arg_s}. Make sure to use a valid branch name or version tag."
+            exit 1
         fi
     fi
 
