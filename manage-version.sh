@@ -133,6 +133,8 @@ elif [[ "${arg_l}" = "available" ]]; then
 fi
 
 if [[ ! -z "${arg_s}" ]]; then
+    STABLE_COMMIT=$(git rev-parse --short stable)
+    
     # Switch to new branch
     if [[ "${arg_s}" = "dev" ]]; then
         info "Switching to branch dev ..."
@@ -157,6 +159,7 @@ if [[ ! -z "${arg_s}" ]]; then
             if [[ "${__cleaned_name}" = "${line}" ]]; then
                 info "Switching to branch ${__cleaned_name} ..."
                 git checkout $__cleaned_name
+                git checkout fc1e9d8 manage-version.sh
                 __is_branch=true
                 break
             fi
