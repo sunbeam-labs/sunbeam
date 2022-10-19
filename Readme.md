@@ -2,7 +2,7 @@
 
 # Sunbeam: a robust, extensible metagenomic sequencing pipeline 
 
-[![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev) [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=latest)](http://sunbeam.readthedocs.io/en/latest/?badge=latest) [![DOI:10.1186/s40168-019-0658-x](https://img.shields.io/badge/Published%20in-Microbiome-1abc9c.svg)](https://doi.org/10.1186/s40168-019-0658-x)
+[![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev) [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=stable)](https://sunbeam.readthedocs.io/en/stable/?badge=stable) [![DOI:10.1186/s40168-019-0658-x](https://img.shields.io/badge/Published%20in-Microbiome-1abc9c.svg)](https://doi.org/10.1186/s40168-019-0658-x)
 
 Sunbeam is a pipeline written in [snakemake](http://snakemake.readthedocs.io)
 that simplifies and automates many of the steps in metagenomic sequencing
@@ -47,7 +47,12 @@ See how people are using Sunbeam:
 
 ### Changelog:
 
-#### v3.1.0 (October 13, 2022)
+#### v3.1.1 (October 19, 2022)
+
+ - Upgrade manage-version.sh to work with any version (before or after 3.1) and always keep itself on the latest version
+ - Allow multiple targets with `sunbeam run --target_list [TARGET, ...]`
+
+#### v3.1.0 (October 14, 2022)
 
  - Upgrade snakemake to v7.15.1, this fixed two issues with running jobs on the cluster
  - Add manage-versions.sh which manages versions of sunbeam automatically for users in a single repo

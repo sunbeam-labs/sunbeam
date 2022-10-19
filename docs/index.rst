@@ -31,7 +31,7 @@ Sunbeam currently automates the following tasks:
   <https://github.com/DerrickWood/kraken>`_;
 * Assembly of reads into contigs using `Megahit
   <https://github.com/voutcn/megahit>`_;
-* Contig annotation using BLAST[n/p] and `Diamond <https://github.com/bbuchfink/diamond>`;
+* Contig annotation using BLAST[n/p] and `Diamond <https://github.com/bbuchfink/diamond>`_;
 * Mapping of reads to target genomes; and
 * ORF prediction using `Prodigal <https://github.com/hyattpd/Prodigal>`_
 
@@ -40,10 +40,6 @@ Sunbeam was designed to be modular and extensible. We have a few pre-built
 assembly graphs, read alignments, and taxonomic classifications.
 
 To get started, see our :ref:`quickstart`!
-
-.. tip::
-
-  To install sunbeam version 2, use the command `git clone git@github.com:sunbeam-labs/sunbeam.git --branch v2.1.0 sunbeam2` This can be used to install any specific release of sunbeam.
 
 If you use Sunbeam in your research, please cite:
 

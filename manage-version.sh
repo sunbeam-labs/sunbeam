@@ -45,11 +45,11 @@ if [[ "${arg_d:?}" = "1" ]]; then
     LOG_LEVEL="7"
 fi
 
-function debug_capture () {
+function debug_capture() {
     debug "$(echo -e "$(${@})")"
 }
 
-function installation_error () {
+function installation_error() {
     error "${1} failed!"
     if [[ "${arg_v:?}" != 1 && "${arg_d:?}" != 1 ]]; then
 	error "Try re-running with -v or -d, or file an issue on Github."
@@ -72,27 +72,33 @@ function __test_env() {
     fi
 }
 
-function enable_conda_activate () {
+function enable_conda_activate() {
     # Allow conda [de]activate in this script
     CONDA_BASE=$(conda info --base) # see https://github.com/conda/conda/issues/7980
     source $CONDA_BASE/etc/profile.d/conda.sh
 }
 
-function activate_sunbeam () {
+function activate_sunbeam() {
     enable_conda_activate
     set +o nounset
     conda activate $1
     set -o nounset
 }
 
-function deactivate_sunbeam () {
+function deactivate_sunbeam() {
     enable_conda_activate
     set +o nounset
     conda deactivate
     set -o nounset
 }
 
-debug_capture git pull
+function git_checkout() {
+    # If you're developing on this script, you can change the second checkout target to be 
+    # the branch you're working on so that it will update the script to that instead of stable
+    git checkout -f $1 ${2:- } && git checkout stable manage-version.sh
+}
+
+debug_capture git fetch
 
 # list current
 if [[ "${arg_a:?}" = "1" ]]; then
@@ -133,16 +139,23 @@ elif [[ "${arg_l}" = "available" ]]; then
 fi
 
 if [[ ! -z "${arg_s}" ]]; then
+    CURRENT_TAG=$(git describe --tag)
+
+    CHANGES=$(git status --porcelain --untracked-files=no)
+    if [ "${CHANGES}" != "M  manage-version.sh" ] && [ "${CHANGES}" != "A  manage-version.sh" ] && [ "${CHANGES}" != "" ]; then
+        error "You have local changes to this branch that will be overwritten by switching, please commit or stash them and try again (make sure to keep manage-version.sh at it's current version though, it's ok to have manage-version.sh listed as a change with 'git status' when running this script)."
+        error "`git status --porcelain --untracked-files=no`"
+        exit 1
+    fi
+    
     # Switch to new branch
     if [[ "${arg_s}" = "dev" ]]; then
         info "Switching to branch dev ..."
-        git checkout dev
+        git_checkout dev 
     elif [[ "${arg_s}" = "stable" ]]; then
         info "Switching to branch stable ..."
-        git checkout stable
+        git_checkout stable
     else
-        __is_branch=false
-        __is_tag=false
         __cleaned_name="${arg_s}"
         if [[ "${arg_s:0:7}" = "sunbeam" ]]; then
             __cleaned_name="${arg_s:7}"
@@ -156,29 +169,29 @@ if [[ ! -z "${arg_s}" ]]; then
         do
             if [[ "${__cleaned_name}" = "${line}" ]]; then
                 info "Switching to branch ${__cleaned_name} ..."
-                git checkout $__cleaned_name
-                __is_branch=true
+                git_checkout $__cleaned_name
                 break
             fi
         done
+        
+        NEW_TAG=$(git describe --tag)
+        if [[ $NEW_TAG = $CURRENT_TAG ]]; then # Avoid creating branch again if already exists
+            git tag --list |
+            while read line
+            do
+                if [[ "v$__cleaned_name" = "${line}" ]]; then
+                    info "Switching to release v${__cleaned_name} ..."
+                    git_checkout tags/v${__cleaned_name} "-b ${__cleaned_name}"
+                    __is_tag=true
+                    break
+                fi
+            done
+        fi
 
-        git tag --list |
-        while read line
-        do
-            if [[ "$__cleaned_name" = "${line}" ]]; then
-                info "Switching to release v${__cleaned_name} ..."
-                git checkout tags/v${__cleaned_name} -b ${__cleaned_name}
-                __is_tag=true
-                break
-            fi
-        done
-
-        # Check if no cases were hit
-        if [[ $__is_branch = false ]]; then
-            if [[ $__is_tag = false ]]; then
-                error "Couldn't find ${arg_s}. Make sure to use a valid branch name or version tag."
-                exit 1
-            fi
+        NEW_TAG=$(git describe --tag)
+        if [[ $NEW_TAG = $CURRENT_TAG ]]; then # Check if no cases were hit
+            error "Couldn't find ${arg_s}. Make sure to use a valid branch name or version tag."
+            exit 1
         fi
     fi
 
