@@ -1,0 +1,5 @@
+name: reports
+channels:
+  - conda-forge
+dependencies:
+  - pandas
