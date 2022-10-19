@@ -156,6 +156,8 @@ if [[ ! -z "${arg_s}" ]]; then
         do
             if [[ "${__cleaned_name}" = "${line}" ]]; then
                 info "Switching to branch ${__cleaned_name} ..."
+                # If you're developing on this script, you can change the second checkout target to be 
+                # the branch you're working on so that it will update the script to that instead of stable
                 git checkout $__cleaned_name && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
                 break
             fi
