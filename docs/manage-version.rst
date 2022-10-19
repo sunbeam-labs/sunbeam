@@ -15,12 +15,6 @@ versions of sunbeam; automatically managing the environments and the code
 branches/tags. This is the preferred way to manage versions of your local 
 installation of sunbeam >=3.1.
 
-.. tip::
-
-    This script was implemented in v3.1.0, so using it to switch to any prior 
-    versions will then require referring to the manual-version-management_ section to switch 
-    versions again.
-
 The most common use case will be once you've had sunbeam installed for a while 
 and new versions have come out, you can easily upgrade to the latest version 
 by running ``./manage-version.sh -s stable``. This will update your code, install 

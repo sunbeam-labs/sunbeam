@@ -141,8 +141,8 @@ fi
 if [[ ! -z "${arg_s}" ]]; then
     CURRENT_TAG=$(git describe --tag)
 
-    if [ `git status --porcelain --untracked-files=no` != "M manage-version.sh" ] && [ `git status --porcelain --untracked-files=no` != "" ]; then
-        error "You have local changes to this branch that will be overwritten by switching, please commit or stash them and try again (make sure to keep manage-version.sh at it's current version though, it's ok to have manage-version.sh listed as a change with `git status` when running this script)."
+    if [ "$(git status --porcelain --untracked-files=no)" != "M manage-version.sh" ] && [ "$(git status --porcelain --untracked-files=no)" != "" ]; then
+        error "You have local changes to this branch that will be overwritten by switching, please commit or stash them and try again (make sure to keep manage-version.sh at it's current version though, it's ok to have manage-version.sh listed as a change with 'git status' when running this script)."
         exit 1
     fi
     
