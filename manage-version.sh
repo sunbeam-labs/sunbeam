@@ -98,6 +98,14 @@ function git_checkout() {
     git checkout $1 ${2:- } && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
 }
 
+function git_status() {
+    git status --porcelain |
+    while read line
+    do
+        echo $line
+    done
+}
+
 debug_capture git fetch
 
 # list current
@@ -140,6 +148,9 @@ fi
 
 if [[ ! -z "${arg_s}" ]]; then
     CURRENT_TAG=$(git describe --tag)
+    if [[ git_status = false ]]; then
+        error "Your git working tree is unclean. Run `git status` to see what files have been changed. If you don't need to keep any changes run `git stash` and then try this script again."
+        exit 1
     
     # Switch to new branch
     if [[ "${arg_s}" = "dev" ]]; then
