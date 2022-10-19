@@ -46,23 +46,27 @@ def main(argv=sys.argv):
 
     conda_prefix = Path(args.sunbeam_dir)/".snakemake"
 
-    target_list = list()
     if(args.target_list == []):
-        target_list = ['']
-    else:
-        target_list = args.target_list
-
-    for target in target_list:
-        print(f"Running sunbeam on target: {target}")
         snakemake_args = ['snakemake',
             '--snakefile', str(snakefile),
             '-c',
             '--use-conda',
-            '--conda-prefix', str(conda_prefix),
-            target] + remaining
+            '--conda-prefix', str(conda_prefix)] + remaining
         print("Running: "+" ".join(snakemake_args))
 
         cmd = subprocess.run(snakemake_args)
+    else:
+        for target in args.target_list:
+            print(f"Running sunbeam on target: {target}")
+            snakemake_args = ['snakemake',
+                '--snakefile', str(snakefile),
+                '-c',
+                '--use-conda',
+                '--conda-prefix', str(conda_prefix),
+                target] + remaining
+            print("Running: "+" ".join(snakemake_args))
+
+            cmd = subprocess.run(snakemake_args)
     
     sys.exit(cmd.returncode)
     
