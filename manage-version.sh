@@ -98,7 +98,7 @@ function git_checkout() {
     git checkout $1 ${2:- } && git checkout 310-specify-multiple-targets-with-sunbeam-run manage-version.sh
 }
 
-debug_capture git pull
+debug_capture git fetch
 
 # list current
 if [[ "${arg_a:?}" = "1" ]]; then
