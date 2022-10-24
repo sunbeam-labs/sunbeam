@@ -57,10 +57,10 @@ we expect to make.  Here is the rule that runs the program::
 
     rule run_metaspades:
         input:
-            r1 = str(QC_FP/'decontam'/'{sample}_1.fastq.gz'),
-            r2 = str(QC_FP/'decontam'/'{sample}_2.fastq.gz')
+            r1 = QC_FP/'decontam'/'{sample}_1.fastq.gz',
+            r2 = QC_FP/'decontam'/'{sample}_2.fastq.gz'
         output:
-            str(ASSEMBLY_FP/'metaspades'/'{sample}')
+            ASSEMBLY_FP/'metaspades'/'{sample}'
         conda:
             "metaspades_example_env.yaml"
         shell:
@@ -80,14 +80,12 @@ inside the command.
 In this example, the input and output filepaths are given as Python
 code.  This is typical for rules in Sunbeam, because we are using info
 from the user's configuration to determine the full filepath.  Let's
-take ``str(QC_FP/'decontam'/'{sample}_1.fastq.gz')`` and see how it's
+take ``QC_FP/'decontam'/'{sample}_1.fastq.gz'`` and see how it's
 put together.  ``QC_FP`` is a Python variable, which gives the
 absolute path to the directory containing quality control results in
 Sunbeam.  This value is a special ``Path`` object in Python, which
 means that we can add subdirectories using the division symbol ``/``.
-As punishment for this convenience, we have to convert this ``Path``
-object back to an ordinary string before it can be used in the rule.
-The ``str()`` function accomplishes this.  Here, ``decontam`` is the
+Here, ``decontam`` is the
 name of a subdirectory inside the main quality control directory. The
 last part, ``{sample}_1.fastq.gz`` looks like the name of a gzipped
 FASTQ file, but has something going on inside those curly braces.
@@ -109,34 +107,34 @@ extension.  Here are all the patterns you can use:
 +-----------------------+----------------------------------------------------------------+
 | Sequence data files   | Target                                                         |
 +=======================+================================================================+
-| Quality-controlled,   | str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')                  |
-| non-decontaminated    | str(QC_FP/'cleaned'/'{sample}_1.fastq.gz')                     |
-| sequences             | str(QC_FP/'cleaned'/'{sample}_2.fastq.gz')                     |
+| Quality-controlled,   | QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'                       |
+| non-decontaminated    | QC_FP/'cleaned'/'{sample}_1.fastq.gz'                          |
+| sequences             | QC_FP/'cleaned'/'{sample}_2.fastq.gz'                          |
 +-----------------------+----------------------------------------------------------------+
-| Quality-controlled,   | str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz')                 |
-| decontaminated        | str(QC_FP/'decontam'/'{sample}_1.fastq.gz')                    |
-| sequences             | str(QC_FP/'decontam'/'{sample}_2.fastq.gz')                    |
+| Quality-controlled,   | QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'                      |
+| decontaminated        | QC_FP/'decontam'/'{sample}_1.fastq.gz'                         |
+| sequences             | QC_FP/'decontam'/'{sample}_2.fastq.gz'                         |
 +-----------------------+----------------------------------------------------------------+
-| Contig sequences      | str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa')               |
+| Contig sequences      | ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'                    |
 +-----------------------+----------------------------------------------------------------+
-| Open reading frame    | str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_nucl.fa') |
+| Open reading frame    | ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_nucl.fa'      |
 | nucleotide sequences  |                                                                |
 +-----------------------+----------------------------------------------------------------+
-| Open reading frame    | str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_prot.fa') |
+| Open reading frame    | ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_prot.fa'      |
 | protein sequences     |                                                                |
 +-----------------------+----------------------------------------------------------------+
 
 +-----------------------+-----------------------------------------------+
 | Summary tables        | Target                                        |
 +=======================+===============================================+
-| Attrition from        | str(QC_FP/'reports'/'preprocess_summary.tsv') |
+| Attrition from        | QC_FP/'reports'/'preprocess_summary.tsv'      |
 | decontamination and   |                                               |
 | quality control       |                                               |
 +-----------------------+-----------------------------------------------+
-| Sequence              | str(QC_FP/'reports'/'fastqc_quality.tsv')     |
+| Sequence              | QC_FP/'reports'/'fastqc_quality.tsv'          |
 | quality scores        |                                               |
 +-----------------------+-----------------------------------------------+
-| Taxonomic assignments | str(CLASSIFY_FP/'kraken'/'all_samples.tsv')   |
+| Taxonomic assignments | CLASSIFY_FP/'kraken'/'all_samples.tsv'        |
 | from Kraken           |                                               |
 +-----------------------+-----------------------------------------------+
 
@@ -152,7 +150,7 @@ by MetaSPAdes for every sample::
 
     rule all_metaspades:
         input:
-            expand(str(ASSEMBLY_FP/'metaspades'/'{sample}'),
+            expand(ASSEMBLY_FP/'metaspades'/'{sample}',
                    sample=Samples.keys())
 
 This rule is critical for the ``{sample}`` pattern to work inside the
@@ -197,12 +195,12 @@ one rule.    ::
 
   rule make_shallowshotgun_report:
       input:
-          kraken = str(CLASSIFY_FP/'kraken'/'all_samples.tsv'),
-          preprocess = str(QC_FP/'preprocess_summary.tsv'),
-          quality = str(QC_FP/'fastqc_quality.tsv'),
+          kraken = CLASSIFY_FP/'kraken'/'all_samples.tsv',
+          preprocess = QC_FP/'preprocess_summary.tsv',
+          quality = QC_FP/'fastqc_quality.tsv',
           sampleinfo = sunbeam_dir + '/extensions/sbx_shallowshotgun_pilot/data/sampleinfo.tsv'
       output:
-          str(Cfg['all']['output_fp']/'reports/ShallowShotgun_Pilot_Report.html')
+          Cfg['all']['output_fp']/'reports/ShallowShotgun_Pilot_Report.html'
       script:
           'shallowshotgun_pilot_report.Rmd'
 
@@ -230,8 +228,7 @@ In the output section, we need to specify a file path for the final
 report.  Here, we use the configuration parameter
 ``Cfg['all']['output_fp']`` to get the base directory for output from
 Sunbeam.  The value of this configuration parameter is a ``Path``
-object, so we use the ``/`` symbol to add the rest of the filepath,
-and surround the whole thing with the ``str()`` function.  Just as a
+object, so we use the ``/`` symbol to add the rest of the filepath.  Just as a
 note, Snakemake will create the ``reports/`` subdirectory if needed,
 so you don't have to worry about directories being present ahead of
 time to accommodate your output files.
