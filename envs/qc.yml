@@ -1,6 +1,7 @@
 name: qc
 channels:
   - bioconda
+  - conda-forge
 dependencies:
   - biopython
   - bwa
