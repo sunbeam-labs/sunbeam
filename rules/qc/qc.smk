@@ -129,7 +129,7 @@ rule fastqc:
     params:
         outdir = QC_FP/'reports'
     conda:
-        "../../envs/qc.yml"
+        "../../envs/reports.yml"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract"
 
