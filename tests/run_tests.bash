@@ -57,7 +57,7 @@ while getopts "d:e:t:vh" opt; do
 	    echo "Run the Sunbeam test suite."
 	    echo "  -d DIR       Use DIR rather than a temporary directory (remains after tests finish)"
 	    echo "  -e ENV_NAME  Use a pre-existing Conda environment rather than creating one (remains after tests finish)"
-	    echo "  -t TEST      Run a specific test from tests/test_suite.bash only"
+	    echo "  -t TEST      Run a specific test from tests/test_suite.bash only or run all (default: runs core tests)"
 	    echo "  -v           Show command output while running"
 	    echo "  -h           Display this message and exit"
 	    exit 1
@@ -232,7 +232,16 @@ function build_test_data {
 
 function run_test_suite {
     for testcase in $(declare -f | grep -o "^test[a-zA-Z_]*") ; do
-	capture_output ${testcase}
+	    capture_output ${testcase}
+    done
+}
+
+function run_core_test_suite {
+    declare -a core_tests=("test_all" "test_mapping" "test_assembly_failures")
+
+    for testcase in "${core_tests[@]}"
+    do
+        capture_output ${testcase}
     done
 }
 
@@ -245,9 +254,13 @@ source tests/test_suite.bash
 
 # Run single test, if specified, or all detected tests otherwise
 if [ ! -z ${RUN_TEST+x} ]; then
-    capture_output ${RUN_TEST}
+    if [ $RUN_TEST  = "all" ]; then
+        run_test_suite
+    else
+        capture_output ${RUN_TEST}
+    fi
 else
-    run_test_suite
+    run_core_test_suite
 fi
 
 
