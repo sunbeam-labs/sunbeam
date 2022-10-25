@@ -59,5 +59,6 @@ sequencing experiments. *Microbiome* 7:46 (2019)
    extensions.rst
    install.rst
    manage-version.rst
+   run_tests.rst
    citation.rst
 

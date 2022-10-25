@@ -94,6 +94,6 @@ rule preprocess_report:
     output:
         QC_FP/'reports'/'preprocess_summary.tsv'
     conda:
-        "../../envs/qc.yml"
+        "../../envs/reports.yml"
     script:
         "../../scripts/qc/preprocess_report.py"
