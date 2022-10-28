@@ -1,8 +1,6 @@
 rule all_decontam:
     input:
-        expand(
-            QC_FP/'decontam'/'{sample}_{rp}.fastq.gz',
-            sample=Samples.keys(), rp=Pairs)
+        TARGET_DECONTAM
 
 ruleorder: build_host_index > build_genome_index
         
