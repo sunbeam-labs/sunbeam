@@ -8,4 +8,5 @@ dependencies:
   - conda-forge::gsl         # bcftools
   - conda-forge::libopenblas # bcftools
   - numpy
+  - python=3.10.6
   - samtools
