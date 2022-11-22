@@ -117,7 +117,6 @@ include: "rules/qc/decontaminate.smk"
 
 # ---- Assembly rules
 include: "rules/assembly/assembly.smk"
-include: "rules/assembly/coverage.smk"
 
 
 # ---- Contig annotation rules
