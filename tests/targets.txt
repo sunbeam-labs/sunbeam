@@ -1,11 +1,3 @@
-annotation/blastn/bacteria/contig/dummybfragilis.btf
-annotation/blastn/bacteria/contig/dummyecoli.btf
-annotation/blastn/bacteria/contig/random.btf
-
-annotation/summary/dummybfragilis.tsv
-annotation/summary/dummyecoli.tsv
-annotation/summary/random.tsv
-
 assembly/contigs/dummybfragilis-contigs.fa
 assembly/contigs/dummyecoli-contigs.fa
 assembly/contigs/random-contigs.fa

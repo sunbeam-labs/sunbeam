@@ -41,18 +41,10 @@ TARGET_ASSEMBLY = [
 ]
 
 
-# ---- Contig annotation
-# Annotate all contigs
-TARGET_ANNOTATE = expand(
-    ANNOTATION_FP/'summary'/'{sample}.tsv',
-    sample=Samples.keys())
-
-
 # ---- All targets
 TARGET_ALL = (
     TARGET_QC +
     TARGET_DECONTAM +
     TARGET_CLASSIFY +
-    TARGET_ASSEMBLY +
-    TARGET_ANNOTATE
+    TARGET_ASSEMBLY
 )

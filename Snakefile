@@ -101,11 +101,6 @@ CLASSIFY_FP = output_subdir(Cfg, 'classify')
 MAPPING_FP = output_subdir(Cfg, 'mapping')
 
 
-# ---- Download rules
-if Cfg['all']['download_reads']:
-	include: "rules/download/download.smk"
-
-
 # ---- Targets rules
 include: "rules/targets/targets.smk"
 
@@ -120,8 +115,6 @@ include: "rules/assembly/assembly.smk"
 
 
 # ---- Contig annotation rules
-include: "rules/annotation/annotation.smk"
-include: "rules/annotation/blast.smk"
 include: "rules/annotation/orf.smk"
 
 
