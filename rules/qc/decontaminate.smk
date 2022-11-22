@@ -2,7 +2,6 @@ rule all_decontam:
     input:
         TARGET_DECONTAM
 
-ruleorder: build_host_index > build_genome_index
         
 rule build_host_index:
     input:
