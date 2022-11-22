@@ -128,10 +128,6 @@ include: "rules/annotation/orf.smk"
 # ---- Classifier rules
 include: "rules/classify/kraken.smk"
 
-
-# ---- Mapping rules
-include: "rules/mapping/mapping.smk"
-
 for sbx_path, wildcards in sbxs:
     include: sbx_path
         

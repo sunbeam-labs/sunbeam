@@ -41,21 +41,6 @@ TARGET_ASSEMBLY = [
 ]
 
 
-# ---- Mapping
-# Map reads to target genomes
-TARGET_MAPPING = [
-    expand(
-        MAPPING_FP/"{genome}"/"{sample}.bam.bai",
-        genome=GenomeSegments.keys(), sample=Samples.keys()),
-    expand(
-        MAPPING_FP/"{genome}"/"{sample}.raw.bcf",
-        genome=GenomeSegments.keys(), sample=Samples.keys()),
-    expand(
-        MAPPING_FP/"{genome}"/"coverage.csv",
-        genome=GenomeSegments.keys())
-]
-
-
 # ---- Contig annotation
 # Annotate all contigs
 TARGET_ANNOTATE = expand(

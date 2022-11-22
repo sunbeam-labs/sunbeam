@@ -23,6 +23,3 @@ qc/decontam/random_1.fastq.gz
 qc/cleaned/dummybfragilis_1.fastq.gz
 qc/cleaned/dummyecoli_1.fastq.gz
 qc/cleaned/random_1.fastq.gz
-
-mapping/human/coverage.csv
-mapping/phix174/coverage.csv
