@@ -2,12 +2,6 @@ assembly/contigs/dummybfragilis-contigs.fa
 assembly/contigs/dummyecoli-contigs.fa
 assembly/contigs/random-contigs.fa
 
-classify/kraken/all_samples.biom
-classify/kraken/all_samples.tsv
-classify/kraken/dummybfragilis-taxa.tsv
-classify/kraken/dummyecoli-taxa.tsv
-classify/kraken/random-taxa.tsv
-
 qc/decontam/dummybfragilis_1.fastq.gz
 qc/decontam/dummyecoli_1.fastq.gz
 qc/decontam/random_1.fastq.gz
