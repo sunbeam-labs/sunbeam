@@ -118,9 +118,6 @@ include: "rules/assembly/assembly.smk"
 include: "rules/annotation/orf.smk"
 
 
-# ---- Classifier rules
-include: "rules/classify/kraken.smk"
-
 for sbx_path, wildcards in sbxs:
     include: sbx_path
         
