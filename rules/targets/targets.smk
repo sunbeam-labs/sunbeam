@@ -11,12 +11,15 @@ TARGET_FASTQC = [
     str(QC_FP/'reports'/'fastqc_quality.tsv'),
 ]
 
+
 # Quality-control reads
 TARGET_CLEAN = expand(
     QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz',
     sample = Samples.keys(), rp = Pairs)
 
+
 TARGET_QC = TARGET_CLEAN + TARGET_FASTQC
+
 
 # Remove host reads
 TARGET_DECONTAM = [
@@ -25,11 +28,6 @@ TARGET_DECONTAM = [
         sample = Samples.keys(), rp = Pairs),
     str(QC_FP/'reports'/'preprocess_summary.tsv'),
 ]
-
-
-# ---- Classification
-# Classify all reads
-TARGET_CLASSIFY = [CLASSIFY_FP/'kraken'/'all_samples.tsv']
 
 
 # ---- Assembly
@@ -45,6 +43,5 @@ TARGET_ASSEMBLY = [
 TARGET_ALL = (
     TARGET_QC +
     TARGET_DECONTAM +
-    TARGET_CLASSIFY +
     TARGET_ASSEMBLY
 )
