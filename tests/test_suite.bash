@@ -30,16 +30,6 @@ function test_all_old_illumina {
     sunbeam run -- --configfile=$TEMPDIR/tmp_config_old_illumina.yml -p
     mv $TEMPDIR/samples_orig.csv $TEMPDIR/samples.csv
 
-    # Check contents
-    annot_summary=sunbeam_output_old_illumina/annotation/summary/dummyecoli.tsv
-    awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/$annot_summary || (
-        # stderr will show up on the summary output for the test suite as well
-        # as in the .err file.  false will cause the shell to exit assuming -e
-        # is in effect here.
-        echo "Check failed on $annot_summary" > /dev/stderr
-        false
-    )
-
     # Check targets
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output_old_illumina tests/targets.txt
 
