@@ -3,6 +3,7 @@ channels:
   - bioconda
 dependencies:
   - bioconda::snakemake
+  - singularity
   - ruamel.yaml
   - biopython # Needed for building test data
 # - blast # Needed for building test data
