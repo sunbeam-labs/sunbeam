@@ -51,6 +51,7 @@ def main(argv=sys.argv):
         snakemake_args = ['snakemake',
             '--snakefile', str(snakefile),
             '-c',
+            '--use-singularity',
             '--use-conda',
             '--conda-prefix', str(conda_prefix)] + remaining
         print("Running: "+" ".join(snakemake_args))
@@ -62,6 +63,7 @@ def main(argv=sys.argv):
             snakemake_args = ['snakemake',
                 '--snakefile', str(snakefile),
                 '-c',
+                '--use-singularity',
                 '--use-conda',
                 '--conda-prefix', str(conda_prefix),
                 target] + remaining
