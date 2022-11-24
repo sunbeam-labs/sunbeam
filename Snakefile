@@ -82,25 +82,13 @@ else:
 HostGenomes = {Path(g.name).stem: read_seq_ids(Cfg['qc']['host_fp'] / g) for g in HostGenomeFiles}
 sys.stderr.write("done.\n")
 
-sys.stderr.write("Collecting target genomes... ")
-if Cfg['mapping']['genomes_fp'] == Cfg['all']['root']:
-    GenomeFiles = []
-    GenomeSegments = {}
-else:
-    GenomeFiles = [f for f in Cfg['mapping']['genomes_fp'].glob('*.fasta')]
-    GenomeSegments = {PurePath(g.name).stem: read_seq_ids(Cfg['mapping']['genomes_fp'] / g) for g in GenomeFiles}
-sys.stderr.write("done.\n")
-
 # ---- Change your workdir to output_fp
 workdir: str(Cfg['all']['output_fp'])
 
 # ---- Set up output paths for the various steps
-DOWNLOAD_FP = output_subdir(Cfg, 'download')
 QC_FP = output_subdir(Cfg, 'qc')
 ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
 ANNOTATION_FP = output_subdir(Cfg, 'annotation')
-CLASSIFY_FP = output_subdir(Cfg, 'classify')
-MAPPING_FP = output_subdir(Cfg, 'mapping')
 
 
 # ---- Targets rules
