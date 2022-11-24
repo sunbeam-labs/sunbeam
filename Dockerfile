@@ -14,7 +14,7 @@ LABEL io.github.snakemake.conda_env_hash="a0adbd8232d5365eb11a5b01b898e0f31c6fc4
 #   dependencies:
 #     - megahit # https://github.com/sunbeam-labs/sunbeam/issues/213
 RUN mkdir -p /conda-envs/418b67981e43f64151d2840602a45c78
-COPY ../../../envs/assembly.yml /conda-envs/418b67981e43f64151d2840602a45c78/environment.yaml
+COPY envs/assembly.yml /conda-envs/418b67981e43f64151d2840602a45c78/environment.yaml
 
 # Conda environment:
 #   source: ../../../envs/komplexity.yml
@@ -26,7 +26,7 @@ COPY ../../../envs/assembly.yml /conda-envs/418b67981e43f64151d2840602a45c78/env
 #   dependencies:
 #     - komplexity
 RUN mkdir -p /conda-envs/f2039bdd3dcc9f605689b977f5422cfc
-COPY ../../../envs/komplexity.yml /conda-envs/f2039bdd3dcc9f605689b977f5422cfc/environment.yaml
+COPY envs/komplexity.yml /conda-envs/f2039bdd3dcc9f605689b977f5422cfc/environment.yaml
 
 # Conda environment:
 #   source: ../../../envs/qc.yml
@@ -45,7 +45,7 @@ COPY ../../../envs/komplexity.yml /conda-envs/f2039bdd3dcc9f605689b977f5422cfc/e
 #     - samtools
 #     - trimmomatic
 RUN mkdir -p /conda-envs/fd1dfdfd80cf2f45d2a8d9fc1883f451
-COPY ../../../envs/qc.yml /conda-envs/fd1dfdfd80cf2f45d2a8d9fc1883f451/environment.yaml
+COPY envs/qc.yml /conda-envs/fd1dfdfd80cf2f45d2a8d9fc1883f451/environment.yaml
 
 # Conda environment:
 #   source: ../../../envs/reports.yml
@@ -59,7 +59,7 @@ COPY ../../../envs/qc.yml /conda-envs/fd1dfdfd80cf2f45d2a8d9fc1883f451/environme
 #     - bioconda::fastqc
 #     - conda-forge::pandas
 RUN mkdir -p /conda-envs/ffbe99c905f0d2965589357aef4c2358
-COPY ../../../envs/reports.yml /conda-envs/ffbe99c905f0d2965589357aef4c2358/environment.yaml
+COPY envs/reports.yml /conda-envs/ffbe99c905f0d2965589357aef4c2358/environment.yaml
 
 # Step 2: Generate conda environments
 
