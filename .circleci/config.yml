@@ -11,6 +11,17 @@ jobs:
     steps:
       - checkout
 
+      - setup_remote_docker:
+          docker_layer_caching: true
+      
+      - run:
+          name: Build and push Docker image
+          command: |
+            export TAG=0.1.${CIRCLE_BUILD_NUM}
+            docker build -t ctbushman/sunbeam:$TAG Dockerfile
+            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
+            docker push ctbushman/sunbeam:$TAG
+
       # Download and cache dependencies
       - restore_cache:
           keys:
