@@ -46,5 +46,7 @@ assembly:
   threads: 4
 annotation:
   suffix: annotation
+mapping:
+  suffix: mapping
 blastdbs:
   root_fp: ''

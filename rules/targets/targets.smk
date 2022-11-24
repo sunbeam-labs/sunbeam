@@ -39,9 +39,18 @@ TARGET_ASSEMBLY = [
 ]
 
 
+# ---- Annotation
+# Find and extract ORFs
+TARGET_ANNOTATION = [
+    expand(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_{suffix}.fa',
+        sample=Samples.keys(), suffix=['prot','nucl'])
+]
+
+
 # ---- All targets
 TARGET_ALL = (
     TARGET_QC +
     TARGET_DECONTAM +
-    TARGET_ASSEMBLY
+    TARGET_ASSEMBLY +
+    TARGET_ANNOTATION
 )
