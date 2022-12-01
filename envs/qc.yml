@@ -11,3 +11,4 @@ dependencies:
   - rust-bio-tools
   - samtools
   - trimmomatic
+  - python=3.10

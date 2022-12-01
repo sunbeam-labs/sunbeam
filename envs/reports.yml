@@ -6,3 +6,4 @@ dependencies:
   - bioconda::biopython
   - bioconda::fastqc
   - conda-forge::pandas
+  - python=3.10
