@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import argparse
 import ruamel.yaml
@@ -18,6 +19,7 @@ def main(argv=sys.argv):
     project_fp = setup_project_folder(args)
     samplelists = write_samples_from_input(args, project_fp)
     write_config(args, project_fp, samplelists)
+    write_profile(args, project_fp)
 
 def get_conda_prefix():
     try:
@@ -56,7 +58,6 @@ def parse_args(argv):
         type=argparse.FileType("r"))
 
     samplelist = parser.add_argument_group("sample list options")
-    
     samplelist.add_argument(
         "--data_fp", type=Path, metavar="PATH",
         help="path to folder containing fastq.gz files")
@@ -66,6 +67,12 @@ def parse_args(argv):
     samplelist.add_argument(
         "--single_end", action="store_true",
         help="fastq files are in single-end, not paired-end, format for --data_fp")
+
+    profile = parser.add_argument_group("profile file options")
+    profile.add_argument(
+        "--profile", type=str, metavar="STR", default="default",
+        help="name of the profile template to use (e.g. default, slurm) (default: default)"
+    )
 
     # argparse doesn't support complete argument groups that are mutually
     # exclusive (need to do subparsers/subcommands) but this seems good enough:
@@ -140,3 +147,10 @@ def write_config(args, project_fp, samplelists):
         raise SystemExit("Found both paired and unpaired reads. Wrote two sample lists "
                         "and config files, with '_paired' or '_single' appended.")
 
+def write_profile(args, project_fp):
+    template_fp = f'sunbeamlib/data/{args.profile}_profile.yaml'
+    config_fp = project_fp/'config.yaml'
+    shutil.copyfile(template_fp, config_fp)
+    with open(config_fp, 'a') as f:
+        f.write("\n# Filepath of this projects configfile")
+        f.write(f"\nconfigfile: {project_fp/args.output}")

@@ -5,8 +5,6 @@ dependencies:
   - bioconda::snakemake
   - ruamel.yaml
   - biopython # Needed for building test data
-# - blast # Needed for building test data
   - kraken2 # Needed for building test data
   - semantic_version
   - python=3.10
- # - git
