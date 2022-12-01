@@ -3,7 +3,7 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - bioconda::biopython
-  - bioconda::fastqc
-  - conda-forge::pandas
+  - biopython
+  - fastqc
+  - pandas
   - python=3.10
