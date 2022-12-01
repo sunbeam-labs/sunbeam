@@ -9,12 +9,12 @@
 rule prodigal:
     """Use Progial for coding genes predictions in contigs."""
     input:
-        ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'
+        ASSEMBLY_FP / "contigs" / "{sample}-contigs.fa",
     output:
-        gff = ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes.gff',
-        faa = ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_prot.fa',
-        fna = ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_nucl.fa',
-        log = ANNOTATION_FP/'genes'/'prodigal'/'log'/'{sample}.out'
+        gff=ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes.gff",
+        faa=ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes_prot.fa",
+        fna=ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes_nucl.fa",
+        log=ANNOTATION_FP / "genes" / "prodigal" / "log" / "{sample}.out",
     conda:
         "../../envs/annotation.yml"
     shell:
@@ -30,12 +30,11 @@ rule prodigal:
         fi
         """
 
+
 rule _test_prodigal:
     input:
-        expand(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_{suffix}.fa',
-        sample=Samples.keys(), suffix=['prot','nucl'])
-
-
-        
-                
-        
+        expand(
+            ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes_{suffix}.fa",
+            sample=Samples.keys(),
+            suffix=["prot", "nucl"],
+        ),

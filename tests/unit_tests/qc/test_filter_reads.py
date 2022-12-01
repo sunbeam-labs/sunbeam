@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 from scripts.qc.filter_reads_f import count_host_reads, calculate_counts, write_log
 
+
 class FinalFilterTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
@@ -20,7 +21,7 @@ class FinalFilterTests(unittest.TestCase):
         self.input2_contents = "read0\nread4"
         with open(self.input2_fp, "w") as f:
             f.write(self.input2_contents)
-        
+
         self.reads_fp = os.path.join(self.temp_dir, "reads.fa")
         self.reads_contents = """@read0\nAAAAAA\n+\n++++++
 @read1\nAAAAAA\n+\n++++++
@@ -33,15 +34,15 @@ class FinalFilterTests(unittest.TestCase):
 
         self.output_fp = os.path.join(self.temp_dir, "out.log")
         self.output_contents = "1\t3\t1\n"
-    
+
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
-    
+
     def test_all(self):
         with open(self.output_fp, "w") as f:
             hostdict = OrderedDict()
             net_hostlist = set()
-            
+
             count_host_reads(self.input1_fp, hostdict, net_hostlist)
             count_host_reads(self.input2_fp, hostdict, net_hostlist)
 

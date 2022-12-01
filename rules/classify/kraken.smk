@@ -2,21 +2,22 @@
 #
 # Rules for running Kraken
 
+
 rule all_classify:
     input:
-        TARGET_CLASSIFY
-        
+        TARGET_CLASSIFY,
+
+
 rule kraken2_classify_report:
     input:
-        expand(QC_FP/'decontam'/'{{sample}}_{rp}.fastq.gz',rp = Pairs)
+        expand(QC_FP / "decontam" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
-        raw = CLASSIFY_FP/'kraken'/'raw'/'{sample}-raw.tsv',
-        report = CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv'
+        raw=CLASSIFY_FP / "kraken" / "raw" / "{sample}-raw.tsv",
+        report=CLASSIFY_FP / "kraken" / "{sample}-taxa.tsv",
     params:
-        db = Cfg['classify']['kraken_db_fp'],
-        paired_end = "--paired" if Cfg['all']['paired_end'] else ""
-    threads:
-        Cfg['classify']['threads']
+        db=Cfg["classify"]["kraken_db_fp"],
+        paired_end="--paired" if Cfg["all"]["paired_end"] else "",
+    threads: Cfg["classify"]["threads"]
     shell:
         """
         kraken2 --gzip-compressed \
@@ -26,24 +27,25 @@ rule kraken2_classify_report:
                 > {output.raw}
         """
 
+
 rule kraken2_biom:
     input:
-        expand(CLASSIFY_FP/'kraken'/'{sample}-taxa.tsv',
-               sample=Samples.keys())
+        expand(CLASSIFY_FP / "kraken" / "{sample}-taxa.tsv", sample=Samples.keys()),
     conda:
         "../../envs/classify.yml"
     output:
-        CLASSIFY_FP/'kraken'/'all_samples.biom'
+        CLASSIFY_FP / "kraken" / "all_samples.biom",
     shell:
         """
         kraken-biom --max D -o {output} {input}
         """
 
+
 rule classic_k2_biom:
     input:
-        CLASSIFY_FP/'kraken'/'all_samples.biom'
+        CLASSIFY_FP / "kraken" / "all_samples.biom",
     output:
-        CLASSIFY_FP/'kraken'/'all_samples.tsv'
+        CLASSIFY_FP / "kraken" / "all_samples.tsv",
     conda:
         "../../envs/classify.yml"
     shell:
@@ -52,4 +54,3 @@ rule classic_k2_biom:
         --to-tsv --header-key=taxonomy --process-obs-metadata=taxonomy \
         --output-metadata-id="Consensus Lineage"
         """
-

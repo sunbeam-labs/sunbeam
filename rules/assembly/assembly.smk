@@ -4,23 +4,25 @@
 #
 # Requires Megahit.
 
+
 rule all_assembly:
     """Build contigs for all samples."""
     input:
-        TARGET_ASSEMBLY
+        TARGET_ASSEMBLY,
+
 
 ruleorder: megahit_paired > megahit_unpaired
 
+
 rule megahit_paired:
     input:
-        r1 = QC_FP/'decontam'/'{sample}_1.fastq.gz',
-        r2 = QC_FP/'decontam'/'{sample}_2.fastq.gz'
+        r1=QC_FP / "decontam" / "{sample}_1.fastq.gz",
+        r2=QC_FP / "decontam" / "{sample}_2.fastq.gz",
     output:
-        ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa'
+        ASSEMBLY_FP / "megahit" / "{sample}_asm" / "final.contigs.fa",
     params:
-        out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
-    threads:
-        Cfg['assembly']['threads']
+        out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
+    threads: Cfg["assembly"]["threads"]
     conda:
         "../../envs/assembly.yml"
     shell:
@@ -46,15 +48,15 @@ rule megahit_paired:
         fi
         """
 
+
 rule megahit_unpaired:
     input:
-        QC_FP/'decontam'/'{sample}_1.fastq.gz'
+        QC_FP / "decontam" / "{sample}_1.fastq.gz",
     output:
-        ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa'
+        ASSEMBLY_FP / "megahit" / "{sample}_asm" / "final.contigs.fa",
     params:
-        out_fp = str(ASSEMBLY_FP/'megahit'/'{sample}_asm')
-    threads:
-        Cfg['assembly']['threads']
+        out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
+    threads: Cfg["assembly"]["threads"]
     conda:
         "../../envs/assembly.yml"
     shell:
@@ -76,23 +78,25 @@ rule megahit_unpaired:
         fi
         """
 
+
 rule final_filter:
     input:
-        ASSEMBLY_FP/'megahit'/'{sample}_asm'/'final.contigs.fa'
+        ASSEMBLY_FP / "megahit" / "{sample}_asm" / "final.contigs.fa",
     output:
-        ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'
+        ASSEMBLY_FP / "contigs" / "{sample}-contigs.fa",
     params:
-        len = Cfg['assembly']['min_length']
+        len=Cfg["assembly"]["min_length"],
     log:
-        ASSEMBLY_FP/'log'/'vsearch'/'{sample}.log'
+        ASSEMBLY_FP / "log" / "vsearch" / "{sample}.log",
     conda:
         "../../envs/assembly.yml"
     script:
         "../../scripts/assembly/final_filter.py"
 
+
 rule clean_assembly:
     input:
-        M = ASSEMBLY_FP/'megahit',
+        M=ASSEMBLY_FP / "megahit",
     shell:
         """
         rm -rf {input.M} && echo "Cleanup assembly finished."

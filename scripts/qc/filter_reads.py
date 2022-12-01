@@ -11,12 +11,15 @@ for hostid in snakemake.input.hostids:
 
 host, nonhost = calculate_counts(snakemake.input.reads, net_hostlist)
 
-os.system("""
+os.system(
+    """
 gzip -dc {a} | \
 rbt fastq-filter {b} | \
 gzip > {c}
-""".format(a=snakemake.input.reads, b=snakemake.input.hostreads, c=snakemake.output.reads))
+""".format(
+        a=snakemake.input.reads, b=snakemake.input.hostreads, c=snakemake.output.reads
+    )
+)
 
-with open(snakemake.output.log, 'w') as log:
+with open(snakemake.output.log, "w") as log:
     write_log(log, hostdict, host, nonhost)
-
