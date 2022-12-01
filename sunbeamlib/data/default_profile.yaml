@@ -1,0 +1,21 @@
+# Default options for running sunbeam
+use-conda: True
+cores: True # 'True' uses all available cores, you can also specify a number
+
+# Default resource configuration
+default-resources:
+  - account="hpcusers"
+  - partition="defq"
+  - runtime=100
+  - mem_mb=1000
+  - disk_mb=1000
+# set-threads: map rule names to threads
+set-threads:
+  - TEST=6
+# set-resources: map rule names to resources in general
+set-resources:
+  - TEST:mem_mb=2000
+  - TEST:runtime=1200
+
+
+configfile: "./sunbeam_config.yml"

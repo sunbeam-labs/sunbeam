@@ -69,7 +69,5 @@ def main(argv=sys.argv):
 
             cmds.append(subprocess.run(snakemake_args))
     
-    for cmd in cmds:
-        print(cmd.returncode)
     sys.exit(cmds[0].returncode)
     
