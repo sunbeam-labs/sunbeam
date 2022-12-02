@@ -188,12 +188,12 @@ rule samples:
 onsuccess:
     print("Sunbeam finished!")
     print(f"{log}")
-    parse_err_and_warn(log)
+    warnings, errors = parse_err_and_warn(log)
     compile_benchmarks(BENCHMARK_FP, Cfg['all']['root'] / 'stats')
 
 
 onerror:
     print("Sunbeam sad :(")
     print(f"{log}")
-    parse_err_and_warn(log)
+    warnings, errors = parse_err_and_warn(log)
     compile_benchmarks(BENCHMARK_FP, Cfg['all']['root'] / 'stats')

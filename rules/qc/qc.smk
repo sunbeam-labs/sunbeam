@@ -75,7 +75,9 @@ rule trimmomatic_unpaired:
     output:
         QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
     log:
-        QC_FP / "log" / "trimmomatic" / "{sample}.out",
+        LOG_FP / "trimmomatic_unpaired_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "trimmomatic_unpaired_{sample}.tsv"
     params:
         sw_start=Cfg["qc"]["slidingwindow"][0],
         sw_end=Cfg["qc"]["slidingwindow"][1],
@@ -110,7 +112,9 @@ rule trimmomatic_paired:
             QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_2_unpaired.fastq.gz"
         ),
     log:
-        QC_FP / "log" / "trimmomatic" / "{sample}.out",
+        LOG_FP / "trimmomatic_paired_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "trimmomatic_paired_{sample}.tsv"
     params:
         sw_start=Cfg["qc"]["slidingwindow"][0],
         sw_end=Cfg["qc"]["slidingwindow"][1],
@@ -138,6 +142,10 @@ rule fastqc:
         reads=expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
         expand(QC_FP / "reports" / "{{sample}}_{rp}_fastqc/fastqc_data.txt", rp=Pairs),
+    log:
+        LOG_FP / "fastqc_{sample}_{rp}.log",
+    benchmark:
+        BENCHMARK_FP / "fastqc_{sample}_{rp}.tsv"
     params:
         outdir=QC_FP / "reports",
     conda:
@@ -167,6 +175,10 @@ rule find_low_complexity:
         expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
         QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
+    log:
+        LOG_FP / "find_low_complexity_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "find_low_complexity_{sample}.tsv"
     conda:
         "../../envs/komplexity.yml"
     shell:
@@ -181,9 +193,13 @@ rule find_low_complexity:
 rule remove_low_complexity:
     input:
         reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
-        ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
+        ids=LOG_FP / "find_low_complexity_{sample}.filtered_ids",
     output:
         QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
+    log:
+        LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
+    benchmark:
+        BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
     conda:
         "../../envs/qc.yml"
     shell:
