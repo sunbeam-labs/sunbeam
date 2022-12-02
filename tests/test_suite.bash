@@ -1,6 +1,6 @@
 # Test normal behavior
 function test_all {
-    sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p
+    sunbeam run --profile $TEMPDIR/
 
     # Check contents
     annot_summary=sunbeam_output/annotation/summary/dummyecoli.tsv
