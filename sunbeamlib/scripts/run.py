@@ -46,7 +46,7 @@ def main(argv=sys.argv):
 
     cmds = list()
     if args.target_list == []:
-        args.target_list = ['']
+        args.target_list = [""]
 
     for target in args.target_list:
         if target:
@@ -54,14 +54,18 @@ def main(argv=sys.argv):
 
         # Including target when it's en empty string breaks stuff so the extra
         # list comp avoids that
-        snakemake_args = [arg for arg in [
-            "snakemake",
-            "--snakefile",
-            str(snakefile),
-            "--conda-prefix",
-            str(conda_prefix),
-            target,
-        ] if arg] + remaining
+        snakemake_args = [
+            arg
+            for arg in [
+                "snakemake",
+                "--snakefile",
+                str(snakefile),
+                "--conda-prefix",
+                str(conda_prefix),
+                target,
+            ]
+            if arg
+        ] + remaining
         print("Running: " + " ".join(snakemake_args))
 
         cmds.append(subprocess.run(snakemake_args))

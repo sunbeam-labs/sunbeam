@@ -121,8 +121,8 @@ ASSEMBLY_FP = output_subdir(Cfg, "assembly")
 ANNOTATION_FP = output_subdir(Cfg, "annotation")
 CLASSIFY_FP = output_subdir(Cfg, "classify")
 MAPPING_FP = output_subdir(Cfg, "mapping")
-BENCHMARK_FP = Cfg['all']['output_fp'] / 'benchmarks'
-LOG_FP = Cfg['all']['output_fp'] / 'logs'
+BENCHMARK_FP = Cfg["all"]["output_fp"] / "benchmarks"
+LOG_FP = Cfg["all"]["output_fp"] / "logs"
 
 
 # ---- Download rules
@@ -189,11 +189,11 @@ onsuccess:
     print("Sunbeam finished!")
     print(f"{log}")
     warnings, errors = parse_err_and_warn(log)
-    compile_benchmarks(BENCHMARK_FP, Cfg['all']['root'] / 'stats')
+    compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
 
 
 onerror:
     print("Sunbeam sad :(")
     print(f"{log}")
     warnings, errors = parse_err_and_warn(log)
-    compile_benchmarks(BENCHMARK_FP, Cfg['all']['root'] / 'stats')
+    compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
