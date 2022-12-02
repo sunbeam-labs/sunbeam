@@ -33,7 +33,7 @@ rule adapter_removal_unpaired:
     output:
         QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
     log:
-        LOG_FP / "adapter_removal_unpaired_{sample}.log",
+        QC_FP / "log" / "cutadapt" / "{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
     params:
@@ -53,7 +53,7 @@ rule adapter_removal_paired:
         gr1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
         gr2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
     log:
-        LOG_FP / "adapter_removal_paired_{sample}.log",
+        QC_FP / "log" / "cutadapt" / "{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
     params:
@@ -75,7 +75,7 @@ rule trimmomatic_unpaired:
     output:
         QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
     log:
-        LOG_FP / "trimmomatic_unpaired_{sample}.log",
+        QC_FP / "log" / "trimmomatic" / "{sample}.log",
     benchmark:
         BENCHMARK_FP / "trimmomatic_unpaired_{sample}.tsv"
     params:
@@ -112,7 +112,7 @@ rule trimmomatic_paired:
             QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_2_unpaired.fastq.gz"
         ),
     log:
-        LOG_FP / "trimmomatic_paired_{sample}.log",
+        QC_FP / "log" / "trimmomatic" / "{sample}.log",
     benchmark:
         BENCHMARK_FP / "trimmomatic_paired_{sample}.tsv"
     params:
