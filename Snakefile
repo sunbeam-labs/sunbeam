@@ -129,40 +129,20 @@ LOG_FP = Cfg["all"]["output_fp"] / "logs"
 if Cfg["all"]["download_reads"]:
 
     include: "rules/download/download.smk"
-
-
 # ---- Targets rules
 include: "rules/targets/targets.smk"
-
-
 # ---- Quality control rules
 include: "rules/qc/qc.smk"
-
-
 include: "rules/qc/decontaminate.smk"
-
-
 # ---- Assembly rules
 include: "rules/assembly/assembly.smk"
-
-
 include: "rules/assembly/coverage.smk"
-
-
 # ---- Contig annotation rules
 include: "rules/annotation/annotation.smk"
-
-
 include: "rules/annotation/blast.smk"
-
-
 include: "rules/annotation/orf.smk"
-
-
 # ---- Classifier rules
 include: "rules/classify/kraken.smk"
-
-
 # ---- Mapping rules
 include: "rules/mapping/mapping.smk"
 

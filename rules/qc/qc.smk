@@ -143,9 +143,9 @@ rule fastqc:
     output:
         expand(QC_FP / "reports" / "{{sample}}_{rp}_fastqc/fastqc_data.txt", rp=Pairs),
     log:
-        LOG_FP / "fastqc.log",
+        LOG_FP / "fastqc_{sample}.log",
     benchmark:
-        BENCHMARK_FP / "fastqc.tsv"
+        BENCHMARK_FP / "fastqc_{sample}.tsv"
     params:
         outdir=QC_FP / "reports",
     conda:
