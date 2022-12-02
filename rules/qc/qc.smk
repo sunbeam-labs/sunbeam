@@ -174,7 +174,7 @@ rule find_low_complexity:
     input:
         expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
-        QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
+        QC_FP / "03_komplexity" / "{sample}.filtered_ids",
     log:
         LOG_FP / "find_low_complexity_{sample}.log",
     benchmark:
@@ -193,7 +193,7 @@ rule find_low_complexity:
 rule remove_low_complexity:
     input:
         reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
-        ids=LOG_FP / "find_low_complexity_{sample}.filtered_ids",
+        ids=QC_FP / "03_komplexity" / "{sample}.filtered_ids",
     output:
         QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
     log:
