@@ -4,11 +4,11 @@
 # Author: Erik Clarke <ecl@mail.med.upenn.edu>
 # Created: 2016-04-28
 #
+import configparser
 import os
 import re
 import sys
 import yaml
-import configparser
 
 from pprint import pprint
 from pathlib import Path, PurePath
@@ -18,6 +18,7 @@ from snakemake.exceptions import WorkflowError
 
 from sunbeamlib import load_sample_list, read_seq_ids
 from sunbeamlib.config import *
+from sunbeamlib.post import *
 from sunbeamlib.reports import *
 
 
@@ -30,8 +31,8 @@ wildcard_constraints:
 # Load config file
 if not config:
     raise SystemExit(
-        "No config file specified. Run `sunbeam init` to generate a "
-        "config file, and specify with --configfile"
+        "Config not found, are you sure your profile contains a path to an "
+        "existing configfile?"
     )
 
 sunbeam_dir = ""
@@ -120,6 +121,8 @@ ASSEMBLY_FP = output_subdir(Cfg, "assembly")
 ANNOTATION_FP = output_subdir(Cfg, "annotation")
 CLASSIFY_FP = output_subdir(Cfg, "classify")
 MAPPING_FP = output_subdir(Cfg, "mapping")
+BENCHMARK_FP = Cfg['all']['output_fp'] / 'benchmarks'
+LOG_FP = Cfg['all']['output_fp'] / 'logs'
 
 
 # ---- Download rules
@@ -180,3 +183,17 @@ rule samples:
         "Samples to be processed:"
     run:
         [print(sample) for sample in sorted(list(Samples.keys()))]
+
+
+onsuccess:
+    print("Sunbeam finished!")
+    print(f"{log}")
+    parse_err_and_warn(log)
+    compile_benchmarks(BENCHMARK_FP, Cfg['all']['root'] / 'stats')
+
+
+onerror:
+    print("Sunbeam sad :(")
+    print(f"{log}")
+    parse_err_and_warn(log)
+    compile_benchmarks(BENCHMARK_FP, Cfg['all']['root'] / 'stats')

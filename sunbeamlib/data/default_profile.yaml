@@ -1,6 +1,6 @@
 # Default options for running sunbeam
 use-conda: True
-cores: True # 'True' uses all available cores, you can also specify a number
+cores: 'all' # 'all' uses all available cores, you can also specify a number
 
 # Default resource configuration
 default-resources:

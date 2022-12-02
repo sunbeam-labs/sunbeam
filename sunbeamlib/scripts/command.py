@@ -1,6 +1,5 @@
 import sys
 import argparse
-import subprocess
 import sunbeamlib
 from sunbeamlib.scripts.run import main as Run
 from sunbeamlib.scripts.init import main as Init

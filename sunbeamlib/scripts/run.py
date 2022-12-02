@@ -38,54 +38,32 @@ def main(argv=sys.argv):
     snakefile = Path(args.sunbeam_dir) / "Snakefile"
     if not snakefile.exists():
         sys.stderr.write(
-            "Error: could not find a Snakefile in directory '{}'\n".format(
-                args.sunbeam_dir
-            )
+            f"Error: could not find a Snakefile in directory '{args.sunbeam_dir}'\n"
         )
         sys.exit(1)
-
-    # Move config file arg to the end to avoid parsing issues
-    # https://github.com/sunbeam-labs/sunbeam/issues/263
-    try:
-        config_index = remaining.index("--configfile")
-        remaining.append(remaining.pop(config_index))
-        remaining.append(remaining.pop(config_index))
-    except ValueError as e:
-        print(
-            "--configfile flag not found, either it is missing (not ok) or was provided as --configfile=filename (ok)"
-        )
 
     conda_prefix = Path(args.sunbeam_dir) / ".snakemake"
 
     cmds = list()
     if args.target_list == []:
-        snakemake_args = [
+        args.target_list = ['']
+
+    for target in args.target_list:
+        if target:
+            print(f"Running sunbeam on target: {target}")
+
+        # Including target when it's en empty string breaks stuff so the extra
+        # list comp avoids that
+        snakemake_args = [arg for arg in [
             "snakemake",
             "--snakefile",
             str(snakefile),
-            "-c",
-            "--use-conda",
             "--conda-prefix",
             str(conda_prefix),
-        ] + remaining
+            target,
+        ] if arg] + remaining
         print("Running: " + " ".join(snakemake_args))
 
         cmds.append(subprocess.run(snakemake_args))
-    else:
-        for target in args.target_list:
-            print(f"Running sunbeam on target: {target}")
-            snakemake_args = [
-                "snakemake",
-                "--snakefile",
-                str(snakefile),
-                "-c",
-                "--use-conda",
-                "--conda-prefix",
-                str(conda_prefix),
-                target,
-            ] + remaining
-            print("Running: " + " ".join(snakemake_args))
-
-            cmds.append(subprocess.run(snakemake_args))
 
     sys.exit(cmds[0].returncode)

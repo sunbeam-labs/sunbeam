@@ -1,12 +1,8 @@
 import sys
-import io
-import re
 from pathlib import Path
 import argparse
 import csv
-import subprocess
 
-import ruamel.yaml
 from snakemake.utils import listfiles
 
 from sunbeamlib import guess_format_string, SampleFormatError, MissingMatePairError

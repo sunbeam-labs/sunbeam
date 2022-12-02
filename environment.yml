@@ -2,7 +2,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bioconda::snakemake
+  - snakemake
   - ruamel.yaml
   - biopython # Needed for building test data
   - kraken2 # Needed for building test data
