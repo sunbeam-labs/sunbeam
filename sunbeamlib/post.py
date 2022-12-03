@@ -35,4 +35,4 @@ def compile_benchmarks(benchmark_fp: str, stats_fp: str):
             with open(os.path.join(benchmark_fp, fp), "r") as g:
                 reader = csv.reader(g, delimiter="\t")
                 next(reader)  # Headers line
-                writer.writerow(fp[:-4] + next(reader))
+                writer.writerow([fp[:-4]] + next(reader))
