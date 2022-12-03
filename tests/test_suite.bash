@@ -57,7 +57,7 @@ function test_all_old_illumina {
 function test_optional_cutadapt {
     sed 's/adapters: \[.*\]/adapters: \[\]/g' $TEMPDIR/tmp_config.yml > $TEMPDIR/tmp_config_nocutadapt.yml
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run --profile $TEMPDIR/ --configfile=$TEMPDIR/tmp_config_nocutadapt.yml all_decontam
+    sunbeam run --profile $TEMPDIR/ all_decontam --configfile=$TEMPDIR/tmp_config_nocutadapt.yml
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_1.fastq.gz ]
     [ -f $TEMPDIR/sunbeam_output/qc/decontam/dummyecoli_2.fastq.gz ]
 }
@@ -87,7 +87,7 @@ function test_version_check {
 
 # Test that we detect and run extensions
 function test_extensions {
-    sunbeam run --profile $TEMPDIR/ --configfile $TEMPDIR/tmp_config.yml sbx_test | grep "SBX_TEST"
+    sunbeam run --profile $TEMPDIR/ sbx_test --configfile $TEMPDIR/tmp_config.yml | grep "SBX_TEST"
 }
 
 # Test that single-end sequencing configurations work
@@ -104,7 +104,7 @@ function test_single_end {
 # Test that paired-end qc rules produce files with the same number of reads
 function test_pair_concordance {
     rm -rf $TEMPDIR/sunbeam_output/qc
-    sunbeam run --profile $TEMPDIR/ --configfile $TEMPDIR/tmp_config.yml all_decontam
+    sunbeam run --profile $TEMPDIR/ all_decontam --configfile $TEMPDIR/tmp_config.yml
     for r1 in $TEMPDIR/sunbeam_output/qc/cleaned/*_1.fastq.gz; do
 	r1_lines=$(zcat $r1 | wc -l)
 	r2=${r1%_1.fastq.gz}_2.fastq.gz
@@ -223,7 +223,7 @@ function test_mapping {
     for file in $TEMPDIR/hosts/human*; do
         mv $file $TEMPDIR/hosts_${file##*/}
     done
-    sunbeam run --profile $TEMPDIR/ --configfile $TEMPDIR/test_mapping_config.yml all_mapping
+    sunbeam run --profile $TEMPDIR/ all_mapping --configfile $TEMPDIR/test_mapping_config.yml
     # Move human host files back to original location
     for file in $TEMPDIR/hosts_*; do
         mv $file ${file/hosts_/hosts\//}
@@ -257,7 +257,7 @@ function test_mapping {
 # avoids this.
 function test_subdir_patterns {
     # All we need to check is that the graph resolution works.
-    sunbeam run --profile $TEMPDIR/ --configfile $TEMPDIR/tmp_config.yml sbx_test_subdir -n
+    sunbeam run --profile $TEMPDIR/ sbx_test_subdir --configfile $TEMPDIR/tmp_config.yml -n
 }
 
 # Fix for #167:
@@ -267,7 +267,7 @@ function test_subdir_patterns {
 # Checking for successful behavior is already handled in test_all.
 function test_assembly_failures {
     # Up to just before the assembly rules, things should work fine.
-    sunbeam run --profile $TEMPDIR/ --configfile=$TEMPDIR/tmp_config.yml all_decontam
+    sunbeam run --profile $TEMPDIR/ all_decontam --configfile=$TEMPDIR/tmp_config.yml
     # Remove previous assembly files, if they exist.
     rm -rf $TEMPDIR/sunbeam_output/assembly
 
@@ -289,7 +289,7 @@ function test_assembly_failures {
     (
     export PATH="$TEMPDIR/megahit_137:$PATH"
     # (This command should *not* exit successfully.)
-    ! txt=$(sunbeam run --profile $TEMPDIR/ --configfile=$TEMPDIR/tmp_config.yml all_assembly)
+    ! txt=$(sunbeam run --profile $TEMPDIR/ all_assembly --configfile=$TEMPDIR/tmp_config.yml)
     echo "$txt" | grep "Check your memory"
     )
 }
@@ -361,7 +361,7 @@ function test_extend_trailing_slash {
 
 # Test that we detect and run extension rules using the smk extension (#196)
 function test_extension_smk {
-    sunbeam run --profile $TEMPDIR/ --configfile $TEMPDIR/tmp_config.yml sbx_test_smk | grep "SBX_TEST_SMK"
+    sunbeam run --profile $TEMPDIR/ sbx_test_smk --configfile $TEMPDIR/tmp_config.yml | grep "SBX_TEST_SMK"
 }
 
 # Test that the host decontamination doesn't double count reads giving negative non-host numbers (#304)
@@ -389,7 +389,7 @@ function test_host_filter_counts {
     sunbeam config modify --str 'all: {samplelist_fp: "samples_test_mapping.csv"}' \
         $TEMPDIR/tmp_config.yml > $TEMPDIR/test_mapping_config.yml
 
-    sunbeam run --profile $TEMPDIR/ --configfile $TEMPDIR/test_mapping_config.yml preprocess_report
+    sunbeam run --profile $TEMPDIR/ preprocess_report --configfile $TEMPDIR/test_mapping_config.yml
     # Check that preprocess_summary counts one read for human and human_copy but only one read
     # filtered in total
 	report=$TEMPDIR/sunbeam_output/qc/reports/preprocess_summary.tsv
