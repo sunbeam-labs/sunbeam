@@ -92,7 +92,7 @@ rule filter_reads:
         reads=QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
         log=QC_FP / "log" / "decontam" / "{sample}_{rp}.txt",
     log:
-        LOG_FP / "filter_reads_{sample}_{rp}.log",
+        QC_FP / "log" / "decontam" / "{sample}_{rp}.txt",
     benchmark:
         BENCHMARK_FP / "filter_reads_{sample}_{rp}.tsv"
     conda:
