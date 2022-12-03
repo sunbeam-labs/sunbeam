@@ -73,7 +73,8 @@ rule trimmomatic_unpaired:
     input:
         QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
     output:
-        QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
+        unpair=QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
+        log=QC_FP / "log" / "trimmomatic" / "{sample}.log",
     log:
         QC_FP / "log" / "trimmomatic" / "{sample}.log",
     benchmark:
@@ -88,7 +89,7 @@ rule trimmomatic_unpaired:
         """
         trimmomatic \
         SE -threads {threads} -phred33 \
-        {input} {output} \
+        {input} {output.unpair} \
         ILLUMINACLIP:{Cfg[qc][adapter_template]}:2:30:10:8:true \
         LEADING:{Cfg[qc][leading]} \
         TRAILING:{Cfg[qc][trailing]} \
@@ -111,6 +112,7 @@ rule trimmomatic_paired:
         unpair_r2=temp(
             QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_2_unpaired.fastq.gz"
         ),
+        log=QC_FP / "log" / "trimmomatic" / "{sample}.log",
     log:
         QC_FP / "log" / "trimmomatic" / "{sample}.log",
     benchmark:
