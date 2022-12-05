@@ -7,6 +7,7 @@
 import configparser
 import os
 import re
+import shutil
 import sys
 import yaml
 
@@ -165,15 +166,21 @@ rule samples:
         [print(sample) for sample in sorted(list(Samples.keys()))]
 
 
+onstart:
+    try:
+        shutil.rmtree(BENCHMARK_FP)
+        print("Clearing benchmarks directory.")
+    except Exception as e:
+        None
+
+
 onsuccess:
     print("Sunbeam finished!")
-    print(f"{log}")
     warnings, errors = parse_err_and_warn(log)
     compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
 
 
 onerror:
-    print("Sunbeam sad :(")
-    print(f"{log}")
+    print("Sunbeam failed with error.")
     warnings, errors = parse_err_and_warn(log)
     compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
