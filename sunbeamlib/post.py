@@ -13,7 +13,10 @@ def parse_err_and_warn(log_fp: str) -> tuple:
 
 def compile_benchmarks(benchmark_fp: str, stats_fp: str):
     """Aggregate all the benchmark files into one and put it in stats_fp"""
-    benchmarks = os.listdir(benchmark_fp)
+    try:
+        benchmarks = os.listdir(benchmark_fp)
+    except FileNotFoundError as e:
+        print("No benchmark files found")
     if not benchmarks:
         print("No benchmark files found")
         return None
