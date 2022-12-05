@@ -15,6 +15,8 @@ rule prodigal:
         faa=ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes_prot.fa",
         fna=ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes_nucl.fa",
         log=ANNOTATION_FP / "genes" / "prodigal" / "log" / "{sample}.out",
+    benchmark:
+        BENCHMARK_FP / "prodigal_{sample}.tsv"
     conda:
         "../../envs/annotation.yml"
     shell:

@@ -33,6 +33,8 @@ rule contigs_mapping:
     output:
         bam=ASSEMBLY_FP / "contigs" / "minimap2" / "{sample}.sorted.bam",
         bai=ASSEMBLY_FP / "contigs" / "minimap2" / "{sample}.sorted.bam.bai",
+    benchmark:
+        BENCHMARK_FP / "contigs_mapping_{sample}.tsv"
     params:
         temp=temp(ASSEMBLY_FP / "contigs" / "minimap2" / "{sample}.sorted.tmp"),
     threads: Cfg["mapping"]["threads"]
@@ -52,6 +54,8 @@ rule mapping_depth:
         bai=ASSEMBLY_FP / "contigs" / "minimap2" / "{sample}.sorted.bam.bai",
     output:
         depth=ASSEMBLY_FP / "contigs" / "coverage" / "{sample}.depth",
+    benchmark:
+        BENCHMARK_FP / "mapping_depth_{sample}.tsv"
     conda:
         "../../envs/assembly.yml"
     shell:
@@ -65,6 +69,8 @@ rule get_coverage:
         ASSEMBLY_FP / "contigs" / "coverage" / "{sample}.depth",
     output:
         ASSEMBLY_FP / "contigs" / "coverage" / "{sample}.csv",
+    benchmark:
+        BENCHMARK_FP / "get_coverage_{sample}.tsv"
     conda:
         "../../envs/assembly.yml"
     script:

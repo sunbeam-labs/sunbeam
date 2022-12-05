@@ -25,6 +25,8 @@ rule aggregate_results:
         ),
     output:
         ANNOTATION_FP / "summary" / "{sample}.tsv",
+    benchmark:
+        BENCHMARK_FP / "aggregate_results_{sample}.tsv"
     params:
         dbs=list(Blastdbs["nucl"].keys()) + list(Blastdbs["prot"].keys()),
         nucl=Blastdbs["nucl"],

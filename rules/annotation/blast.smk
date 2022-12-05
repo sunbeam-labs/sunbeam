@@ -12,6 +12,8 @@ rule build_diamond_db:
         [Blastdbs["prot"][db] for db in Blastdbs["prot"]],
     output:
         [Blastdbs["prot"][db] + ".dmnd" for db in Blastdbs["prot"]],
+    benchmark:
+        BENCHMARK_FP / "build_diamond_db.tsv"
     conda:
         "../../envs/annotation.yml"
     shell:
@@ -26,6 +28,8 @@ rule run_blastn:
         contigs=ASSEMBLY_FP / "contigs" / "{sample}-contigs.fa",
     output:
         ANNOTATION_FP / "blastn" / "{db}" / "{contigs}" / "{sample}.btf",
+    benchmark:
+        BENCHMARK_FP / "run_blastn_{db}_{contigs}_{sample}.tsv"
     params:
         db=lambda wildcard: Blastdbs["nucl"][wildcard.db],
     threads: Cfg["blast"]["threads"]
@@ -52,6 +56,8 @@ rule run_diamond_blastp:
         indeces=rules.build_diamond_db.output,
     output:
         ANNOTATION_FP / "blastp" / "{db}" / "{orf_finder}" / "{sample}.btf",
+    benchmark:
+        BENCHMARK_FP / "run_diamond_blastp_{db}_{orf_finder}_{sample}.tsv"
     threads: Cfg["blast"]["threads"]
     conda:
         "../../envs/annotation.yml"
@@ -77,6 +83,8 @@ rule run_diamond_blastx:
         indeces=rules.build_diamond_db.output,
     output:
         ANNOTATION_FP / "blastx" / "{db}" / "{orf_finder}" / "{sample}.btf",
+    benchmark:
+        BENCHMARK_FP / "run_diamond_blastx_{db}_{orf_finder}_{sample}.tsv"
     threads: Cfg["blast"]["threads"]
     conda:
         "../../envs/annotation.yml"

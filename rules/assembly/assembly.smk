@@ -20,6 +20,8 @@ rule megahit_paired:
         r2=QC_FP / "decontam" / "{sample}_2.fastq.gz",
     output:
         ASSEMBLY_FP / "megahit" / "{sample}_asm" / "final.contigs.fa",
+    benchmark:
+        BENCHMARK_FP / "megahit_paired_{sample}.tsv"
     params:
         out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
     threads: Cfg["assembly"]["threads"]
@@ -54,6 +56,8 @@ rule megahit_unpaired:
         QC_FP / "decontam" / "{sample}_1.fastq.gz",
     output:
         ASSEMBLY_FP / "megahit" / "{sample}_asm" / "final.contigs.fa",
+    benchmark:
+        BENCHMARK_FP / "megahit_unpaired_{sample}.tsv"
     params:
         out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
     threads: Cfg["assembly"]["threads"]
@@ -84,10 +88,12 @@ rule final_filter:
         ASSEMBLY_FP / "megahit" / "{sample}_asm" / "final.contigs.fa",
     output:
         ASSEMBLY_FP / "contigs" / "{sample}-contigs.fa",
-    params:
-        len=Cfg["assembly"]["min_length"],
     log:
         ASSEMBLY_FP / "log" / "vsearch" / "{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "final_filter_{sample}.tsv"
+    params:
+        len=Cfg["assembly"]["min_length"],
     conda:
         "../../envs/assembly.yml"
     script:

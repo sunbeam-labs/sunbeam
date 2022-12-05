@@ -11,6 +11,8 @@ rule build_genome_index:
         Cfg["mapping"]["genomes_fp"] / "{genome}.fasta",
     output:
         Cfg["mapping"]["genomes_fp"] / "{genome}.fasta.amb",
+    benchmark:
+        BENCHMARK_FP / "build_genome_index_{genome}.tsv"
     conda:
         "../../envs/mapping.yml"
     shell:
@@ -23,9 +25,11 @@ rule align_to_genome:
         index=Cfg["mapping"]["genomes_fp"] / "{genome}.fasta.amb",
     output:
         temp(MAPPING_FP / "intermediates" / "{genome}" / "{sample}.sam"),
-    threads: Cfg["mapping"]["threads"]
+    benchmark:
+        BENCHMARK_FP / "align_to_genome_{genome}_{sample}.tsv"
     params:
         index_fp=Cfg["mapping"]["genomes_fp"],
+    threads: Cfg["mapping"]["threads"]
     conda:
         "../../envs/mapping.yml"
     shell:
@@ -41,6 +45,8 @@ rule samtools_convert:
         MAPPING_FP / "intermediates" / "{genome}" / "{sample}.sam",
     output:
         MAPPING_FP / "{genome}" / "{sample}.bam",
+    benchmark:
+        BENCHMARK_FP / "samtools_convert_{genome}_{sample}.tsv"
     threads: Cfg["mapping"]["threads"]
     conda:
         "../../envs/mapping.yml"
@@ -71,6 +77,8 @@ rule samtools_get_coverage:
         MAPPING_FP / "{genome}" / "{sample}.bam",
     output:
         MAPPING_FP / "intermediates" / "{genome}" / "{sample}.csv",
+    benchmark:
+        BENCHMARK_FP / "samtools_get_coverage_{genome}_{sample}.tsv"
     conda:
         "../../envs/mapping.yml"
     script:
@@ -82,6 +90,8 @@ rule samtools_index:
         MAPPING_FP / "{genome}" / "{sample}.bam",
     output:
         MAPPING_FP / "{genome}" / "{sample}.bam.bai",
+    benchmark:
+        BENCHMARK_FP / "samtools_getindex_{genome}_{sample}.tsv"
     conda:
         "../../envs/mapping.yml"
     shell:
@@ -94,6 +104,8 @@ rule samtools_mpileup:
         genome=Cfg["mapping"]["genomes_fp"] / "{genome}.fasta",
     output:
         MAPPING_FP / "{genome}" / "{sample}.raw.bcf",
+    benchmark:
+        BENCHMARK_FP / "samtools_mpileup_{genome}_{sample}.tsv"
     conda:
         "../../envs/mapping.yml"
     shell:
