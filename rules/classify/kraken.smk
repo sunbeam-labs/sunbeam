@@ -19,7 +19,7 @@ rule kraken2_classify_report:
     params:
         db=Cfg["classify"]["kraken_db_fp"],
         paired_end="--paired" if Cfg["all"]["paired_end"] else "",
-    threads: Cfg["classify"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     shell:
         """
         kraken2 --gzip-compressed \

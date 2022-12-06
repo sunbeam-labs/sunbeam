@@ -24,7 +24,7 @@ rule megahit_paired:
         BENCHMARK_FP / "megahit_paired_{sample}.tsv"
     params:
         out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
-    threads: Cfg["assembly"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/assembly.yml"
     shell:
@@ -60,7 +60,7 @@ rule megahit_unpaired:
         BENCHMARK_FP / "megahit_unpaired_{sample}.tsv"
     params:
         out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
-    threads: Cfg["assembly"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/assembly.yml"
     shell:

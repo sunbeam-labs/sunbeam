@@ -37,7 +37,7 @@ rule contigs_mapping:
         BENCHMARK_FP / "contigs_mapping_{sample}.tsv"
     params:
         temp=temp(ASSEMBLY_FP / "contigs" / "minimap2" / "{sample}.sorted.tmp"),
-    threads: Cfg["mapping"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/assembly.yml"
     shell:

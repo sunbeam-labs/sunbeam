@@ -29,7 +29,7 @@ rule align_to_genome:
         BENCHMARK_FP / "align_to_genome_{genome}_{sample}.tsv"
     params:
         index_fp=Cfg["mapping"]["genomes_fp"],
-    threads: Cfg["mapping"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/mapping.yml"
     shell:
@@ -47,7 +47,7 @@ rule samtools_convert:
         MAPPING_FP / "{genome}" / "{sample}.bam",
     benchmark:
         BENCHMARK_FP / "samtools_convert_{genome}_{sample}.tsv"
-    threads: Cfg["mapping"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/mapping.yml"
     shell:

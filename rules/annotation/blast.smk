@@ -32,7 +32,7 @@ rule run_blastn:
         BENCHMARK_FP / "run_blastn_{db}_{contigs}_{sample}.tsv"
     params:
         db=lambda wildcard: Blastdbs["nucl"][wildcard.db],
-    threads: Cfg["blast"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/annotation.yml"
     shell:
@@ -58,7 +58,7 @@ rule run_diamond_blastp:
         ANNOTATION_FP / "blastp" / "{db}" / "{orf_finder}" / "{sample}.btf",
     benchmark:
         BENCHMARK_FP / "run_diamond_blastp_{db}_{orf_finder}_{sample}.tsv"
-    threads: Cfg["blast"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/annotation.yml"
     shell:
@@ -85,7 +85,7 @@ rule run_diamond_blastx:
         ANNOTATION_FP / "blastx" / "{db}" / "{orf_finder}" / "{sample}.btf",
     benchmark:
         BENCHMARK_FP / "run_diamond_blastx_{db}_{orf_finder}_{sample}.tsv"
-    threads: Cfg["blast"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/annotation.yml"
     shell:

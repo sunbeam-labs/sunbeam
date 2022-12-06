@@ -37,7 +37,7 @@ rule align_to_host:
     params:
         sam=temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam"),
         index_fp=Cfg["qc"]["host_fp"],
-    threads: Cfg["qc"]["threads"]
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/qc.yml"
     shell:
