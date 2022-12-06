@@ -9,6 +9,5 @@ sample = snakemake.wildcards.sample
 output_fp = snakemake.output[0]
 
 with open(input_fp) as f:
-    with open(output_fp, 'w') as g:
+    with open(output_fp, "w") as g:
         write_csv(g, get_cov_stats(parse_depth(f), sample))
-

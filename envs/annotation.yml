@@ -8,3 +8,4 @@ dependencies:
   - conda-forge::boost-cpp # For diamond 2.0.11
   - diamond=2.0.11
   - prodigal
+  - python=3.10

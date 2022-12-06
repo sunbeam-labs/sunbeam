@@ -4,71 +4,84 @@
 
 from sunbeamlib import qc
 
+
 rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
     input:
-        TARGET_QC
+        TARGET_QC,
+
 
 ruleorder: adapter_removal_paired > adapter_removal_unpaired
 
+
 rule sample_intake:
     input:
-        lambda wildcards: Samples[wildcards.sample][wildcards.rp]
+        lambda wildcards: Samples[wildcards.sample][wildcards.rp],
     output:
-        QC_FP/'00_samples'/'{sample}_{rp}.fastq.gz'
+        QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
     params:
-        suffix = Cfg['qc']['seq_id_ending']
+        suffix=Cfg["qc"]["seq_id_ending"],
     conda:
         "../../envs/qc.yml"
     script:
         "../../scripts/qc/sample_intake.py"
 
+
 rule adapter_removal_unpaired:
     input:
-        QC_FP/'00_samples'/'{sample}_1.fastq.gz'
-    params:
-        tmp = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq'),
-    log: QC_FP/'log'/'cutadapt'/'{sample}.log'
+        QC_FP / "00_samples" / "{sample}_1.fastq.gz",
     output:
-        QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'
-    threads:
-        Cfg['qc']['threads']
+        QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
+    log:
+        QC_FP / "log" / "cutadapt" / "{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
+    params:
+        tmp=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/qc.yml"
     script:
         "../../scripts/qc/adapter_removal_unpaired.py"
-    
+
+
 rule adapter_removal_paired:
     input:
-        r1 = QC_FP/'00_samples'/'{sample}_1.fastq.gz',
-        r2 = QC_FP/'00_samples'/'{sample}_2.fastq.gz'
-    params:
-        r1 = str(QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'),
-        r2 = str(QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz')
-    log: QC_FP/'log'/'cutadapt'/'{sample}.log'
+        r1=QC_FP / "00_samples" / "{sample}_1.fastq.gz",
+        r2=QC_FP / "00_samples" / "{sample}_2.fastq.gz",
     output:
-        gr1 = QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz',
-        gr2 = QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz'
-    threads:
-        Cfg['qc']['threads']
+        gr1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
+        gr2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
+    log:
+        QC_FP / "log" / "cutadapt" / "{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
+    params:
+        r1=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz"),
+        r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz"),
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/qc.yml"
     script:
         "../../scripts/qc/adapter_removal_paired.py"
 
+
 ruleorder: trimmomatic_paired > trimmomatic_unpaired
-        
+
+
 rule trimmomatic_unpaired:
     input:
-        QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz'
+        QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
     output:
-        QC_FP/'02_trimmomatic'/'{sample}_1.fastq.gz'
-    log: QC_FP/'log'/'trimmomatic'/'{sample}.out'
+        QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
+    log:
+        QC_FP / "log" / "trimmomatic" / "{sample}.out",
+    benchmark:
+        BENCHMARK_FP / "trimmomatic_unpaired_{sample}.tsv"
     params:
-        sw_start = Cfg['qc']['slidingwindow'][0],
-        sw_end = Cfg['qc']['slidingwindow'][1]
-    threads:
-        Cfg['qc']['threads']
+        sw_start=Cfg["qc"]["slidingwindow"][0],
+        sw_end=Cfg["qc"]["slidingwindow"][1],
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/qc.yml"
     shell:
@@ -84,22 +97,28 @@ rule trimmomatic_unpaired:
         > >(tee {log}) 2> >(tee {log} >&2)
         """
 
-            
+
 rule trimmomatic_paired:
     input:
-        r1 = QC_FP/'01_cutadapt'/'{sample}_1.fastq.gz',
-        r2 = QC_FP/'01_cutadapt'/'{sample}_2.fastq.gz'
+        r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
+        r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
     output:
-        pair_r1 = QC_FP/'02_trimmomatic'/'{sample}_1.fastq.gz',
-        pair_r2 = QC_FP/'02_trimmomatic'/'{sample}_2.fastq.gz',
-        unpair_r1 = temp(QC_FP/'02_trimmomatic'/'unpaired'/'{sample}_1_unpaired.fastq.gz'),
-        unpair_r2 = temp(QC_FP/'02_trimmomatic'/'unpaired'/'{sample}_2_unpaired.fastq.gz')
-    log: QC_FP/'log'/'trimmomatic'/'{sample}.out',
+        pair_r1=QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
+        pair_r2=QC_FP / "02_trimmomatic" / "{sample}_2.fastq.gz",
+        unpair_r1=temp(
+            QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_1_unpaired.fastq.gz"
+        ),
+        unpair_r2=temp(
+            QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_2_unpaired.fastq.gz"
+        ),
+    log:
+        QC_FP / "log" / "trimmomatic" / "{sample}.out",
+    benchmark:
+        BENCHMARK_FP / "trimmomatic_paired_{sample}.tsv"
     params:
-        sw_start = Cfg['qc']['slidingwindow'][0],
-        sw_end = Cfg['qc']['slidingwindow'][1]
-    threads:
-        Cfg['qc']['threads']
+        sw_start=Cfg["qc"]["slidingwindow"][0],
+        sw_end=Cfg["qc"]["slidingwindow"][1],
+    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
     conda:
         "../../envs/qc.yml"
     shell:
@@ -117,42 +136,49 @@ rule trimmomatic_paired:
         > >(tee {log}) 2> >(tee {log} >&2)
         """
 
+
 rule fastqc:
     input:
-        reads = expand(
-            QC_FP/"02_trimmomatic"/"{{sample}}_{rp}.fastq.gz",
-            rp=Pairs)
+        reads=expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
-        expand(
-            QC_FP/'reports'/'{{sample}}_{rp}_fastqc/fastqc_data.txt',
-            rp=Pairs)
+        expand(QC_FP / "reports" / "{{sample}}_{rp}_fastqc/fastqc_data.txt", rp=Pairs),
+    log:
+        LOG_FP / "fastqc_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "fastqc_{sample}.tsv"
     params:
-        outdir = QC_FP/'reports'
+        outdir=QC_FP / "reports",
     conda:
         "../../envs/reports.yml"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract"
 
+
 rule fastqc_report:
     """ make fastqc reports """
     input:
-        files = expand(
-            QC_FP/'reports'/'{sample}_{rp}_fastqc/fastqc_data.txt',
-            sample=Samples.keys(),rp=Pairs)
+        files=expand(
+            QC_FP / "reports" / "{sample}_{rp}_fastqc/fastqc_data.txt",
+            sample=Samples.keys(),
+            rp=Pairs,
+        ),
     output:
-        QC_FP/'reports'/'fastqc_quality.tsv'
+        QC_FP / "reports" / "fastqc_quality.tsv",
     conda:
         "../../envs/qc.yml"
     script:
         "../../scripts/qc/fastqc_report.py"
 
+
 rule find_low_complexity:
     input:
-        expand(
-            QC_FP/'02_trimmomatic'/'{{sample}}_{rp}.fastq.gz',
-            rp=Pairs)
+        expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
-        QC_FP/'log'/'komplexity'/'{sample}.filtered_ids'
+        QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
+    log:
+        LOG_FP / "find_low_complexity_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "find_low_complexity_{sample}.tsv"
     conda:
         "../../envs/komplexity.yml"
     shell:
@@ -163,12 +189,17 @@ rule find_low_complexity:
         done
         """
 
+
 rule remove_low_complexity:
     input:
-        reads = QC_FP/'02_trimmomatic'/'{sample}_{rp}.fastq.gz',
-        ids = QC_FP/'log'/'komplexity'/'{sample}.filtered_ids'
+        reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
+        ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
     output:
-        QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz'
+        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
+    log:
+        LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
+    benchmark:
+        BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
     conda:
         "../../envs/qc.yml"
     shell:
@@ -177,25 +208,29 @@ rule remove_low_complexity:
         gzip > {output}
         """
 
+
 rule qc_final:
     input:
-        QC_FP/'03_komplexity'/'{sample}_{rp}.fastq.gz'
+        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
     output:
-        QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'
+        QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
     shell:
         """cp {input} {output}"""
+
 
 rule clean_qc:
     input:
         expand(
-            QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz',
-            sample=Samples.keys(), rp=Pairs)
+            QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
+            sample=Samples.keys(),
+            rp=Pairs,
+        ),
     params:
-        cutadapt_fp = QC_FP/'01_cutadapt',
-        trimmomatic_fp = QC_FP/'02_trimmomatic',
-        komplexity_fp = QC_FP/'03_komplexity'
+        cutadapt_fp=QC_FP / "01_cutadapt",
+        trimmomatic_fp=QC_FP / "02_trimmomatic",
+        komplexity_fp=QC_FP / "03_komplexity",
     output:
-        touch(".qc_cleaned")
+        touch(".qc_cleaned"),
     shell:
         """
         rm -r {params.cutadapt_fp} && \
