@@ -3,7 +3,7 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - biopython
+  - conda-forge::biopython
   - blast
   - conda-forge::boost-cpp # For diamond 2.0.11
   - diamond=2.0.11

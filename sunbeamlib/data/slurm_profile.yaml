@@ -1,5 +1,6 @@
 # Default options for running sunbeam on slurm
 rerun-incomplete: True
+rerun-triggers: "mtime"
 latency-wait: 90
 jobs: 10
 keep-going: True
@@ -8,7 +9,7 @@ printshellcmds: True
 nolock: True
 verbose: True
 use-conda: True
-cores: 'all' # 'all' uses all available cores, you can also specify a number
+cores: 24 # 'all' uses all available cores, but seems to be broken at least on CHOP cluster
 cluster: "sbatch \
           --account={resources.account} \
           --partition={resources.partition} \
