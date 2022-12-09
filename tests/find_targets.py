@@ -3,21 +3,22 @@ import sys
 import argparse
 from pathlib import Path
 
+
 def main():
 
     parser = argparse.ArgumentParser(
-        description="Finds target files; breaks if not found.")
+        description="Finds target files; breaks if not found."
+    )
     parser.add_argument(
-        "--prefix", type=Path, help="Prefix to add to paths in target",
-        default="")
-    parser.add_argument(
-        "targets", type=argparse.FileType('r'))
+        "--prefix", type=Path, help="Prefix to add to paths in target", default=""
+    )
+    parser.add_argument("targets", type=argparse.FileType("r"))
 
     args = parser.parse_args()
     for line in args.targets:
         if not line.strip():
             continue
-        target = args.prefix/Path(line.strip())
+        target = args.prefix / Path(line.strip())
         # FIXME: Check if zero-sized
         if not target.exists():
             raise SystemExit("Target '{}' not found".format(target))

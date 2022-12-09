@@ -3,7 +3,7 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - biopython
+  - conda-forge::biopython
   - bwa
   - cutadapt
   - fastqc
@@ -11,3 +11,4 @@ dependencies:
   - rust-bio-tools
   - samtools
   - trimmomatic
+  - python=3.10

@@ -6,6 +6,7 @@ import gzip
 import re
 from Bio import SeqIO
 
+
 def strip_seq_id_suffix(fp_in, fp_out, suffix_pattern):
     """Remove sequence ID suffix from entries in a FASTQ file.
 

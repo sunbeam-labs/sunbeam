@@ -6,16 +6,18 @@
 # FastQC reports
 TARGET_FASTQC = [
     expand(
-        QC_FP/'reports'/'{sample}_{rp}_fastqc'/'fastqc_data.txt',
-        sample=Samples.keys(), rp=Pairs),
-    str(QC_FP/'reports'/'fastqc_quality.tsv'),
+        QC_FP / "reports" / "{sample}_{rp}_fastqc" / "fastqc_data.txt",
+        sample=Samples.keys(),
+        rp=Pairs,
+    ),
+    str(QC_FP / "reports" / "fastqc_quality.tsv"),
 ]
 
 
 # Quality-control reads
 TARGET_CLEAN = expand(
-    QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz',
-    sample = Samples.keys(), rp = Pairs)
+    QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz", sample=Samples.keys(), rp=Pairs
+)
 
 
 TARGET_QC = TARGET_CLEAN + TARGET_FASTQC
@@ -24,9 +26,9 @@ TARGET_QC = TARGET_CLEAN + TARGET_FASTQC
 # Remove host reads
 TARGET_DECONTAM = [
     expand(
-        QC_FP/'decontam'/'{sample}_{rp}.fastq.gz',
-        sample = Samples.keys(), rp = Pairs),
-    str(QC_FP/'reports'/'preprocess_summary.tsv'),
+        QC_FP / "decontam" / "{sample}_{rp}.fastq.gz", sample=Samples.keys(), rp=Pairs
+    ),
+    str(QC_FP / "reports" / "preprocess_summary.tsv"),
 ]
 
 

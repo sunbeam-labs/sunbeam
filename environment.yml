@@ -2,11 +2,10 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bioconda::snakemake
+  - snakemake
   - singularity
   - ruamel.yaml
   - biopython # Needed for building test data
-# - blast # Needed for building test data
   - kraken2 # Needed for building test data
   - semantic_version
- # - git
+  - python=3.10
