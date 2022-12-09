@@ -104,11 +104,13 @@ workdir: str(Cfg["all"]["output_fp"])
 
 
 # ---- Set up output paths for the various steps
-QC_FP = output_subdir(Cfg, 'qc')
-ASSEMBLY_FP = output_subdir(Cfg, 'assembly')
-ANNOTATION_FP = output_subdir(Cfg, 'annotation')
-CLASSIFY_FP = output_subdir(Cfg, 'classify')
-MAPPING_FP = output_subdir(Cfg, 'mapping')
+QC_FP = output_subdir(Cfg, "qc")
+ASSEMBLY_FP = output_subdir(Cfg, "assembly")
+ANNOTATION_FP = output_subdir(Cfg, "annotation")
+CLASSIFY_FP = output_subdir(Cfg, "classify")
+MAPPING_FP = output_subdir(Cfg, "mapping")
+BENCHMARK_FP = Cfg["all"]["output_fp"] / "benchmarks"
+LOG_FP = Cfg["all"]["output_fp"] / "logs"
 
 
 # ---- Targets rules

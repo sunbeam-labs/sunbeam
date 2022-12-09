@@ -35,24 +35,20 @@ TARGET_DECONTAM = [
 # ---- Assembly
 # Assemble contigs
 TARGET_ASSEMBLY = [
-    expand(
-        ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa',
-        sample = Samples.keys())
+    expand(ASSEMBLY_FP / "contigs" / "{sample}-contigs.fa", sample=Samples.keys())
 ]
 
 
 # ---- Annotation
 # Find and extract ORFs
 TARGET_ANNOTATION = [
-    expand(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_{suffix}.fa',
-        sample=Samples.keys(), suffix=['prot','nucl'])
+    expand(
+        ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes_{suffix}.fa",
+        sample=Samples.keys(),
+        suffix=["prot", "nucl"],
+    )
 ]
 
 
 # ---- All targets
-TARGET_ALL = (
-    TARGET_QC +
-    TARGET_DECONTAM +
-    TARGET_ASSEMBLY +
-    TARGET_ANNOTATION
-)
+TARGET_ALL = TARGET_QC + TARGET_DECONTAM + TARGET_ASSEMBLY + TARGET_ANNOTATION

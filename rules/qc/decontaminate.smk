@@ -2,7 +2,7 @@ rule all_decontam:
     input:
         TARGET_DECONTAM,
 
- 
+
 rule build_host_index:
     input:
         Cfg["qc"]["host_fp"] / "{host}.fasta",
