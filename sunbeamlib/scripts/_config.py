@@ -71,7 +71,7 @@ def main(argv):
         "1. To apply a set of defaults to an existing config file in place:\n"
         "    $ sunbeam config modify -i -f defaults.yml my_config.yml\n"
         "2. To change a single key:value pair in the 'mapping' section:\n"
-        "    $ sunbeam config modify -i -s 'mapping: {keep_unaligned: True}'"
+        "    $ sunbeam config modify -i -s 'mapping: {keep_unaligned: True}' my_config.yml"
     )
     modify_command = subcommands.add_parser(
         "modify",
