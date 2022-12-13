@@ -58,6 +58,9 @@ assembly:
 annotation:
   suffix: annotation
 
+blastdbs:
+  root_fp: ''
+
 mapping:
   suffix: mapping
 

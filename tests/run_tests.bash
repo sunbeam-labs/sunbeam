@@ -141,9 +141,6 @@ function setup {
 	mv $SBX_FP $OLD_SBX_FP
     fi
     mkdir $SBX_FP
-
-    # Clear test_results file
-    echo "Test Results" > test_results
 }
     
 function cleanup {
@@ -237,7 +234,7 @@ function run_test_suite {
 }
 
 function run_core_test_suite {
-    declare -a core_tests=("test_all" "test_mapping" "test_assembly_failures")
+    declare -a core_tests=("test_all" "test_assembly_failures")
 
     for testcase in "${core_tests[@]}"
     do
