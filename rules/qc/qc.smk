@@ -38,7 +38,7 @@ rule adapter_removal_unpaired:
         BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
     params:
         tmp=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
-    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
+    threads: 4
     conda:
         "../../envs/qc.yml"
     script:
@@ -59,7 +59,7 @@ rule adapter_removal_paired:
     params:
         r1=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz"),
         r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz"),
-    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
+    threads: 4
     conda:
         "../../envs/qc.yml"
     script:
@@ -81,7 +81,7 @@ rule trimmomatic_unpaired:
     params:
         sw_start=Cfg["qc"]["slidingwindow"][0],
         sw_end=Cfg["qc"]["slidingwindow"][1],
-    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
+    threads: 4
     conda:
         "../../envs/qc.yml"
     shell:
@@ -118,7 +118,7 @@ rule trimmomatic_paired:
     params:
         sw_start=Cfg["qc"]["slidingwindow"][0],
         sw_end=Cfg["qc"]["slidingwindow"][1],
-    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
+    threads: 4
     conda:
         "../../envs/qc.yml"
     shell:

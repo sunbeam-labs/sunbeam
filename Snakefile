@@ -109,8 +109,8 @@ ASSEMBLY_FP = output_subdir(Cfg, "assembly")
 ANNOTATION_FP = output_subdir(Cfg, "annotation")
 CLASSIFY_FP = output_subdir(Cfg, "classify")
 MAPPING_FP = output_subdir(Cfg, "mapping")
-BENCHMARK_FP = Cfg["all"]["output_fp"] / "benchmarks"
-LOG_FP = Cfg["all"]["output_fp"] / "logs"
+BENCHMARK_FP = output_subdir(Cfg, "benchmarks")
+LOG_FP = output_subdir(Cfg, "logs")
 
 
 # ---- Targets rules
