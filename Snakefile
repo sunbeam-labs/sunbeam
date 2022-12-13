@@ -73,7 +73,6 @@ Blastdbs = process_databases(Cfg["blastdbs"])
 Samples = load_sample_list(
     Cfg["all"]["samplelist_fp"],
     Cfg["all"]["paired_end"],
-    Cfg["all"]["download_reads"],
     Cfg["all"]["root"] / Cfg["all"]["output_fp"],
 )
 Pairs = ["1", "2"] if Cfg["all"]["paired_end"] else ["1"]
