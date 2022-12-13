@@ -58,6 +58,9 @@ assembly:
 annotation:
   suffix: annotation
 
+mapping:
+  suffix: mapping
+
 # Per-rule computational resource usage data
 benchmarks:
   suffix: benchmarks
