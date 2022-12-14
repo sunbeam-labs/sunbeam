@@ -125,7 +125,10 @@ def update(config_str, new, strict=False):
     else:
         sbx_config = ruamel.yaml.round_trip_load(extension_config())
         if sbx_config:
-            config = _update_dict(config, sbx_config)
+            for k, v in sbx_config.items():
+                if k not in config.keys():
+                    # Only update sbx_config if that sbx isn't in the config file yet
+                    config = _update_dict(config, {k: v})
         config = _update_dict(config, new)
     return config
 
