@@ -36,6 +36,9 @@ def compile_benchmarks(benchmark_fp: str, stats_fp: str):
     with open(stats_file, "w") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerow(headers)
+        if not benchmarks:
+            # Not sure how it gets to here but it seems to sometimes
+            return None
         for fp in benchmarks.sort():
             with open(os.path.join(benchmark_fp, fp), "r") as g:
                 reader = csv.reader(g, delimiter="\t")
