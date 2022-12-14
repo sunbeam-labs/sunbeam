@@ -35,7 +35,7 @@ def compile_benchmarks(benchmark_fp: str, stats_fp: str):
     with open(stats_file, "w") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerow(headers)
-        for fp in benchmarks:
+        for fp in benchmarks.sort():
             with open(os.path.join(benchmark_fp, fp), "r") as g:
                 reader = csv.reader(g, delimiter="\t")
                 next(reader)  # Headers line
