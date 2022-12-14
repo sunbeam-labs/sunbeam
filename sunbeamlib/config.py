@@ -123,10 +123,10 @@ def update(config_str, new, strict=False):
     if strict:
         config = _update_dict_strict(config, new)
     else:
-        config = _update_dict(config, new)
         sbx_config = ruamel.yaml.round_trip_load(extension_config())
         if sbx_config:
             config = _update_dict(config, sbx_config)
+        config = _update_dict(config, new)
     return config
 
 
