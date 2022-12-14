@@ -18,6 +18,7 @@ def compile_benchmarks(benchmark_fp: str, stats_fp: str):
         benchmarks = os.listdir(benchmark_fp)
     except FileNotFoundError as e:
         print("No benchmark files found")
+        return None
     if not benchmarks:
         print("No benchmark files found")
         return None
