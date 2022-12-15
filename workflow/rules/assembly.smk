@@ -97,7 +97,7 @@ rule final_filter:
     conda:
         "../envs/assembly.yml"
     script:
-        "../../scripts/assembly/final_filter.py"
+        "../scripts/assembly/final_filter.py"
 
 
 rule clean_assembly:

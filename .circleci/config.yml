@@ -26,6 +26,7 @@ jobs:
       - restore_cache:
           keys:
           - dependencies-{{ .Branch }}-{{ find -s workflow/envs/ -type f -exec md5sum {} \; | md5sum }}
+          - dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
 
       - run:
           name: install
@@ -49,6 +50,11 @@ jobs:
           paths:
             - .snakemake/
           key: dependencies-{{ .Branch }}-{{ find -s workflow/envs/ -type f -exec md5sum {} \; | md5sum }}
+      
+      - save_cache:
+          paths:
+            - ~/miniconda3
+          key: dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
 
 workflows:
   version: 2

@@ -24,7 +24,7 @@ rule sample_intake:
     conda:
         "../envs/qc.yml"
     script:
-        "../../scripts/qc/sample_intake.py"
+        "../scripts/qc/sample_intake.py"
 
 
 rule adapter_removal_unpaired:
@@ -42,7 +42,7 @@ rule adapter_removal_unpaired:
     conda:
         "../envs/qc.yml"
     script:
-        "../../scripts/qc/adapter_removal_unpaired.py"
+        "../scripts/qc/adapter_removal_unpaired.py"
 
 
 rule adapter_removal_paired:
@@ -63,7 +63,7 @@ rule adapter_removal_paired:
     conda:
         "../envs/qc.yml"
     script:
-        "../../scripts/qc/adapter_removal_paired.py"
+        "../scripts/qc/adapter_removal_paired.py"
 
 
 ruleorder: trimmomatic_paired > trimmomatic_unpaired
@@ -167,7 +167,7 @@ rule fastqc_report:
     conda:
         "../envs/qc.yml"
     script:
-        "../../scripts/qc/fastqc_report.py"
+        "../scripts/qc/fastqc_report.py"
 
 
 rule find_low_complexity:

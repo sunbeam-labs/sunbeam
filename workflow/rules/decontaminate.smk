@@ -62,7 +62,7 @@ rule get_mapped_reads:
     conda:
         "../envs/qc.yml"
     script:
-        "../../scripts/qc/get_mapped_reads.py"
+        "../scripts/qc/get_mapped_reads.py"
 
 
 rule aggregate_reads:
@@ -74,7 +74,7 @@ rule aggregate_reads:
     output:
         temp(QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids"),
     script:
-        "../../scripts/qc/aggregate_reads.py"
+        "../scripts/qc/aggregate_reads.py"
 
 
 rule filter_reads:
@@ -95,7 +95,7 @@ rule filter_reads:
     conda:
         "../envs/qc.yml"
     script:
-        "../../scripts/qc/filter_reads.py"
+        "../scripts/qc/filter_reads.py"
 
 
 rule preprocess_report:
@@ -122,4 +122,4 @@ rule preprocess_report:
     conda:
         "../envs/reports.yml"
     script:
-        "../../scripts/qc/preprocess_report.py"
+        "../scripts/qc/preprocess_report.py"
