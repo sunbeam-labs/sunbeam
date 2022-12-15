@@ -17,7 +17,7 @@ jobs:
       - run:
           name: Build and push Docker image
           command: |
-            export TAG=0.1.${CIRCLE_BUILD_NUM}
+            export TAG=0.0.0
             docker build -t ctbushman/sunbeam:$TAG .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
             docker push ctbushman/sunbeam:$TAG

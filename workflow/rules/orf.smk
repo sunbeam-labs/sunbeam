@@ -23,7 +23,7 @@ rule prodigal:
     benchmark:
         BENCHMARK_FP / "prodigal_{sample}.tsv"
     conda:
-        "../../envs/annotation.yml"
+        "../envs/annotation.yml"
     shell:
         """
         if [[ -s {input} ]]; then

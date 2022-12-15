@@ -16,7 +16,7 @@ rule build_host_index:
         host="{host}",
         index_fp=Cfg["qc"]["host_fp"],
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     shell:
         "cd {Cfg[qc][host_fp]} && bwa index {input}"
 
@@ -36,7 +36,7 @@ rule align_to_host:
         index_fp=Cfg["qc"]["host_fp"],
     threads: 4
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     shell:
         """
         bwa mem -M -t {threads} \
@@ -60,7 +60,7 @@ rule get_mapped_reads:
         pct_id=Cfg["qc"]["pct_id"],
         frac=Cfg["qc"]["frac"],
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     script:
         "../../scripts/qc/get_mapped_reads.py"
 
@@ -93,7 +93,7 @@ rule filter_reads:
     benchmark:
         BENCHMARK_FP / "filter_reads_{sample}_{rp}.tsv"
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     script:
         "../../scripts/qc/filter_reads.py"
 
@@ -120,6 +120,6 @@ rule preprocess_report:
     benchmark:
         BENCHMARK_FP / "preprocess_report.tsv"
     conda:
-        "../../envs/reports.yml"
+        "../envs/reports.yml"
     script:
         "../../scripts/qc/preprocess_report.py"
