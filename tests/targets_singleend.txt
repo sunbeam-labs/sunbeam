@@ -1,20 +1,6 @@
-annotation/blastn/bacteria/contig/dummybfragilis.btf
-annotation/blastn/bacteria/contig/dummyecoli.btf
-annotation/blastn/bacteria/contig/random.btf
-
-annotation/summary/dummybfragilis.tsv
-annotation/summary/dummyecoli.tsv
-annotation/summary/random.tsv
-
 assembly/contigs/dummybfragilis-contigs.fa
 assembly/contigs/dummyecoli-contigs.fa
 assembly/contigs/random-contigs.fa
-
-classify/kraken/all_samples.biom
-classify/kraken/all_samples.tsv
-classify/kraken/dummybfragilis-taxa.tsv
-classify/kraken/dummyecoli-taxa.tsv
-classify/kraken/random-taxa.tsv
 
 qc/decontam/dummybfragilis_1.fastq.gz
 qc/decontam/dummyecoli_1.fastq.gz
@@ -23,6 +9,3 @@ qc/decontam/random_1.fastq.gz
 qc/cleaned/dummybfragilis_1.fastq.gz
 qc/cleaned/dummyecoli_1.fastq.gz
 qc/cleaned/random_1.fastq.gz
-
-mapping/human/coverage.csv
-mapping/phix174/coverage.csv
