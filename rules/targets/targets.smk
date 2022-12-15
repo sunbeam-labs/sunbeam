@@ -13,12 +13,15 @@ TARGET_FASTQC = [
     str(QC_FP / "reports" / "fastqc_quality.tsv"),
 ]
 
+
 # Quality-control reads
 TARGET_CLEAN = expand(
     QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz", sample=Samples.keys(), rp=Pairs
 )
 
+
 TARGET_QC = TARGET_CLEAN + TARGET_FASTQC
+
 
 # Remove host reads
 TARGET_DECONTAM = [
@@ -29,49 +32,23 @@ TARGET_DECONTAM = [
 ]
 
 
-# ---- Classification
-# Classify all reads
-TARGET_CLASSIFY = [CLASSIFY_FP / "kraken" / "all_samples.tsv"]
-
-
 # ---- Assembly
 # Assemble contigs
 TARGET_ASSEMBLY = [
-    expand(ASSEMBLY_FP / "contigs" / "{sample}-contigs.fa", sample=Samples.keys()),
-    ASSEMBLY_FP / "contigs_coverage.txt",
+    expand(ASSEMBLY_FP / "contigs" / "{sample}-contigs.fa", sample=Samples.keys())
 ]
 
 
-# ---- Mapping
-# Map reads to target genomes
-TARGET_MAPPING = [
+# ---- Annotation
+# Find and extract ORFs
+TARGET_ANNOTATION = [
     expand(
-        MAPPING_FP / "{genome}" / "{sample}.bam.bai",
-        genome=GenomeSegments.keys(),
+        ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes_{suffix}.fa",
         sample=Samples.keys(),
-    ),
-    expand(
-        MAPPING_FP / "{genome}" / "{sample}.raw.bcf",
-        genome=GenomeSegments.keys(),
-        sample=Samples.keys(),
-    ),
-    expand(MAPPING_FP / "{genome}" / "coverage.csv", genome=GenomeSegments.keys()),
+        suffix=["prot", "nucl"],
+    )
 ]
-
-
-# ---- Contig annotation
-# Annotate all contigs
-TARGET_ANNOTATE = expand(
-    ANNOTATION_FP / "summary" / "{sample}.tsv", sample=Samples.keys()
-)
 
 
 # ---- All targets
-TARGET_ALL = (
-    TARGET_QC
-    + TARGET_DECONTAM
-    + TARGET_CLASSIFY
-    + TARGET_ASSEMBLY
-    + TARGET_ANNOTATE
-    + TARGET_MAPPING
-)
+TARGET_ALL = TARGET_QC + TARGET_DECONTAM + TARGET_ASSEMBLY + TARGET_ANNOTATION

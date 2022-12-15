@@ -6,6 +6,11 @@
 # See Readme.md
 
 
+rule all_annotation:
+    input:
+        TARGET_ANNOTATION,
+
+
 rule prodigal:
     """Use Progial for coding genes predictions in contigs."""
     input:

@@ -2,16 +2,6 @@
 function test_all {
     sunbeam run --profile $TEMPDIR/
 
-    # Check contents
-    annot_summary=sunbeam_output/annotation/summary/dummyecoli.tsv
-    awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/$annot_summary || (
-        # stderr will show up on the summary output for the test suite as well
-        # as in the .err file.  false will cause the shell to exit assuming -e
-        # is in effect here.
-        echo "Check failed on $annot_summary" > /dev/stderr
-        false
-    )
-
     # Check targets
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt
 }
@@ -37,16 +27,6 @@ function test_all_old_illumina {
     sed -i -r 's/^( +seq_id_ending: *).*$/\1"\/[12]"/' $TEMPDIR/tmp_config_old_illumina.yml
     sunbeam run --profile $TEMPDIR/
     mv $TEMPDIR/samples_orig.csv $TEMPDIR/samples.csv
-
-    # Check contents
-    annot_summary=sunbeam_output_old_illumina/annotation/summary/dummyecoli.tsv
-    awk '/NC_000913.3|\t2/  {rc = 1; print}; END { exit !rc }' $TEMPDIR/$annot_summary || (
-        # stderr will show up on the summary output for the test suite as well
-        # as in the .err file.  false will cause the shell to exit assuming -e
-        # is in effect here.
-        echo "Check failed on $annot_summary" > /dev/stderr
-        false
-    )
 
     # Check targets
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output_old_illumina tests/targets.txt
@@ -174,79 +154,6 @@ function test_blank_fp_behavior {
     # directory as a genomes_fp directory.
     [ ! -f $TEMPDIR/sunbeam_output/mapping/indexes_human/coverage.csv ]
     [ ! -f $TEMPDIR/sunbeam_output/mapping/indexes_phix174/coverage.csv ]
-}
-
-# Test that mapping reports aligning read pairs for a contrived example.
-# This could maybe be rolled into test_all (as the annotation check already is)
-# if the data setup were reorganized.
-function test_mapping {
-    # Create two read pairs using lines from the human genome fasta.
-    r1_1=$TEMPDIR/data_files/PCMP_stub_human_R1.fastq.gz
-    r2_1=$TEMPDIR/data_files/PCMP_stub_human_R2.fastq.gz
-    r1_2=$TEMPDIR/data_files/PCMP_stub2_human_R1.fastq.gz
-    r2_2=$TEMPDIR/data_files/PCMP_stub2_human_R2.fastq.gz
-    human=$TEMPDIR/indexes/human.fasta
-    (
-        echo "@read0"
-        sed -n 2p $human
-        echo "+"
-        sed -n 's:.:G:g;2p' $human
-    ) | gzip > $r1_1
-    (
-        echo "@read0"
-        sed -n 2p $human | rev | tr '[ACTG]' '[TGAC]'
-        echo "+"
-        sed -n 's:.:G:g;2p' $human
-    ) | gzip > $r2_1
-    (
-        echo "@read0"
-        sed -n 15p $human | cut -c 1-40
-        echo "+"
-        sed -n 's:.:G:g;2p' $human | cut -c 1-40
-    ) | gzip > $r1_2
-    (
-        echo "@read0"
-        sed -n 15p $human | cut -c 1-40 | rev | tr '[ACTG]' '[TGAC]'
-        echo "+"
-        sed -n 's:.:G:g;2p' $human | cut -c 1-40
-    ) | gzip > $r2_2
-    # Run sunbeam mapping rules with these two samples defined.
-    (
-	    echo "stub_human,$r1_1,$r2_1"
-	    echo "stub2_human,$r1_2,$r2_2"
-    ) > $TEMPDIR/samples_test_mapping.csv
-    sunbeam config modify --str 'all: {samplelist_fp: "samples_test_mapping.csv"}' \
-        $TEMPDIR/tmp_config.yml > $TEMPDIR/test_mapping_config.yml
-
-    # Move human host files to top-level, since we're using that genome for
-    # mapping in this test and shouldn't decontaminate using it as well.
-    for file in $TEMPDIR/hosts/human*; do
-        mv $file $TEMPDIR/hosts_${file##*/}
-    done
-    sunbeam run --profile $TEMPDIR/ all_mapping --configfile $TEMPDIR/test_mapping_config.yml
-    # Move human host files back to original location
-    for file in $TEMPDIR/hosts_*; do
-        mv $file ${file/hosts_/hosts\//}
-    done
-    # After the header line, there should be two lines in the human and phix
-    # coverage summaries, with two reads mapping for human and none for phix.
-    # The lines should be sorted in standard alphanumeric order; stub2_human
-    # will come before stub_human.
-    (
-	    csv_human=$TEMPDIR/sunbeam_output/mapping/human/coverage.csv
-	    csv_phix=$TEMPDIR/sunbeam_output/mapping/phix174/coverage.csv
-	    function col3 { cut -f3 -d, | tr '\n' : ; }
-	    function col5 { cut -f5 -d, | tr '\n' : ; }
-	    test "Sample:stub2_human:stub_human:" == $(col3 < "$csv_human")
-	    test "Max:2:2:" == $(col5 < "$csv_human")
-	    test "Sample:stub2_human:stub_human:" == $(col3 < "$csv_phix")
-	    test "Max:0:0:" == $(col5 < "$csv_phix")
-    ) || (
-	    echo "Unexpected coverage.csv content from mapping rules" > /dev/stderr
-        cat $csv_human
-        cat $csv_phix
-	    false
-	)
 }
 
 # Fix for #185:

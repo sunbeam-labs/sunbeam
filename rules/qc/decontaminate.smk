@@ -3,9 +3,6 @@ rule all_decontam:
         TARGET_DECONTAM,
 
 
-ruleorder: build_host_index > build_genome_index
-
-
 rule build_host_index:
     input:
         Cfg["qc"]["host_fp"] / "{host}.fasta",
@@ -37,7 +34,7 @@ rule align_to_host:
     params:
         sam=temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam"),
         index_fp=Cfg["qc"]["host_fp"],
-    threads: 4  # Should be overridden by profile's set-threads (https://github.com/snakemake/snakemake/issues/1983)
+    threads: 4
     conda:
         "../../envs/qc.yml"
     shell:
