@@ -25,7 +25,7 @@ def main(argv=sys.argv):
     parser.add_argument(
         "-s",
         "--sunbeam_dir",
-        default=os.path.join(os.getenv("SUNBEAM_DIR", os.getcwd()), "workflow/"),
+        default=os.getenv("SUNBEAM_DIR", os.getcwd()),
         help="Path to Sunbeam installation",
     )
     parser.add_argument(
@@ -35,10 +35,10 @@ def main(argv=sys.argv):
     # The remaining args (after --) are passed to Snakemake
     args, remaining = parser.parse_known_args(argv)
 
-    snakefile = Path(args.sunbeam_dir) / "Snakefile"
+    snakefile = Path(args.sunbeam_dir) / "workflow" / "Snakefile"
     if not snakefile.exists():
         sys.stderr.write(
-            f"Error: could not find a Snakefile in directory '{args.sunbeam_dir}'\n"
+            f"Error: could not find '{snakefile}'\n"
         )
         sys.exit(1)
 
