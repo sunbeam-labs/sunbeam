@@ -25,7 +25,7 @@ def main(argv=sys.argv):
     parser.add_argument(
         "-s",
         "--sunbeam_dir",
-        default=os.getenv("SUNBEAM_DIR", os.getcwd()),
+        default=os.path.join(os.getenv("SUNBEAM_DIR", os.getcwd()), "workflow/"),
         help="Path to Sunbeam installation",
     )
     parser.add_argument(
