@@ -25,11 +25,11 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - dependencies-{{ .Branch }}-{{ checksum "envs/annotation.yml" }}
-          - dependencies-{{ .Branch }}-{{ checksum "envs/assembly.yml" }}
-          - dependencies-{{ .Branch }}-{{ checksum "envs/komplexity.yml" }}
-          - dependencies-{{ .Branch }}-{{ checksum "envs/qc.yml" }}
-          - dependencies-{{ .Branch }}-{{ checksum "envs/reports.yml" }}
+          - dependencies-{{ .Branch }}-{{ checksum "workflow/envs/annotation.yml" }}
+          - dependencies-{{ .Branch }}-{{ checksum "workflow/envs/assembly.yml" }}
+          - dependencies-{{ .Branch }}-{{ checksum "workflow/envs/komplexity.yml" }}
+          - dependencies-{{ .Branch }}-{{ checksum "workflow/envs/qc.yml" }}
+          - dependencies-{{ .Branch }}-{{ checksum "workflow/envs/reports.yml" }}
           - dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
 
       - run:
@@ -53,27 +53,27 @@ jobs:
       - save_cache:
           paths:
             - .snakemake/
-          key: dependencies-{{ .Branch }}-{{ checksum "envs/annotation.yml" }}
+          key: dependencies-{{ .Branch }}-{{ checksum "workflow/envs/annotation.yml" }}
 
       - save_cache:
           paths:
             - .snakemake/
-          key: dependencies-{{ .Branch }}-{{ checksum "envs/assembly.yml" }}
+          key: dependencies-{{ .Branch }}-{{ checksum "workflow/envs/assembly.yml" }}
 
       - save_cache:
           paths:
             - .snakemake/
-          key: dependencies-{{ .Branch }}-{{ checksum "envs/komplexity.yml" }}
+          key: dependencies-{{ .Branch }}-{{ checksum "workflow/envs/komplexity.yml" }}
 
       - save_cache:
           paths:
             - .snakemake/
-          key: dependencies-{{ .Branch }}-{{ checksum "envs/qc.yml" }}
+          key: dependencies-{{ .Branch }}-{{ checksum "workflow/envs/qc.yml" }}
 
       - save_cache:
           paths:
             - .snakemake/
-          key: dependencies-{{ .Branch }}-{{ checksum "envs/reports.yml" }}
+          key: dependencies-{{ .Branch }}-{{ checksum "workflow/envs/reports.yml" }}
       
       - save_cache:
           paths:
