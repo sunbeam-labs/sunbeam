@@ -37,9 +37,7 @@ def main(argv=sys.argv):
 
     snakefile = Path(args.sunbeam_dir) / "workflow" / "Snakefile"
     if not snakefile.exists():
-        sys.stderr.write(
-            f"Error: could not find '{snakefile}'\n"
-        )
+        sys.stderr.write(f"Error: could not find '{snakefile}'\n")
         sys.exit(1)
 
     conda_prefix = Path(args.sunbeam_dir) / ".snakemake"
@@ -62,6 +60,7 @@ def main(argv=sys.argv):
                 str(snakefile),
                 "--conda-prefix",
                 str(conda_prefix),
+                "--use-singularity",
                 target,
             ]
             if arg

@@ -22,7 +22,9 @@ from sunbeamlib.config import *
 from sunbeamlib.post import *
 from sunbeamlib.reports import *
 
+
 container: "docker://ctbushman/sunbeam:0.0.0"
+
 
 # Disallow slashes in our sample names during Snakemake's wildcard evaluation.
 # Slashes should always be interpreted as directory separators.
