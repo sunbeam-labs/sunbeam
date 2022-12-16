@@ -3,7 +3,7 @@ import tempfile
 import unittest
 import os
 
-from scripts.assembly.final_filter_f import parse_fasta, filter_seqs, write_fasta
+from workflow.scripts.assembly.final_filter_f import parse_fasta, filter_seqs, write_fasta
 
 
 class FinalFilterTests(unittest.TestCase):
