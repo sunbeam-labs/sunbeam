@@ -144,7 +144,7 @@ rule samples:
 onstart:
     try:
         shutil.rmtree(BENCHMARK_FP)
-        print("Clearing benchmarks directory.")
+        print("Cleared benchmarks directory.")
     except Exception as e:
         None
 
