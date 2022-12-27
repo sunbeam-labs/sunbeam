@@ -3,10 +3,21 @@ import datetime
 import os
 
 
+WARN_STR = ['warn', 'warning']
+ERR_STR = ['err', 'error', 'exception']
+
+
 def parse_err_and_warn(log_fp: str) -> tuple:
     """Go through output log and return a list of warnings and a list of errors"""
     warns = list()
     errs = list()
+
+    with open(log_fp) as f:
+        for n, l in enumerate(f, 1):
+            if [w in l.lower() for w in WARN_STR]:
+                warns.append(f"{n}: {l}")
+            if [e in l.lower() for e in ERR_STR]:
+                errs.append(f"{n}: {l}")
 
     return warns, errs
 

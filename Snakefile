@@ -145,17 +145,29 @@ onstart:
     try:
         shutil.rmtree(BENCHMARK_FP)
         print("Cleared benchmarks directory.")
-    except Exception as e:
+    except FileNotFoundError as e:
         None
 
 
 onsuccess:
     print("Sunbeam finished!")
     warnings, errors = parse_err_and_warn(log)
+    print("Warnings:\n")
+    for w in warnings:
+        print(f"{w}\n")
+    print("Errors:\n")
+    for e in errors:
+        print(f"{e}\n")
     compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
 
 
 onerror:
     print("Sunbeam failed with error.")
     warnings, errors = parse_err_and_warn(log)
+    print("Warnings:\n")
+    for w in warnings:
+        print(f"{w}\n")
+    print("Errors:\n")
+    for e in errors:
+        print(f"{e}\n")
     compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
