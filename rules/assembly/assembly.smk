@@ -40,7 +40,7 @@ rule megahit_paired:
         then
             rm -rf {params.out_fp}
         fi
-        megahit -t {threads} -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue || exitcode=$?
+        megahit -t {threads} -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue 2>&1 {log} || exitcode=$?
 
         if [ $exitcode -eq 255 ]
         then
@@ -74,7 +74,7 @@ rule megahit_unpaired:
 
         ## sometimes the error is due to lack of memory
         exitcode=0
-        megahit -t {threads} -r {input} -o {params.out_fp} -f --continue 2>&1 | tee {log} || exitcode=$?
+        megahit -t {threads} -r {input} -o {params.out_fp} -f --continue 2>&1 {log} || exitcode=$?
 
         if [ $exitcode -eq 255 ]
         then
