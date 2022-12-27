@@ -152,8 +152,11 @@ onstart:
 onsuccess:
     print("Sunbeam finished!")
     warnings, errors = parse_err_and_warn(log)
-    print(f"Warnings: {len(warnings)}\n")
-    print(f"Errors: {len(errors)}\n")
+    print(f"Warnings: {len(warnings)}\nLine #'s: {warnings}\n")
+    print(f"Errors: {len(errors)}\nLine #'s: {errors}\n")
+    alerts = parse_rule_logs(LOG_FP)
+    for a in alerts:
+        print(a)
     compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
 
 
@@ -162,4 +165,7 @@ onerror:
     warnings, errors = parse_err_and_warn(log)
     print(f"Warnings: {len(warnings)}\nLine #'s: {warnings}\n")
     print(f"Errors: {len(errors)}\nLine #'s: {errors}\n")
+    alerts = parse_rule_logs(LOG_FP)
+    for a in alerts:
+        print(a)
     compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")

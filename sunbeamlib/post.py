@@ -22,6 +22,18 @@ def parse_err_and_warn(log_fp: str) -> tuple:
     return warns, errs
 
 
+def parse_rule_logs(log_fp: str) -> list:
+    """Go through each per-rule log and report any warnings or errors"""
+    log_fps = os.listdir(log_fp)
+    alerts = []
+    for fp in log_fps:
+        warns, errs = parse_err_and_warn(os.path.join(log_fp, fp))
+        if warns or errs:
+            alerts.append(f"{fp}:\nWarnings: ({len(warns)} {warns}\nErrors: ({len(errs)} {errs}\n")
+    
+    return alerts
+
+
 def compile_benchmarks(benchmark_fp: str, stats_fp: str):
     """Aggregate all the benchmark files into one and put it in stats_fp"""
     benchmarks = []
