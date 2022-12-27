@@ -34,7 +34,6 @@ rule prodigal:
           touch {output.faa}
           touch {output.gff}
           touch {output.fna}
-          touch {output.log}
         fi
         """
 

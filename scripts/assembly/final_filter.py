@@ -8,4 +8,6 @@ with open(snakemake.log[0], "w") as l:
         with open(f"{snakemake.input[0]}.{snakemake.params.len}f", "w") as g:
             write_fasta(g, list(filter_seqs(parse_fasta(f), snakemake.params.len)))
 
-    shutil.copyfile(f"{snakemake.input[0]}.{snakemake.params.len}f", snakemake.output[0])
+    shutil.copyfile(
+        f"{snakemake.input[0]}.{snakemake.params.len}f", snakemake.output[0]
+    )
