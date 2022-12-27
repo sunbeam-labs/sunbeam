@@ -3,8 +3,8 @@ import datetime
 import os
 
 
-WARN_STR = ['warn', 'warning']
-ERR_STR = ['err', 'error', 'exception']
+WARN_STR = ["warn", "warning"]
+ERR_STR = ["err", "error", "exception"]
 
 
 def parse_err_and_warn(log_fp: str) -> tuple:
@@ -29,8 +29,10 @@ def parse_rule_logs(log_fp: str) -> list:
     for fp in log_fps:
         warns, errs = parse_err_and_warn(os.path.join(log_fp, fp))
         if warns or errs:
-            alerts.append(f"{fp}:\nWarnings: ({len(warns)}) {warns}\nErrors: ({len(errs)}) {errs}\n")
-    
+            alerts.append(
+                f"{fp}:\nWarnings: ({len(warns)}) {warns}\nErrors: ({len(errs)}) {errs}"
+            )
+
     return alerts
 
 
