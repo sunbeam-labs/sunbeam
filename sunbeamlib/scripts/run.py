@@ -60,7 +60,6 @@ def main(argv=sys.argv):
                 str(snakefile),
                 "--conda-prefix",
                 str(conda_prefix),
-                "--use-singularity",
                 target,
             ]
             if arg
