@@ -15,9 +15,9 @@ def parse_err_and_warn(log_fp: str) -> tuple:
     with open(log_fp) as f:
         for n, l in enumerate(f, 1):
             if [1 for w in WARN_STR if w in l.lower()]:
-                warns.append(f"{n}: {l}")
+                warns.append(n)
             if [1 for e in ERR_STR if e in l.lower()]:
-                errs.append(f"{n}: {l}")
+                errs.append(n)
 
     return warns, errs
 
