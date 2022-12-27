@@ -19,7 +19,9 @@ with open(snakemake.log[0], "w") as l:
     rbt fastq-filter {b} | \
     gzip > {c}
     """.format(
-            a=snakemake.input.reads, b=snakemake.input.hostreads, c=snakemake.output.reads
+            a=snakemake.input.reads,
+            b=snakemake.input.hostreads,
+            c=snakemake.output.reads,
         )
     )
 

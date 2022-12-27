@@ -153,7 +153,7 @@ rule fastqc:
     conda:
         "../../envs/reports.yml"
     shell:
-        "fastqc -o {params.outdir} {input.reads} -extract"
+        "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
 
 rule fastqc_report:
@@ -190,7 +190,7 @@ rule find_low_complexity:
     shell:
         """
         for rp in {input}; do
-          gzip -dc $rp | kz | \
+          gzip -dc $rp | kz 2>&1 | tee {log} | \
           awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> {output}
         done
         """
@@ -210,7 +210,7 @@ rule remove_low_complexity:
         "../../envs/qc.yml"
     shell:
         """
-        gzip -dc {input.reads} | rbt fastq-filter {input.ids} |\
+        gzip -dc {input.reads} | rbt fastq-filter {input.ids} 2>&1 | tee {log} |\
         gzip > {output}
         """
 
