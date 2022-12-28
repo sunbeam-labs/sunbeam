@@ -30,7 +30,7 @@ file and (optionally) a sample list.
 
 .. code-block:: shell
 
-    sunbeam init [-h] [-f] [--output FILE] [--defaults FILE] [--template FILE] [--data_fp PATH] [--format STR] [--single_end] project_fp
+    sunbeam init [-h] [-f] [--output FILE] [--defaults FILE] [--template FILE] [--data_fp PATH] [--format STR] [--single_end] [--profile STR] project_fp
 
 .. code-block:: shell
 
@@ -54,6 +54,12 @@ Sample list options:
     --single_end: Fastq files are in single-end, not paired-end, format for --data_fp.
     project_fp: Project directory (will be created if it does not exist).
 
+Profile file options:
+
+.. code-block:: shell
+
+    --profile: Name of the profile template to use (e.g. default, slurm) (default: default)
+
 run
 ===
 
@@ -66,9 +72,9 @@ Executes the Sunbeam pipeline by calling Snakemake.
 Usage examples:
 
 1. To run all targets (not including extensions):
-   ``sunbeam run --configfile /path/to/sunbeam_config.yml``
+   ``sunbeam run --profile /path/to/project/``
 2. To specify multiple targets:
-   ``sunbeam run --configfile /path/to/sunbeam_config.yml --target_list all_qc all_assembly all_demic``
+   ``sunbeam run --profile /path/to/project/ --target_list all_qc all_assembly all_annotation``
 
 .. code-block:: shell
 
@@ -76,6 +82,10 @@ Usage examples:
     -s/--sunbeam_dir: Path to sunbeam installation.
     --target_list: A list of targets to run successively.
     <snakemake options>: You can pass further arguments to Snakemake after ``--``, e.g: ``$ sunbeam run -- --cores 12``. See http://snakemake.readthedocs.io for more information.
+
+.. tip::
+
+    The ``--profile`` option is a snakemake option but should be used whenever using ``sunbeam run``. The main sunbeam snakefile requires a config object to be defined and the profile created by ``sunbeam init`` will always specify a config file to get that from.
 
 config
 ======
@@ -132,7 +142,7 @@ Usage examples:
 .. code-block:: shell
 
     -h: Display help.
-    -s/--str: YAML string (e.g. 'blast: {threads: 4}').
+    -s/--str: YAML string (e.g. 'qc: {minlen: 48}').
     -f/--file: YAML file with new config values.
     -i/--in_place: Alters config file in place.
     -o/-out: Where to write modified config file.
