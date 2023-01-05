@@ -7,8 +7,9 @@ dependencies:
   - bwa
   - cutadapt
   - fastqc
+  - numpy
   - pysam
+  - python=3.10
   - rust-bio-tools
   - samtools
   - trimmomatic
-  - python=3.10
