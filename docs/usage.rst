@@ -254,6 +254,7 @@ qc
   using cutadapt. Replace with ``""`` to skip.
 * ``rev_adapters``: (cutadapt) custom reverse adaptor sequences to remove
   using cutadapt. Replace with ``""`` to skip.
+* ``cutadapt_opts``: (cutadapt) options to pass to cutadapt. Replace with ``""`` to pass no extra options.
 * ``kz_threshold``: a value between 0 and 1 to determine the low-complexity boundary (1 is most stringent). Ignored if not masking low-complexity sequences.
 * ``pct_id``: (decontaminate) minimum percent identity to host genome to
   consider match
@@ -327,7 +328,7 @@ To run Sunbeam, make sure you've activated the sunbeam environment. Then run:
 
 .. code-block:: shell
 
-   sunbeam run --configfile ~/path/to/config.yml
+   sunbeam run --profile path/to/project/
 
 There are many options that you can use to determine which outputs you want. By
 default, if nothing is specified, this runs the entire pipeline. However, each
@@ -337,17 +338,13 @@ the command above and consist of the following:
 
 * ``all_qc``: basic quality control on all reads (no host read removal)
 * ``all_decontam``: quality control and host read removal on all samples
-* ``all_mapping``: align reads to target genomes
-* ``all_classify``: classify taxonomic provenance of all qc'd, decontaminated
-  reads
 * ``all_assembly``: build contigs from all qc'd, decontaminated reads
-* ``all_annotate``: annotate contigs using defined BLAST databases
 
 To use one of these options, simply run it like so:
 
 .. code-block:: shell
 
-   sunbeam run -- --configfile ~/path/to/config.yml all_classify
+   sunbeam run --profile path/to/project/ all_qc
 
 In addition, since Sunbeam is really just a set of `snakemake
 <http://snakemake.readthedocs.io/en/latest/executable.html>`_ rules, all the
@@ -371,17 +368,17 @@ Cluster options
 
 Sunbeam inherits its cluster abilities from Snakemake. There's nothing special
 about installing Sunbeam on a cluster, but in order to distribute work to
-cluster nodes, you have to use the ``--cluster`` and ``--jobs`` flags. For
-example, if we wanted each rule to run on a 12-thread node, and a max of 100
-rules executing in parallel, we would use the following command on our cluster:
+cluster nodes, you have to use the ``--cluster`` and ``--jobs`` flags. This is 
+handled by using a cluster profile instead of the default. Sunbeam comes with a 
+slurm profile template but you can create others or use existing ones from 
+`here <https://github.com/Snakemake-Profiles>`_. Once you've initialized a 
+project with a cluster profile, run it as normal:
 
 .. code-block:: shell
 
-   sunbeam run -- --configfile ~/path/to/config.yml --cluster "bsub -n 12" -j 100 -w 90
+   sunbeam run --profile /path/to/cluster/project/
 
-The ``-w 90`` flag is provided to account for filesystem latency that often
-causes issues on clusters. It asks Snakemake to wait for 90 seconds before
-complaining that an expected output file is missing.
+Edit any options set in the profile as if they are snakemake command line arguments.
 
 Outputs
 =======
@@ -394,26 +391,11 @@ databases, one nucleotide ('bacteria') and one protein ('card').
 
    sunbeam_output
 	├ annotation
-	│   ├ blastn
-	│   │   └ bacteria
-	│   │       └ contig
-	│   ├ blastp
-	│   │   └ card
-	│   │       └ prodigal
-	│   ├ blastx
-	│   │   └ card
-	│   │       └ prodigal
-	│   ├ genes
-	│   │   └ prodigal
-	│   │       └ log
-	│   └ summary
+	│   └ genes
+	│       └ prodigal
+	│           └ log
 	├ assembly
-	│   ├ contigs
-	├ classify
-	│   └ kraken
-	│       └ raw
-	├ mapping
-   	│   └ genome1
+	│   └ contigs
 	└ qc
 	    ├ cleaned
 	    ├ decontam
@@ -432,30 +414,11 @@ Contig annotation
 
    sunbeam_output
 	├ annotation
-	│   ├ blastn
-	│   │   └ bacteria
-	│   │       └ contig
-	│   ├ blastp
-	│   │   └ card
-	│   │       └ prodigal
-	│   ├ blastx
-	│   │   └ card
-	│   │       └ prodigal
 	│   ├ genes
 	│   │   └ prodigal
 	│   │       └ log
-	│   └ summary
-
-This contains the BLAST/Diamond results in blast tabular format from the assembled contigs. ``blastn``
-contains the results from directly BLASTing the contig nucleotide sequences
-against the nucleotide databases. ``blastp`` and ``blastx`` use genes identified
-by the ORF finding program Prodigal to search for hits in the protein databases.
 
 The genes found from Prodigal are available in the ``genes`` folder.
-
-Finally, the ``summary`` folder contains an aggregated report of the number and
-types of hits of each contig against the BLAST databases, as well as length and
-circularity.
 
 Contig assembly
 ---------------
@@ -463,36 +426,10 @@ Contig assembly
 .. code-block:: shell
 
    	├ assembly
-	│   ├ contigs
+	    └ contigs
 
 
 This contains the assembled contigs for each sample under 'contigs'.
-
-Taxonomic classification
-------------------------
-
-.. code-block:: shell
-
-	├ classify
-	│   └ kraken
-	│       └ raw
-
-This contains the taxonomic outputs from Kraken, both the raw output as well as
-summarized results. The primary output file is ``all_samples.tsv``, which is a
-BIOM-style format with samples as columns and taxonomy IDs as rows, and number
-of reads assigned to each in each cell.
-
-Alignment to genomes
---------------------
-
-.. code-block:: shell
-
-   	├ mapping
-   	│   └ genome1
-
-
-Alignment files (in BAM format) to each target genome are contained in
-subfolders named for the genome, such as 'genome1'.
 
 Quality control
 ---------------
