@@ -1,0 +1,6 @@
+name: rust-bio-tools
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - rust-bio-tools

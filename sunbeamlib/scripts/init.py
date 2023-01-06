@@ -193,3 +193,4 @@ def write_profile(args, project_fp):
     with open(config_fp, "a") as f:
         f.write("\n# Filepath of this projects configfile")
         f.write(f"\nconfigfile: {project_fp/args.output}")
+    sys.stderr.write("New profile file written to {}\n".format(config_fp))

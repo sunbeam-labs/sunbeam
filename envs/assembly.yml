@@ -1,6 +1,5 @@
 name: assembly
 channels:
   - bioconda
-  - conda-forge
 dependencies:
-  - megahit # https://github.com/sunbeam-labs/sunbeam/issues/213
+  - megahit
