@@ -1,0 +1,5 @@
+name: fastqc
+channels:
+  - bioconda
+dependencies:
+  - fastqc
