@@ -1,8 +1,9 @@
 name: reports
 channels:
   - conda-forge
+  - bioconda
 dependencies:
-  - biopython
+  - conda-forge::biopython
   - pandas
-  - pysam
+  - bioconda::pysam
   - python=3.10
