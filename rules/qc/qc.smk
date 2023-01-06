@@ -22,7 +22,7 @@ rule sample_intake:
     params:
         suffix=Cfg["qc"]["seq_id_ending"],
     conda:
-        "../../envs/qc.yml"
+        "../../envs/reports.yml"
     script:
         "../../scripts/qc/sample_intake.py"
 
@@ -149,7 +149,7 @@ rule fastqc:
     params:
         outdir=QC_FP / "reports",
     conda:
-        "../../envs/fastqc.yml"
+        "../../envs/qc.yml"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract"
 
