@@ -6,6 +6,5 @@ dependencies:
   - cutadapt
   - fastqc
   - pysam
-  - rust-bio-tools
   - samtools
   - trimmomatic
