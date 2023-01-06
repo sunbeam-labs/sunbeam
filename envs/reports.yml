@@ -4,5 +4,5 @@ channels:
   - conda-forge
 dependencies:
   - conda-forge::biopython
-  - fastqc
-  - pandas
+  - bioconda::fastqc
+  - conda-forge::pandas
