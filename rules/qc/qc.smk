@@ -24,7 +24,7 @@ rule sample_intake:
     params:
         suffix=Cfg["qc"]["seq_id_ending"],
     conda:
-        "../../envs/qc.yml"
+        "../../envs/reports.yml"
     script:
         "../../scripts/qc/sample_intake.py"
 
@@ -151,7 +151,7 @@ rule fastqc:
     params:
         outdir=QC_FP / "reports",
     conda:
-        "../../envs/reports.yml"
+        "../../envs/qc.yml"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
@@ -171,7 +171,7 @@ rule fastqc_report:
     benchmark:
         BENCHMARK_FP / "fastqc_report.tsv"
     conda:
-        "../../envs/qc.yml"
+        "../../envs/reports.yml"
     script:
         "../../scripts/qc/fastqc_report.py"
 
@@ -207,7 +207,7 @@ rule remove_low_complexity:
     benchmark:
         BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
     conda:
-        "../../envs/qc.yml"
+        "../../envs/rbt.yml"
     shell:
         """
         gzip -dc {input.reads} | rbt fastq-filter {input.ids} 2>&1 | tee {log} |\

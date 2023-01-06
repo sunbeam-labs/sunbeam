@@ -17,7 +17,7 @@ Welcome to Sunbeam
 Sunbeam is a pipeline written in `snakemake <http://snakemake.readthedocs.io>`_
 that simplifies and automates many of the steps in metagenomic sequencing
 analysis. Sunbeam requires a reasonably modern GNU/Linux computer with bash, 
-Python 2.6+, internet access (to retrieve dependencies), 4Gb of RAM, and at 
+Python 3.1+, internet access (to retrieve dependencies), 4Gb of RAM, and at 
 least 3Gb of disk space. RAM and disk space requirements may increase depending 
 on the databases and tasks you choose to run, and the size of your data. For 
 more information, check out the `Sunbeam paper in Microbiome 
@@ -27,15 +27,11 @@ Sunbeam currently automates the following tasks:
 
 * Quality control, including adaptor trimming, host read removal, and quality
   filtering;
-* Taxonomic assignment of reads to databases using `Kraken
-  <https://github.com/DerrickWood/kraken>`_;
 * Assembly of reads into contigs using `Megahit
   <https://github.com/voutcn/megahit>`_;
-* Contig annotation using BLAST[n/p] and `Diamond <https://github.com/bbuchfink/diamond>`_;
-* Mapping of reads to target genomes; and
 * ORF prediction using `Prodigal <https://github.com/hyattpd/Prodigal>`_
 
-Sunbeam was designed to be modular and extensible. We have a few pre-built
+Sunbeam was designed to be modular and extensible. We have 
 :ref:`extensions` available that handle visualization tasks, including contig
 assembly graphs, read alignments, and taxonomic classifications.
 

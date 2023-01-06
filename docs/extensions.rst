@@ -263,36 +263,40 @@ Variables provided by Sunbeam
 Here is a table of all the Python variables provided by Sunbeam for
 use in your extensions:
 
-+-------------------+-------------+----------------------------------------------+
-| Variable name     | Type        | Description                                  |
-+-------------------+-------------+----------------------------------------------+
-| ``QC_FP``         | Path        | Output directory for quality control files.  |
-+-------------------+-------------+----------------------------------------------+
-| ``ASSEMBLY_FP``   | Path        | Output directory for assembly files.         |
-+-------------------+-------------+----------------------------------------------+
-| ``ANNOTATION_FP`` | Path        | Output directory for gene annotation files.  |
-+-------------------+-------------+----------------------------------------------+
-| ``CLASSIFY_FP``   | Path        | Output directory for taxonomic               |
-|                   |             | classification files.                        |
-+-------------------+-------------+----------------------------------------------+
-| ``Samples``       | Dictionary  | Key is the sample name, value is a dictionary|
-|                   |             | with keys "1" and "2", values are the        |
-|                   |             | the gzipped FASTQ files at the start of the  |
-|                   |             | workflow.  For unpaired reads the value for  |
-|                   |             | "2" is the empty string.                     |
-+-------------------+-------------+----------------------------------------------+
-| ``Pairs``         | List        | For paired reads, ["1", "2"]. For unpaired   |
-|                   |             | reads, ["1"].                                |
-+-------------------+-------------+----------------------------------------------+
-| ``Cfg``           | Dictionary  | Parameters found in the configuration file.  |
-|                   |             | For any parameter ending in "_fp", the value |
-|                   |             | is converted to a Path object.  The most     |
-|                   |             | commonly used parameter is                   |
-|                   |             | ``Cfg['all']['output_dir']``, which gives the|
-|                   |             | base output directory.                       |
-+-------------------+-------------+----------------------------------------------+
-| ``sunbeam_dir``   | String      | File path where Sunbeam is installed.        |
-+-------------------+-------------+----------------------------------------------+
++-------------------+-------------+-----------------------------------------------+
+| Variable name     | Type        | Description                                   |
++-------------------+-------------+-----------------------------------------------+
+| ``QC_FP``         | Path        | Output directory for quality control files.   |
++-------------------+-------------+-----------------------------------------------+
+| ``ASSEMBLY_FP``   | Path        | Output directory for assembly files.          |
++-------------------+-------------+-----------------------------------------------+
+| ``ANNOTATION_FP`` | Path        | Output directory for gene annotation files.   |
++-------------------+-------------+-----------------------------------------------+
+|| ``CLASSIFY_FP``  || Path       || Output directory for taxonomic               |
+||                  ||            || classification files.                        |
++-------------------+-------------+-----------------------------------------------+
+| ``BENCHMARK_FP``  | Path        | Output directory for benchmark files.         |
++-------------------+-------------+-----------------------------------------------+
+| ``LOG_FP``        | Path        | Output directory for logs.                    |
++-------------------+-------------+-----------------------------------------------+
+|| ``Samples``      || Dictionary ||                                              |
+||                  ||            || with keys "1" and "2", values are the        |
+||                  ||            || the gzipped FASTQ files at the start of the  |
+||                  ||            || workflow. For unpaired reads the value for   |
+||                  ||            || "2" is the empty string.                     |
++-------------------+-------------+-----------------------------------------------+
+|| ``Pairs``        || List       || For paired reads, ["1", "2"]. For unpaired   |
+||                  ||            || reads, ["1"].                                |
++-------------------+-------------+-----------------------------------------------+
+|| ``Cfg``          || Dictionary || Parameters found in the configuration file.  |
+||                  ||            || For any parameter ending in "_fp", the value |
+||                  ||            || is converted to a Path object. The most      |
+||                  ||            || commonly used parameter is                   |
+||                  ||            || base output directory.                       |
+||                  ||            ||                                              |
++-------------------+-------------+-----------------------------------------------+
+| ``sunbeam_dir``   | String      | File path where Sunbeam is installed.         |
++-------------------+-------------+-----------------------------------------------+
 
 Further reading
 ---------------

@@ -1,7 +1,6 @@
 import os
 import sys
 from collections import OrderedDict
-
 from filter_reads_f import count_host_reads, calculate_counts, write_log
 
 with open(snakemake.log[0], "w") as l:
