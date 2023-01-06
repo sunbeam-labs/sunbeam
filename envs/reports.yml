@@ -4,4 +4,5 @@ channels:
 dependencies:
   - biopython
   - pandas
+  - pysam
   - python=3.10

@@ -1,10 +1,10 @@
 name: qc
 channels:
   - bioconda
+  - anaconda
 dependencies:
   - bwa
   - cutadapt
   - fastqc
-  - pysam
   - samtools
   - trimmomatic
