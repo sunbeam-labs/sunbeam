@@ -1,8 +1,6 @@
 name: reports
 channels:
-  - bioconda
   - conda-forge
 dependencies:
-  - conda-forge::biopython
-  - bioconda::fastqc
-  - conda-forge::pandas
+  - biopython
+  - pandas
