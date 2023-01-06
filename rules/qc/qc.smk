@@ -165,7 +165,7 @@ rule fastqc_report:
     output:
         QC_FP / "reports" / "fastqc_quality.tsv",
     conda:
-        "../../envs/qc.yml"
+        "../../envs/reports.yml"
     script:
         "../../scripts/qc/fastqc_report.py"
 
