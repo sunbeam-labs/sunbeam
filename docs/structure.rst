@@ -10,8 +10,8 @@ Software Structure
 Overview
 ========
 
-Sunbeam is a snakemake pipeline with a python library acting as a wrapper. 
-Calling ``sunbeam [cmd] [args] [options]`` is a call to this wrapper library 
+Sunbeam is a snakemake pipeline with a python library acting as a wrapper (``sunbeamlib``). 
+Calling ``sunbeam run [args] [options]`` is a call to this wrapper library 
 which then invokes the necessary snakemake commands. The main Snakefile can be 
 found in the root directory and it makes use of rules from ``rules/`` and 
 ``extensions/``, scripts from ``scripts/``, and environments from ``envs/``. Tests 
@@ -31,6 +31,9 @@ the dependencies required to run sunbeam and is used to create the main sunbeam
 environment. The setup file defines the structure and dependencies of the 
 sunbeamlib_ and makes it installable via pip. The snakefile manages all of the 
 snakemake components of the pipeline.
+
+There are also bash scripts for installing sunbeam and managing sunbeam's version 
+called ``install.sh`` and ``manage-version.sh``. These each have their own doc pages.
 
 .. tip::
 
@@ -91,7 +94,8 @@ snakemake. The python files in the root contain a number of utility functions
 whiles those in ``scripts/`` define the commands for sunbeam. 
 ``scripts/command.py`` takes in ``sunbeam [cmd]`` and then routes it to the file 
 matching the given command. The ``data/`` directory contains the default config 
-file as well as some sample configs for running on a cluster.
+file as well as some sample config templates for running on a cluster. It also 
+contains the default profile template and one for slurm.
 
 tests/
 ------
@@ -121,8 +125,8 @@ run by CircleCI as well as any scripts that are included in those jobs.
 ********
 
 This directory contains the ``PULL_REQUEST_TEMPLATE.md`` file which defines a 
-template for any pull requests on the sunbeam repository. This is also where 
-definitions for any CI/CD workflows run through GitHub Actions would live.
+template for any pull requests on the sunbeam repository. It is also where 
+the SuperLinter CI job definition lives.
 
 .snakemake/
 ***********
@@ -130,4 +134,5 @@ definitions for any CI/CD workflows run through GitHub Actions would live.
 This directory is created the first time you run sunbeam. It will contain all 
 the auxiliary environments created by snakemake (each environment will be named 
 by a hash of the ``.yml`` file, so any changes to those files will result in a 
-new environment being built).
+new environment being built). It also includes things like logs of previous runs 
+and singularity images/builds if you use singularity.

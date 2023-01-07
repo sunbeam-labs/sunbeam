@@ -1,9 +1,10 @@
 name: reports
 channels:
-  - bioconda
   - conda-forge
+  - bioconda
 dependencies:
   - conda-forge::biopython
-  - fastqc
+  - numpy
   - pandas
+  - bioconda::pysam
   - python=3.10
