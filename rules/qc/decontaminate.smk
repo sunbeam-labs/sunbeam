@@ -18,7 +18,7 @@ rule build_host_index:
     conda:
         "../../envs/qc.yml"
     shell:
-        "cd {Cfg[qc][host_fp]} && bwa index {input}"
+        "cd {Cfg[qc][host_fp]} && bwa index {input} 2>&1 | tee {log}"
 
 
 rule align_to_host:
@@ -28,7 +28,8 @@ rule align_to_host:
     output:
         temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam"),
     log:
-        LOG_FP / "align_to_host_{host}_{sample}.log",
+        bwa_log=LOG_FP / "align_to_host_bwa_{host}_{sample}.log",
+        sam_log=LOG_FP / "align_to_host_samtools_{host}_{sample}.log",
     benchmark:
         BENCHMARK_FP / "align_to_host_{host}_{sample}.tsv"
     params:
@@ -41,8 +42,8 @@ rule align_to_host:
         """
         bwa mem -M -t {threads} \
         {params.index_fp}/{wildcards.host}.fasta \
-        {input.reads} -o {params.sam} && \
-        samtools view -bSF4 {params.sam} > {output} && \
+        {input.reads} -o {params.sam} 2>&1 | tee {log.bwa_log} && \
+        samtools view -bSF4 {params.sam} -o {output} 2>&1 | tee {log.sam_log} && \
         rm {params.sam}
         """
 
@@ -89,7 +90,7 @@ rule filter_reads:
         reads=QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
         log=QC_FP / "log" / "decontam" / "{sample}_{rp}.txt",
     log:
-        QC_FP / "log" / "decontam" / "{sample}_{rp}.txt",
+        LOG_FP / "filter_reads_{sample}_{rp}.log",
     benchmark:
         BENCHMARK_FP / "filter_reads_{sample}_{rp}.tsv"
     conda:
@@ -102,7 +103,7 @@ rule preprocess_report:
     """Combines the information from multiple preprocessing steps"""
     input:
         trim_files=expand(
-            QC_FP / "log" / "trimmomatic" / "{sample}.out",
+            LOG_FP / "trimmomatic_{sample}.log",
             sample=sorted(Samples.keys()),
         ),
         decontam_files=expand(
