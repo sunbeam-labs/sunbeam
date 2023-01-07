@@ -1,15 +1,10 @@
 name: qc
 channels:
   - bioconda
-  - conda-forge
+  - anaconda
 dependencies:
-  - conda-forge::biopython
   - bwa
   - cutadapt
   - fastqc
-  - numpy
-  - pysam
-  - python=3.10
-  - rust-bio-tools
   - samtools
   - trimmomatic

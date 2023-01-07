@@ -19,10 +19,12 @@ rule sample_intake:
         lambda wildcards: Samples[wildcards.sample][wildcards.rp],
     output:
         QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
+    log:
+        LOG_FP / "sample_intake_{sample}_{rp}.log",
     params:
         suffix=Cfg["qc"]["seq_id_ending"],
     conda:
-        "../envs/qc.yml"
+        "../../envs/reports.yml"
     script:
         "../scripts/qc/sample_intake.py"
 
@@ -33,7 +35,7 @@ rule adapter_removal_unpaired:
     output:
         QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
     log:
-        QC_FP / "log" / "cutadapt" / "{sample}.log",
+        LOG_FP / "adapter_removal_unpaired_{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
     params:
@@ -53,7 +55,7 @@ rule adapter_removal_paired:
         gr1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
         gr2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
     log:
-        QC_FP / "log" / "cutadapt" / "{sample}.log",
+        LOG_FP / "adapter_removal_paired_{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
     params:
@@ -75,7 +77,7 @@ rule trimmomatic_unpaired:
     output:
         QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
     log:
-        QC_FP / "log" / "trimmomatic" / "{sample}.out",
+        LOG_FP / "trimmomatic_{sample}.log",
     benchmark:
         BENCHMARK_FP / "trimmomatic_unpaired_{sample}.tsv"
     params:
@@ -112,7 +114,7 @@ rule trimmomatic_paired:
             QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_2_unpaired.fastq.gz"
         ),
     log:
-        QC_FP / "log" / "trimmomatic" / "{sample}.out",
+        LOG_FP / "trimmomatic_{sample}.log",
     benchmark:
         BENCHMARK_FP / "trimmomatic_paired_{sample}.tsv"
     params:
@@ -149,9 +151,9 @@ rule fastqc:
     params:
         outdir=QC_FP / "reports",
     conda:
-        "../envs/reports.yml"
+        "../../envs/qc.yml"
     shell:
-        "fastqc -o {params.outdir} {input.reads} -extract"
+        "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
 
 rule fastqc_report:
@@ -164,8 +166,12 @@ rule fastqc_report:
         ),
     output:
         QC_FP / "reports" / "fastqc_quality.tsv",
+    log:
+        LOG_FP / "fastqc_report.log",
+    benchmark:
+        BENCHMARK_FP / "fastqc_report.tsv"
     conda:
-        "../envs/qc.yml"
+        "../../envs/reports.yml"
     script:
         "../scripts/qc/fastqc_report.py"
 
@@ -184,7 +190,7 @@ rule find_low_complexity:
     shell:
         """
         for rp in {input}; do
-          gzip -dc $rp | kz | \
+          gzip -dc $rp | kz 2>&1 | tee {log} | \
           awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> {output}
         done
         """
@@ -201,10 +207,10 @@ rule remove_low_complexity:
     benchmark:
         BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
     conda:
-        "../envs/qc.yml"
+        "../../envs/rbt.yml"
     shell:
         """
-        gzip -dc {input.reads} | rbt fastq-filter {input.ids} |\
+        gzip -dc {input.reads} | rbt fastq-filter {input.ids} 2>&1 | tee {log} |\
         gzip > {output}
         """
 

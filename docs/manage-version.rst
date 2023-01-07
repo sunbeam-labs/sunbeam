@@ -12,8 +12,13 @@ Overview
 
 This script enables users of sunbeam to easily switch between different 
 versions of sunbeam; automatically managing the environments and the code  
-branches/tags. This is the preferred way to manage versions of your local 
-installation of sunbeam.
+branches/tags. Sunbeam is designed such that you can have multiple versions 
+installed at the same time, either in one repository or in multiple. The 
+simpler option is to simply install each version of sunbeam that you want 
+in separate directories (i.e. you could have ``sunbeam2``, ``sunbeam3``, 
+and ``sunbeam4`` directories, each containing a separate installation of 
+sunbeam). If you prefer to keep everything in one directory, this script 
+allows you to change versions in place.
 
 The most common use case will be once you've had sunbeam installed for a while 
 and new versions have come out, you can easily upgrade to the latest version 

@@ -19,21 +19,21 @@ rule prodigal:
         gff=ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes.gff",
         faa=ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes_prot.fa",
         fna=ANNOTATION_FP / "genes" / "prodigal" / "{sample}_genes_nucl.fa",
-        log=ANNOTATION_FP / "genes" / "prodigal" / "log" / "{sample}.out",
     benchmark:
         BENCHMARK_FP / "prodigal_{sample}.tsv"
+    log:
+        LOG_FP / "prodigal_{sample}.log",
     conda:
         "../envs/annotation.yml"
     shell:
         """
         if [[ -s {input} ]]; then
           prodigal -i {input} -o {output.gff} \
-          -a {output.faa} -d {output.fna} -p meta  &> {output.log}
+          -a {output.faa} -d {output.fna} -p meta 2>&1 | tee {log}
         else
           touch {output.faa}
           touch {output.gff}
           touch {output.fna}
-          touch {output.log}
         fi
         """
 

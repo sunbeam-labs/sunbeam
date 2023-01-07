@@ -22,6 +22,8 @@ rule megahit_paired:
         ASSEMBLY_FP / "megahit" / "{sample}_asm" / "final.contigs.fa",
     benchmark:
         BENCHMARK_FP / "megahit_paired_{sample}.tsv"
+    log:
+        LOG_FP / "megahit_paired_{sample}.log",
     params:
         out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
     threads: 4
@@ -38,7 +40,7 @@ rule megahit_paired:
         then
             rm -rf {params.out_fp}
         fi
-        megahit -t {threads} -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue || exitcode=$?
+        megahit -t {threads} -1 {input.r1} -2 {input.r2} -o {params.out_fp} --continue 2>&1 {log} || exitcode=$?
 
         if [ $exitcode -eq 255 ]
         then
@@ -58,6 +60,8 @@ rule megahit_unpaired:
         ASSEMBLY_FP / "megahit" / "{sample}_asm" / "final.contigs.fa",
     benchmark:
         BENCHMARK_FP / "megahit_unpaired_{sample}.tsv"
+    log:
+        LOG_FP / "megahit_unpaired_{sample}.log",
     params:
         out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
     threads: 4
@@ -70,7 +74,7 @@ rule megahit_unpaired:
 
         ## sometimes the error is due to lack of memory
         exitcode=0
-        megahit -t {threads} -r {input} -o {params.out_fp} -f --continue || exitcode=$?
+        megahit -t {threads} -r {input} -o {params.out_fp} -f --continue 2>&1 {log} || exitcode=$?
 
         if [ $exitcode -eq 255 ]
         then
@@ -89,7 +93,7 @@ rule final_filter:
     output:
         ASSEMBLY_FP / "contigs" / "{sample}-contigs.fa",
     log:
-        ASSEMBLY_FP / "log" / "vsearch" / "{sample}.log",
+        LOG_FP / "final_filter_{sample}.log",
     benchmark:
         BENCHMARK_FP / "final_filter_{sample}.tsv"
     params:
