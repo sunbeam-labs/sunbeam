@@ -9,6 +9,7 @@ printshellcmds: True
 nolock: True
 verbose: True
 use-conda: True
+use-envmodules: True
 cores: 24 # 'all' uses all available cores, but seems to be broken at least on CHOP cluster
 cluster: "sbatch \
           --account={resources.account} \
