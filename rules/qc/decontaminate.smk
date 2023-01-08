@@ -17,6 +17,8 @@ rule build_host_index:
         index_fp=Cfg["qc"]["host_fp"],
     conda:
         "../../envs/qc.yml"
+    envmodules:
+        "bio/bwa"
     shell:
         "cd {Cfg[qc][host_fp]} && bwa index {input} 2>&1 | tee {log}"
 
