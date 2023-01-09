@@ -5,7 +5,11 @@ import os
 
 from collections import OrderedDict
 
-from workflow.scripts.filter_reads_f import count_host_reads, calculate_counts, write_log
+from workflow.scripts.filter_reads_f import (
+    count_host_reads,
+    calculate_counts,
+    write_log,
+)
 
 
 class FinalFilterTests(unittest.TestCase):

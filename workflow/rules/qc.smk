@@ -91,7 +91,7 @@ rule trimmomatic_unpaired:
     conda:
         "../envs/qc.yml"
     envmodules:
-        "bio/trimmomatic"
+        "bio/trimmomatic",
     shell:
         """
         trimmomatic \
@@ -130,7 +130,7 @@ rule trimmomatic_paired:
     conda:
         "../envs/qc.yml"
     envmodules:
-        "bio/trimmomatic"
+        "bio/trimmomatic",
     shell:
         """
         trimmomatic \
