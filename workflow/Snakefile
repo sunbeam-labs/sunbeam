@@ -113,14 +113,14 @@ LOG_FP = output_subdir(Cfg, "logs")
 
 
 # ---- Targets rules
-include: "rules/targets/targets.smk"
+include: "rules/targets.smk"
 # ---- Quality control rules
-include: "rules/qc/qc.smk"
-include: "rules/qc/decontaminate.smk"
+include: "rules/qc.smk"
+include: "rules/decontaminate.smk"
 # ---- Assembly rules
-include: "rules/assembly/assembly.smk"
+include: "rules/assembly.smk"
 # ---- Contig annotation rules
-include: "rules/annotation/orf.smk"
+include: "rules/orf.smk"
 
 
 for sbx_path, wildcards in sbxs:
