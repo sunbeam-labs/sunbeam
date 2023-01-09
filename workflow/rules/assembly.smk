@@ -28,7 +28,7 @@ rule megahit_paired:
         out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
     threads: 4
     conda:
-        "../../envs/assembly.yml"
+        "../envs/assembly.yml"
     shell:
         """
         ## turn off bash strict mode
@@ -66,7 +66,7 @@ rule megahit_unpaired:
         out_fp=str(ASSEMBLY_FP / "megahit" / "{sample}_asm"),
     threads: 4
     conda:
-        "../../envs/assembly.yml"
+        "../envs/assembly.yml"
     shell:
         """
         ## turn off bash strict mode
@@ -99,9 +99,9 @@ rule final_filter:
     params:
         len=Cfg["assembly"]["min_length"],
     conda:
-        "../../envs/assembly.yml"
+        "../envs/assembly.yml"
     script:
-        "../../scripts/assembly/final_filter.py"
+        "../scripts/final_filter.py"
 
 
 rule clean_assembly:

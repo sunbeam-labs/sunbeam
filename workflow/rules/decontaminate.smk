@@ -16,7 +16,7 @@ rule build_host_index:
         host="{host}",
         index_fp=Cfg["qc"]["host_fp"],
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     envmodules:
         "bio/bwa",
     shell:
@@ -39,7 +39,7 @@ rule align_to_host:
         index_fp=Cfg["qc"]["host_fp"],
     threads: 4
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     shell:
         """
         bwa mem -M -t {threads} \
@@ -63,9 +63,9 @@ rule get_mapped_reads:
         pct_id=Cfg["qc"]["pct_id"],
         frac=Cfg["qc"]["frac"],
     conda:
-        "../../envs/reports.yml"
+        "../envs/reports.yml"
     script:
-        "../../scripts/qc/get_mapped_reads.py"
+        "../scripts/get_mapped_reads.py"
 
 
 rule aggregate_reads:
@@ -77,7 +77,7 @@ rule aggregate_reads:
     output:
         temp(QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids"),
     script:
-        "../../scripts/qc/aggregate_reads.py"
+        "../scripts/aggregate_reads.py"
 
 
 rule filter_reads:
@@ -96,9 +96,9 @@ rule filter_reads:
     benchmark:
         BENCHMARK_FP / "filter_reads_{sample}_{rp}.tsv"
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     script:
-        "../../scripts/qc/filter_reads.py"
+        "../scripts/filter_reads.py"
 
 
 rule preprocess_report:
@@ -123,6 +123,6 @@ rule preprocess_report:
     benchmark:
         BENCHMARK_FP / "preprocess_report.tsv"
     conda:
-        "../../envs/reports.yml"
+        "../envs/reports.yml"
     script:
-        "../../scripts/qc/preprocess_report.py"
+        "../scripts/preprocess_report.py"

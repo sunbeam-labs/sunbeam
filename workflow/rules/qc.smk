@@ -24,9 +24,9 @@ rule sample_intake:
     params:
         suffix=Cfg["qc"]["seq_id_ending"],
     conda:
-        "../../envs/reports.yml"
+        "../envs/reports.yml"
     script:
-        "../../scripts/qc/sample_intake.py"
+        "../scripts/sample_intake.py"
 
 
 rule adapter_removal_unpaired:
@@ -42,9 +42,9 @@ rule adapter_removal_unpaired:
         tmp=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
     threads: 4
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     script:
-        "../../scripts/qc/adapter_removal_unpaired.py"
+        "../scripts/adapter_removal_unpaired.py"
 
 
 rule adapter_removal_paired:
@@ -63,9 +63,9 @@ rule adapter_removal_paired:
         r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz"),
     threads: 4
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     script:
-        "../../scripts/qc/adapter_removal_paired.py"
+        "../scripts/adapter_removal_paired.py"
 
 
 ruleorder: trimmomatic_paired > trimmomatic_unpaired
@@ -85,7 +85,7 @@ rule trimmomatic_unpaired:
         sw_end=Cfg["qc"]["slidingwindow"][1],
     threads: 4
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     shell:
         """
         trimmomatic \
@@ -122,7 +122,7 @@ rule trimmomatic_paired:
         sw_end=Cfg["qc"]["slidingwindow"][1],
     threads: 4
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     shell:
         """
         trimmomatic \
@@ -151,7 +151,7 @@ rule fastqc:
     params:
         outdir=QC_FP / "reports",
     conda:
-        "../../envs/qc.yml"
+        "../envs/qc.yml"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
@@ -171,9 +171,9 @@ rule fastqc_report:
     benchmark:
         BENCHMARK_FP / "fastqc_report.tsv"
     conda:
-        "../../envs/reports.yml"
+        "../envs/reports.yml"
     script:
-        "../../scripts/qc/fastqc_report.py"
+        "../scripts/fastqc_report.py"
 
 
 rule find_low_complexity:
@@ -186,7 +186,7 @@ rule find_low_complexity:
     benchmark:
         BENCHMARK_FP / "find_low_complexity_{sample}.tsv"
     conda:
-        "../../envs/komplexity.yml"
+        "../envs/komplexity.yml"
     shell:
         """
         for rp in {input}; do
@@ -207,7 +207,7 @@ rule remove_low_complexity:
     benchmark:
         BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
     conda:
-        "../../envs/rbt.yml"
+        "../envs/rbt.yml"
     shell:
         """
         gzip -dc {input.reads} | rbt fastq-filter {input.ids} 2>&1 | tee {log} |\
