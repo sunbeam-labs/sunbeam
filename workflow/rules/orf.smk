@@ -25,6 +25,8 @@ rule prodigal:
         LOG_FP / "prodigal_{sample}.log",
     conda:
         "../envs/annotation.yml"
+    envmodules:
+        "bio/prodigal",
     shell:
         """
         if [[ -s {input} ]]; then

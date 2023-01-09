@@ -43,6 +43,8 @@ rule adapter_removal_unpaired:
     threads: 4
     conda:
         "../envs/qc.yml"
+    envmodules:
+        "bio/cutadapt",
     script:
         "../scripts/adapter_removal_unpaired.py"
 
@@ -64,6 +66,8 @@ rule adapter_removal_paired:
     threads: 4
     conda:
         "../envs/qc.yml"
+    envmodules:
+        "bio/cutadapt",
     script:
         "../scripts/adapter_removal_paired.py"
 
@@ -86,6 +90,8 @@ rule trimmomatic_unpaired:
     threads: 4
     conda:
         "../envs/qc.yml"
+    envmodules:
+        "bio/trimmomatic"
     shell:
         """
         trimmomatic \
@@ -123,6 +129,8 @@ rule trimmomatic_paired:
     threads: 4
     conda:
         "../envs/qc.yml"
+    envmodules:
+        "bio/trimmomatic"
     shell:
         """
         trimmomatic \
@@ -152,6 +160,8 @@ rule fastqc:
         outdir=QC_FP / "reports",
     conda:
         "../envs/qc.yml"
+    envmodules:
+        "bio/fastqc",
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
@@ -208,6 +218,8 @@ rule remove_low_complexity:
         BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
     conda:
         "../envs/rbt.yml"
+    envmodules:
+        "bio/rust-bio-tools",
     shell:
         """
         gzip -dc {input.reads} | rbt fastq-filter {input.ids} 2>&1 | tee {log} |\

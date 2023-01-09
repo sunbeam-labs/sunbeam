@@ -40,6 +40,9 @@ rule align_to_host:
     threads: 4
     conda:
         "../envs/qc.yml"
+    envmodules:
+        "bio/bwa",
+        "bio/samtools",
     shell:
         """
         bwa mem -M -t {threads} \
@@ -64,6 +67,8 @@ rule get_mapped_reads:
         frac=Cfg["qc"]["frac"],
     conda:
         "../envs/reports.yml"
+    envmodules:
+        "bio/pysam",
     script:
         "../scripts/get_mapped_reads.py"
 
@@ -124,5 +129,8 @@ rule preprocess_report:
         BENCHMARK_FP / "preprocess_report.tsv"
     conda:
         "../envs/reports.yml"
+    envmodules:
+        "bio/biopython",
+        "bio/pandas",
     script:
         "../scripts/preprocess_report.py"
