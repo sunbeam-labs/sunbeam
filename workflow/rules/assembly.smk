@@ -29,8 +29,6 @@ rule megahit_paired:
     threads: 4
     conda:
         "../envs/assembly.yml"
-    envmodules:
-        "bio/megahit",
     shell:
         """
         ## turn off bash strict mode
@@ -69,8 +67,6 @@ rule megahit_unpaired:
     threads: 4
     conda:
         "../envs/assembly.yml"
-    envmodules:
-        "bio/megahit",
     shell:
         """
         ## turn off bash strict mode
