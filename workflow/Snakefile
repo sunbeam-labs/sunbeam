@@ -99,7 +99,7 @@ sys.stderr.write("done.\n")
 
 
 # ---- Change your workdir to output_fp
-workdir: str(Cfg["all"]["output_fp"])
+#workdir: str(Cfg["all"]["output_fp"])
 
 
 # ---- Set up output paths for the various steps
@@ -151,12 +151,6 @@ onstart:
 
 onsuccess:
     print("Sunbeam finished!")
-    warnings, errors = parse_err_and_warn(log)
-    print(f"Warnings: ({len(warnings)}) {warnings}\n")
-    print(f"Errors: ({len(errors)}) {errors}\n")
-    alerts = parse_rule_logs(LOG_FP)
-    for a in alerts:
-        print(a)
     compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
 
 
