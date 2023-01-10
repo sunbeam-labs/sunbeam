@@ -24,7 +24,7 @@ rule prodigal:
     log:
         LOG_FP / "prodigal_{sample}.log",
     conda:
-        "../../envs/annotation.yml"
+        "../envs/annotation.yml"
     shell:
         """
         if [[ -s {input} ]]; then

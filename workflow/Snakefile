@@ -99,7 +99,7 @@ sys.stderr.write("done.\n")
 
 
 # ---- Change your workdir to output_fp
-workdir: str(Cfg["all"]["output_fp"])
+# workdir: str(Cfg["all"]["output_fp"])
 
 
 # ---- Set up output paths for the various steps
@@ -113,14 +113,14 @@ LOG_FP = output_subdir(Cfg, "logs")
 
 
 # ---- Targets rules
-include: "rules/targets/targets.smk"
+include: "rules/targets.smk"
 # ---- Quality control rules
-include: "rules/qc/qc.smk"
-include: "rules/qc/decontaminate.smk"
+include: "rules/qc.smk"
+include: "rules/decontaminate.smk"
 # ---- Assembly rules
-include: "rules/assembly/assembly.smk"
+include: "rules/assembly.smk"
 # ---- Contig annotation rules
-include: "rules/annotation/orf.smk"
+include: "rules/orf.smk"
 
 
 for sbx_path, wildcards in sbxs:
@@ -151,12 +151,6 @@ onstart:
 
 onsuccess:
     print("Sunbeam finished!")
-    warnings, errors = parse_err_and_warn(log)
-    print(f"Warnings: ({len(warnings)}) {warnings}\n")
-    print(f"Errors: ({len(errors)}) {errors}\n")
-    alerts = parse_rule_logs(LOG_FP)
-    for a in alerts:
-        print(a)
     compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
 
 

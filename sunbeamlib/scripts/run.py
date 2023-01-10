@@ -35,10 +35,10 @@ def main(argv=sys.argv):
     # The remaining args (after --) are passed to Snakemake
     args, remaining = parser.parse_known_args(argv)
 
-    snakefile = Path(args.sunbeam_dir) / "Snakefile"
+    snakefile = Path(args.sunbeam_dir) / "workflow" / "Snakefile"
     if not snakefile.exists():
         sys.stderr.write(
-            f"Error: could not find a Snakefile in directory '{args.sunbeam_dir}'\n"
+            f"Error: could not find a Snakefile in directory '{str(Path(args.sunbeam_dir) / 'workflow')}'\n"
         )
         sys.exit(1)
 
