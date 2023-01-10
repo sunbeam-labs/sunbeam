@@ -12,7 +12,7 @@ if fwd_adapters or rev_adapters:
         rev_adapter_str = "-B " + " -B ".join(snakemake.config["qc"]["rev_adapters"])
     os.system(
         """
-    cutadapt --discard-trimmed -O {a} \
+    cutadapt {i} {a} \
     --cores {b} \
     {c} {d} \
     -o {e} -p {f} \
@@ -30,6 +30,7 @@ if fwd_adapters or rev_adapters:
             g=snakemake.input.r1,
             h=snakemake.input.r2,
             j=snakemake.log,
+            i=snakemake.config["qc"]["cutadapt_opts"],
         )
     )
 else:
