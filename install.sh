@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+__version_tag=$(git describe --tags || echo v4.0.0) # <--- Update this on each version release
+__version_tag="${__version_tag:1}" # Remove the 'v' prefix
 
 read -r -d '' __usage <<-'EOF'
   -e --environment  [arg] Environment to install to. Default: "sunbeam" followed by the version tag (e.g. sunbeam3.0.1)
@@ -62,8 +64,6 @@ function installation_error () {
 # Set variables
 __conda_path="${arg_c:-${HOME}/miniconda3}"
 __sunbeam_dir="${arg_s:-$(readlink -f ${__dir})}"
-__version_tag=$(git describe --tags)
-__version_tag="${__version_tag:1}" # Remove the 'v' prefix
 __sunbeam_env="${arg_e:-sunbeam${__version_tag}}"
 __update_lib=false
 __update_env=false
@@ -184,10 +184,6 @@ function install_env_vars () {
 
 function install_sunbeamlib () {
     activate_sunbeam
-    if [[ $(__git_dir_exists) != true ]]; then
-      installation_error "Sunbeam requires a git clone \
-(instead of a compressed archive) to detect its version"
-    fi
     debug_capture pip install --upgrade $__sunbeam_dir 2>&1
     if [[ $(__test_sunbeam) != true ]]; then
 	installation_error "Library installation"
