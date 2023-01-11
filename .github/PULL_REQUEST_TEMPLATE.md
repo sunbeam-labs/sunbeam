@@ -6,4 +6,4 @@
 If this is for a release:
     * [ ] I have updated documentation
     * [ ] I have updated the hardcoded version at the top of `install.sh` to match what this release's version will be
-    * [ ] I have created a release archive (using `snakemake --profile random/profile/ --archive sunbeamX.X.X.tar.gz`) that will be attached to this release
+    * [ ] I have created a release archive that will be attached to this release
