@@ -242,6 +242,10 @@ else
     __env_changed=true
 fi
 
+# Always update the env_vars.sh in the sunbeam environment
+debug "Updating \$SUNBEAM_DIR variable to point to ${__sunbeam_dir}"
+install_env_vars
+
 # Install sunbeamlib into environment if changed or requested
 if [[ $__env_changed = true ]]; then
     info "Environment installed/updated; (re)installing Sunbeam library..."
@@ -255,10 +259,6 @@ elif [[ $__update_lib = true ]]; then
 else
     info "Sunbeam library already installed (use '--update lib' to update)"
 fi
-
-# Always update the env_vars.sh in the sunbeam environment
-debug "Updating \$SUNBEAM_DIR variable to point to ${__sunbeam_dir}"
-install_env_vars
 
 # Check if on pre-existing path
 if [[ $__old_path != *"${__conda_path}/bin"* ]]; then
