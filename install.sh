@@ -242,7 +242,8 @@ else
     __env_changed=true
 fi
 
-# Check again to ensure success
+# Set version as env var
+export SUNBEAM_VER=${__version_tag}
 
 # Install sunbeamlib into environment if changed or requested
 if [[ $__env_changed = true ]]; then
