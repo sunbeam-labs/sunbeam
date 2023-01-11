@@ -14,7 +14,7 @@ from snakemake.utils import listfiles
 from snakemake.workflow import expand
 from Bio import SeqIO
 
-__version__ = str(Version.coerce(get_distribution("sunbeam").version))
+__version__ = str(Version.coerce("v4.0.0"))
 
 
 def load_sample_list(samplelist_fp, paired_end, root_proj=""):

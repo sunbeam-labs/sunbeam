@@ -8,9 +8,9 @@ bash dev_scripts/reformat.sh
 
 The sunbeam_config.yml file is included to run some snakemake commands.
 
-### generate_archive.sh
+### generate_archive.sh X.X.X
 
-Generate a tarball for a sunbeam release. This requires first running snakemake's `--archive` to generate the `.snakemake/conda-archive` directory and then manually wrapping up the necessary directories for release.
+Generate a tarball for a sunbeam release. This requires first running snakemake's `--archive` to generate the `.snakemake/conda-archive` directory and then manually wrapping up the necessary directories for release. It takes one parameter which is the version identifier.
 
 ### generate_dockerfile.sh
 
