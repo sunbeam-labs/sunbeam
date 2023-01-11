@@ -175,10 +175,10 @@ function install_environment () {
 function install_env_vars () {
     activate_sunbeam
     mkdir -p ${CONDA_PREFIX}/etc/conda/activate.d
-    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}" > \
+    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}\nexport SUNBEAM_VER=${__version_tag}" > \
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
     mkdir -p ${CONDA_PREFIX}/etc/conda/deactivate.d
-    echo -ne "#/bin/sh\nunset SUNBEAM_DIR" > \
+    echo -ne "#/bin/sh\nunset SUNBEAM_DIR\nunset SUNBEAM_VER" > \
 	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
 }
 
@@ -241,9 +241,6 @@ else
     install_environment
     __env_changed=true
 fi
-
-# Set version as env var
-export SUNBEAM_VER=${__version_tag}
 
 # Install sunbeamlib into environment if changed or requested
 if [[ $__env_changed = true ]]; then
