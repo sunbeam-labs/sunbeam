@@ -19,13 +19,41 @@ Windows using the Ubuntu [WSL](https://docs.microsoft.com/en-us/windows/wsl/abou
 Installation
 ============
 
-Clone the stable branch of Sunbeam and run the installation script:
+Sunbeam has two options for installation, either with git or with tar. For development work 
+on sunbeam, use git. For standard usage, installing each version of sunbeam that you need 
+from tarballs into separate directories is recommended (i.e. if you want versions 3 and 4 installed, 
+you would repeat the tar install process below for sunbeam3.1.1 and sunbeam4.0.0 (or whatever specific 
+versions you want)).
 
-.. code-block:: shell
+.. tabs::
 
-   git clone -b stable https://github.com/sunbeam-labs/sunbeam
-   cd sunbeam
-   bash install.sh
+   .. tab:: tar install
+
+      On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) 
+      then unpack and install it. The tarball is built on a RHEL8.5 machine.
+
+      .. code-block:: shell
+
+         wget https://github.com/sunbeam-labs/sunbeam/archive/refs/tags/sunbeam4.0.0.tar.gz
+         mkdir sunbeam4.0.0
+         tar -zxf sunbeam4.0.0.tar.gz -C sunbeam4.0.0
+         cd sunbeam4.0.0 && ./install.sh
+
+   .. tab:: git install
+
+      On a Linux machine, download a copy of Sunbeam from our GitHub repository, and
+      install.
+
+      .. code-block:: shell
+
+         git clone -b stable https://github.com/sunbeam-labs/sunbeam.git
+         cd sunbeam
+         ./install.sh
+
+      .. tip::
+
+         If you're planning on doing development work on sunbeam, use 
+         'git clone -b stable git@github.com:sunbeam-labs/sunbeam.git' instead.
 
 The installer will check for and install the three components necessary for
 Sunbeam to work. The first is `Conda <https://conda.io>`_, a system for

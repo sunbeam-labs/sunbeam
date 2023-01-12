@@ -19,6 +19,10 @@ are managed by a script ``tests/run_tests.bash`` which collects test
 functions from ``tests/test_suite.bash``. Documentation lives in ``docs/`` and is 
 served by ReadTheDocs.
 
+.. tip::
+    
+    Some of these sections won't exist if you install via tar.
+
 Sections
 ========
 
