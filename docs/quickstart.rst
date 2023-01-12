@@ -6,19 +6,7 @@ Quickstart Guide
 
 .. contents::
    :depth: 2
-.. tabs::
 
-   .. code-tab:: c
-
-      Apples are green, or sometimes red.
-
-   .. code-tab:: py
-
-      Pears are green.
-
-   .. code-tab:: java
-
-      Oranges are orange.
 Installation
 ************
 
