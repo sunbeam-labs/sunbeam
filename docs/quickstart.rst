@@ -8,15 +8,15 @@ Quickstart Guide
    :depth: 2
 .. tabs::
 
-   .. tab:: Apples
+   .. code-tab:: Apples
 
       Apples are green, or sometimes red.
 
-   .. tab:: Pears
+   .. code-tab:: Pears
 
       Pears are green.
 
-   .. tab:: Oranges
+   .. code-tab:: Oranges
 
       Oranges are orange.
 Installation
