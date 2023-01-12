@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-__version_tag="4.0.0" # <--- Update this on each version release
+__version_tag=$(git describe --tags || echo v4.0.0) # <--- Update this on each version release
+__version_tag="${__version_tag:1}" # Remove the 'v' prefix
 
 read -r -d '' __usage <<-'EOF'
   -e --environment  [arg] Environment to install to. Default: "sunbeam" followed by the version tag (e.g. sunbeam3.0.1)
