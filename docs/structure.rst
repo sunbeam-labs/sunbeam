@@ -4,9 +4,6 @@
 Software Structure
 ==================
 
-.. contents::
-   :depth: 2
-
 Overview
 ========
 

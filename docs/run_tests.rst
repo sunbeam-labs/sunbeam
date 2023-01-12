@@ -4,9 +4,6 @@
 run_tests.bash
 ==============
 
-.. contents::
-   :depth: 2
-
 Overview
 ========
 

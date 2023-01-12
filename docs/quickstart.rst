@@ -4,9 +4,6 @@
 Quickstart Guide
 =====================
 
-.. contents::
-   :depth: 2
-
 Installation
 ************
 

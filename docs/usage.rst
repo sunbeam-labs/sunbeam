@@ -4,9 +4,6 @@
 User Guide
 ==========
 
-.. contents::
-   :depth: 3
-
 Requirements
 ============
 
