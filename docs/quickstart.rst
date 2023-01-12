@@ -6,13 +6,37 @@ Quickstart Guide
 
 .. contents::
    :depth: 2
+.. tabs::
 
+   .. tab:: Apples
+
+      Apples are green, or sometimes red.
+
+   .. tab:: Pears
+
+      Pears are green.
+
+   .. tab:: Oranges
+
+      Oranges are orange.
 Installation
 ************
 
 There are two installation methods available, installing via git or via tar. We do not currently support non-Linux environments.
 
 .. tabs::
+
+   .. tab:: tar install
+
+      On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) 
+      then unpack and install it.
+
+      .. code-block:: shell
+
+         wget https://github.com/sunbeam-labs/sunbeam/archive/refs/tags/sunbeam4.0.0.tar.gz
+         mkdir sunbeam4.0.0
+         tar -zxf sunbeam4.0.0.tar.gz -C sunbeam4.0.0
+         cd sunbeam4.0.0 && ./install.sh
 
    .. tab:: git install
 
@@ -29,18 +53,6 @@ There are two installation methods available, installing via git or via tar. We 
 
          If you're planning on doing development work on sunbeam, use 
          'git clone -b stable git@github.com:sunbeam-labs/sunbeam.git' instead.
-
-   .. tab:: tar install
-
-      On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) 
-      then unpack and install it.
-
-      .. code-block:: shell
-
-         wget https://github.com/sunbeam-labs/sunbeam/archive/refs/tags/sunbeam4.0.0.tar.gz
-         mkdir sunbeam4.0.0
-         tar -zxf sunbeam4.0.0.tar.gz -C sunbeam4.0.0
-         cd sunbeam4.0.0 && ./install.sh
 
 This installs Sunbeam and all its dependencies, including the `Conda
 <https://conda.io/miniconda.html>`_ environment manager, if required. It will finish 
