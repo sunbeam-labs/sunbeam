@@ -3,4 +3,4 @@
 
 snakemake --configfile dev_scripts/sunbeam_config.yml --archive tmp.tar.gz
 rm tmp.tar.gz
-tar -czvf sunbeam$1.tar.gz .snakemake/conda-archive/ etc/ extensions/.placeholder sunbeamlib/ tests/ workflow/ environment.yml install.sh Readme.md setup.py
+tar -czvf sunbeam$1.tar.gz .snakemake/conda-archive/ etc/ extensions/.placeholder sunbeamlib/ tests/ workflow/ environment.yml install.sh Readme.md setup.py MANIFEST.in
