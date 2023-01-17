@@ -4,9 +4,6 @@
 install.sh
 ==========
 
-.. contents::
-   :depth: 2
-
 Overview
 ========
 

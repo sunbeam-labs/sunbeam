@@ -1,19 +1,16 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(
     name="sunbeam",
-    use_scm_version = True,
-    setup_requires=['setuptools_scm'],
+    setup_requires=['setuptools'],
     install_requires=['pysam', 'semantic_version', 'pytest'],
-    packages=["sunbeamlib"],
+    packages=find_packages(),
     include_package_data=True,
-    package_data={"sunbeamlib": ["sunbeamlib/data/*.yml"]},
+    package_data={"sunbeamlib": ["sunbeamlib/data/*.yml", "sunbeamlib/data/*.yaml"]},
     entry_points={'console_scripts': [
-        'sunbeam = sunbeamlib.scripts.command:main',
-        'sunbeam_init = sunbeamlib.scripts.init:main',
-        'sunbeam_mod_config = sunbeamlib.scripts.config:main'
+        'sunbeam = sunbeamlib.scripts.command:main'
     ]},
     classifiers=[
-        'Programming Language :: Python :: 3.4'
+        'Programming Language :: Python :: 3.9'
     ]
 )

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+__version_tag=$(if git describe --tags >/dev/null 2>&1 ; then git describe --tags; else echo v4.0.0; fi) # <--- Update this on each version release
+__version_tag="${__version_tag:1}" # Remove the 'v' prefix
 
 read -r -d '' __usage <<-'EOF'
   -e --environment  [arg] Environment to install to. Default: "sunbeam" followed by the version tag (e.g. sunbeam3.0.1)
@@ -62,8 +64,6 @@ function installation_error () {
 # Set variables
 __conda_path="${arg_c:-${HOME}/miniconda3}"
 __sunbeam_dir="${arg_s:-$(readlink -f ${__dir})}"
-__version_tag=$(git describe --tags)
-__version_tag="${__version_tag:1}" # Remove the 'v' prefix
 __sunbeam_env="${arg_e:-sunbeam${__version_tag}}"
 __update_lib=false
 __update_env=false
@@ -175,19 +175,15 @@ function install_environment () {
 function install_env_vars () {
     activate_sunbeam
     mkdir -p ${CONDA_PREFIX}/etc/conda/activate.d
-    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}" > \
+    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}\nexport SUNBEAM_VER=${__version_tag}" > \
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
     mkdir -p ${CONDA_PREFIX}/etc/conda/deactivate.d
-    echo -ne "#/bin/sh\nunset SUNBEAM_DIR" > \
+    echo -ne "#/bin/sh\nunset SUNBEAM_DIR\nunset SUNBEAM_VER" > \
 	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
 }
 
 function install_sunbeamlib () {
     activate_sunbeam
-    if [[ $(__git_dir_exists) != true ]]; then
-      installation_error "Sunbeam requires a git clone \
-(instead of a compressed archive) to detect its version"
-    fi
     debug_capture pip install --upgrade $__sunbeam_dir 2>&1
     if [[ $(__test_sunbeam) != true ]]; then
 	installation_error "Library installation"
@@ -246,7 +242,9 @@ else
     __env_changed=true
 fi
 
-# Check again to ensure success
+# Always update the env_vars.sh in the sunbeam environment
+debug "Updating \$SUNBEAM_DIR variable to point to ${__sunbeam_dir}"
+install_env_vars
 
 # Install sunbeamlib into environment if changed or requested
 if [[ $__env_changed = true ]]; then
@@ -261,10 +259,6 @@ elif [[ $__update_lib = true ]]; then
 else
     info "Sunbeam library already installed (use '--update lib' to update)"
 fi
-
-# Always update the env_vars.sh in the sunbeam environment
-debug "Updating \$SUNBEAM_DIR variable to point to ${__sunbeam_dir}"
-install_env_vars
 
 # Check if on pre-existing path
 if [[ $__old_path != *"${__conda_path}/bin"* ]]; then

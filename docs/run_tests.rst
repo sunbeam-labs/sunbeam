@@ -4,9 +4,6 @@
 run_tests.bash
 ==============
 
-.. contents::
-   :depth: 2
-
 Overview
 ========
 
@@ -24,7 +21,7 @@ code when you create a PR.
 Options
 =======
 
-All available options for the command line, used with ``tests/run_tests.sh [options]``.
+All available options for the command line, used with ``bash tests/run_tests.sh [options]``.
 
 -d [arg]
 ++++++++

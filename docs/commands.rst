@@ -4,9 +4,6 @@
 Sunbeam Commands
 ================
 
-.. contents::
-   :depth: 2
-
 .. code-block:: shell
     
     sunbeam [-h | -v] <subcommand>

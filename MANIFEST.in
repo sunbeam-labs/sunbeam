@@ -1,0 +1,2 @@
+include sunbeamlib/data/*.yml
+include sunbeamlib/data/*.yaml
