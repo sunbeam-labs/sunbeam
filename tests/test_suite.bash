@@ -1,5 +1,6 @@
 # Test normal behavior
 function test_all {
+    snakemake --version
     sunbeam run --profile $TEMPDIR/
 
     # Check targets

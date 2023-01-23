@@ -96,7 +96,9 @@ def parse_fastqc_quality(filename):
         ).group(1)
 
         f_s = StringIO(tableString)
-        df = pandas.read_csv(f_s, sep="\t", usecols=["#Base", "Mean"], index_col="#Base")
+        df = pandas.read_csv(
+            f_s, sep="\t", usecols=["#Base", "Mean"], index_col="#Base"
+        )
         sample_name = os.path.basename(filename.split("_fastqc")[0])
         df.columns = [sample_name]
         f_s.close()
