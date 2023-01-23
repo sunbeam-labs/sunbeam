@@ -1,7 +1,9 @@
 #!/bin/bash
 
-snakefmt rules/
-snakefmt Snakefile
+cd $SUNBEAM_DIR
+
+snakefmt workflow/rules/
+snakefmt workflow/Snakefile
 snakefmt tests/
 
-black scripts/ sunbeamlib/ tests/
+black workflow/scripts/ sunbeamlib/ tests/
