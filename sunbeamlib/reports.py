@@ -90,13 +90,17 @@ def summarize_qual_decontam(tfile, dfile, kfile, paired_end):
 def parse_fastqc_quality(filename):
     with open(filename) as f:
         report = f.read()
-    tableString = re.search(
-        "\>\>Per base sequence quality.*?\n(.*?)\n\>\>END_MODULE", report, re.DOTALL
-    ).group(1)
+    try:
+        tableString = re.search(
+            "\>\>Per base sequence quality.*?\n(.*?)\n\>\>END_MODULE", report, re.DOTALL
+        ).group(1)
 
-    f_s = StringIO(tableString)
-    df = pandas.read_csv(f_s, sep="\t", usecols=["#Base", "Mean"], index_col="#Base")
-    sample_name = os.path.basename(filename.split("_fastqc")[0])
-    df.columns = [sample_name]
-    f_s.close()
-    return df
+        f_s = StringIO(tableString)
+        df = pandas.read_csv(f_s, sep="\t", usecols=["#Base", "Mean"], index_col="#Base")
+        sample_name = os.path.basename(filename.split("_fastqc")[0])
+        df.columns = [sample_name]
+        f_s.close()
+        return df
+    except AttributeError as e:
+        sys.stderr(f"{filename} has no per-base sequence quality reports.")
+        return None
