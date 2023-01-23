@@ -104,5 +104,5 @@ def parse_fastqc_quality(filename):
         f_s.close()
         return df
     except AttributeError as e:
-        sys.stderr(f"{filename} has no per-base sequence quality reports.")
+        sys.stderr.write(f"{filename} has no per-base sequence quality reports.")
         return None
