@@ -94,7 +94,7 @@ rule filter_reads:
     benchmark:
         BENCHMARK_FP / "filter_reads_{sample}_{rp}.tsv"
     conda:
-        "../envs/qc.yml"
+        "../envs/rbt.yml"
     script:
         "../scripts/filter_reads.py"
 

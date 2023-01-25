@@ -4,6 +4,6 @@
 * [ ] If this adds or modifies a rule that uses FASTQ files, the input accepts gzipped FASTQ and outputs gzipped FASTQ, or marks uncompressed FASTQ output as `temp`
 
 If this is for a release:
-    * [ ] I have updated documentation
-    * [ ] I have updated the hardcoded version at the top of `install.sh` to match what this release's version will be
-    * [ ] I have created a release archive that will be attached to this release
+* [ ] I have updated documentation
+* [ ] I have updated the hardcoded version at the top of `install.sh` to match what this release's version will be
+* [ ] I have created a release archive that will be attached to this release
