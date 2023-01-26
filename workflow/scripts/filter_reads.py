@@ -11,7 +11,7 @@ with open(snakemake.log[0], "w") as l:
 
     host, nonhost = calculate_counts(snakemake.input.reads, net_hostlist)
 
-    sp.run(
+    sp.call(
         "gzip",
         "-dc",
         snakemake.input.reads,
