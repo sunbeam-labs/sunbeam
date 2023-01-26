@@ -31,8 +31,18 @@ jobs:
           name: run tests
           command: |
             TAG=$(git describe --tag)
-            bash tests/run_tests.bash -e sunbeam${TAG:1} -t all
+            bash tests/run_tests.bash -e sunbeam${TAG:1} -d output/ -t all
           no_output_timeout: 40m
+
+      - run:
+          name: log dump
+          command: |
+            tail -n +1 output/sunbeam_output/logs/*
+
+      - run:
+          name: benchmark dump
+          command: |
+            cat output/stats/*
 
       - save_cache:
           paths:
