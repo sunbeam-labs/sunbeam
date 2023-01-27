@@ -14,19 +14,32 @@ with open(snakemake.log[0], "w") as l:
     sys.stderr.write(f"{snakemake.input.reads}\n")
     sys.stderr.write(f"{snakemake.input.hostreads}\n")
     sys.stderr.write(f"{snakemake.output.reads}\n")
+    sys.stderr.write(str([
+        "gzip",
+        "-dc",
+        snakemake.input.reads,
+        "|",
+        "rbt",
+        "fastq-filter",
+        snakemake.input.hostreads,
+        "|",
+        "gzip",
+        ">",
+        snakemake.output.reads,
+    ]))
 
     sp.call([
         "gzip",
         "-dc",
-        f"{snakemake.input.reads}",
+        snakemake.input.reads,
         "|",
         "rbt",
         "fastq-filter",
-        f"{snakemake.input.hostreads}",
+        snakemake.input.hostreads,
         "|",
         "gzip",
         ">",
-        f"{snakemake.output.reads}",
+        snakemake.output.reads,
     ])
 
     with open(snakemake.output.log, "w") as log:
