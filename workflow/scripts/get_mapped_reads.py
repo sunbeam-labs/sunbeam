@@ -2,7 +2,6 @@ import sys
 from sunbeamlib.decontam import get_mapped_reads
 
 with open(snakemake.log[0], "w") as l:
-    sys.stderr = sys.stdout = l
     with open(snakemake.output.ids, "w") as out:
         last = None
         for read_id in get_mapped_reads(
