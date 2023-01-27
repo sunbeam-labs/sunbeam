@@ -16,7 +16,7 @@ with open(snakemake.log[0], "w") as l:
     sys.stderr.write(str(type(snakemake.input.reads[0])))
     sys.stderr.write(snakemake.input.reads[0])
 
-    sp.call(
+    sp.call([
         "gzip",
         "-dc",
         snakemake.input.reads,
@@ -28,7 +28,7 @@ with open(snakemake.log[0], "w") as l:
         "gzip",
         ">",
         snakemake.output.reads,
-    )
+    ])
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
