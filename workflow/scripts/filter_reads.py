@@ -11,19 +11,22 @@ with open(snakemake.log[0], "w") as l:
 
     host, nonhost = calculate_counts(snakemake.input.reads, net_hostlist)
 
-    sp.call([
-        "gzip",
-        "-dc",
-        snakemake.input.reads,
-        "|",
-        "rbt",
-        "fastq-filter",
-        snakemake.input.hostreads,
-        "|",
-        "gzip",
-        ">",
-        snakemake.output.reads,
-    ], shell=True)
+    sp.call(
+        [
+            "gzip",
+            "-dc",
+            snakemake.input.reads,
+            "|",
+            "rbt",
+            "fastq-filter",
+            snakemake.input.hostreads,
+            "|",
+            "gzip",
+            ">",
+            snakemake.output.reads,
+        ],
+        shell=True,
+    )
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
