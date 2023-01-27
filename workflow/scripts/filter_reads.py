@@ -11,9 +11,9 @@ with open(snakemake.log[0], "w") as l:
 
     host, nonhost = calculate_counts(snakemake.input.reads, net_hostlist)
 
-    sys.stderr.write(type(snakemake.input.reads))
+    sys.stderr.write(str(type(snakemake.input.reads)))
     sys.stderr.write(snakemake.input.reads)
-    sys.stderr.write(type(snakemake.input.reads[0]))
+    sys.stderr.write(str(type(snakemake.input.reads[0])))
     sys.stderr.write(snakemake.input.reads[0])
 
     sp.call(
