@@ -37,14 +37,17 @@ jobs:
       - run:
           name: log dump
           when: always
-          command: |
-            tail -n +1 output/sunbeam_output/logs/*
+          command: tail -n +1 output/sunbeam_output/logs/*
+
+      - run:
+          name: output dump
+          when: always
+          command: ls -lRh output/
 
       - run:
           name: benchmark dump
           when: always
-          command: |
-            cat output/stats/*
+          command: cat output/stats/*
 
       - save_cache:
           paths:
