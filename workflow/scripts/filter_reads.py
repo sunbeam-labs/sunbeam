@@ -15,8 +15,8 @@ with open(snakemake.log[0], "w") as l:
     sys.stderr.write(f"{snakemake.input.hostreads}\n")
     sys.stderr.write(f"{snakemake.output.reads}\n")
     sys.stderr.write(str([
-        "gzip",
-        "-dc",
+        "gunzip",
+        "-c",
         snakemake.input.reads,
         "|",
         "rbt",
