@@ -62,7 +62,7 @@ rule b_align_to_host:
 
 rule get_mapped_reads:
     input:
-        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam",
+        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
     output:
         ids=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.ids",
     log:
