@@ -25,26 +25,38 @@ rule align_to_host:
     input:
         reads=expand(QC_FP / "cleaned" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
         index=Cfg["qc"]["host_fp"] / "{host}.fasta.amb",
+        host=Cfg["qc"]["host_fp"] / "{host}.fasta",
     output:
-        temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam"),
+        temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam"),
     log:
-        bwa_log=LOG_FP / "align_to_host_bwa_{host}_{sample}.log",
-        sam_log=LOG_FP / "align_to_host_samtools_{host}_{sample}.log",
+        LOG_FP / "align_to_host_{host}_{sample}.log",
     benchmark:
         BENCHMARK_FP / "align_to_host_{host}_{sample}.tsv"
-    params:
-        sam=temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam"),
-        index_fp=Cfg["qc"]["host_fp"],
     threads: 4
     conda:
         "../envs/qc.yml"
     shell:
         """
-        bwa mem -M -t {threads} \
-        {params.index_fp}/{wildcards.host}.fasta \
-        {input.reads} -o {params.sam} 2>&1 | tee {log.bwa_log} && \
-        samtools view -bSF4 {params.sam} -o {output} 2>&1 | tee {log.sam_log} && \
-        rm {params.sam}
+        bwa mem -M -t {threads} {input.host} \
+        {input.reads} -o {output} 2>&1 | tee {log}
+        """
+
+
+rule b_align_to_host:
+    input:
+        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
+    output:
+        temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam"),
+    log:
+        LOG_FP / "b_align_to_host_{host}_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "b_align_to_host_{host}_{sample}.tsv"
+    threads: 4
+    conda:
+        "../envs/qc.yml"
+    shell:
+        """
+        samtools view -bSF4 {params.sam} -o {output} 2>&1 | tee {log}
         """
 
 

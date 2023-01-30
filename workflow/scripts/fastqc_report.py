@@ -3,7 +3,6 @@ import sys
 from sunbeamlib import reports
 
 with open(snakemake.log[0], "w") as l:
-    sys.stderr = sys.stdout = l
     quality_list = [
         reports.parse_fastqc_quality(file) for file in snakemake.input.files
     ]

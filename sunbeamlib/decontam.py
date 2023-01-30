@@ -1,9 +1,10 @@
 import pysam
 
 
-def get_mapped_reads(fp, min_pct_id, min_len_frac):
+def get_mapped_reads(fp, min_pct_id, min_len_frac, log):
     sam = pysam.AlignmentFile(fp)
     for read in sam:
+        log.write(f"Checking read: {read}")
         if (
             (not read.is_unmapped)
             and (_get_frac(read) > min_len_frac)
