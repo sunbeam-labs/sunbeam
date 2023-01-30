@@ -11,7 +11,6 @@ def get_mapped_reads(fp, min_pct_id, min_len_frac, log):
     count_ret = 0
     for read in sam:
         count += 1
-        log.write(str(read.is_unmapped))
         if (
             (not read.is_unmapped)
             and (_get_frac(read) > min_len_frac)

@@ -60,9 +60,25 @@ rule b_align_to_host:
         """
 
 
+rule samtools_index:
+    input:
+        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam",
+    output:
+        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam.bai",
+    log:
+        LOG_FP / "samtools_index_{host}_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "samtools_index_{host}_{sample}.tsv"
+    conda:
+        "../../envs/qc.yml"
+    shell:
+        "samtools index {input} {output}"
+
+
 rule get_mapped_reads:
     input:
-        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
+        bam=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam",
+        bai=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam.bai",
     output:
         ids=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.ids",
     log:

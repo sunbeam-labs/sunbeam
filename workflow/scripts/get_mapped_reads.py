@@ -6,7 +6,7 @@ with open(snakemake.log[0], "w") as l:
         last = None
 
         for read_id in get_mapped_reads(
-            snakemake.input[0], snakemake.params.pct_id, snakemake.params.frac, l
+            snakemake.input.bam, snakemake.params.pct_id, snakemake.params.frac, l
         ):
             l.write(f"DEBUG: Processing read ID {read_id}")
             if read_id == last:
