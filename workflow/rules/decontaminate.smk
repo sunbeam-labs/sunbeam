@@ -27,7 +27,7 @@ rule align_to_host:
         index=Cfg["qc"]["host_fp"] / "{host}.fasta.amb",
         host=Cfg["qc"]["host_fp"] / "{host}.fasta",
     output:
-        temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam"),
+        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
     log:
         LOG_FP / "align_to_host_{host}_{sample}.log",
     benchmark:
@@ -46,7 +46,7 @@ rule b_align_to_host:
     input:
         QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
     output:
-        temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam"),
+        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam",
     log:
         LOG_FP / "b_align_to_host_{host}_{sample}.log",
     benchmark:
@@ -56,7 +56,7 @@ rule b_align_to_host:
         "../envs/qc.yml"
     shell:
         """
-        samtools view -bSF4 {params.sam} -o {output} 2>&1 | tee {log}
+        samtools view -bSF4 {input} -o {output} 2>&1 | tee {log}
         """
 
 
@@ -86,8 +86,19 @@ rule aggregate_reads:
         ),
     output:
         temp(QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids"),
-    script:
-        "../scripts/aggregate_reads.py"
+    log:
+        LOG_FP / "aggregate_reads_{sample}.log",
+    shell:
+        """
+        arr=({input})
+        if (( ${{#arr[@]}} == 0 )); then
+            echo 'No intermediate ids...' > {log}
+            touch {output}
+        else
+            echo 'Aggregating reads...' > {log}
+            cat {input} > {output}
+        fi
+        """
 
 
 rule filter_reads:

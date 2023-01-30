@@ -1,7 +1,6 @@
 # Test normal behavior
 function test_all {
-    snakemake --version
-    sunbeam run --profile $TEMPDIR/
+    sunbeam run --profile $TEMPDIR/ --notemp
 
     # Check targets
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt

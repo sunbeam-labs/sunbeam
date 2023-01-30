@@ -1,8 +1,10 @@
 import pysam
+import sys
 
 
 def get_mapped_reads(fp, min_pct_id, min_len_frac, log):
-    sam = pysam.AlignmentFile(fp)
+    log.write(f"Running get_mapped_reads on {fp} with min_pct_id = {min_pct_id} and min_len_frac = {min_len_frac}\n")
+    sam = pysam.AlignmentFile(fp, 'rb')
     for read in sam:
         log.write(f"Checking read: {read}")
         if (
