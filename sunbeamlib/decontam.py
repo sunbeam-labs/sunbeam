@@ -3,15 +3,25 @@ import sys
 
 
 def get_mapped_reads(fp, min_pct_id, min_len_frac, log):
-    log.write(f"Running get_mapped_reads on {fp} with min_pct_id = {min_pct_id} and min_len_frac = {min_len_frac}\n")
-    sam = pysam.AlignmentFile(fp, 'rb')
+    log.write(
+        f"Running get_mapped_reads on {fp} with min_pct_id = {min_pct_id} and min_len_frac = {min_len_frac}\n"
+    )
+    sam = pysam.AlignmentFile(fp)
+    count = 0
+    count_ret = 0
     for read in sam:
+        count += 1
+        log.write(str(read.is_unmapped))
         if (
             (not read.is_unmapped)
             and (_get_frac(read) > min_len_frac)
             and (_get_pct_identity(read) > min_pct_id)
         ):
+            count_ret += 1
             yield read.query_name
+
+    log.write(f"Total reads processed: {count}")
+    log.write(f"Total reads used: {count_ret}")
 
 
 def _get_pct_identity(read):
