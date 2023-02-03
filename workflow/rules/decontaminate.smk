@@ -7,7 +7,10 @@ rule build_host_index:
     input:
         Cfg["qc"]["host_fp"] / "{host}.fasta",
     output:
-        Cfg["qc"]["host_fp"] / "{host}.fasta.amb",
+        [
+            Cfg["qc"]["host_fp"] / ("{host}.fasta." + ext)
+            for ext in ["amb", "ann", "bwt", "pac", "sa"]
+        ],
     log:
         LOG_FP / "build_host_index_{host}.log",
     benchmark:
@@ -24,8 +27,11 @@ rule build_host_index:
 rule align_to_host:
     input:
         reads=expand(QC_FP / "cleaned" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
-        index=Cfg["qc"]["host_fp"] / "{host}.fasta.amb",
         host=Cfg["qc"]["host_fp"] / "{host}.fasta",
+        ids=[
+            Cfg["qc"]["host_fp"] / ("{host}.fasta." + ext)
+            for ext in ["amb", "ann", "bwt", "pac", "sa"]
+        ],
     output:
         QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
     log:
@@ -41,6 +47,28 @@ rule align_to_host:
         {input.reads} -o {output} 2>&1 | tee {log}
         """
 
+
+rule get_unmapped_reads:
+    input: 
+        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
+    output:
+        QC_FP / "decontam" / "{host}" / "{sample}.sam"
+    log:
+        LOG_FP / "get_unmapped_reads.log"
+    shell:
+        """
+        samtools view -f 4 {input} > {output}
+        """
+
+
+rule gather:
+    input:
+        expand(QC_FP / "decontam" / "{host}" / "{sample}.sam",
+        host=HostGenomes.keys(),
+        sample=Samples,)
+    output:
+        "never"
+    
 
 rule b_align_to_host:
     input:
@@ -60,25 +88,9 @@ rule b_align_to_host:
         """
 
 
-rule samtools_index:
-    input:
-        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam",
-    output:
-        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam.bai",
-    log:
-        LOG_FP / "samtools_index_{host}_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "samtools_index_{host}_{sample}.tsv"
-    conda:
-        "../../envs/qc.yml"
-    shell:
-        "samtools index {input} {output}"
-
-
 rule get_mapped_reads:
     input:
-        bam=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam",
-        bai=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam.bai",
+        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam",
     output:
         ids=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.ids",
     log:
