@@ -54,7 +54,7 @@ rule get_unmapped_reads:
     output:
         QC_FP / "decontam" / "{host}" / "{sample}.sam"
     log:
-        LOG_FP / "get_unmapped_reads.log"
+        LOG_FP / "get_unmapped_reads_{host}_{sample}.log"
     shell:
         """
         samtools view -f 4 {input} -o {output} 2>&1 | tee {log}
