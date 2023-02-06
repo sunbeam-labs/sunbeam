@@ -48,6 +48,11 @@ jobs:
           name: benchmark dump
           when: always
           command: cat output/stats/*
+      
+      - run:
+          name: snakemake env dumps
+          command: |
+            bash dev_scripts/dump_.snakemake.sh
 
       - save_cache:
           paths:

@@ -19,8 +19,8 @@ def get_mapped_reads(fp, min_pct_id, min_len_frac, log):
             count_ret += 1
             yield read.query_name
 
-    log.write(f"Total reads processed: {count}")
-    log.write(f"Total reads used: {count_ret}")
+    log.write(f"Total reads processed: {count}\n")
+    log.write(f"Total reads used: {count_ret}\n")
 
 
 def _get_pct_identity(read):
