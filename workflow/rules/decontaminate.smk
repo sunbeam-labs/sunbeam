@@ -48,19 +48,6 @@ rule align_to_host:
         """
 
 
-rule get_unmapped_reads:
-    input: 
-        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
-    output:
-        QC_FP / "decontam" / "{host}" / "{sample}.sam"
-    log:
-        LOG_FP / "get_unmapped_reads_{host}_{sample}.log"
-    shell:
-        """
-        samtools view -f 4 {input} -o {output} 2>&1 | tee {log}
-        """
-
-
 rule b_align_to_host:
     input:
         QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
