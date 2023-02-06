@@ -43,6 +43,7 @@ rule align_to_host:
         "../envs/qc.yml"
     shell:
         """
+        bwa --version > {log} && \
         bwa mem -M -t {threads} {input.host} \
         {input.reads} -o {output} 2>&1 | tee {log}
         """
@@ -62,7 +63,7 @@ rule b_align_to_host:
         "../envs/qc.yml"
     shell:
         """
-        samtools view -bSF4 {input} -o {output} 2>&1 | tee {log}
+        samtools --version > {log} && samtools view -bSF4 {input} -o {output} 2>&1 | tee {log}
         """
 
 
