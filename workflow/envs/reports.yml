@@ -6,6 +6,5 @@ dependencies:
   - conda-forge::biopython
   - numpy
   - pandas
-  - bioconda::pysam=0.15
-  - bioconda::libdeflate=1.0
+  - bioconda::pysam
   - python=3.10
