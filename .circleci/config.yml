@@ -51,6 +51,7 @@ jobs:
       
       - run:
           name: snakemake env dumps
+          when: always
           command: |
             bash dev_scripts/dump_.snakemake.sh
 
