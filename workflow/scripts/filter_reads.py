@@ -4,8 +4,11 @@ from collections import OrderedDict
 from filter_reads_f import count_host_reads, calculate_counts, write_log
 
 with open(snakemake.log[0], "w") as l:
-    with open(snakemake.input.unmapped_reads[0]) as f:
-        sys.exit(f.readlines())
+    with open(snakemake.input.hostreads) as f:
+        if not f.readlines():
+            s = f"ERROR: {snakemake.input.hostreads} is empty, exiting..."
+            l.write(s)
+            sys.exit(s)
 
     hostdict = OrderedDict()
     net_hostlist = set()
