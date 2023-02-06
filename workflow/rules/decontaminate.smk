@@ -62,7 +62,7 @@ rule b_align_to_host:
         "../envs/qc.yml"
     shell:
         """
-        samtools view -bF4 {input} -o {output} 2>&1 | tee {log}
+        samtools view -b {input} -o {output} 2>&1 | tee {log}
         """
 
 
