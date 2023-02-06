@@ -7,4 +7,5 @@ dependencies:
   - numpy
   - pandas
   - pysam=0.15
+  - libdeflate=1.0
   - python=3.10
