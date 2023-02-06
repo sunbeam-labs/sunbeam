@@ -40,7 +40,7 @@ jobs:
           command: tail -n +1 output/sunbeam_output/logs/*
 
       - run:
-          name: output dump
+          name: output tree dump
           when: always
           command: ls -lRh output/
 
