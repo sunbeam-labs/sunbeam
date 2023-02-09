@@ -1,5 +1,0 @@
-name: assembly
-channels:
-  - bioconda
-dependencies:
-  - megahit

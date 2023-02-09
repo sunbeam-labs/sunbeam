@@ -117,10 +117,6 @@ include: "rules/targets.smk"
 # ---- Quality control rules
 include: "rules/qc.smk"
 include: "rules/decontaminate.smk"
-# ---- Assembly rules
-include: "rules/assembly.smk"
-# ---- Contig annotation rules
-include: "rules/orf.smk"
 
 
 for sbx_path, wildcards in sbxs:
