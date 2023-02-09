@@ -1,7 +1,6 @@
 # Test normal behavior
 function test_all {
-    snakemake --version
-    sunbeam run --profile $TEMPDIR/
+    sunbeam run --profile $TEMPDIR/ --notemp
 
     # Check targets
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt
@@ -74,7 +73,6 @@ function test_extensions {
 # Test that single-end sequencing configurations work
 function test_single_end {
     rm -rf $TEMPDIR/sunbeam_output/qc # These interfere if all tests are run back to back
-    rm -rf $TEMPDIR/sunbeam_output/assembly/megahit # But these lines do nothing if this test is run by itself
     sunbeam config modify --str 'all: {paired_end: false}' \
 	    $TEMPDIR/tmp_config.yml > $TEMPDIR/single_end_config.yml
     sunbeam run --profile $TEMPDIR/ --configfile $TEMPDIR/single_end_config.yml
@@ -168,40 +166,6 @@ function test_subdir_patterns {
     sunbeam run --profile $TEMPDIR/ sbx_test_subdir --configfile $TEMPDIR/tmp_config.yml -n
 }
 
-# Fix for #167:
-# Check that if megahit gives a nonzero exit code it is handled appropriately.
-# The two main cases are 255 (empty contigs) and anything else nonzero
-# (presumed to be memory-related in the assembly rules).
-# Checking for successful behavior is already handled in test_all.
-function test_assembly_failures {
-    # Up to just before the assembly rules, things should work fine.
-    sunbeam run --profile $TEMPDIR/ all_decontam --configfile=$TEMPDIR/tmp_config.yml
-    # Remove previous assembly files, if they exist.
-    rm -rf $TEMPDIR/sunbeam_output/assembly
-
-    # If megahit exits with 255, it implies no contigs were built.
-#    mkdir -p "$TEMPDIR/megahit_255"
-#    echo -e '#!/usr/bin/env bash\nexit 255' > $TEMPDIR/megahit_255/megahit
-#    chmod +x $TEMPDIR/megahit_255/megahit
-#    (
-#    export PATH="$TEMPDIR/megahit_255:$PATH"
-#    txt=$(sunbeam run -- --configfile=$TEMPDIR/tmp_config.yml -p all_assembly)
-#    echo "$txt" > /mnt/d/Penn/sunbeam/log.txt
-#    echo "$txt" | grep "Empty contigs"
-#    )
-
-    # If megahit gives an exit code != 0 and != 255 it is an error.
-    mkdir -p "$TEMPDIR/megahit_137"
-    echo -e '#!/usr/bin/env bash\nexit 137' > $TEMPDIR/megahit_137/megahit
-    chmod +x $TEMPDIR/megahit_137/megahit
-    (
-    export PATH="$TEMPDIR/megahit_137:$PATH"
-    # (This command should *not* exit successfully.)
-    ! txt=$(sunbeam run --profile $TEMPDIR/ all_assembly --configfile=$TEMPDIR/tmp_config.yml)
-    echo "$txt" | grep "Check your memory"
-    )
-}
-
 # For #150 and #152: make sure sunbeam config update works
 function test_sunbeam_config_update {
     # Make a new config file
@@ -252,10 +216,9 @@ function test_extension_config_update {
 # For #251: test sunbeam extend
 
 function test_all_sunbeam_extend {
-    sunbeam extend https://github.com/sunbeam-labs/sbx_coassembly
+    sunbeam extend https://github.com/sunbeam-labs/sbx_kraken
     sunbeam config update -i $TEMPDIR/tmp_config.yml
-    sunbeam run all_coassemble --profile $TEMPDIR/ --configfile=$TEMPDIR/tmp_config.yml
-    test `ls $TEMPDIR/sunbeam_output/assembly | grep "coassembly" | wc -l` -eq 1
+    sunbeam run all_classify --profile $TEMPDIR/ --configfile=$TEMPDIR/tmp_config.yml -n
 }
 
 # For #261: handle URLs with a trailing slash
