@@ -1,11 +1,11 @@
-from io import TextIOWrapper
 import os
-import subprocess
+import subprocess as sp
+from io import TextIOWrapper
 
 
 def count_host_reads(fp: str, hostdict: dict, net_hostlist: set):
     hostname = os.path.basename(os.path.dirname(fp))
-    hostcts = int(subprocess.getoutput("cat {} | wc -l".format(fp)).strip())
+    hostcts = int(sp.getoutput(f"cat {fp} | wc -l").strip())
     hostdict[hostname] = hostcts
 
     with open(fp) as f:
@@ -14,7 +14,7 @@ def count_host_reads(fp: str, hostdict: dict, net_hostlist: set):
 
 
 def calculate_counts(fp: str, net_hostlist: set) -> tuple:
-    original = int(str(subprocess.getoutput("zcat {} | wc -l".format(fp))).strip()) // 4
+    original = int(str(sp.getoutput(f"zcat {fp} | wc -l")).strip()) // 4
     host = len(net_hostlist)
     nonhost = int(original - host)
 
@@ -22,7 +22,7 @@ def calculate_counts(fp: str, net_hostlist: set) -> tuple:
 
 
 def write_log(f: TextIOWrapper, hostdict: dict, host: int, nonhost: int):
-    f.write("{}\n".format("\t".join(list(hostdict.keys()) + ["host", "nonhost"])))
+    f.write(f"{'\t'.join(list(hostdict.keys()) + ['host', 'nonhost'])}\n")
     f.write(
-        "{}\n".format("\t".join(map(str, list(hostdict.values()) + [host, nonhost])))
+        f"{'\t'.join(map(str, list(hostdict.values()) + [host, nonhost]))}\n"
     )
