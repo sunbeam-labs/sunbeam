@@ -49,7 +49,7 @@ with open(snakemake.log[0], "w") as l:
             )
         )
 
-    with open(snakemake.output.reads, "w") as f:
+    with gzip.open(snakemake.output.reads, "wt") as f:
         for k, v in net_unmapped_reads.items():
             f.write(f"{k}\n")
             for val in v:
