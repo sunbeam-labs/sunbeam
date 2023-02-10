@@ -6,5 +6,4 @@ dependencies:
   - conda-forge::biopython
   - numpy
   - pandas
-  - bioconda::pysam
   - python=3.10

@@ -30,8 +30,6 @@ with open(snakemake.log[0], "w") as l:
     l.write(f"Total unmapped count: {total_unmapped_count}\n")
     l.write(f"Collisions count: {collisions}\n")
 
-    # Sanity check
-
     host = total_count - total_unmapped_count
     nonhost = total_unmapped_count
 

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="sunbeam",
     setup_requires=['setuptools'],
-    install_requires=['pysam', 'semantic_version', 'pytest'],
+    install_requires=['semantic_version', 'pytest'],
     packages=find_packages(),
     include_package_data=True,
     package_data={"sunbeamlib": ["sunbeamlib/data/*.yml", "sunbeamlib/data/*.yaml"]},
