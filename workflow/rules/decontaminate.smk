@@ -33,7 +33,7 @@ rule align_to_host:
             for ext in ["amb", "ann", "bwt", "pac", "sa"]
         ],
     output:
-        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
+        temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam"),
     log:
         LOG_FP / "align_to_host_{host}_{sample}.log",
     benchmark:
@@ -52,7 +52,7 @@ rule get_unmapped_reads:
     input:
         QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
     output:
-        QC_FP / "decontam" / "{host}" / "unmapped_{sample}.sam",
+        temp(QC_FP / "decontam" / "{host}" / "unmapped_{sample}.sam"),
     log:
         LOG_FP / "get_unmapped_reads_{host}_{sample}.log",
     benchmark:
@@ -62,18 +62,32 @@ rule get_unmapped_reads:
         "../envs/qc.yml"
     shell:
         """
-        samtools view -f4 {input} -o {output} 2>&1 | tee {log} && sleep 10000
+        samtools view -f4 {input} -o {output} 2>&1 | tee {log}
+        """
+
+
+rule sam_convert:
+    input:
+        QC_FP / "decontam" / "{host}" / "unmapped_{sample}.sam",
+    output:
+        rp_1=temp(QC_FP / "decontam" / "{host}" / "unmapped_{sample}_1.fastq"),
+        rp_2=temp(QC_FP / "decontam" / "{host}" / "unmapped_{sample}_2.fastq"),
+    log:
+        LOG_FP / "sam_convert_{host}_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "sam_convert_{host}_{sample}.tsv"
+    conda:
+        "../envs/qc.yml"
+    shell:
+        """
+        samtools fastq -1 {output.rp_1} -2 {output.rp_2} {input} 2>&1 | tee {log}
         """
 
 
 rule filter_unmapped_reads:
     input:
-        mapping=expand(
-            QC_FP / "decontam" / "intermediates" / "{host}" / "{{sample}}.sam",
-            host=HostGenomes.keys(),
-        )
-        unmapped=expand(
-            QC_FP / "decontam" / "{host}" / "unmapped_{{sample}}.sam",
+        unmapped_reads=expand(
+            QC_FP / "decontam" / "{host}" / "unmapped_{{sample}}_{{rp}}.fastq",
             host=HostGenomes.keys(),
         ),
         reads=QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
@@ -84,8 +98,6 @@ rule filter_unmapped_reads:
         LOG_FP / "filter_unmapped_reads_{sample}_{rp}.log",
     benchmark:
         BENCHMARK_FP / "filter_unmapped_reads_{sample}_{rp}.tsv"
-    conda:
-        "../envs/rbt.yml"
     script:
         "../scripts/filter_unmapped_reads.py"
 
