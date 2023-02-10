@@ -53,7 +53,6 @@ classify:
 # Contig assembly
 assembly:
   suffix: assembly
-  min_length: 300
 
 # Contig annotation
 annotation:
