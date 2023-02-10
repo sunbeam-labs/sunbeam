@@ -24,6 +24,7 @@ def parse_fastq(f):
 
         yield (header_str, seq_str, plus_str, quality_str)
 
+
 def write_fastq(record, f):
     for i, l in enumerate(record):
         if i == 0:
