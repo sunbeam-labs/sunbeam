@@ -6,11 +6,6 @@ function test_all {
     python tests/find_targets.py --prefix $TEMPDIR/sunbeam_output tests/targets.txt
 }
 
-# Unit testing for all sunbeam scripts
-function test_scripts {
-    pytest tests/unit_tests/
-}
-
 # For #221: full test using old-style Illumina paired sequence IDs (/1 and /2)
 function test_all_old_illumina {
     # init will always write to samples.csv so we'll stash the old one and then

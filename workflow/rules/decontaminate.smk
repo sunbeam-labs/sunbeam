@@ -33,7 +33,7 @@ rule align_to_host:
             for ext in ["amb", "ann", "bwt", "pac", "sa"]
         ],
     output:
-        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
+        temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam"),
     log:
         LOG_FP / "align_to_host_{host}_{sample}.log",
     benchmark:
@@ -48,85 +48,58 @@ rule align_to_host:
         """
 
 
-rule b_align_to_host:
+rule get_unmapped_reads:
     input:
         QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
     output:
-        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam",
+        temp(QC_FP / "decontam" / "{host}" / "unmapped_{sample}.sam"),
     log:
-        LOG_FP / "b_align_to_host_{host}_{sample}.log",
+        LOG_FP / "get_unmapped_reads_{host}_{sample}.log",
     benchmark:
-        BENCHMARK_FP / "b_align_to_host_{host}_{sample}.tsv"
+        BENCHMARK_FP / "get_unmapped_reads_{host}_{sample}.tsv"
     threads: 4
     conda:
         "../envs/qc.yml"
     shell:
         """
-        samtools view -b {input} -o {output} 2>&1 | tee {log}
+        samtools view -f4 {input} -o {output} 2>&1 | tee {log}
         """
-        #samtools view -bF4 {input} -o {output} 2>&1 | tee {log}
 
 
-rule get_mapped_reads:
+rule sam_convert:
     input:
-        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.bam",
+        QC_FP / "decontam" / "{host}" / "unmapped_{sample}.sam",
     output:
-        ids=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.ids",
+        rp_1=temp(QC_FP / "decontam" / "{host}" / "unmapped_{sample}_1.fastq"),
+        rp_2=temp(QC_FP / "decontam" / "{host}" / "unmapped_{sample}_2.fastq"),
     log:
-        LOG_FP / "get_mapped_reads_{host}_{sample}.log",
+        LOG_FP / "sam_convert_{host}_{sample}.log",
     benchmark:
-        BENCHMARK_FP / "get_mapped_reads_{host}_{sample}.tsv"
-    params:
-        pct_id=Cfg["qc"]["pct_id"],
-        frac=Cfg["qc"]["frac"],
+        BENCHMARK_FP / "sam_convert_{host}_{sample}.tsv"
     conda:
-        "../envs/reports.yml"
-    script:
-        "../scripts/get_mapped_reads.py"
-
-
-rule aggregate_reads:
-    input:
-        expand(
-            QC_FP / "decontam" / "intermediates" / "{host}" / "{{sample}}.ids",
-            host=HostGenomes.keys(),
-        ),
-    output:
-        temp(QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids"),
-    log:
-        LOG_FP / "aggregate_reads_{sample}.log",
+        "../envs/qc.yml"
     shell:
         """
-        arr=({input})
-        if (( ${{#arr[@]}} == 0 )); then
-            echo 'No intermediate ids...' > {log}
-            touch {output}
-        else
-            echo 'Aggregating reads...' > {log}
-            cat {input} > {output}
-        fi
+        samtools fastq -1 {output.rp_1} -2 {output.rp_2} {input} 2>&1 | tee {log}
         """
 
 
-rule filter_reads:
+rule filter_unmapped_reads:
     input:
-        hostreads=QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids",
-        reads=QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
-        hostids=expand(
-            QC_FP / "decontam" / "intermediates" / "{host}" / "{{sample}}.ids",
+        unmapped_reads=expand(
+            QC_FP / "decontam" / "{host}" / "unmapped_{{sample}}_{{rp}}.fastq",
             host=HostGenomes.keys(),
         ),
+        reads=QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
     output:
         reads=QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
         log=QC_FP / "log" / "decontam" / "{sample}_{rp}.txt",
     log:
-        LOG_FP / "filter_reads_{sample}_{rp}.log",
+        LOG_FP / "filter_unmapped_reads_{sample}_{rp}.log",
     benchmark:
-        BENCHMARK_FP / "filter_reads_{sample}_{rp}.tsv"
-    conda:
-        "../envs/rbt.yml"
+        BENCHMARK_FP / "filter_unmapped_reads_{sample}_{rp}.tsv"
     script:
-        "../scripts/filter_reads.py"
+        "../scripts/filter_unmapped_reads.py"
 
 
 rule preprocess_report:
