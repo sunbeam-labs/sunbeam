@@ -25,8 +25,8 @@ def strip_seq_id_suffix(fp_in, fp_out, suffix_pattern):
         else:
             f_out = open(fp_out, "w")
         for record in parse_fastq(f_in):
-            record[0] = re.sub(suffix_pattern + "$", "", record[0])
-            write_fastq(record, f_out)
+            trimmed_id = re.sub(suffix_pattern + "$", "", record[0])
+            write_fastq((trimmed_id, record[1], record[2], record[3]), f_out)
     finally:
         f_in.close()
         f_out.close()

@@ -8,3 +8,4 @@ dependencies:
   - biopython # Needed for building test data
   - kraken2 # Needed for building test data
   - semantic_version
+  - python>=3.10
