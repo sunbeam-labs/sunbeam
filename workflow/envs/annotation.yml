@@ -1,5 +1,0 @@
-name: annotation
-channels:
-  - bioconda
-dependencies:
-  - prodigal

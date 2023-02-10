@@ -1,7 +1,3 @@
-assembly/contigs/dummybfragilis-contigs.fa
-assembly/contigs/dummyecoli-contigs.fa
-assembly/contigs/random-contigs.fa
-
 qc/decontam/dummybfragilis_1.fastq.gz
 qc/decontam/dummyecoli_1.fastq.gz
 qc/decontam/random_1.fastq.gz
