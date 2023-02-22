@@ -30,6 +30,10 @@ jobs:
       - run:
           name: run tests
           command: |
+            export PATH=$PATH:$HOME/miniconda3/bin
+            CONDA_BASE=$(conda info --base)
+            source $CONDA_BASE/etc/profile.d/conda.sh
+            
             TAG=$(git describe --tag)
             conda activate sunbeam$TAG
             pytest .tests/
