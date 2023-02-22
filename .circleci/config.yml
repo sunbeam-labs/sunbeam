@@ -31,7 +31,8 @@ jobs:
           name: run tests
           command: |
             TAG=$(git describe --tag)
-            bash tests/run_tests.bash -e sunbeam${TAG:1} -d output/ -t all
+            conda activate sunbeam$TAG
+            pytest .tests/
           no_output_timeout: 40m
 
       - run:
