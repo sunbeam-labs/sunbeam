@@ -33,6 +33,8 @@ jobs:
             export PATH=$PATH:$HOME/miniconda3/bin
             CONDA_BASE=$(conda info --base)
             source $CONDA_BASE/etc/profile.d/conda.sh
+
+            conda info --envs
             
             TAG=$(git describe --tag)
             conda activate sunbeam$TAG
