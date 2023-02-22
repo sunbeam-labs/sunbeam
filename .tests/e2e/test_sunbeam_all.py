@@ -65,6 +65,9 @@ def init(config):
 
     yield output_dir
 
+    if os.environ.get("CI", False):
+        shutil.copytree(output_dir, "output/")
+
     shutil.move(sunbeam_dir / "extensions_moved", sunbeam_dir / "extensions")
     if not yaml["output_dir"]:
         shutil.rmtree(output_dir)
