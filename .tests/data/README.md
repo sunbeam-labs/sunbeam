@@ -6,7 +6,7 @@ These reads are generated using `wgsim` to take 100 reads from each of four geno
 cd .tests/reads
 
 wgsim ../raw/Bfragilis.fna Bfragilis_R1.fq Bfragilis_R2.fq -N 100
-wgsim ../raw/Ecoli.fna Ecoli_r1.fq Ecoli_R2.fq -N 100
+wgsim ../raw/Ecoli.fna Ecoli_R1.fq Ecoli_R2.fq -N 100
 wgsim ../hosts/human.fasta human_R1.fq human_R2.fq -N 100
 wgsim ../hosts/phix174.fasta phix174_R1.fq phix174_R2.fq -N 100
 
