@@ -21,7 +21,7 @@ def init(config):
     else:
         output_dir = Path(yaml["output_dir"])
         output_dir.mkdir(parents=True, exist_ok=True)
-        if not os.listdir(output_dir) == 0:
+        if not os.listdir(output_dir) == []:
             if yaml["overwrite"]:
                 shutil.rmtree(output_dir)
                 output_dir.mkdir()
@@ -66,7 +66,8 @@ def init(config):
     yield output_dir
 
     shutil.move(sunbeam_dir / "extensions_moved", sunbeam_dir / "extensions")
-    shutil.rmtree(output_dir)
+    if not yaml["output_dir"]:
+        shutil.rmtree(output_dir)
 
 
 def test_sunbeam_all(init):
