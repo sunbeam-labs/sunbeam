@@ -7,6 +7,7 @@ with open(snakemake.log[0], "w") as l:
     net_unmapped_reads = {}
     host_unmapped_counts = {}
     collisions = 0
+
     for i in snakemake.input.unmapped_reads:
         host_unmapped_counts[os.path.basename(os.path.dirname(i))] = (
             total_count - sum(1 for line in open(i)) // 4
@@ -32,6 +33,11 @@ with open(snakemake.log[0], "w") as l:
 
     host = total_count - total_unmapped_count
     nonhost = total_unmapped_count
+
+    if len(snakemake.input.unmapped_reads) == 0:
+        l.write(f"No unmapped reads files, there are probably no host files.")
+        host = 0
+        nonhost = total_count
 
     with open(snakemake.output.log, "w") as f:
         f.write(

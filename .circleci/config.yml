@@ -48,6 +48,11 @@ jobs:
           name: output tree dump
           when: always
           command: ls -lRh output/
+      
+      - run:
+          name: reports dump
+          when: always
+          command: cat output/sunbeam_output/qc/reports/preprocess_summary.tsv
 
       - run:
           name: benchmark dump
