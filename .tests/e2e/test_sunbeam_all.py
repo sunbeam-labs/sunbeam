@@ -90,7 +90,7 @@ def test_sunbeam_all(init):
         for line in f.readlines():
             if not line.strip():
                 continue
-            target = output_dir / line.strip()
+            target = output_dir / "sunbeam_output" / line.strip()
             if not target.exists():
                 raise SystemExit(f"Target '{target}' not found")
             elif target.stat().st_size == 0:
