@@ -32,7 +32,7 @@ def strip_seq_id_suffix(fp_in, fp_out, suffix_pattern):
         f_out.close()
 
 
-def filter_ids(fp_in, fp_out, ids):
+def filter_ids(fp_in, fp_out, ids, log):
     """Remove ids from FASTQ file.
 
     fp_in: path to input FASTQ
@@ -41,5 +41,7 @@ def filter_ids(fp_in, fp_out, ids):
     """
     with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
         for record in parse_fastq(f_in):
-            if record[0] not in ids:
+            if record[0][:-1] not in ids:
                 write_fastq(record, f_out)
+            else:
+                log.write(f"{record[0]} filtered\n")
