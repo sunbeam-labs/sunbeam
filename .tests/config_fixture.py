@@ -57,7 +57,10 @@ def output_dir(config):
     yield output_dir
 
     if os.environ.get("CI", False):
-        shutil.copytree(output_dir, "output/")
+        try:
+            shutil.copytree(output_dir, "output/")
+        except FileExistsError as e:
+            pass
 
     if (extensions_fp / ".test").exists():
         shutil.rmtree(extensions_fp)
