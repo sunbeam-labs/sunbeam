@@ -8,7 +8,6 @@ from pathlib import Path
 test_dir = Path(__file__).parent.parent.parent.resolve()
 sys.path.append(str(test_dir))
 from config_fixture import output_dir, config
-data_dir = Path(__file__).parent / "data"
 
 @pytest.fixture
 def init(output_dir):
@@ -37,8 +36,8 @@ def init(output_dir):
         ]
     )
 
-    os.symlink(test_dir / "data" / "reads" / "TEST_R1.fastq.gz", data_dir / "qc" / "00_samples" / "TEST_1.fastq.gz")
-    os.symlink(test_dir / "data" / "reads" / "TEST_R2.fastq.gz", data_dir / "qc" / "00_samples" / "TEST_2.fastq.gz")
+    os.symlink(test_dir / "data" / "reads" / "TEST_R1.fastq.gz", output_dir / "sunbeam_output" / "qc" / "00_samples" / "TEST_1.fastq.gz")
+    os.symlink(test_dir / "data" / "reads" / "TEST_R2.fastq.gz", output_dir / "sunbeam_output" / "qc" / "00_samples" / "TEST_2.fastq.gz")
 
     yield output_dir
 
