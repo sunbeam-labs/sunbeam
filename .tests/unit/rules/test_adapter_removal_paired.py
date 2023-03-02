@@ -35,7 +35,6 @@ def test_adapter_removal_paired(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
-            "--rerun-triggers=params",
             f"{r1}",
             f"{r2}",
         ]

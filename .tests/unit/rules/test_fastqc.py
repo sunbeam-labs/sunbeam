@@ -18,19 +18,18 @@ def setup(init):
     output_dir = init
 
     shutil.copytree(data_dir / "qc" / "01_cutadapt", output_dir / "sunbeam_output" / "qc" / "01_cutadapt")
+    shutil.copytree(data_dir / "qc" / "02_trimmomatic", output_dir / "sunbeam_output" / "qc" / "02_trimmomatic")
 
     yield output_dir
 
     shutil.rmtree(output_dir / "sunbeam_output")
 
 
-def test_trimmomatic_paired(setup):
+def test_fastqc(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    r1 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "TEST_1.fastq.gz"
-    r2 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "TEST_2.fastq.gz"
-    ur1 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "unpaired" / "TEST_1_unpaired.fastq.gz"
-    ur2 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "unpaired" / "TEST_2_unpaired.fastq.gz"
+    r1 = sunbeam_output_dir / "qc" / "reports" / "TEST_1_fastqc" / "fastqc_data.txt"
+    r2 = sunbeam_output_dir / "qc" / "reports" / "TEST_2_fastqc" / "fastqc_data.txt"
 
     sp.check_output(
         [
@@ -41,12 +40,8 @@ def test_trimmomatic_paired(setup):
             "--notemp",
             f"{r1}",
             f"{r2}",
-            f"{ur1}",
-            f"{ur2}",
         ]
     )
 
     assert os.path.isfile(r1)
     assert os.path.isfile(r2)
-    assert os.path.isfile(ur1)
-    assert os.path.isfile(ur2)
