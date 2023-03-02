@@ -17,7 +17,7 @@ data_dir = Path(__file__).parent / "data"
 def setup(init):
     output_dir = init
 
-    shutil.copytree(data_dir / "qc" / "01_cutadapt", output_dir / "sunbeam_output" / "qc")
+    shutil.copytree(data_dir / "qc" / "01_cutadapt", output_dir / "sunbeam_output" / "qc" / "01_cutadapt")
 
     yield output_dir
 
