@@ -34,4 +34,4 @@ def test_guess_format_string(init):
 
     test_strs = ["TEST_R1.fastq.gz", "TEST_R2.fastq.gz"]
     ret = guess_format_string(test_strs)
-    assert ret == ""
+    assert ret == "{sample}_R{rp}.fastq.gz"
