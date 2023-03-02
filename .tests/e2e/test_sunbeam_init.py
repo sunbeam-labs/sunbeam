@@ -1,4 +1,6 @@
+import os
 import pytest
+import shutil
 import subprocess as sp
 import sys
 from pathlib import Path
@@ -23,6 +25,12 @@ def init(output_dir):
     )
 
     yield output_dir
+
+    if os.environ.get("CI", False):
+        try:
+            shutil.copytree(output_dir, "output_sunbeam_init/")
+        except FileExistsError as e:
+            pass
 
 
 def test_init(init):

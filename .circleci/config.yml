@@ -42,22 +42,22 @@ jobs:
       - run:
           name: log dump
           when: always
-          command: tail -n +1 output/sunbeam_output/logs/*
+          command: tail -n +1 output_*/sunbeam_output/logs/*
 
       - run:
           name: output tree dump
           when: always
-          command: ls -lRh output/
+          command: ls -lRh output_*
       
       - run:
           name: reports dump
           when: always
-          command: cat output/sunbeam_output/qc/reports/preprocess_summary.tsv
+          command: cat output_*/sunbeam_output/qc/reports/preprocess_summary.tsv
 
       - run:
           name: benchmark dump
           when: always
-          command: cat output/stats/*
+          command: cat output_*/stats/*
       
       - run:
           name: snakemake env dumps

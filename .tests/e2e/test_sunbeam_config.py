@@ -1,4 +1,6 @@
+import os
 import pytest
+import shutil
 import subprocess as sp
 import sys
 from pathlib import Path
@@ -24,6 +26,12 @@ def init(output_dir):
     )
 
     yield output_dir
+
+    if os.environ.get("CI", False):
+        try:
+            shutil.copytree(output_dir, "output_sunbeam_config/")
+        except FileExistsError as e:
+            pass
 
 
 @pytest.fixture
@@ -55,3 +63,8 @@ def test_config_modify(config_modify):
         config_dict = yaml.load(f)
 
     assert config_dict["qc"]["host_fp"] == str(hosts_fp)
+
+
+@pytest.fixture
+def config_update(init):
+    output_dir = init
