@@ -15,8 +15,6 @@ data_dir = Path(__file__).parent / "data"
 def setup(init):
     output_dir = init
 
-    shutil.copytree(data_dir / "qc" / "00_samples", output_dir / "sunbeam_output")
-
     yield output_dir
 
     shutil.rmtree(output_dir / "sunbeam_output")
@@ -34,8 +32,7 @@ def test_adapter_removal_paired(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
-            "--rerun-triggers",
-            "params",
+            "--rerun-triggers=params",
             f"{r1}",
             f"{r2}",
         ]
