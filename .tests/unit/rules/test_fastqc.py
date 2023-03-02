@@ -43,5 +43,5 @@ def test_fastqc(setup):
         ]
     )
 
-    assert os.path.isfile(r1)
-    assert os.path.isfile(r2)
+    assert r1.stat().st_size >= 30000
+    assert r2.stat().st_size >= 30000

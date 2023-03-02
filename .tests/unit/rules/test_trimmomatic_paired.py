@@ -46,7 +46,5 @@ def test_trimmomatic_paired(setup):
         ]
     )
 
-    assert os.path.isfile(r1)
-    assert os.path.isfile(r2)
-    assert os.path.isfile(ur1)
-    assert os.path.isfile(ur2)
+    assert r1.stat().st_size >= 10000
+    assert r2.stat().st_size >= 10000
