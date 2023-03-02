@@ -41,7 +41,7 @@ def filter_ids(fp_in, fp_out, ids, log):
     """
     with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
         for record in parse_fastq(f_in):
-            if remove_pair_id(record[0]) not in ids:
+            if remove_pair_id(record[0], log) not in ids:
                 write_fastq(record, f_out)
             else:
                 log.write(f"{record[0]} filtered\n")
