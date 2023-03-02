@@ -5,9 +5,9 @@ config.yml
 configs/config*.yml
 .snakemake
 \#*
-*.fastq.gz
 output
 __pycache__
+.tests/data/hosts/*.fasta.*
 tests/sunbeam_output
 tests/bacteria
 tests/local

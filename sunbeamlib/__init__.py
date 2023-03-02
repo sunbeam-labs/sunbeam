@@ -7,12 +7,9 @@ import sys
 import csv
 
 from pathlib import Path
-from pkg_resources import get_distribution
 
 from semantic_version import Version
-from snakemake.utils import listfiles
-from snakemake.workflow import expand
-from Bio import SeqIO
+from sunbeamlib.parse import parse_fasta
 
 __version__ = str(Version.coerce(os.environ.get("SUNBEAM_VER", "0.0.0")))
 
@@ -165,4 +162,5 @@ def read_seq_ids(fasta_fp):
     """
     Return the sequence identifiers for a given fasta filename.
     """
-    return [record.id for record in SeqIO.parse(str(fasta_fp), "fasta")]
+    with open(str(fasta_fp)) as f:
+        return list(parse_fasta(f))

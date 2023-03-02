@@ -19,11 +19,12 @@ def main():
         if not line.strip():
             continue
         target = args.prefix / Path(line.strip())
-        # FIXME: Check if zero-sized
         if not target.exists():
-            raise SystemExit("Target '{}' not found".format(target))
+            raise SystemExit(f"Target '{target}' not found")
+        elif target.stat().st_size == 0:
+            raise SystemExit(f"Target '{target}' is empty")
         else:
-            print("Found target '{}'".format(target))
+            print(f"Found target '{target}'")
 
 
 if __name__ == "__main__":

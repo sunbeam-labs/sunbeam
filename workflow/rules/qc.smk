@@ -207,12 +207,9 @@ rule remove_low_complexity:
     benchmark:
         BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
     conda:
-        "../envs/rbt.yml"
-    shell:
-        """
-        gzip -dc {input.reads} | rbt fastq-filter {input.ids} 2>&1 | tee {log} |\
-        gzip > {output}
-        """
+        "../envs/reports.yml"
+    script:
+        "../scripts/remove_low_complexity.py"
 
 
 rule qc_final:

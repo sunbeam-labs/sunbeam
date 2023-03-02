@@ -3,7 +3,6 @@ from sunbeamlib import qc
 from pathlib import Path
 
 with open(snakemake.log[0], "w") as l:
-    sys.stderr = sys.stdout = l
     if snakemake.params.suffix:
         qc.strip_seq_id_suffix(
             snakemake.input[0], snakemake.output[0], snakemake.params.suffix
