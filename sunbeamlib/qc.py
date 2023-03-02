@@ -51,10 +51,11 @@ def remove_pair_id(id, log):
     
     id: id string
     """
-    if id[:-2] == "/1" or id[:-2] == "/2":
+    id = id.strip()
+    if id[-2:] == "/1" or id[-2:] == "/2":
         return id[:-2]
     space_split = id.split(" ")
     if len(space_split) == 2 and (space_split[1][0] == "1" or space_split[1][0] == "2"):
         return " ".join([space_split[0], space_split[1][1:]])
-    log.write(f"Didn't find read pair ID in {id}")
+    log.write(f"Didn't find read pair ID in {id}\n")
     return id
