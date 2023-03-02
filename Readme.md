@@ -150,5 +150,6 @@ See how people are using Sunbeam:
 - Chunyu Zhao ([@zhaoc1](https://github.com/zhaoc1))
 - Jesse Connell ([@ressy](https://github.com/ressy))
 - Louis Taylor ([@louiejtaylor](https://github.com/louiejtaylor))
+- Charlie Bushman ([@ulthran](https://github.com/ulthran))
 - Kyle Bittinger ([@kylebittinger](https://github.com/kylebittinger))
 

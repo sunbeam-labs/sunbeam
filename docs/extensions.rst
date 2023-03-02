@@ -385,13 +385,8 @@ A good example to follow is the `sbx_coassembly
 Publishing at sunbeam-labs.org
 ==============================
 
-You are welcome to add your Sunbeam extensions to the directory at
-`sunbeam-labs.org <https://sunbeam-labs.org/>`_.  To submit your
-extension to the directory, please go to the `development page for
-sunbeam-labs.org
-<https://github.com/sunbeam-labs/sunbeam-labs.github.io>`_ and `open
-an issue
-<https://github.com/sunbeam-labs/sunbeam-labs.github.io/issues>`_ with
-the GitHub URL of your extension. If you know Javascript, you can edit
-the list at the top of the file ``main.js`` and `send us a pull request
-<https://github.com/sunbeam-labs/sunbeam-labs.github.io/pulls>`_.
+You are welcome to add your Sunbeam extensions to the organization at
+`sunbeam-labs <https://github.com/sunbeam-labs>`_.  To submit your
+extension, please go to the `sunbeam Issues page
+<https://github.com/sunbeam-labs/sunbeam/issues>`_ and open and issue with
+the GitHub URL of your extension.
