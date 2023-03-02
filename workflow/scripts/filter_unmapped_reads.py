@@ -1,60 +1,53 @@
 import gzip
 import os
+from sunbeamlib.parse import parse_fastq, write_fastq
 
 with open(snakemake.log[0], "w") as l:
     total_count = sum(1 for line in gzip.open(snakemake.input.reads, "r")) // 4
-
-    net_unmapped_reads = {}
-    host_unmapped_counts = {}
-    collisions = 0
+    host_mapped_counts = {}
+    unmapped_reads = {}
 
     for i in snakemake.input.unmapped_reads:
-        host_unmapped_counts[os.path.basename(os.path.dirname(i))] = (
+        basename = os.path.basename(os.path.dirname(i))
+        host_mapped_counts[basename] = (
             total_count - sum(1 for line in open(i)) // 4
         )
+        unmapped_reads[basename] = set()
         with open(i) as f:
-            id = ""
-            for i, line in enumerate(f.readlines()):
-                if i % 4 == 0:
-                    id = line.strip()
-                elif i % 4 == 1:
-                    if id in net_unmapped_reads:
-                        collisions += 1
-                    net_unmapped_reads[id] = [line.strip()]
-                else:
-                    net_unmapped_reads[id].append(line.strip())
+            for record in parse_fastq(f):
+                unmapped_reads[basename].add(record)
+            
+    final_unmapped_reads = set.intersection(*unmapped_reads.values())
 
-    total_unmapped_count = len(net_unmapped_reads)
-
-    l.write(f"Per host unmapped count: {host_unmapped_counts}\n")
+    l.write(f"Per host mapped count: {host_mapped_counts}\n")
     l.write(f"Total count: {total_count}\n")
-    l.write(f"Total unmapped count: {total_unmapped_count}\n")
-    l.write(f"Collisions count: {collisions}\n")
 
-    host = total_count - total_unmapped_count
-    nonhost = total_unmapped_count
+    host = sum(host_mapped_counts.values())
+    nonhost = len(final_unmapped_reads)
+    l.write(f"Total host mapped count: {host}\n")
+    l.write(f"Total unmapped count: {nonhost}\n")
+    l.write(f"Sanity check (host + nonhost = total): {host} + {nonhost} = {total_count}\n")
+    assert host + nonhost == total_count
 
     if len(snakemake.input.unmapped_reads) == 0:
-        l.write(f"No unmapped reads files, there are probably no host files.")
+        l.write(f"No unmapped reads files, there are probably no host files\n")
         host = 0
         nonhost = total_count
 
     with open(snakemake.output.log, "w") as f:
         f.write(
             "{}\n".format(
-                "\t".join(list(host_unmapped_counts.keys()) + ["host", "nonhost"])
+                "\t".join(list(host_mapped_counts.keys()) + ["host", "nonhost"])
             )
         )
         f.write(
             "{}\n".format(
                 "\t".join(
-                    map(str, list(host_unmapped_counts.values()) + [host, nonhost])
+                    map(str, list(host_mapped_counts.values()) + [host, nonhost])
                 )
             )
         )
 
-    with gzip.open(snakemake.output.reads, "wt") as f:
-        for k, v in net_unmapped_reads.items():
-            f.write(f"{k}\n")
-            for val in v:
-                f.write(f"{val}\n")
+    with gzip.open(snakemake.output.reads, "wt") as f_out:
+        for record in final_unmapped_reads:
+            write_fastq(record, f_out)
