@@ -1,0 +1,10 @@
+PASS	Basic Statistics	TEST_2.fastq.gz
+FAIL	Per base sequence quality	TEST_2.fastq.gz
+FAIL	Per sequence quality scores	TEST_2.fastq.gz
+WARN	Per base sequence content	TEST_2.fastq.gz
+FAIL	Per sequence GC content	TEST_2.fastq.gz
+PASS	Per base N content	TEST_2.fastq.gz
+PASS	Sequence Length Distribution	TEST_2.fastq.gz
+PASS	Sequence Duplication Levels	TEST_2.fastq.gz
+WARN	Overrepresented sequences	TEST_2.fastq.gz
+PASS	Adapter Content	TEST_2.fastq.gz
