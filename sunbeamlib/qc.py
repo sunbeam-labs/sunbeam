@@ -46,9 +46,10 @@ def filter_ids(fp_in, fp_out, ids, log):
             else:
                 log.write(f"{record[0]} filtered\n")
 
+
 def remove_pair_id(id, log):
     """Remove the 1 or 2 from a paired read ID
-    
+
     id: id string
     """
     id = id.strip()

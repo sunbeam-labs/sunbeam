@@ -17,16 +17,20 @@ data_dir = Path(__file__).parent / "data"
 def setup(init):
     output_dir = init
 
+    shutil.copytree(data_dir / "01_cutadapt", output_dir / "sunbeam_output" / "qc")
+
     yield output_dir
 
     shutil.rmtree(output_dir / "sunbeam_output")
 
 
-def test_adapter_removal_paired(setup):
+def test_trimmomatic_paired(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    r1 = sunbeam_output_dir / "qc" / "01_cutadapt" / "TEST_1.fastq.gz"
-    r2 = sunbeam_output_dir / "qc" / "01_cutadapt" / "TEST_2.fastq.gz"
+    r1 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "TEST_1.fastq.gz"
+    r2 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "TEST_2.fastq.gz"
+    ur1 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "unpaired" / "TEST_1_unpaired.fastq.gz"
+    ur2 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "unpaired" / "TEST_2_unpaired.fastq.gz"
 
     sp.check_output(
         [
@@ -38,8 +42,12 @@ def test_adapter_removal_paired(setup):
             "--rerun-triggers=params",
             f"{r1}",
             f"{r2}",
+            f"{ur1}",
+            f"{ur2}",
         ]
     )
 
     assert os.path.isfile(r1)
     assert os.path.isfile(r2)
+    assert os.path.isfile(ur1)
+    assert os.path.isfile(ur2)

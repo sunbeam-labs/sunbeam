@@ -8,9 +8,16 @@ test_dir = Path(__file__).parent.parent.parent.resolve()
 sys.path.append(str(test_dir))
 
 from config_fixture import output_dir, config
-from sunbeamlib import load_sample_list, guess_format_string, _verify_path, circular, read_seq_ids
+from sunbeamlib import (
+    load_sample_list,
+    guess_format_string,
+    _verify_path,
+    circular,
+    read_seq_ids,
+)
 
 data_dir = Path(__file__).parent / "data"
+
 
 @pytest.fixture
 def init(output_dir):
@@ -24,7 +31,8 @@ def init(output_dir):
             shutil.copytree(output_dir, "output_sunbeamlib/")
         except FileExistsError as e:
             pass
-    
+
+
 def test_load_sample_list(init):
     output_dir = init
 
