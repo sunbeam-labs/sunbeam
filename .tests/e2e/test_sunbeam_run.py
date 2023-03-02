@@ -66,10 +66,12 @@ def test_sunbeam_run_all(init):
                 print(f"Found target '{target}'")
 
     with open(sunbeam_output_dir / "qc" / "reports" / "preprocess_summary.tsv") as f:
-        f.readline() # Headers
+        f.readline()  # Headers
         stats = f.readline().split("\t")
-        assert stats[1] == 400 # Input reads
-        assert stats[2] == 400 # Both kept by cutadapt
-        assert stats[6] + stats[7] + stats[10] == 200 # Human + phiX + komplexity
-        assert stats[8] + stats[10] == 200 # Host + komplexity
-        assert stats[9] == 200 # Nonhost
+        assert int(stats[1]) == 400  # Input reads
+        assert int(stats[2]) == 400  # Both kept by cutadapt
+        assert (
+            int(stats[6]) + int(stats[7]) + int(stats[10]) == 200
+        )  # Human + phiX + komplexity
+        assert int(stats[8]) + int(stats[10]) == 200  # Host + komplexity
+        assert int(stats[9]) == 200  # Nonhost

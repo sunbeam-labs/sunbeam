@@ -24,6 +24,7 @@ def init(output_dir):
 
     yield output_dir
 
+
 def test_init(init):
     output_dir = init
 

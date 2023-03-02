@@ -25,10 +25,11 @@ def init(output_dir):
 
     yield output_dir
 
+
 @pytest.fixture
 def config_modify(init):
     output_dir = init
-    hosts_fp = test_dir / 'data' / 'hosts'
+    hosts_fp = test_dir / "data" / "hosts"
     config_str = f"qc: {{host_fp: {hosts_fp}}}"
 
     sp.check_output(
@@ -45,11 +46,12 @@ def config_modify(init):
 
     yield output_dir, hosts_fp
 
+
 def test_config_modify(config_modify):
     output_dir, hosts_fp = config_modify
 
     yaml = YAML(typ="safe")
     with open(output_dir / "sunbeam_config.yml") as f:
         config_dict = yaml.load(f)
-    
+
     assert config_dict["qc"]["host_fp"] == str(hosts_fp)

@@ -12,13 +12,8 @@ from config_fixture import output_dir, config
 def list_samples(output_dir):
     output_dir = output_dir / "sunbeam_list_samples"
 
-    yield sp.check_output(
-        [
-            "sunbeam",
-            "list_samples",
-            f"{test_dir / 'data' / 'reads'}"
-        ]
-    )
+    yield sp.check_output(["sunbeam", "list_samples", f"{test_dir / 'data' / 'reads'}"])
+
 
 def test_list_samples(list_samples):
     sample_list = list_samples

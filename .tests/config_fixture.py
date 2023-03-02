@@ -17,6 +17,7 @@ def config():
 
     yield config_dict
 
+
 @pytest.fixture
 def output_dir(config):
     yaml = config

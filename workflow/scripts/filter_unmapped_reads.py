@@ -9,14 +9,12 @@ with open(snakemake.log[0], "w") as l:
 
     for i in snakemake.input.unmapped_reads:
         basename = os.path.basename(os.path.dirname(i))
-        host_mapped_counts[basename] = (
-            total_count - sum(1 for line in open(i)) // 4
-        )
+        host_mapped_counts[basename] = total_count - sum(1 for line in open(i)) // 4
         unmapped_reads[basename] = set()
         with open(i) as f:
             for record in parse_fastq(f):
                 unmapped_reads[basename].add(record)
-            
+
     final_unmapped_reads = set.intersection(*unmapped_reads.values())
 
     l.write(f"Per host mapped count: {host_mapped_counts}\n")
@@ -26,7 +24,9 @@ with open(snakemake.log[0], "w") as l:
     nonhost = len(final_unmapped_reads)
     l.write(f"Total host mapped count: {host}\n")
     l.write(f"Total unmapped count: {nonhost}\n")
-    l.write(f"Sanity check (host + nonhost = total): {host} + {nonhost} = {total_count}\n")
+    l.write(
+        f"Sanity check (host + nonhost = total): {host} + {nonhost} = {total_count}\n"
+    )
     assert host + nonhost == total_count
 
     if len(snakemake.input.unmapped_reads) == 0:
@@ -42,9 +42,7 @@ with open(snakemake.log[0], "w") as l:
         )
         f.write(
             "{}\n".format(
-                "\t".join(
-                    map(str, list(host_mapped_counts.values()) + [host, nonhost])
-                )
+                "\t".join(map(str, list(host_mapped_counts.values()) + [host, nonhost]))
             )
         )
 
