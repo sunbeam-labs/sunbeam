@@ -17,10 +17,10 @@ def parse_fasta(f):
 
 def parse_fastq(f):
     for g in grouper(f.readlines(), 4):
-        header_str = g[0][1:].strip().decode("utf-8") 
-        seq_str = g[1].strip().decode("utf-8") 
-        plus_str = g[2].strip().decode("utf-8") 
-        quality_str = g[3].strip().decode("utf-8") 
+        header_str = g[0][1:].strip()
+        seq_str = g[1].strip()
+        plus_str = g[2].strip()
+        quality_str = g[3].strip()
 
         yield (header_str, seq_str, plus_str, quality_str)
 
