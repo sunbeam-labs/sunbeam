@@ -40,17 +40,37 @@ def setup(init):
         data_dir / "qc" / "decontam" / "intermediates",
         output_dir / "sunbeam_output" / "qc" / "decontam" / "intermediates",
     )
+    shutil.copyfile(
+        data_dir / "qc" / "decontam" / "human" / "unmapped_TEST.sam",
+        output_dir
+        / "sunbeam_output"
+        / "qc"
+        / "decontam"
+        / "human"
+        / "unmapped_TEST.sam",
+    )
+    shutil.copyfile(
+        data_dir / "qc" / "decontam" / "phix174" / "unmapped_TEST.sam",
+        output_dir
+        / "sunbeam_output"
+        / "qc"
+        / "decontam"
+        / "phix174"
+        / "unmapped_TEST.sam",
+    )
 
     yield output_dir
 
     shutil.rmtree(output_dir / "sunbeam_output")
 
 
-def test_get_unmapped_reads(setup):
+def test_sam_convert(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    human = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_TEST.sam"
-    phix = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_TEST.sam"
+    human1 = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_TEST_1.fastq"
+    human2 = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_TEST_2.fastq"
+    phix1 = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_TEST_1.fastq"
+    phix2 = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_TEST_2.fastq"
 
     sp.check_output(
         [
@@ -60,10 +80,14 @@ def test_get_unmapped_reads(setup):
             f"{output_dir}",
             "--notemp",
             "--rerun-triggers=input",
-            f"{human}",
-            f"{phix}",
+            f"{human1}",
+            f"{human2}",
+            f"{phix1}",
+            f"{phix2}",
         ]
     )
 
-    assert human.stat().st_size >= 100000
-    assert phix.stat().st_size >= 100000
+    assert human1.stat().st_size >= 40000
+    assert human2.stat().st_size >= 40000
+    assert phix1.stat().st_size >= 40000
+    assert phix2.stat().st_size >= 40000
