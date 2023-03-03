@@ -37,8 +37,8 @@ def test_build_host_index(setup):
         "--notemp",
         "--rerun-triggers=input",
     ]
-    args.append(human)
-    args.append(phix)
+    args += human
+    args += phix
     sp.check_output(args)
 
     assert len(os.listdir(test_dir / "data" / "hosts")) == 12
