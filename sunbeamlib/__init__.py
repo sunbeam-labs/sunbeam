@@ -14,7 +14,7 @@ from sunbeamlib.parse import parse_fasta
 __version__ = str(Version.coerce(os.environ.get("SUNBEAM_VER", "0.0.0")))
 
 
-def load_sample_list(samplelist_fp, paired_end, root_proj=""):
+def load_sample_list(samplelist_fp, paired_end=True, root_proj=""):
     """
     Build a list of samples from a sample list file.
     :param samplelist_fp: a Path to a whitespace-delimited samplelist file,
@@ -112,11 +112,13 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
                         continue
             variant_idx.append(i)
             elements.append("{sample}")
+            print(str(elements))
     # Combine multiple variant elements
     if len(variant_idx) > 0:
         _min = min(variant_idx)
         _max = max(variant_idx)
         elements[_min + 1 : _max + 2] = ["{sample}"]
+        print(str(elements))
         return "".join(reversed(elements))
     else:
         raise SampleFormatError("No variable regions identified")
