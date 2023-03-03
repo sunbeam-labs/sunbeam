@@ -61,6 +61,8 @@ def test_load_sample_list(init):
         assert False
     except ValueError as e:
         pass
+    
+    assert load_sample_list(sample_list_fp, False)["TEST"] == {"1": str(sample1.resolve()), "2": ""}
 
     with open(sample2, "w") as f2:
         f2.write(" ")
