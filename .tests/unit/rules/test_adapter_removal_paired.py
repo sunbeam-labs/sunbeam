@@ -35,6 +35,7 @@ def test_adapter_removal_paired(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
+            "--rerun-triggers=input",
             f"{r1}",
             f"{r2}",
         ]
@@ -42,4 +43,3 @@ def test_adapter_removal_paired(setup):
 
     assert r1.stat().st_size >= 10000
     assert r2.stat().st_size >= 10000
-

@@ -17,8 +17,14 @@ data_dir = Path(__file__).parent / "data"
 def setup(init):
     output_dir = init
 
-    shutil.copytree(data_dir / "qc" / "01_cutadapt", output_dir / "sunbeam_output" / "qc" / "01_cutadapt")
-    shutil.copytree(data_dir / "qc" / "02_trimmomatic", output_dir / "sunbeam_output" / "qc" / "02_trimmomatic")
+    shutil.copytree(
+        data_dir / "qc" / "01_cutadapt",
+        output_dir / "sunbeam_output" / "qc" / "01_cutadapt",
+    )
+    shutil.copytree(
+        data_dir / "qc" / "02_trimmomatic",
+        output_dir / "sunbeam_output" / "qc" / "02_trimmomatic",
+    )
 
     yield output_dir
 
@@ -38,6 +44,7 @@ def test_fastqc(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
+            "--rerun-triggers=input",
             f"{r1}",
             f"{r2}",
         ]
