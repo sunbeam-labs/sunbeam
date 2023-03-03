@@ -29,12 +29,14 @@ def test_build_host_index(setup):
     human = [test_dir / "data" / "hosts" / f"human.fasta.{ext}" for ext in exts]
     phix = [test_dir / "data" / "hosts" / f"phix174.fasta.{ext}" for ext in exts]
 
-    args = ["sunbeam",
-            "run",
-            "--profile",
-            f"{output_dir}",
-            "--notemp",
-            "--rerun-triggers=input",]
+    args = [
+        "sunbeam",
+        "run",
+        "--profile",
+        f"{output_dir}",
+        "--notemp",
+        "--rerun-triggers=input",
+    ]
     args.append(human)
     args.append(phix)
     sp.check_output(args)
