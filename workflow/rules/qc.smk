@@ -233,7 +233,7 @@ rule clean_qc:
         trimmomatic_fp=QC_FP / "02_trimmomatic",
         komplexity_fp=QC_FP / "03_komplexity",
     output:
-        touch(".qc_cleaned"),
+        touch(QC_FP / ".qc_cleaned"),
     shell:
         """
         rm -r {params.cutadapt_fp} && \

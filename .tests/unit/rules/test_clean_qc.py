@@ -25,16 +25,27 @@ def setup(init):
         data_dir / "qc" / "02_trimmomatic",
         output_dir / "sunbeam_output" / "qc" / "02_trimmomatic",
     )
+    shutil.copytree(
+        data_dir / "qc" / "log" / "komplexity",
+        output_dir / "sunbeam_output" / "qc" / "log" / "komplexity",
+    )
+    shutil.copytree(
+        data_dir / "qc" / "03_komplexity",
+        output_dir / "sunbeam_output" / "qc" / "03_komplexity",
+    )
+    shutil.copytree(
+        data_dir / "qc" / "cleaned", output_dir / "sunbeam_output" / "qc" / "cleaned"
+    )
 
     yield output_dir
 
     shutil.rmtree(output_dir / "sunbeam_output")
 
 
-def test_find_low_complexity(setup):
+def test_clean_qc(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    r = sunbeam_output_dir / "qc" / "log" / "komplexity" / "TEST.filtered_ids"
+    r = sunbeam_output_dir / "qc" / ".qc_cleaned"
 
     sp.check_output(
         [
@@ -48,16 +59,10 @@ def test_find_low_complexity(setup):
         ]
     )
 
-    expected_ids = [
-        "KI270762.1_45667_46245_1:0:0_0:0:0_6/1",
-        "KI270762.1_10179_10639_7:0:0_2:0:0_22/1",
-        "KI270762.1_1730_2260_0:1:0_0:0:0_31/1",
-        "KI270762.1_10398_10889_1:0:0_2:0:0_3b/1",
-        "KI270762.1_13312_13765_3:0:0_0:0:0_60/1",
-        "KI270762.1_1651_2168_0:0:0_0:0:0_36/2",
-    ]
+    cutadapt_fp = sunbeam_output_dir / "qc" / "01_cutadapt"
+    trimmomatic_fp = sunbeam_output_dir / "qc" / "02_trimmomatic"
+    komplexity_fp = sunbeam_output_dir / "qc" / "03_komplexity"
 
-    with open(r) as f:
-        ids = [id.strip() for id in f.readlines()]
-        for id in expected_ids:
-            assert id in ids
+    assert not os.path.isdir(cutadapt_fp)
+    assert not os.path.isdir(trimmomatic_fp)
+    assert not os.path.isdir(komplexity_fp)
