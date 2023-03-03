@@ -1,0 +1,10 @@
+TrimmomaticPE: Started with arguments:
+ -threads 4 -phred33 /mnt/d/Penn/sunbeam/projects/generated-test/sunbeam_output/qc/01_cutadapt/TEST_1.fastq.gz /mnt/d/Penn/sunbeam/projects/generated-test/sunbeam_output/qc/01_cutadapt/TEST_2.fastq.gz /mnt/d/Penn/sunbeam/projects/generated-test/sunbeam_output/qc/02_trimmomatic/TEST_1.fastq.gz /mnt/d/Penn/sunbeam/projects/generated-test/sunbeam_output/qc/02_trimmomatic/unpaired/TEST_1_unpaired.fastq.gz /mnt/d/Penn/sunbeam/projects/generated-test/sunbeam_output/qc/02_trimmomatic/TEST_2.fastq.gz /mnt/d/Penn/sunbeam/projects/generated-test/sunbeam_output/qc/02_trimmomatic/unpaired/TEST_2_unpaired.fastq.gz ILLUMINACLIP:/mnt/d/Penn/sunbeam/.snakemake/f4d482eb49a22b5157a972f98ae0f4b7_/share/trimmomatic/adapters/NexteraPE-PE.fa:2:30:10:8:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'AGATGTGTATAAGAGACAG' and 'AGATGTGTATAAGAGACAG'
+Using Long Clipping Sequence: 'GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG'
+Using Long Clipping Sequence: 'TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG'
+Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTCCGAGCCCACGAGAC'
+Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTGACGCTGCCGACGA'
+ILLUMINACLIP: Using 1 prefix pairs, 4 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Input Read Pairs: 400 Both Surviving: 400 (100.00%) Forward Only Surviving: 0 (0.00%) Reverse Only Surviving: 0 (0.00%) Dropped: 0 (0.00%)
+TrimmomaticPE: Completed successfully
