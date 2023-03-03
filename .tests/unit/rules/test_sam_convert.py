@@ -40,23 +40,16 @@ def setup(init):
         data_dir / "qc" / "decontam" / "intermediates",
         output_dir / "sunbeam_output" / "qc" / "decontam" / "intermediates",
     )
+    output_decontam_dir = output_dir / "sunbeam_output" / "qc" / "decontam"
+    (output_decontam_dir / "human").mkdir()
+    (output_decontam_dir / "phix174").mkdir()
     shutil.copyfile(
         data_dir / "qc" / "decontam" / "human" / "unmapped_TEST.sam",
-        output_dir
-        / "sunbeam_output"
-        / "qc"
-        / "decontam"
-        / "human"
-        / "unmapped_TEST.sam",
+        output_decontam_dir / "human" / "unmapped_TEST.sam",
     )
     shutil.copyfile(
         data_dir / "qc" / "decontam" / "phix174" / "unmapped_TEST.sam",
-        output_dir
-        / "sunbeam_output"
-        / "qc"
-        / "decontam"
-        / "phix174"
-        / "unmapped_TEST.sam",
+        output_decontam_dir / "phix174" / "unmapped_TEST.sam",
     )
 
     yield output_dir
