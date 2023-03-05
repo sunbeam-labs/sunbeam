@@ -89,16 +89,12 @@ def test_sunbeam_run_all(init):
 def init_single_end(output_dir):
     output_dir = output_dir / "sunbeam_run_single_end"
 
-    reads_fp = test_dir / 'data' / 'single_end_reads'
-    reads_fp.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(test_dir / "data" / "reads" / "TEST_R1.fastq.gz", reads_fp / "TEST.fastq.gz")
-
     sp.check_output(
         [
             "sunbeam",
             "init",
             "--data_fp",
-            f"{reads_fp}",
+            f"{test_dir / 'data' / 'single_end_reads'}",
             "--single_end",
             output_dir,
         ]
@@ -120,17 +116,15 @@ def init_single_end(output_dir):
 
     yield output_dir
 
-    shutil.rmtree(reads_fp)
-
     if os.environ.get("CI", False):
         try:
-            shutil.copytree(output_dir, "output_sunbeam_run/")
+            shutil.copytree(output_dir, "output_sunbeam_run_single_end/")
         except FileExistsError as e:
             pass
 
 
-def test_sunbeam_run_all_single_end(init):
-    output_dir = init
+def test_sunbeam_run_all_single_end(init_single_end):
+    output_dir = init_single_end
     sunbeam_output_dir = output_dir / "sunbeam_output"
 
     sp.check_output(
@@ -143,7 +137,7 @@ def test_sunbeam_run_all_single_end(init):
         ]
     )
 
-    with open(test_dir / "targets.txt") as f:
+    with open(test_dir / "targets_single_end.txt") as f:
         for line in f.readlines():
             if not line.strip():
                 continue
