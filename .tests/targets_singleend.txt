@@ -1,7 +1,6 @@
-qc/decontam/dummybfragilis_1.fastq.gz
-qc/decontam/dummyecoli_1.fastq.gz
-qc/decontam/random_1.fastq.gz
+qc/decontam/TEST.fastq.gz
 
-qc/cleaned/dummybfragilis_1.fastq.gz
-qc/cleaned/dummyecoli_1.fastq.gz
-qc/cleaned/random_1.fastq.gz
+qc/cleaned/TEST.fastq.gz
+
+qc/reports/preprocess_summary.tsv
+qc/reports/fastqc_quality.tsv
