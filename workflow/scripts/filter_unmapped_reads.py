@@ -1,8 +1,13 @@
 import gzip
 import os
+import sys
 from sunbeamlib.parse import parse_fastq, write_fastq
 
 with open(snakemake.log[0], "w") as l:
+    if not snakemake.config["qc"]["host_fp"]:
+        l.write("Cfg['qc']['host_fp'] is empty, please specify a path to reference files before running decontam")
+        sys.exit(1)
+
     total_count = sum(1 for line in gzip.open(snakemake.input.reads, "r")) // 4
     host_mapped_counts = {}
     unmapped_reads = {}
@@ -28,11 +33,6 @@ with open(snakemake.log[0], "w") as l:
         f"Sanity check (host + nonhost = total): {host} + {nonhost} = {total_count}\n"
     )
     assert host + nonhost == total_count
-
-    if len(snakemake.input.unmapped_reads) == 0:
-        l.write(f"No unmapped reads files, there are probably no host files\n")
-        host = 0
-        nonhost = total_count
 
     with open(snakemake.output.log, "w") as f:
         f.write(
