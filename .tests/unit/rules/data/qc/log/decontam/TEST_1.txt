@@ -1,0 +1,2 @@
+human	phix174	host	nonhost
+94	100	194	200

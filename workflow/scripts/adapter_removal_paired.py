@@ -1,46 +1,63 @@
+import gzip
 import os
+import subprocess as sp
+import sys
 
-fwd_adapters = snakemake.config["qc"]["fwd_adapters"]
-rev_adapters = snakemake.config["qc"]["rev_adapters"]
-if fwd_adapters or rev_adapters:
-    overlap = float("inf")
-    if fwd_adapters:
-        overlap = min(min(len(a) for a in fwd_adapters), overlap)
-        fwd_adapter_str = "-b " + " -b ".join(snakemake.config["qc"]["fwd_adapters"])
-    if rev_adapters:
-        overlap = min(min(len(a) for a in rev_adapters), overlap)
-        rev_adapter_str = "-B " + " -B ".join(snakemake.config["qc"]["rev_adapters"])
-    os.system(
-        """
-    cutadapt {i} {a} \
-    --cores {b} \
-    {c} {d} \
-    -o {e} -p {f} \
-    {g} {h} \
-    > {j} 2>&1
-    gzip {e}
-    gzip {f}
-    """.format(
-            a=overlap,
-            b=snakemake.threads,
-            c=fwd_adapter_str,
-            d=rev_adapter_str,
-            e=snakemake.params.r1,
-            f=snakemake.params.r2,
-            g=snakemake.input.r1,
-            h=snakemake.input.r2,
-            j=snakemake.log,
-            i=snakemake.config["qc"]["cutadapt_opts"],
-        )
-    )
-else:
-    os.system(
-        """
-    ln -s {a} {b} && ln -s {c} {d}
-    """.format(
-            a=snakemake.input.r1,
-            b=snakemake.output.gr1,
-            c=snakemake.input.r2,
-            d=snakemake.output.gr2,
-        )
-    )
+with open(snakemake.log[0], "w") as log:
+    fwd_adapters = snakemake.config["qc"]["fwd_adapters"]
+    rev_adapters = snakemake.config["qc"]["rev_adapters"]
+    if fwd_adapters or rev_adapters:
+        overlap = float("inf")
+        if fwd_adapters:
+            overlap = min(min(len(a) for a in fwd_adapters), overlap)
+            fwd_adapter_str = "-b " + " -b ".join(
+                snakemake.config["qc"]["fwd_adapters"]
+            )
+        if rev_adapters:
+            overlap = min(min(len(a) for a in rev_adapters), overlap)
+            rev_adapter_str = "-B " + " -B ".join(
+                snakemake.config["qc"]["rev_adapters"]
+            )
+
+        try:
+            args = [
+                "cutadapt",
+                "-O",
+                str(overlap),
+                "--cores",
+                str(snakemake.threads),
+            ]
+            args += snakemake.config["qc"]["cutadapt_opts"].split(" ")
+            args += fwd_adapter_str.split(" ")
+            args += rev_adapter_str.split(" ")
+            args += [
+                "-o",
+                f"{snakemake.params.r1}",
+                "-p",
+                f"{snakemake.params.r2}",
+                f"{snakemake.input.r1}",
+                f"{snakemake.input.r2}",
+            ]
+            cutadapt_output = sp.check_output(
+                args,
+                stderr=sp.STDOUT,
+            )
+        except sp.CalledProcessError as e:
+            log.write(e.output.decode())
+            sys.exit(e.returncode)
+        log.write(cutadapt_output.decode())
+
+        with open(snakemake.params.r1) as f_in, gzip.open(
+            snakemake.output.r1, "wt"
+        ) as f_out:
+            f_out.writelines(f_in.readlines())
+        with open(snakemake.params.r2) as f_in, gzip.open(
+            snakemake.output.r2, "wt"
+        ) as f_out:
+            f_out.writelines(f_in.readlines())
+        os.remove(snakemake.params.r1)
+        os.remove(snakemake.params.r2)
+    else:
+        log.write("Adapters not found, skipping adapter removal...")
+        os.symlink(snakemake.input.r1, snakemake.output.r1)
+        os.symlink(snakemake.input.r2, snakemake.output.r2)

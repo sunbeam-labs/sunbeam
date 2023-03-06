@@ -1,0 +1,2 @@
+Samples	input	both_kept	fwd_only	rev_only	dropped	human	phix174	host	nonhost	komplexity
+trimmomatic_TEST.log	400	400	0	0	0	94	100	194	200	6
