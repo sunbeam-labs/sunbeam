@@ -20,7 +20,7 @@ with open(snakemake.log[0], "w") as l:
     l.write(f"Per host mapped count: {host_mapped_counts}\n")
     l.write(f"Total count: {total_count}\n")
 
-    host = sum(host_mapped_counts.values())
+    host = total_count - len(final_unmapped_reads)
     nonhost = len(final_unmapped_reads)
     l.write(f"Total host mapped count: {host}\n")
     l.write(f"Total unmapped count: {nonhost}\n")

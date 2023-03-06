@@ -2,6 +2,11 @@ rule all_decontam:
     input:
         TARGET_DECONTAM,
 
+if Cfg["all"]["paired_end"]:
+    ruleorder: sam_convert_paired > sam_convert_unpaired
+else:
+    ruleorder: sam_convert_unpaired > sam_convert_paired
+
 
 rule build_host_index:
     input:
@@ -66,7 +71,24 @@ rule get_unmapped_reads:
         """
 
 
-rule sam_convert:
+rule sam_convert_unpaired:
+    input:
+        QC_FP / "decontam" / "{host}" / "unmapped_{sample}.sam",
+    output:
+        temp(QC_FP / "decontam" / "{host}" / "unmapped_{sample}_1.fastq"),
+    log:
+        LOG_FP / "sam_convert_{host}_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "sam_convert_{host}_{sample}.tsv"
+    conda:
+        "../envs/qc.yml"
+    shell:
+        """
+        samtools fastq -1 {output} {input} 2>&1 | tee {log}
+        """
+
+
+rule sam_convert_paired:
     input:
         QC_FP / "decontam" / "{host}" / "unmapped_{sample}.sam",
     output:
