@@ -1,7 +1,0 @@
-qc/decontam/dummybfragilis_1.fastq.gz
-qc/decontam/dummyecoli_1.fastq.gz
-qc/decontam/random_1.fastq.gz
-
-qc/cleaned/dummybfragilis_1.fastq.gz
-qc/cleaned/dummyecoli_1.fastq.gz
-qc/cleaned/random_1.fastq.gz
