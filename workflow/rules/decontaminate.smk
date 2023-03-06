@@ -2,9 +2,14 @@ rule all_decontam:
     input:
         TARGET_DECONTAM,
 
+
 if Cfg["all"]["paired_end"]:
+
     ruleorder: sam_convert_paired > sam_convert_unpaired
+
+
 else:
+
     ruleorder: sam_convert_unpaired > sam_convert_paired
 
 
@@ -125,7 +130,6 @@ rule filter_unmapped_reads:
 
 
 rule preprocess_report:
-    """Combines the information from multiple preprocessing steps"""
     input:
         trim_files=expand(
             LOG_FP / "trimmomatic_{sample}.log",

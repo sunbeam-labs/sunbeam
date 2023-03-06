@@ -81,7 +81,7 @@ def test_sunbeam_run_all(init):
         assert (
             int(stats[6]) + int(stats[8]) + int(stats[11]) == 200
         )  # Human + phiX + komplexity
-        assert int(stats[6]) == int(stats[7]) # Human = human_copy
+        assert int(stats[6]) == int(stats[7])  # Human = human_copy
         assert int(stats[9]) + int(stats[11]) == 200  # Host + komplexity
         assert int(stats[10]) == 200  # Nonhost
 

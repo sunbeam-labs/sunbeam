@@ -27,6 +27,9 @@ def test_build_host_index(setup):
     sunbeam_output_dir = output_dir / "sunbeam_output"
     exts = ["amb", "ann", "bwt", "pac", "sa"]
     human = [test_dir / "data" / "hosts" / f"human.fasta.{ext}" for ext in exts]
+    human_copy = [
+        test_dir / "data" / "hosts" / f"human_copy.fasta.{ext}" for ext in exts
+    ]
     phix = [test_dir / "data" / "hosts" / f"phix174.fasta.{ext}" for ext in exts]
 
     args = [
@@ -38,7 +41,8 @@ def test_build_host_index(setup):
         "--rerun-triggers=input",
     ]
     args += human
+    args += human_copy
     args += phix
     sp.check_output(args)
 
-    assert len(os.listdir(test_dir / "data" / "hosts")) == 12
+    assert len(os.listdir(test_dir / "data" / "hosts")) == 18
