@@ -87,6 +87,46 @@ def test_sunbeam_run_all(init):
 
 
 @pytest.fixture
+def init_no_host(output_dir):
+    output_dir = output_dir / "sunbeam_run"
+
+    sp.check_output(
+        [
+            "sunbeam",
+            "init",
+            "--data_fp",
+            f"{test_dir / 'data' / 'reads'}",
+            output_dir,
+        ]
+    )
+
+    yield output_dir
+
+    if os.environ.get("CI", False):
+        try:
+            shutil.copytree(output_dir, "output_sunbeam_run/")
+        except FileExistsError as e:
+            pass
+
+
+def test_sunbeam_run_all_no_host(init):
+    output_dir = init
+    sunbeam_output_dir = output_dir / "sunbeam_output"
+
+    sp.check_output(
+        [
+            "sunbeam",
+            "run",
+            "--profile",
+            f"{output_dir}",
+            "--notemp",
+        ]
+    )
+
+    assert len(os.listdir(sunbeam_output_dir / "qc" / "cleaned")) == 2
+
+
+@pytest.fixture
 def init_single_end(output_dir):
     output_dir = output_dir / "sunbeam_run_single_end"
 
