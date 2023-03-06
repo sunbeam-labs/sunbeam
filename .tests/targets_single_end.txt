@@ -1,6 +1,6 @@
-qc/decontam/TEST.fastq.gz
+qc/decontam/TEST_1.fastq.gz
 
-qc/cleaned/TEST.fastq.gz
+qc/cleaned/TEST_1.fastq.gz
 
 qc/reports/preprocess_summary.tsv
 qc/reports/fastqc_quality.tsv
