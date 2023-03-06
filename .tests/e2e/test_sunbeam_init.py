@@ -44,6 +44,7 @@ def test_init(init):
     assert profile_fp.exists()
     assert samples_fp.exists()
 
+
 @pytest.fixture
 def init_single_end(output_dir):
     output_dir = output_dir / "sunbeam_init_single_end"

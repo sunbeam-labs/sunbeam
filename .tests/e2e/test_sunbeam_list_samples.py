@@ -18,14 +18,24 @@ def list_samples(output_dir):
 def test_list_samples(list_samples):
     output_dir = list_samples
 
-    sample_list = sp.check_output(["sunbeam", "list_samples", f"{test_dir / 'data' / 'reads'}"])
+    sample_list = sp.check_output(
+        ["sunbeam", "list_samples", f"{test_dir / 'data' / 'reads'}"]
+    )
 
     assert ".tests/data/reads/TEST_R1.fastq.gz" in sample_list.decode("utf-8")
     assert ".tests/data/reads/TEST_R2.fastq.gz" in sample_list.decode("utf-8")
 
+
 def test_list_samples_single_end(list_samples):
     output_dir = list_samples
 
-    sample_list = sp.check_output(["sunbeam", "list_samples", f"{test_dir / 'data' / 'single_end_reads'}", "--single_end"])
+    sample_list = sp.check_output(
+        [
+            "sunbeam",
+            "list_samples",
+            f"{test_dir / 'data' / 'single_end_reads'}",
+            "--single_end",
+        ]
+    )
 
     assert ".tests/data/single_end_reads/TEST.fastq.gz" in sample_list.decode("utf-8")
