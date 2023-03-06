@@ -38,7 +38,7 @@ qc:
   # Cutadapt
   fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
-  cutadapt_opts: "--discard-trimmed -O"
+  cutadapt_opts: "--discard-trimmed"
   # Komplexity
   kz_threshold: 0.55
   # Decontam

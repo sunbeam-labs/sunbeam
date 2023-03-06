@@ -1,4 +1,5 @@
 import gzip
+import os
 import pytest
 import shutil
 import subprocess as sp
@@ -46,3 +47,50 @@ def test_adapter_removal_paired(setup):
 
     with gzip.open(r1) as f1, gzip.open(r2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())
+
+def test_adapater_removal_paired_no_adapters(setup):
+    output_dir = setup
+    sunbeam_output_dir = output_dir / "sunbeam_output"
+    r1 = sunbeam_output_dir / "qc" / "01_cutadapt" / "TEST_1.fastq.gz"
+    r2 = sunbeam_output_dir / "qc" / "01_cutadapt" / "TEST_2.fastq.gz"
+
+    config_str = f"qc: {{fwd_adapters: }}"
+    sp.check_output(
+        [
+            "sunbeam",
+            "config",
+            "modify",
+            "-i",
+            "-s",
+            config_str,
+            f"{output_dir / 'sunbeam_config.yml'}"
+        ]
+    )
+    config_str = f"qc: {{rev_adapters: }}"
+    sp.check_output(
+        [
+            "sunbeam",
+            "config",
+            "modify",
+            "-i",
+            "-s",
+            config_str,
+            f"{output_dir / 'sunbeam_config.yml'}"
+        ]
+    )
+
+    sp.check_output(
+        [
+            "sunbeam",
+            "run",
+            "--profile",
+            f"{output_dir}",
+            "--notemp",
+            "--rerun-triggers=input",
+            f"{r1}",
+            f"{r2}",
+        ]
+    )
+
+    assert os.path.islink(r1)
+    assert os.path.islink(r2)

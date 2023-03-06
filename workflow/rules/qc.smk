@@ -39,7 +39,7 @@ rule adapter_removal_unpaired:
     benchmark:
         BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
     params:
-        tmp=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
+        QC_FP / "01_cutadapt" / "{sample}_1.fastq",
     threads: 4
     conda:
         "../envs/qc.yml"
@@ -52,15 +52,15 @@ rule adapter_removal_paired:
         r1=QC_FP / "00_samples" / "{sample}_1.fastq.gz",
         r2=QC_FP / "00_samples" / "{sample}_2.fastq.gz",
     output:
-        gr1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
-        gr2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
+        r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
+        r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
     log:
         LOG_FP / "adapter_removal_paired_{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
     params:
-        r1=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz"),
-        r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz"),
+        r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq",
+        r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq",
     threads: 4
     conda:
         "../envs/qc.yml"
