@@ -48,6 +48,7 @@ def test_adapter_removal_paired(setup):
     with gzip.open(r1) as f1, gzip.open(r2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())
 
+
 def test_adapater_removal_paired_no_adapters(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
@@ -63,7 +64,7 @@ def test_adapater_removal_paired_no_adapters(setup):
             "-i",
             "-s",
             config_str,
-            f"{output_dir / 'sunbeam_config.yml'}"
+            f"{output_dir / 'sunbeam_config.yml'}",
         ]
     )
     config_str = f"qc: {{rev_adapters: }}"
@@ -75,7 +76,7 @@ def test_adapater_removal_paired_no_adapters(setup):
             "-i",
             "-s",
             config_str,
-            f"{output_dir / 'sunbeam_config.yml'}"
+            f"{output_dir / 'sunbeam_config.yml'}",
         ]
     )
 

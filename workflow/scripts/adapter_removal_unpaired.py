@@ -10,19 +10,23 @@ with open(snakemake.log[0], "w") as log:
         overlap = float("inf")
         if fwd_adapters:
             overlap = min(min(len(a) for a in fwd_adapters), overlap)
-            fwd_adapter_str = "-b " + " -b ".join(snakemake.config["qc"]["fwd_adapters"])
+            fwd_adapter_str = "-b " + " -b ".join(
+                snakemake.config["qc"]["fwd_adapters"]
+            )
         if rev_adapters:
             overlap = min(min(len(a) for a in rev_adapters), overlap)
-            rev_adapter_str = "-g " + " -g ".join(snakemake.config["qc"]["rev_adapters"])
-        
+            rev_adapter_str = "-g " + " -g ".join(
+                snakemake.config["qc"]["rev_adapters"]
+            )
+
         try:
             args = [
-                    "cutadapt",
-                    "-O",
-                    str(overlap),
-                    "--cores",
-                    str(snakemake.threads),
-                ]
+                "cutadapt",
+                "-O",
+                str(overlap),
+                "--cores",
+                str(snakemake.threads),
+            ]
             args += snakemake.config["qc"]["cutadapt_opts"].split(" ")
             args += fwd_adapter_str.split(" ")
             args += rev_adapter_str.split(" ")
@@ -40,7 +44,9 @@ with open(snakemake.log[0], "w") as log:
             sys.exit(e.returncode)
         log.write(cutadapt_output.decode())
 
-        with open(snakemake.params[0]) as f_in, gzip.open(snakemake.output[0], "wt") as f_out:
+        with open(snakemake.params[0]) as f_in, gzip.open(
+            snakemake.output[0], "wt"
+        ) as f_out:
             f_out.writelines(f_in.readlines())
         os.remove(snakemake.params[0])
     else:
