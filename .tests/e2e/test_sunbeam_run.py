@@ -97,6 +97,8 @@ def init_single_end(output_dir):
             "--data_fp",
             f"{test_dir / 'data' / 'single_end_reads'}",
             "--single_end",
+            "--format",
+            "{sample}_R{rp}.fastq.gz",
             output_dir,
         ]
     )
@@ -156,8 +158,8 @@ def test_sunbeam_run_all_single_end(init_single_end):
         assert int(stats[1]) == 400  # Input reads
         assert int(stats[2]) == 400  # Both kept by cutadapt
         assert (
-            int(stats[6]) + int(stats[8]) + int(stats[11]) == 200
+            int(stats[4]) + int(stats[6]) + int(stats[9]) == 200
         )  # Human + phiX + komplexity
-        assert int(stats[6]) == int(stats[7])  # Human = human_copy
-        assert int(stats[9]) + int(stats[11]) == 200  # Host + komplexity
-        assert int(stats[10]) == 200  # Nonhost
+        assert int(stats[4]) == int(stats[5])  # Human = human_copy
+        assert int(stats[7]) + int(stats[9]) == 200  # Host + komplexity
+        assert int(stats[8]) == 200  # Nonhost

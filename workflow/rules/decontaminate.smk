@@ -7,7 +7,6 @@ if Cfg["all"]["paired_end"]:
 
     ruleorder: sam_convert_paired > sam_convert_unpaired
 
-
 else:
 
     ruleorder: sam_convert_unpaired > sam_convert_paired

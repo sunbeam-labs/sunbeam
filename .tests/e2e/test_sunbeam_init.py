@@ -57,7 +57,7 @@ def init_single_end(output_dir):
             f"{test_dir / 'data' / 'reads'}",
             "--single_end",
             "--format",
-            "{sample}.fastq.gz",
+            "{sample}_R{rp}.fastq.gz",
             output_dir,
         ]
     )
