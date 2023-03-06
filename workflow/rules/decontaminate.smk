@@ -89,7 +89,7 @@ rule sam_convert_unpaired:
         "../envs/qc.yml"
     shell:
         """
-        samtools fastq -1 {output} {input} 2>&1 | tee {log}
+        samtools fastq -0 {output} {input} 2>&1 | tee {log}
         """
 
 
