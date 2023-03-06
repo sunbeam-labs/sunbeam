@@ -1,4 +1,4 @@
-import os
+import gzip
 import pytest
 import shutil
 import subprocess as sp
@@ -56,3 +56,6 @@ def test_remove_low_complexity(setup):
 
     assert r1.stat().st_size >= 10000
     assert r2.stat().st_size >= 10000
+
+    with gzip.open(r1) as f1, gzip.open(r2) as f2:
+        assert len(f1.readlines()) == len(f2.readlines())

@@ -57,7 +57,7 @@ def setup(init):
     shutil.rmtree(output_dir / "sunbeam_output")
 
 
-def test_sam_convert(setup):
+def test_sam_convert_paired(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
     human1 = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_TEST_1.fastq"
