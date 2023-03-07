@@ -39,7 +39,7 @@ rule adapter_removal_unpaired:
     benchmark:
         BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
     params:
-        QC_FP / "01_cutadapt" / "{sample}_1.fastq",
+        str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
     threads: 4
     conda:
         "../envs/qc.yml"
@@ -59,8 +59,8 @@ rule adapter_removal_paired:
     benchmark:
         BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
     params:
-        r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq",
-        r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq",
+        r1=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
+        r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
     threads: 4
     conda:
         "../envs/qc.yml"

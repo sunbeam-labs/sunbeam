@@ -3,6 +3,7 @@ from sunbeamlib import qc
 from pathlib import Path
 
 with open(snakemake.log[0], "w") as log:
+    assert snakemake.input[0].endswith(".fastq.gz")
     if snakemake.params.suffix:
         log.write(f"Stripping suffix {snakemake.params.suffix}")
         qc.strip_seq_id_suffix(
