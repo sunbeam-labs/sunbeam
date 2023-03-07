@@ -5,7 +5,9 @@ from sunbeamlib.parse import parse_fastq, write_fastq
 
 with open(snakemake.log[0], "w") as l:
     if not snakemake.config["qc"]["host_fp"]:
-        l.write("Cfg['qc']['host_fp'] is empty, please specify a path to reference files before running decontam")
+        l.write(
+            "Cfg['qc']['host_fp'] is empty, please specify a path to reference files before running decontam"
+        )
         sys.exit(1)
 
     total_count = sum(1 for line in gzip.open(snakemake.input.reads, "r")) // 4

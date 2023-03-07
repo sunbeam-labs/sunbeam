@@ -5,4 +5,3 @@ with open(snakemake.log[0], "w") as log:
             if line[0] == "@":
                 continue
             fq.write(f"{arr[0]}\n{arr[9]}\n+\n{arr[10]}\n")
-            
