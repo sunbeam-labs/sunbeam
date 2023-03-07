@@ -8,6 +8,7 @@ configs/config*.yml
 output
 __pycache__
 .tests/data/hosts/*.fasta.*
+.tests/data/raw/*.fasta.*
 tests/sunbeam_output
 tests/bacteria
 tests/local
