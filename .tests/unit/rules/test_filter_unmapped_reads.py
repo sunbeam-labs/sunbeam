@@ -1,4 +1,4 @@
-import os
+import gzip
 import pytest
 import shutil
 import subprocess as sp
@@ -81,3 +81,6 @@ def test_filter_unmapped_reads(setup):
     assert r2.stat().st_size >= 5000
     assert l1.stat().st_size >= 10
     assert l2.stat().st_size >= 10
+
+    with gzip.open(r1) as f1, gzip.open(r2) as f2:
+        assert len(f1.readlines()) == len(f2.readlines())
