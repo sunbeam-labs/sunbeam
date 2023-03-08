@@ -41,10 +41,10 @@ def filter_ids(fp_in, fp_out, ids, log):
     """
     with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
         for record in parse_fastq(f_in):
-            if remove_pair_id(record[0], log) not in ids:
-                write_fastq(record, f_out)
-            else:
+            if any(id in record[0] for id in ids):
                 log.write(f"{record[0]} filtered\n")
+            else:
+                write_fastq(record, f_out)
 
 
 def remove_pair_id(id, log):
@@ -55,8 +55,6 @@ def remove_pair_id(id, log):
     id = id.strip()
     if id[-2:] == "/1" or id[-2:] == "/2":
         return id[:-2]
-    space_split = id.split(" ")
-    if len(space_split) == 2 and (space_split[1][0] == "1" or space_split[1][0] == "2"):
-        return " ".join([space_split[0], space_split[1][1:]])
-    log.write(f"Didn't find read pair ID in {id}\n")
+    
+    # Assuming it's the newer id variant where komplexity removes the second half (containing pair number)
     return id
