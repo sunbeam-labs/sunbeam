@@ -21,8 +21,6 @@ rule sample_intake:
         QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
     log:
         LOG_FP / "sample_intake_{sample}_{rp}.log",
-    params:
-        suffix=Cfg["qc"]["seq_id_ending"],
     conda:
         "../envs/reports.yml"
     script:
