@@ -57,24 +57,26 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_.])"):
         SampleFormatError(f"Found non fastq.gz files: {str(non_fastq_gz)}")
     if len(fnames) == 0:
         raise SampleFormatError("No files in directory!")
-    
+
     if not paired_end:
         return "{sample}.fastq.gz"
-    
+
     splits = [list(reversed(re.split(split_pattern, fname))) for fname in fnames]
     if len(set([len(p) for p in splits])) > 1:
         sys.stderr.write(
             f"Warning: samples have inconsistent numbers of {split_pattern} characters\n"
         )
-    
+
     pattern = re.compile(".+_(12)\.fastq\.gz")
     if [fn for fn in fnames if pattern.match(fn)] == fnames:
         return "{sample}_{rp}.fastq.gz"
     pattern = re.compile(".+_R(12)\.fastq\.gz")
     if [fn for fn in fnames if pattern.match(fn)] == fnames:
         return "{sample}_R{rp}.fastq.gz"
-    
-    raise SampleFormatError("Couldn't identify sample format, please specify with --format option")
+
+    raise SampleFormatError(
+        "Couldn't identify sample format, please specify with --format option"
+    )
 
 
 class MissingMatePairError(Exception):
