@@ -27,8 +27,6 @@ all:
 # Quality control
 qc:
   suffix: qc
-  # Sample intake
-  seq_id_ending: ""
   # Trimmomatic
   leading: 3
   trailing: 3
