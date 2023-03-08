@@ -67,10 +67,10 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_.])"):
             f"Warning: samples have inconsistent numbers of {split_pattern} characters\n"
         )
 
-    pattern = re.compile(".+_(12)\.fastq\.gz")
+    pattern = re.compile(".+\_[1-2]\.fastq\.gz")
     if [fn for fn in fnames if pattern.match(fn)] == fnames:
         return "{sample}_{rp}.fastq.gz"
-    pattern = re.compile(".+_R(12)\.fastq\.gz")
+    pattern = re.compile(".+\_R[1-2]\.fastq\.gz")
     if [fn for fn in fnames if pattern.match(fn)] == fnames:
         return "{sample}_R{rp}.fastq.gz"
 
