@@ -43,7 +43,7 @@ def load_sample_list(samplelist_fp, paired_end=True, root_proj=""):
     return Samples
 
 
-def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
+def guess_format_string(fnames, paired_end=True, split_pattern="([_.])"):
     """
     Try to guess the format string given a list of filenames.
     :param fnames: a list of filename strings
@@ -52,76 +52,31 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_\.])"):
     :returns: a format string with a {sample} and (maybe) an {rp} element
     """
 
-    if isinstance(fnames, str):
-        raise SampleFormatError("need a list of filenames, not a string")
-    if len(fnames) > 1 and len(set(fnames)) == 1:
-        raise SampleFormatError("all filenames are the same")
-    if len(set(fnames)) == 0:
-        raise SampleFormatError("no files in directory!")
+    non_fastq_gz = [fn for fn in fnames if not fn.endswith(".fastq.gz")]
+    if len(non_fastq_gz) > 0:
+        SampleFormatError(f"Found non fastq.gz files: {str(non_fastq_gz)}")
+    if len(fnames) == 0:
+        raise SampleFormatError("No files in directory!")
 
-    splits = [list(reversed(re.split(split_pattern, fname))) for fname in fnames]
-
-    if len(fnames) == 1:
-        sys.stderr.write("Only one sample found; defaulting to {sample}.fastq.gz\n")
+    if not paired_end:
         return "{sample}.fastq.gz"
 
+    splits = [list(reversed(re.split(split_pattern, fname))) for fname in fnames]
     if len(set([len(p) for p in splits])) > 1:
         sys.stderr.write(
-            "Warning: samples have inconsistent numbers of _ or . characters\n"
+            f"Warning: samples have inconsistent numbers of {split_pattern} characters\n"
         )
 
-    elements = []
-    variant_idx = []
+    pattern = re.compile(".+\_[1-2]\.fastq\.gz")
+    if [fn for fn in fnames if pattern.match(fn)] == fnames:
+        return "{sample}_{rp}.fastq.gz"
+    pattern = re.compile(".+\_R[1-2]\.fastq\.gz")
+    if [fn for fn in fnames if pattern.match(fn)] == fnames:
+        return "{sample}_R{rp}.fastq.gz"
 
-    # A special case when paired-end and only two files:
-    # invariant regions may be sample names (since only one sample)
-    potential_single_sample = len(fnames) == 2 and paired_end
-
-    for i, parts in enumerate(zip(*splits)):
-        items = set(parts)
-        # If they're all the same, it's a common part; so add it to the element
-        # list unchanged
-
-        if items.issubset({"fastq", ".", "_", "gz", "fq"}):
-            elements.append(parts[0])
-        elif len(items) == 1 and not potential_single_sample:
-            elements.append(parts[0])
-        else:
-            if paired_end:
-                # If all the items in a split end with 1 or 2, and only have
-                # one char preceding that that's the same among all items,
-                # OR all the items are 1 or 2 and the only things in a split,
-                # then it's likely a read-pair identifier.
-                if set(_[-1] for _ in items) == {"1", "2"}:
-                    prefixes = set(_[:-1] for _ in items)
-                    NO_PREFIX = prefixes == {""}
-                    ALL_SAME_PREFIX = len(prefixes) == 1
-                    ONE_CHAR_PREFIX = all(len(p) == 1 for p in prefixes)
-                    I_OR_R_PREFIX = prefixes == {"I", "R"}
-                    if (
-                        NO_PREFIX
-                        or (ALL_SAME_PREFIX and ONE_CHAR_PREFIX)
-                        or I_OR_R_PREFIX
-                    ):
-                        if I_OR_R_PREFIX:
-                            prefix = "R"
-                        else:
-                            prefix = parts[0][:-1]
-                        elements.append("{rp}")
-                        elements.append(prefix)
-                        continue
-            variant_idx.append(i)
-            elements.append("{sample}")
-            print(str(elements))
-    # Combine multiple variant elements
-    if len(variant_idx) > 0:
-        _min = min(variant_idx)
-        _max = max(variant_idx)
-        elements[_min + 1 : _max + 2] = ["{sample}"]
-        print(str(elements))
-        return "".join(reversed(elements))
-    else:
-        raise SampleFormatError("No variable regions identified")
+    raise SampleFormatError(
+        "Couldn't identify sample format, please specify with --format option"
+    )
 
 
 class MissingMatePairError(Exception):

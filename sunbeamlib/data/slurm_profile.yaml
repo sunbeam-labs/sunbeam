@@ -24,7 +24,7 @@ cluster: "sbatch \
 default-resources:
   - account="hpcusers"
   - partition="defq"
-  - runtime=5
+  - runtime=15
   - mem_mb=1000
   - disk_mb=1000
 # set-threads: map rule names to threads
@@ -41,7 +41,6 @@ set-threads:
   - run_diamond_blastp=4
   - run_diamond_blastx=4
   - align_to_genome=4
-  - samtools_convert=4
 # set-resources: map rule names to resources in general
 set-resources:
   - sample_intake:mem_mb=2000
@@ -50,8 +49,6 @@ set-resources:
   - adapter_removal_paired:runtime=60
   - qc_final:mem_mb=2000
   - qc_final:runtime=120
-  - get_mapped_reads:mem_mb=2000
-  - get_mapped_reads:runtime=120
   - demultiplex:mem_mb=10000
   - demultiplex:runtime=720
   - trimmomatic_paired:mem_mb=2000
@@ -62,8 +59,8 @@ set-resources:
   - remove_low_complexity:runtime=120
   - align_to_host:mem_mb=8000
   - align_to_host:runtime=240
-  - filter_reads:mem_mb=8000
-  - filter_reads:runtime=240
+  - filter_unmapped_reads:mem_mb=8000
+  - filter_unmapped_reads:runtime=240
   - megahit_paired:mem_mb=20000
   - megahit_paired:runtime=720
   - kraken2_classify_report:mem_mb=48000

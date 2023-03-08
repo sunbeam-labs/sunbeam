@@ -15,6 +15,11 @@ def parse_fasta(f):
         yield (header_str, seq_str)
 
 
+def write_fasta(record, f):
+    f.write(f">{record[0]}\n")
+    f.write(f"{record[1]}\n")
+
+
 def parse_fastq(f):
     for g in grouper(f.readlines(), 4):
         header_str = g[0][1:].strip()

@@ -21,8 +21,6 @@ rule sample_intake:
         QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
     log:
         LOG_FP / "sample_intake_{sample}_{rp}.log",
-    params:
-        suffix=Cfg["qc"]["seq_id_ending"],
     conda:
         "../envs/reports.yml"
     script:
@@ -201,7 +199,8 @@ rule remove_low_complexity:
         reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
         ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
     output:
-        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
+        out=QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
+        unzip=temp(QC_FP / "03_komplexity" / "unzipped" / "{sample}_{rp}.fastq"),
     log:
         LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
     benchmark:

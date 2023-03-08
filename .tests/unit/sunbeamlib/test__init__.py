@@ -85,10 +85,16 @@ def test_guess_format_string():
     assert ret == "{sample}_R{rp}.fastq.gz"
 
 
+def test_guess_format_string_no_R():
+    test_strs = ["TEST_1.fastq.gz", "TEST_2.fastq.gz"]
+    ret = guess_format_string(test_strs)
+    assert ret == "{sample}_{rp}.fastq.gz"
+
+
 def test_guess_format_string_single_end():
     test_strs = ["TEST.fastq.gz", "Test.fastq.gz", "test.fastq.gz"]
     ret = guess_format_string(test_strs, False)
-    assert ret == "{sample}{sample}.fastq.gz"
+    assert ret == "{sample}.fastq.gz"
 
 
 def test_verify_path(init):
