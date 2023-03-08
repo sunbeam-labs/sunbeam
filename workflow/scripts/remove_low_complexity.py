@@ -1,3 +1,4 @@
+import gzip
 from sunbeamlib.qc import filter_ids, remove_pair_id
 
 with open(snakemake.log[0], "w") as log:
@@ -6,4 +7,7 @@ with open(snakemake.log[0], "w") as log:
         ids = [remove_pair_id(id, log) for id in f.readlines()]
     log.write(f"Komplexity IDs to be filtered: {str(ids)}\n")
 
-    filter_ids(snakemake.input.reads, snakemake.output[0], ids, log)
+    filter_ids(snakemake.input.reads, snakemake.output.unzip, ids, log)
+
+    with open(snakemake.output.unzip, "rb") as f_in, gzip.open(snakemake.output.out, "wb") as f_out:
+        f_out.writelines(f_in.readlines())
