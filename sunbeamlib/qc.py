@@ -14,11 +14,12 @@ def filter_ids(fp_in, fp_out, ids, log):
     ids: list of ids to be removed
     """
     with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
-        records = [r for r in parse_fastq(f_in)]
+        records = [r for r in parse_fastq(f_in)].sort(key=lambda t: t[0])
+        ids.sort()
         for record in records:
-            if any((match := id) in record[0] for id in ids):
+            if ids[0] in record[0]:
                 log.write(f"{record[0]} filtered\n")
-                ids.remove(match)
+                ids.pop(0)
                 records.remove(record)
 
         write_many_fastq(records, f_out)
