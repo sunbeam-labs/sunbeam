@@ -1,7 +1,7 @@
 import gzip
 import os
 import sys
-from sunbeamlib.parse import parse_fastq, write_fastq
+from sunbeamlib.parse import parse_fastq, write_many_fastq
 
 with open(snakemake.log[0], "w") as l:
     if not snakemake.config["qc"]["host_fp"]:
@@ -50,5 +50,4 @@ with open(snakemake.log[0], "w") as l:
         )
 
     with gzip.open(snakemake.output.reads, "wt") as f_out:
-        for record in final_unmapped_reads:
-            write_fastq(record, f_out)
+        write_many_fastq(final_unmapped_reads, f_out)
