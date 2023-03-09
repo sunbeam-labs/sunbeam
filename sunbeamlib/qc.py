@@ -17,7 +17,12 @@ def filter_ids(fp_in, fp_out, ids, log):
         records = [r for r in parse_fastq(f_in)]
         records.sort(key=lambda t: t[0]) 
         ids.sort()
-        for record in records:
+        # Use list(records) so that it's a different object in memory and 
+        # you're free to remove items from the original
+        for record in list(records):
+            if not ids:
+                log.write("IDs list empty, finished filtering\n")
+                break
             if ids[0] in record[0]:
                 log.write(f"{record[0]} filtered\n")
                 ids.pop(0)
