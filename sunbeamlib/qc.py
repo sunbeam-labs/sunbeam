@@ -15,9 +15,9 @@ def filter_ids(fp_in, fp_out, ids, log):
     """
     with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
         records = [r for r in parse_fastq(f_in)]
-        records.sort(key=lambda t: t[0]) 
+        records.sort(key=lambda t: t[0])
         ids.sort()
-        # Use list(records) so that it's a different object in memory and 
+        # Use list(records) so that it's a different object in memory and
         # you're free to remove items from the original
         for record in list(records):
             if not ids:
