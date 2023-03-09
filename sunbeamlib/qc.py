@@ -15,9 +15,8 @@ def filter_ids(fp_in, fp_out, ids, log):
     """
     with gzip.open(fp_in, "rt") as f_in, open(fp_out, "w") as f_out:
         for record in parse_fastq(f_in):
-            if any((match := id) in record[0] for id in ids):
+            if any(id in record[0] for id in ids):
                 log.write(f"{record[0]} filtered\n")
-                ids.remove(match)
             else:
                 write_fastq(record, f_out)
 
@@ -29,8 +28,7 @@ def remove_pair_id(id, log):
     """
     id = id.strip()
     if id[-2:] == "/1" or id[-2:] == "/2":
-        log.write(f"Found old illumina style id: {id}\n")
         return id[:-2]
-
+    
     # Assuming it's the newer id variant where komplexity removes the second half (containing pair number)
     return id
