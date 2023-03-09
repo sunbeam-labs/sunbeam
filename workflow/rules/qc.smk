@@ -199,8 +199,7 @@ rule remove_low_complexity:
         reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
         ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
     output:
-        out=QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
-        unzip=temp(QC_FP / "03_komplexity" / "unzipped" / "{sample}_{rp}.fastq"),
+        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
     log:
         LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
     benchmark:
