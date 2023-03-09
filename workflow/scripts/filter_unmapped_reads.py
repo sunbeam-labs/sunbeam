@@ -22,7 +22,8 @@ with open(snakemake.log[0], "w") as l:
             for record in parse_fastq(f):
                 unmapped_reads[basename].add(record)
 
-    final_unmapped_reads = set.intersection(*unmapped_reads.values())
+    final_unmapped_reads = list(set.intersection(*unmapped_reads.values()))
+    final_unmapped_reads.sort(key=lambda t: t[0])
 
     l.write(f"Per host mapped count: {host_mapped_counts}\n")
     l.write(f"Total count: {total_count}\n")
