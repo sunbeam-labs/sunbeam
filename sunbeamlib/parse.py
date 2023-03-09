@@ -36,3 +36,11 @@ def write_fastq(record, f):
             f.write(f"@{l}\n")
         else:
             f.write(f"{l}\n")
+
+
+def write_many_fastq(record_list, f):
+    record_list = [
+        [f"@{r[0]}\n", f"{r[1]}\n", f"{r[2]}\n", f"{r[3]}\n"] for r in record_list
+    ]
+    record_list = [item for sublist in record_list for item in sublist]
+    f.writelines(record_list)

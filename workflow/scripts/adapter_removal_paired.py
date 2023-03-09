@@ -1,5 +1,6 @@
 import gzip
 import os
+import shutil
 import subprocess as sp
 import sys
 
@@ -47,14 +48,14 @@ with open(snakemake.log[0], "w") as log:
             sys.exit(e.returncode)
         log.write(cutadapt_output.decode())
 
-        with open(snakemake.params.r1) as f_in, gzip.open(
-            snakemake.output.r1, "wt"
+        with open(snakemake.params.r1, "rb") as f_in, gzip.open(
+            snakemake.output.r1, "wb"
         ) as f_out:
-            f_out.writelines(f_in.readlines())
-        with open(snakemake.params.r2) as f_in, gzip.open(
-            snakemake.output.r2, "wt"
+            shutil.copyfileobj(f_in, f_out)
+        with open(snakemake.params.r2, "rb") as f_in, gzip.open(
+            snakemake.output.r2, "wb"
         ) as f_out:
-            f_out.writelines(f_in.readlines())
+            shutil.copyfileobj(f_in, f_out)
         os.remove(snakemake.params.r1)
         os.remove(snakemake.params.r2)
     else:
