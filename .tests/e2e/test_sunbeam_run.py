@@ -145,9 +145,11 @@ def test_sunbeam_run_all_dirty(init_dirty):
         assert int(stats[3]) == 0  # Fwd only
         assert int(stats[4]) == 67  # Rev only
         assert int(stats[5]) == 11  # Dropped
-        assert int(stats[2]) + int(stats[3]) + int(stats[4]) + int(stats[5]) == int(stats[1])
+        assert int(stats[2]) + int(stats[3]) + int(stats[4]) + int(stats[5]) == int(
+            stats[1]
+        )
         assert int(stats[6]) == int(stats[7])  # Human = human_copy
-    
+
 
 @pytest.fixture
 def init_no_host(output_dir):

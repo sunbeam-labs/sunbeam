@@ -1,6 +1,7 @@
 from itertools import groupby
 from more_itertools import grouper
 
+
 # Source: https://www.biostars.org/p/710/
 def parse_fasta(f):
     faiter = (x[1] for x in groupby(f, lambda line: line[0] == ">"))

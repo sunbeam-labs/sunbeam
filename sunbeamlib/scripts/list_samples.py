@@ -9,7 +9,6 @@ from sunbeamlib import guess_format_string, SampleFormatError, MissingMatePairEr
 
 
 def main(argv=sys.argv):
-
     parser = argparse.ArgumentParser("sunbeam list_samples")
 
     parser.add_argument("data_fp", help="Path to folder containing reads", type=Path)
@@ -46,7 +45,6 @@ def main(argv=sys.argv):
 
 
 def build_sample_list(data_fp, format_str, output_file, is_single_end):
-
     data_fp = data_fp.resolve()
     fnames = [f.name for f in data_fp.iterdir() if f.is_file()]
 

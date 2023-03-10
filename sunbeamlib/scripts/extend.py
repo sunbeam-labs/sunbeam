@@ -6,7 +6,6 @@ from pathlib import Path
 
 
 def main(argv=sys.argv):
-
     parser = argparse.ArgumentParser(
         "sunbeam extend",
         usage="%(prog)s github_url",

@@ -6,7 +6,6 @@ from pathlib import Path
 
 
 def main(argv=sys.argv):
-
     epilog_str = (
         "You can pass further arguments to Snakemake after --, e.g:\n"
         "    $ sunbeam run -- --cores 12\n"

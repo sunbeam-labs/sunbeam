@@ -9,7 +9,6 @@ from sunbeamlib.scripts.extend import main as Extend
 
 
 def main():
-
     usage_str = "%(prog)s [-h/--help,-v/--version] <subcommand>"
     description_str = (
         "subcommands:\n"
