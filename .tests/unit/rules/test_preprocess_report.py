@@ -70,7 +70,7 @@ def test_preprocess_report(setup):
         f.readline()  # Headers
         stats = f.readline().split("\t")
         assert int(stats[1]) == 400  # Input reads
-        assert int(stats[2]) == 400  # Both kept by cutadapt
+        assert int(stats[2]) == 400  # Both kept by trimmomatic
         assert (
             int(stats[6]) + int(stats[8]) + int(stats[11]) == 200
         )  # Human + phiX + komplexity

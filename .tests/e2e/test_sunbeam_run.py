@@ -77,7 +77,7 @@ def test_sunbeam_run_all(init):
         f.readline()  # Headers
         stats = f.readline().split("\t")
         assert int(stats[1]) == 400  # Input reads
-        assert int(stats[2]) == 400  # Both kept by cutadapt
+        assert int(stats[2]) == 400  # Both kept by trimmomatic
         assert (
             int(stats[6]) + int(stats[8]) + int(stats[11]) == 200
         )  # Human + phiX + komplexity
@@ -87,8 +87,71 @@ def test_sunbeam_run_all(init):
 
 
 @pytest.fixture
+def init_dirty(output_dir):
+    output_dir = output_dir / "sunbeam_run_dirty"
+
+    sp.check_output(
+        [
+            "sunbeam",
+            "init",
+            "--data_fp",
+            f"{test_dir / 'data' / 'dirty_reads'}",
+            output_dir,
+        ]
+    )
+
+    config_str = f"qc: {{host_fp: {test_dir / 'data' / 'hosts'}}}"
+
+    sp.check_output(
+        [
+            "sunbeam",
+            "config",
+            "modify",
+            "-i",
+            "-s",
+            f"{config_str}",
+            f"{output_dir / 'sunbeam_config.yml'}",
+        ]
+    )
+
+    yield output_dir
+
+    if os.environ.get("CI", False):
+        try:
+            shutil.copytree(output_dir, "output_sunbeam_run_dirty/")
+        except FileExistsError as e:
+            pass
+
+
+def test_sunbeam_run_all_dirty(init_dirty):
+    output_dir = init_dirty
+    sunbeam_output_dir = output_dir / "sunbeam_output"
+
+    sp.check_output(
+        [
+            "sunbeam",
+            "run",
+            "--profile",
+            f"{output_dir}",
+            "--notemp",
+        ]
+    )
+
+    with open(sunbeam_output_dir / "qc" / "reports" / "preprocess_summary.tsv") as f:
+        f.readline()  # Headers
+        stats = f.readline().split("\t")
+        assert int(stats[1]) == 100  # Input reads
+        assert int(stats[2]) == 22  # Both kept by trimmomatic
+        assert int(stats[3]) == 0  # Fwd only
+        assert int(stats[4]) == 67  # Rev only
+        assert int(stats[5]) == 11  # Dropped
+        assert int(stats[2]) + int(stats[3]) + int(stats[4]) + int(stats[5]) == int(stats[0])
+        assert int(stats[6]) == int(stats[7])  # Human = human_copy
+    
+
+@pytest.fixture
 def init_no_host(output_dir):
-    output_dir = output_dir / "sunbeam_run"
+    output_dir = output_dir / "sunbeam_run_no_host"
 
     sp.check_output(
         [
@@ -104,7 +167,7 @@ def init_no_host(output_dir):
 
     if os.environ.get("CI", False):
         try:
-            shutil.copytree(output_dir, "output_sunbeam_run/")
+            shutil.copytree(output_dir, "output_sunbeam_run_no_host/")
         except FileExistsError as e:
             pass
 
@@ -196,7 +259,7 @@ def test_sunbeam_run_all_single_end(init_single_end):
         f.readline()  # Headers
         stats = f.readline().split("\t")
         assert int(stats[1]) == 400  # Input reads
-        assert int(stats[2]) == 400  # Both kept by cutadapt
+        assert int(stats[2]) == 400  # Both kept by trimmomatic
         assert (
             int(stats[4]) + int(stats[6]) + int(stats[9]) == 200
         )  # Human + phiX + komplexity
