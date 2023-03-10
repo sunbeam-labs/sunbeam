@@ -51,13 +51,13 @@ if pkg_major > cfg_major:
     raise SystemExit(
         "\nThis config file was created with an older version of Sunbeam"
         " and may not be compatible. Create a new config file using"
-        "`sunbeam init` and update it using `sunbeam_mod_config`\n"
+        "`sunbeam init` or update this one using `sunbeam config update -i /path/to/sunbeam_config.yml`\n"
     )
 elif pkg_major < cfg_major:
     raise SystemExit(
-        "\nThis config file was created with an newer version of Sunbeam"
-        " and may not be compatible. Create a new config file using "
-        "`sunbeam init` and update it using `sunbeam_mod_config`\n"
+        "\nThis config file was created with an older version of Sunbeam"
+        " and may not be compatible. Create a new config file using"
+        "`sunbeam init` or update this one using `sunbeam config update -i /path/to/sunbeam_config.yml`\n"
     )
 
 # Load extensions
