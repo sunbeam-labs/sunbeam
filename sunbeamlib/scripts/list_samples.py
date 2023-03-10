@@ -101,7 +101,7 @@ def find_samples(data_fp, filename_fmt):
         if rp:
             if not rp in ["1", "2"]:
                 raise ValueError(
-                    "'{rp}' should capture just '1' or '2' in filename, nothing else"
+                    "'{rp}' should capture just '1' or '2' in filename, nothing else."
                 )
             Samples[wcards["sample"]][rp] = fpath
         else:

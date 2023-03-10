@@ -138,11 +138,13 @@ def write_samples_from_input(args, project_fp):
                     is_single_end=args.single_end,
                 )
         except SampleFormatError as e:
+            os.remove(project_fp / "samples.csv")
             raise SystemExit(
                 "Error: could not create sample list. Specify correct sample filename"
                 " format using --format.\n  Reason: {}".format(e)
             )
         except MissingMatePairError as e:
+            os.remove(project_fp / "samples.csv")
             raise SystemExit(
                 "Error: assuming paired-end reads, but could not find mates. Specify "
                 "--single_end if not paired-end, or provide sample name format "

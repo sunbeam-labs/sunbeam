@@ -54,7 +54,7 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_.])"):
 
     non_fastq_gz = [fn for fn in fnames if not fn.endswith(".fastq.gz")]
     if len(non_fastq_gz) > 0:
-        SampleFormatError(f"Found non fastq.gz files: {str(non_fastq_gz)}")
+        raise SampleFormatError(f"Found non fastq.gz files: {str(non_fastq_gz)}")
     if len(fnames) == 0:
         raise SampleFormatError("No files in directory!")
 
@@ -73,6 +73,12 @@ def guess_format_string(fnames, paired_end=True, split_pattern="([_.])"):
     pattern = re.compile(".+\_R[1-2]\.fastq\.gz")
     if [fn for fn in fnames if pattern.match(fn)] == fnames:
         return "{sample}_R{rp}.fastq.gz"
+    pattern = re.compile("[1-2]\_.+\.fastq\.gz")
+    if [fn for fn in fnames if pattern.match(fn)] == fnames:
+        return "{rp}_{sample}.fastq.gz"
+    pattern = re.compile("R[1-2]\_.+\.fastq\.gz")
+    if [fn for fn in fnames if pattern.match(fn)] == fnames:
+        return "R{rp}_{sample}.fastq.gz"
 
     raise SampleFormatError(
         "Couldn't identify sample format, please specify with --format option"
