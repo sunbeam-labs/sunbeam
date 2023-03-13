@@ -25,6 +25,10 @@ def setup(init):
         output_dir / "sunbeam_output" / "qc" / "decontam" / "human",
     )
     shutil.copytree(
+        data_dir / "qc" / "decontam" / "human_copy",
+        output_dir / "sunbeam_output" / "qc" / "decontam" / "human_copy",
+    )
+    shutil.copytree(
         data_dir / "qc" / "decontam" / "phix174",
         output_dir / "sunbeam_output" / "qc" / "decontam" / "phix174",
     )
