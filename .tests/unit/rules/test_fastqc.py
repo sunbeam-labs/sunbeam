@@ -16,7 +16,7 @@ data_dir = Path(__file__).parent / "data"
 @pytest.fixture
 def setup(init):
     output_dir = init
-    
+
     shutil.copytree(
         data_dir / "qc" / "02_trimmomatic",
         output_dir / "sunbeam_output" / "qc" / "02_trimmomatic",

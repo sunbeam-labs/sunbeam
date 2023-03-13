@@ -58,8 +58,7 @@ def test_preprocess_report(setup):
         assert int(stats[1]) == 400  # Input reads
         assert int(stats[2]) == 400  # Both kept by trimmomatic
         assert (
-            int(stats[6]) + int(stats[8]) + int(stats[11]) == 200
+            int(stats[6]) + int(stats[7]) + int(stats[10]) == 200
         )  # Human + phiX + komplexity
-        assert int(stats[6]) == int(stats[7])  # Human = human_copy
-        assert int(stats[9]) + int(stats[11]) == 200  # Host + komplexity
-        assert int(stats[10]) == 200  # Nonhost
+        assert int(stats[8]) + int(stats[10]) == 200  # Host + komplexity
+        assert int(stats[9]) == 200  # Nonhost
