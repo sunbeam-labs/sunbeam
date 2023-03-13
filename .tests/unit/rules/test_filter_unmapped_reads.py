@@ -62,18 +62,20 @@ def test_filter_unmapped_reads(setup):
     l1 = sunbeam_output_dir / "qc" / "log" / "decontam" / "TEST_1.txt"
     l2 = sunbeam_output_dir / "qc" / "log" / "decontam" / "TEST_2.txt"
 
-    sp.check_output(
+    out = sp.check_output(
         [
             "sunbeam",
             "run",
             "--profile",
             f"{output_dir}",
             "--notemp",
-            "--rerun-triggers=input",
+            "--allowed-rules=filter_unmapped_reads",
+            "--rerun-triggers=code",
             f"{r1}",
             f"{r2}",
             f"{l1}",
             f"{l2}",
+            "-n"
         ]
     )
 

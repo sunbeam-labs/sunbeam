@@ -54,6 +54,7 @@ def test_trimmomatic_paired(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
+            "--allowed-rules=trimmomatic_paired",
             "--rerun-triggers=input",
             f"{r1}",
             f"{r2}",

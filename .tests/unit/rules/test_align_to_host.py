@@ -18,22 +18,6 @@ def setup(init):
     output_dir = init
 
     shutil.copytree(
-        data_dir / "qc" / "01_cutadapt",
-        output_dir / "sunbeam_output" / "qc" / "01_cutadapt",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "02_trimmomatic",
-        output_dir / "sunbeam_output" / "qc" / "02_trimmomatic",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "log" / "komplexity",
-        output_dir / "sunbeam_output" / "qc" / "log" / "komplexity",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "03_komplexity",
-        output_dir / "sunbeam_output" / "qc" / "03_komplexity",
-    )
-    shutil.copytree(
         data_dir / "qc" / "cleaned", output_dir / "sunbeam_output" / "qc" / "cleaned"
     )
 
@@ -64,6 +48,7 @@ def test_align_to_host(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
+            "--allowed-rules=align_to_host",
             "--rerun-triggers=input",
             f"{human}",
             f"{phix}",
