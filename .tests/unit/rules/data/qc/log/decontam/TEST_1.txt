@@ -1,2 +1,2 @@
-human	phix174	host	nonhost
-94	100	194	200
+human	human_copy	phix174	host	nonhost
+94	94	100	194	200
