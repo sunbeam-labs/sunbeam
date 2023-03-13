@@ -18,23 +18,8 @@ def setup(init):
     output_dir = init
 
     shutil.copytree(
-        data_dir / "qc" / "01_cutadapt",
-        output_dir / "sunbeam_output" / "qc" / "01_cutadapt",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "02_trimmomatic",
-        output_dir / "sunbeam_output" / "qc" / "02_trimmomatic",
-    )
-    shutil.copytree(
         data_dir / "qc" / "log",
         output_dir / "sunbeam_output" / "qc" / "log",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "03_komplexity",
-        output_dir / "sunbeam_output" / "qc" / "03_komplexity",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "cleaned", output_dir / "sunbeam_output" / "qc" / "cleaned"
     )
     shutil.copytree(
         data_dir / "qc" / "decontam",
@@ -59,6 +44,7 @@ def test_preprocess_report(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
+            "--allowed-rules=preprocess_report",
             "--rerun-triggers=input",
             f"{r}",
         ]

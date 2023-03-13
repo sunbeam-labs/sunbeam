@@ -38,6 +38,7 @@ def test_build_host_index(setup):
         "--profile",
         f"{output_dir}",
         "--notemp",
+        "--allowed-rules=build_host_index",
         "--rerun-triggers=input",
     ]
     args += human

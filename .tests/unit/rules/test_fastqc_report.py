@@ -18,14 +18,6 @@ def setup(init):
     output_dir = init
 
     shutil.copytree(
-        data_dir / "qc" / "01_cutadapt",
-        output_dir / "sunbeam_output" / "qc" / "01_cutadapt",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "02_trimmomatic",
-        output_dir / "sunbeam_output" / "qc" / "02_trimmomatic",
-    )
-    shutil.copytree(
         data_dir / "qc" / "reports", output_dir / "sunbeam_output" / "qc" / "reports"
     )
     os.remove(output_dir / "sunbeam_output" / "qc" / "reports" / "fastqc_quality.tsv")
@@ -47,6 +39,7 @@ def test_fastqc_report(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
+            "--allowed-rules=fastqc_report",
             "--rerun-triggers=input",
             f"{r}",
         ]

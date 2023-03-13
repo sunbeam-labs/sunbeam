@@ -18,27 +18,7 @@ def setup(init):
     output_dir = init
 
     shutil.copytree(
-        data_dir / "qc" / "01_cutadapt",
-        output_dir / "sunbeam_output" / "qc" / "01_cutadapt",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "02_trimmomatic",
-        output_dir / "sunbeam_output" / "qc" / "02_trimmomatic",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "log" / "komplexity",
-        output_dir / "sunbeam_output" / "qc" / "log" / "komplexity",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "03_komplexity",
-        output_dir / "sunbeam_output" / "qc" / "03_komplexity",
-    )
-    shutil.copytree(
         data_dir / "qc" / "cleaned", output_dir / "sunbeam_output" / "qc" / "cleaned"
-    )
-    shutil.copytree(
-        data_dir / "qc" / "decontam" / "intermediates",
-        output_dir / "sunbeam_output" / "qc" / "decontam" / "intermediates",
     )
     shutil.copytree(
         data_dir / "qc" / "decontam" / "human",
@@ -70,12 +50,11 @@ def test_filter_unmapped_reads(setup):
             f"{output_dir}",
             "--notemp",
             "--allowed-rules=filter_unmapped_reads",
-            "--rerun-triggers=code",
+            "--rerun-triggers=input",
             f"{r1}",
             f"{r2}",
             f"{l1}",
             f"{l2}",
-            "-n"
         ]
     )
 

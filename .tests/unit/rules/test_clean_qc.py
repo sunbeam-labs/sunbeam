@@ -26,10 +26,6 @@ def setup(init):
         output_dir / "sunbeam_output" / "qc" / "02_trimmomatic",
     )
     shutil.copytree(
-        data_dir / "qc" / "log" / "komplexity",
-        output_dir / "sunbeam_output" / "qc" / "log" / "komplexity",
-    )
-    shutil.copytree(
         data_dir / "qc" / "03_komplexity",
         output_dir / "sunbeam_output" / "qc" / "03_komplexity",
     )
@@ -54,6 +50,7 @@ def test_clean_qc(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
+            "--allowed-rules=clean_qc",
             "--rerun-triggers=input",
             f"{r}",
         ]

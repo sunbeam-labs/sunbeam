@@ -18,10 +18,6 @@ def setup(init):
     output_dir = init
 
     shutil.copytree(
-        data_dir / "qc" / "01_cutadapt",
-        output_dir / "sunbeam_output" / "qc" / "01_cutadapt",
-    )
-    shutil.copytree(
         data_dir / "qc" / "02_trimmomatic",
         output_dir / "sunbeam_output" / "qc" / "02_trimmomatic",
     )
@@ -48,6 +44,7 @@ def test_remove_low_complexity(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
+            "--allowed-rules=remove_low_complexity",
             "--rerun-triggers=input",
             f"{r1}",
             f"{r2}",
