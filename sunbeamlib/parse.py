@@ -2,6 +2,9 @@ from itertools import groupby
 from more_itertools import grouper
 
 
+BLAST6_DEFAULTS = ["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart," "qend," "sstart," "send", "evalue", "bitscore"]
+
+
 # Source: https://www.biostars.org/p/710/
 def parse_fasta(f):
     faiter = (x[1] for x in groupby(f, lambda line: line[0] == ">"))
@@ -45,3 +48,10 @@ def write_many_fastq(record_list, f):
     ]
     record_list = [item for sublist in record_list for item in sublist]
     f.writelines(record_list)
+
+
+def parse_blast6(f, outfmt = BLAST6_DEFAULTS):
+    for line in f.readlines():
+        vals = line.strip().split("\t")
+        if len(outfmt) == len(vals):
+            yield dict(zip(outfmt, vals))
