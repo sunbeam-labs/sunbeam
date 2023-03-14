@@ -4,3 +4,4 @@ channels:
 dependencies:
   - numpy
   - pandas
+  - python>3

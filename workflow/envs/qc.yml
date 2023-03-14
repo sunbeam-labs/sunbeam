@@ -8,3 +8,4 @@ dependencies:
   - fastqc
   - samtools
   - trimmomatic
+  - python>3

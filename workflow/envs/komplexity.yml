@@ -4,3 +4,4 @@ channels:
   - conda-forge # Required by komplexity recipe
 dependencies:
   - komplexity
+  - python>3

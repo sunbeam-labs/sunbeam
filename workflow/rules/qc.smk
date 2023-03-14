@@ -21,8 +21,6 @@ rule sample_intake:
         QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
     log:
         LOG_FP / "sample_intake_{sample}_{rp}.log",
-    conda:
-        "../envs/reports.yml"
     script:
         "../scripts/sample_intake.py"
 
