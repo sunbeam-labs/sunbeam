@@ -76,22 +76,6 @@ def output_subdir(cfg, section):
     return cfg["all"]["output_fp"] / cfg[section]["suffix"]
 
 
-def process_databases(db_dict):
-    """Process the list of databases.
-
-    Expands the nucleotide and protein databases specified
-    """
-    dbs = {"nucl": {}, "prot": {}}
-    root = verify(makepath(db_dict["root_fp"]))
-    nucl = db_dict.get("nucleotide")
-    prot = db_dict.get("protein")
-    if nucl:
-        dbs["nucl"] = {db: str(root / path) for db, path in nucl.items()}
-    if prot:
-        dbs["prot"] = {db: str(root / path) for db, path in prot.items()}
-    return dbs
-
-
 def _update_dict(target, new):
     for k, v in new.items():
         if isinstance(v, Mapping):

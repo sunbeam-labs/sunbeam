@@ -60,6 +60,9 @@ elif pkg_major < cfg_major:
         "`sunbeam init` or update this one using `sunbeam config update -i /path/to/sunbeam_config.yml`\n"
     )
 
+# Setting up config files
+Cfg = check_config(config)
+
 # Load extensions
 sbxs = list(listfiles(sunbeam_dir + "/extensions/{sbx_folder}/{sbx}.rules")) + list(
     listfiles(sunbeam_dir + "/extensions/{sbx_folder}/{sbx}.smk")
@@ -67,9 +70,7 @@ sbxs = list(listfiles(sunbeam_dir + "/extensions/{sbx_folder}/{sbx}.rules")) + l
 for sbx in sbxs:
     sys.stderr.write("Found extension {sbx} in folder {sbx_folder}\n".format(**sbx[1]))
 
-# Setting up config files and samples
-Cfg = check_config(config)
-Blastdbs = process_databases(Cfg["blastdbs"])
+# Setting up samples and read pairs
 Samples = load_sample_list(
     Cfg["all"]["samplelist_fp"],
     Cfg["all"]["paired_end"],
@@ -104,12 +105,15 @@ sys.stderr.write("done.\n")
 
 # ---- Set up output paths for the various steps
 QC_FP = output_subdir(Cfg, "qc")
-ASSEMBLY_FP = output_subdir(Cfg, "assembly")
+BENCHMARK_FP = output_subdir(Cfg, "benchmarks")
+LOG_FP = output_subdir(Cfg, "logs")
+# ---- DEPRECATED
+# These paths will be moved to their respective extensions in a future version
+ASSEMBLY_FP = output_subdir(Cfg, "assembly")  
 ANNOTATION_FP = output_subdir(Cfg, "annotation")
 CLASSIFY_FP = output_subdir(Cfg, "classify")
 MAPPING_FP = output_subdir(Cfg, "mapping")
-BENCHMARK_FP = output_subdir(Cfg, "benchmarks")
-LOG_FP = output_subdir(Cfg, "logs")
+# ---- DEPRECATED
 
 
 # ---- Targets rules
