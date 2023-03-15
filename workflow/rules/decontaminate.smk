@@ -67,7 +67,7 @@ rule get_unmapped_reads:
     benchmark:
         BENCHMARK_FP / "get_unmapped_reads_{host}_{sample}.tsv"
     params:
-        samtools_opts="-f4"
+        extra="-f4"
     threads: 4
     #conda:
     #    "../envs/qc.yml"
