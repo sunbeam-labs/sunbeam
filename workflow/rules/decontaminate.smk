@@ -66,13 +66,17 @@ rule get_unmapped_reads:
         LOG_FP / "get_unmapped_reads_{host}_{sample}.log",
     benchmark:
         BENCHMARK_FP / "get_unmapped_reads_{host}_{sample}.tsv"
+    params:
+        samtools_opts="-f4"
     threads: 4
     conda:
         "../envs/qc.yml"
-    shell:
-        """
-        samtools view -f4 {input} -o {output} 2>&1 | tee {log}
-        """
+    wrapper:
+        "v1.23.5/bio/samtools/view"
+    #shell:
+    #    """
+    #    samtools view -f4 {input} -o {output} 2>&1 | tee {log}
+    #    """
 
 
 rule sam_convert_unpaired:
