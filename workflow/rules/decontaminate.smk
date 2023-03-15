@@ -69,8 +69,8 @@ rule get_unmapped_reads:
     params:
         samtools_opts="-f4"
     threads: 4
-    conda:
-        "../envs/qc.yml"
+    #conda:
+    #    "../envs/qc.yml"
     wrapper:
         "v1.23.5/bio/samtools/view"
     #shell:
