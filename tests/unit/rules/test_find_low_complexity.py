@@ -30,7 +30,8 @@ def setup(init):
 def test_find_low_complexity(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    r = sunbeam_output_dir / "qc" / "log" / "komplexity" / "TEST.filtered_ids"
+    lr = sunbeam_output_dir / "qc" / "log" / "komplexity" / "LONG.filtered_ids"
+    sr = sunbeam_output_dir / "qc" / "log" / "komplexity" / "SHORT.filtered_ids"
 
     sp.check_output(
         [
@@ -41,20 +42,36 @@ def test_find_low_complexity(setup):
             "--notemp",
             "--allowed-rules=find_low_complexity",
             "--rerun-triggers=input",
-            f"{r}",
+            f"{lr}",
+            f"{sr}",
         ]
     )
 
-    expected_ids = [
-        "KI270762.1_45667_46245_1:0:0_0:0:0_6/1",
-        "KI270762.1_10179_10639_7:0:0_2:0:0_22/1",
-        "KI270762.1_1730_2260_0:1:0_0:0:0_31/1",
-        "KI270762.1_10398_10889_1:0:0_2:0:0_3b/1",
-        "KI270762.1_13312_13765_3:0:0_0:0:0_60/1",
-        "KI270762.1_1651_2168_0:0:0_0:0:0_36/2",
+    expected_long_ids = [
+        "NZ_CP069563.1_58419_58958_1:0:0_0:0:0_3a1/1",
+        "NZ_CP069563.1_58420_58979_0:0:0_0:0:0_3c3/1",
+        "NC_000913.3_59044_59553_0:1:0_0:0:0_1f0/1",
+        "NC_000913.3_41948_42399_1:0:0_1:0:0_257/1",
+        "NC_000913.3_58612_59129_2:0:0_2:1:0_2b/2",
     ]
 
-    with open(r) as f:
+    expected_short_ids = [
+        "NZ_CP069563.1_58552_59002_1:0:0_1:0:0_0/2",
+        "NZ_CP069563.1_30995_31446_1:0:0_0:0:0_4e/2",
+        "KI270762.1_36773_37232_0:0:0_1:0:0_6/2",
+        "KI270762.1_3610_4174_0:0:0_0:0:0_7/2",
+        "KI270762.1_10301_10852_0:0:0_2:0:0_1f/2",
+        "KI270762.1_54637_55107_1:0:0_0:0:0_22/2",
+        "KI270762.1_35081_35616_3:0:0_1:0:0_2d/2",
+        "KI270762.1_45718_46259_2:0:0_0:0:0_4e/2",
+    ]
+
+    with open(lr) as f:
         ids = [id.strip() for id in f.readlines()]
-        for id in expected_ids:
+        for id in expected_long_ids:
+            assert id in ids
+    
+    with open(sr) as f:
+        ids = [id.strip() for id in f.readlines()]
+        for id in expected_short_ids:
             assert id in ids

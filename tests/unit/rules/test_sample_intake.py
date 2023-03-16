@@ -25,8 +25,10 @@ def setup(init):
 def test_sample_intake(init):
     output_dir = init
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    r1 = sunbeam_output_dir / "qc" / "00_samples" / "TEST_1.fastq.gz"
-    r2 = sunbeam_output_dir / "qc" / "00_samples" / "TEST_2.fastq.gz"
+    lr1 = sunbeam_output_dir / "qc" / "00_samples" / "LONG_1.fastq.gz"
+    lr2 = sunbeam_output_dir / "qc" / "00_samples" / "LONG_2.fastq.gz"
+    sr1 = sunbeam_output_dir / "qc" / "00_samples" / "SHORT_1.fastq.gz"
+    sr2 = sunbeam_output_dir / "qc" / "00_samples" / "SHORT_2.fastq.gz"
 
     sp.check_output(
         [
@@ -35,10 +37,14 @@ def test_sample_intake(init):
             "--profile",
             f"{output_dir}",
             "--notemp",
-            f"{r1}",
-            f"{r2}",
+            f"{lr1}",
+            f"{lr2}",
+            f"{sr1}",
+            f"{sr2}",
         ]
     )
 
-    assert os.path.islink(r1)
-    assert os.path.islink(r2)
+    assert os.path.islink(lr1)
+    assert os.path.islink(lr2)
+    assert os.path.islink(sr1)
+    assert os.path.islink(sr2)

@@ -25,12 +25,20 @@ def setup(init):
     (output_decontam_dir / "human").mkdir()
     (output_decontam_dir / "phix174").mkdir()
     shutil.copyfile(
-        data_dir / "qc" / "decontam" / "human" / "unmapped_TEST.sam",
-        output_decontam_dir / "human" / "unmapped_TEST.sam",
+        data_dir / "qc" / "decontam" / "human" / "unmapped_LONG.sam",
+        output_decontam_dir / "human" / "unmapped_LONG.sam",
     )
     shutil.copyfile(
-        data_dir / "qc" / "decontam" / "phix174" / "unmapped_TEST.sam",
-        output_decontam_dir / "phix174" / "unmapped_TEST.sam",
+        data_dir / "qc" / "decontam" / "human" / "unmapped_SHORT.sam",
+        output_decontam_dir / "human" / "unmapped_SHORT.sam",
+    )
+    shutil.copyfile(
+        data_dir / "qc" / "decontam" / "phix174" / "unmapped_LONG.sam",
+        output_decontam_dir / "phix174" / "unmapped_LONG.sam",
+    )
+    shutil.copyfile(
+        data_dir / "qc" / "decontam" / "phix174" / "unmapped_SHORT.sam",
+        output_decontam_dir / "phix174" / "unmapped_SHORT.sam",
     )
 
     yield output_dir
@@ -41,10 +49,14 @@ def setup(init):
 def test_sam_convert_paired(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    human1 = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_TEST_1.fastq"
-    human2 = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_TEST_2.fastq"
-    phix1 = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_TEST_1.fastq"
-    phix2 = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_TEST_2.fastq"
+    lhuman1 = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_LONG_1.fastq"
+    lhuman2 = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_LONG_2.fastq"
+    lphix1 = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_LONG_1.fastq"
+    lphix2 = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_LONG_2.fastq"
+    shuman1 = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_SHORT_1.fastq"
+    shuman2 = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_SHORT_2.fastq"
+    sphix1 = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_SHORT_1.fastq"
+    sphix2 = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_SHORT_2.fastq"
 
     sp.check_output(
         [
@@ -55,14 +67,22 @@ def test_sam_convert_paired(setup):
             "--notemp",
             "--allowed-rules=sam_convert_paired",
             "--rerun-triggers=input",
-            f"{human1}",
-            f"{human2}",
-            f"{phix1}",
-            f"{phix2}",
+            f"{lhuman1}",
+            f"{lhuman2}",
+            f"{lphix1}",
+            f"{lphix2}",
+            f"{shuman1}",
+            f"{shuman2}",
+            f"{sphix1}",
+            f"{sphix2}",
         ]
     )
 
-    assert human1.stat().st_size >= 40000
-    assert human2.stat().st_size >= 40000
-    assert phix1.stat().st_size >= 40000
-    assert phix2.stat().st_size >= 40000
+    assert lhuman1.stat().st_size >= 300000
+    assert lhuman2.stat().st_size >= 300000
+    assert lphix1.stat().st_size >= 300000
+    assert lphix2.stat().st_size >= 300000
+    assert shuman1.stat().st_size >= 40000
+    assert shuman2.stat().st_size >= 40000
+    assert sphix1.stat().st_size >= 40000
+    assert sphix2.stat().st_size >= 40000

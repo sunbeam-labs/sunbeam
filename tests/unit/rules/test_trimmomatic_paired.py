@@ -30,21 +30,37 @@ def setup(init):
 def test_trimmomatic_paired(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    r1 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "TEST_1.fastq.gz"
-    r2 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "TEST_2.fastq.gz"
-    ur1 = (
+    lr1 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "LONG_1.fastq.gz"
+    lr2 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "LONG_2.fastq.gz"
+    sr1 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "SHORT_1.fastq.gz"
+    sr2 = sunbeam_output_dir / "qc" / "02_trimmomatic" / "SHORT_2.fastq.gz"
+    lur1 = (
         sunbeam_output_dir
         / "qc"
         / "02_trimmomatic"
         / "unpaired"
-        / "TEST_1_unpaired.fastq.gz"
+        / "LONG_1_unpaired.fastq.gz"
     )
-    ur2 = (
+    lur2 = (
         sunbeam_output_dir
         / "qc"
         / "02_trimmomatic"
         / "unpaired"
-        / "TEST_2_unpaired.fastq.gz"
+        / "LONG_2_unpaired.fastq.gz"
+    )
+    sur1 = (
+        sunbeam_output_dir
+        / "qc"
+        / "02_trimmomatic"
+        / "unpaired"
+        / "SHORT_1_unpaired.fastq.gz"
+    )
+    sur2 = (
+        sunbeam_output_dir
+        / "qc"
+        / "02_trimmomatic"
+        / "unpaired"
+        / "SHORT_2_unpaired.fastq.gz"
     )
 
     sp.check_output(
@@ -56,15 +72,23 @@ def test_trimmomatic_paired(setup):
             "--notemp",
             "--allowed-rules=trimmomatic_paired",
             "--rerun-triggers=input",
-            f"{r1}",
-            f"{r2}",
-            f"{ur1}",
-            f"{ur2}",
+            f"{lr1}",
+            f"{lr2}",
+            f"{lur1}",
+            f"{lur2}",
+            f"{sr1}",
+            f"{sr2}",
+            f"{sur1}",
+            f"{sur2}",
         ]
     )
 
-    assert r1.stat().st_size >= 10000
-    assert r2.stat().st_size >= 10000
+    assert lr1.stat().st_size >= 50000
+    assert lr2.stat().st_size >= 50000
+    assert sr1.stat().st_size >= 10000
+    assert sr2.stat().st_size >= 10000
 
-    with gzip.open(r1) as f1, gzip.open(r2) as f2:
+    with gzip.open(lr1) as f1, gzip.open(lr2) as f2:
+        assert len(f1.readlines()) == len(f2.readlines())
+    with gzip.open(sr1) as f1, gzip.open(sr2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())

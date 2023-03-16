@@ -34,8 +34,10 @@ def setup(init):
 def test_remove_low_complexity(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    r1 = sunbeam_output_dir / "qc" / "03_komplexity" / "TEST_1.fastq.gz"
-    r2 = sunbeam_output_dir / "qc" / "03_komplexity" / "TEST_2.fastq.gz"
+    lr1 = sunbeam_output_dir / "qc" / "03_komplexity" / "LONG_1.fastq.gz"
+    lr2 = sunbeam_output_dir / "qc" / "03_komplexity" / "LONG_2.fastq.gz"
+    sr1 = sunbeam_output_dir / "qc" / "03_komplexity" / "SHORT_1.fastq.gz"
+    sr2 = sunbeam_output_dir / "qc" / "03_komplexity" / "SHORT_2.fastq.gz"
 
     sp.check_output(
         [
@@ -46,13 +48,19 @@ def test_remove_low_complexity(setup):
             "--notemp",
             "--allowed-rules=remove_low_complexity",
             "--rerun-triggers=input",
-            f"{r1}",
-            f"{r2}",
+            f"{lr1}",
+            f"{lr2}",
+            f"{sr1}",
+            f"{sr2}",
         ]
     )
 
-    assert r1.stat().st_size >= 10000
-    assert r2.stat().st_size >= 10000
+    assert lr1.stat().st_size >= 50000
+    assert lr2.stat().st_size >= 50000
+    assert sr1.stat().st_size >= 10000
+    assert sr2.stat().st_size >= 10000
 
-    with gzip.open(r1) as f1, gzip.open(r2) as f2:
+    with gzip.open(lr1) as f1, gzip.open(lr2) as f2:
+        assert len(f1.readlines()) == len(f2.readlines())
+    with gzip.open(sr1) as f1, gzip.open(sr2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())

@@ -30,8 +30,10 @@ def setup(init):
 def test_get_unmapped_reads(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    human = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_TEST.sam"
-    phix = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_TEST.sam"
+    lhuman = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_LONG.sam"
+    lphix = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_LONG.sam"
+    shuman = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_SHORT.sam"
+    sphix = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_SHORT.sam"
 
     sp.check_output(
         [
@@ -42,10 +44,14 @@ def test_get_unmapped_reads(setup):
             "--notemp",
             "--allowed-rules=get_unmapped_reads",
             "--rerun-triggers=input",
-            f"{human}",
-            f"{phix}",
+            f"{lhuman}",
+            f"{lphix}",
+            f"{shuman}",
+            f"{sphix}",
         ]
     )
 
-    assert human.stat().st_size >= 100000
-    assert phix.stat().st_size >= 100000
+    assert lhuman.stat().st_size >= 500000
+    assert lphix.stat().st_size >= 500000
+    assert shuman.stat().st_size >= 100000
+    assert sphix.stat().st_size >= 100000
