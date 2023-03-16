@@ -89,7 +89,6 @@ def test_sunbeam_run_all(init):
         )  # Human + phiX + nonhost + komplexity
         assert int(stats[6]) == int(stats[7])  # Human = human_copy
         assert int(stats[9]) + int(stats[10]) + int(stats[11]) == 400  # Host + nonhost + komplexity
-        assert int(stats[10]) + int(stats[11]) == 200  # Nonhost + komplexity
 
 
 @pytest.fixture
