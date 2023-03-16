@@ -268,11 +268,11 @@ if [[ $__old_path != *"${__conda_path}/bin"* ]]; then
     warning "   'echo \"export PATH=\$PATH:${__conda_path}/bin\" >> ~/.bashrc'"
     warning "and close and re-open your terminal session to apply."
     warning "When finished, run 'conda activate ${__sunbeam_env}' to begin."
-    warning "Optionally, then run 'pytest .tests'"
+    warning "Optionally, then run 'pytest tests'"
     warning "to make sure the installation is working properly."
 else
     info "Done. Run 'conda activate ${__sunbeam_env}' to begin."
-    info "Optionally, then run 'pytest .tests'"
+    info "Optionally, then run 'pytest tests'"
     info "to make sure the installation is working properly."
 fi
 

@@ -22,4 +22,4 @@ jobs:
           VALIDATE_SNAKEMAKE_SNAKEFMT: true
           VALIDATE_PYTHON_BLACK: true
 
-          FILTER_REGEX_INCLUDE: scripts/.*|rules/.*|sunbeamlib/.*|.tests/.*|Snakefile
+          FILTER_REGEX_INCLUDE: scripts/.*|rules/.*|sunbeamlib/.*|tests/.*|Snakefile
