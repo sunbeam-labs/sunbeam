@@ -75,15 +75,21 @@ def test_sunbeam_run_all(init):
 
     with open(sunbeam_output_dir / "qc" / "reports" / "preprocess_summary.tsv") as f:
         f.readline()  # Headers
-        stats = f.readline().split("\t")
+
+        stats = f.readline().split("\t") # LONG
+        assert int(stats[1]) == 2000  # Input reads
+        assert int(stats[2]) == 2000  # Both kept by trimmomatic
+        assert int(stats[10]) + int(stats[11]) == 2000  # Nonhost + komplexity
+
+        stats = f.readline().split("\t") #SHORT
         assert int(stats[1]) == 400  # Input reads
         assert int(stats[2]) == 400  # Both kept by trimmomatic
         assert (
-            int(stats[6]) + int(stats[8]) + int(stats[11]) == 200
-        )  # Human + phiX + komplexity
+            int(stats[6]) + int(stats[8]) + int(stats[10]) + int(stats[11]) == 400
+        )  # Human + phiX + nonhost + komplexity
         assert int(stats[6]) == int(stats[7])  # Human = human_copy
-        assert int(stats[9]) + int(stats[11]) == 200  # Host + komplexity
-        assert int(stats[10]) == 200  # Nonhost
+        assert int(stats[9]) + int(stats[10]) + int(stats[11]) == 400  # Host + nonhost + komplexity
+        assert int(stats[10]) + int(stats[11]) == 200  # Nonhost + komplexity
 
 
 @pytest.fixture
@@ -259,12 +265,15 @@ def test_sunbeam_run_all_single_end(init_single_end):
 
     with open(sunbeam_output_dir / "qc" / "reports" / "preprocess_summary.tsv") as f:
         f.readline()  # Headers
-        stats = f.readline().split("\t")
+
+        stats = f.readline().split("\t") # LONG
+        assert int(stats[1]) == 2000  # Input reads
+        assert int(stats[2]) == 2000  # Both kept by trimmomatic
+        assert int(stats[8]) + int(stats[9]) == 2000  # Nonhost + komplexity
+
+        stats = f.readline().split("\t") # SHORT
         assert int(stats[1]) == 400  # Input reads
         assert int(stats[2]) == 400  # Both kept by trimmomatic
-        assert (
-            int(stats[4]) + int(stats[6]) + int(stats[9]) == 200
-        )  # Human + phiX + komplexity
         assert int(stats[4]) == int(stats[5])  # Human = human_copy
-        assert int(stats[7]) + int(stats[9]) == 200  # Host + komplexity
+        assert int(stats[7]) == 200  # Host
         assert int(stats[8]) == 200  # Nonhost
