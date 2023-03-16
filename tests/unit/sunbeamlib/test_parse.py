@@ -27,7 +27,7 @@ def test_parse_fasta():
 
 
 def test_parse_fastq():
-    with gzip.open(data_dir / "reads" / "TEST_R1.fastq.gz", "rt") as f:
+    with gzip.open(data_dir / "reads" / "SHORT_R1.fastq.gz", "rt") as f:
         for lines in parse.parse_fastq(f):
             assert len(lines) == 4
             assert set(list(lines[1])).issubset(set(["A", "C", "G", "T"]))
