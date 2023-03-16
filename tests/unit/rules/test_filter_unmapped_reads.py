@@ -41,10 +41,14 @@ def setup(init):
 def test_filter_unmapped_reads(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    r1 = sunbeam_output_dir / "qc" / "decontam" / "TEST_1.fastq.gz"
-    r2 = sunbeam_output_dir / "qc" / "decontam" / "TEST_2.fastq.gz"
-    l1 = sunbeam_output_dir / "qc" / "log" / "decontam" / "TEST_1.txt"
-    l2 = sunbeam_output_dir / "qc" / "log" / "decontam" / "TEST_2.txt"
+    lr1 = sunbeam_output_dir / "qc" / "decontam" / "LONG_1.fastq.gz"
+    lr2 = sunbeam_output_dir / "qc" / "decontam" / "LONG_2.fastq.gz"
+    ll1 = sunbeam_output_dir / "qc" / "log" / "decontam" / "LONG_1.txt"
+    ll2 = sunbeam_output_dir / "qc" / "log" / "decontam" / "LONG_2.txt"
+    sr1 = sunbeam_output_dir / "qc" / "decontam" / "SHORT_1.fastq.gz"
+    sr2 = sunbeam_output_dir / "qc" / "decontam" / "SHORT_2.fastq.gz"
+    sl1 = sunbeam_output_dir / "qc" / "log" / "decontam" / "SHORT_1.txt"
+    sl2 = sunbeam_output_dir / "qc" / "log" / "decontam" / "SHORT_2.txt"
 
     out = sp.check_output(
         [
@@ -55,17 +59,29 @@ def test_filter_unmapped_reads(setup):
             "--notemp",
             "--allowed-rules=filter_unmapped_reads",
             "--rerun-triggers=input",
-            f"{r1}",
-            f"{r2}",
-            f"{l1}",
-            f"{l2}",
+            f"{lr1}",
+            f"{lr2}",
+            f"{ll1}",
+            f"{ll2}",
+            f"{sr1}",
+            f"{sr2}",
+            f"{sl1}",
+            f"{sl2}",
         ]
     )
 
-    assert r1.stat().st_size >= 5000
-    assert r2.stat().st_size >= 5000
-    assert l1.stat().st_size >= 10
-    assert l2.stat().st_size >= 10
+    assert lr1.stat().st_size >= 50000
+    assert lr2.stat().st_size >= 50000
+    assert ll1.stat().st_size >= 10
+    assert ll2.stat().st_size >= 10
 
-    with gzip.open(r1) as f1, gzip.open(r2) as f2:
+    with gzip.open(lr1) as f1, gzip.open(lr2) as f2:
+        assert len(f1.readlines()) == len(f2.readlines())
+    
+    assert sr1.stat().st_size >= 5000
+    assert sr2.stat().st_size >= 5000
+    assert sl1.stat().st_size >= 10
+    assert sl2.stat().st_size >= 10
+
+    with gzip.open(sr1) as f1, gzip.open(sr2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())

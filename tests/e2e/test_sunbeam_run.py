@@ -194,7 +194,7 @@ def test_sunbeam_run_all_no_host(init):
         ]
     )
 
-    assert len(os.listdir(sunbeam_output_dir / "qc" / "cleaned")) == 2
+    assert len(os.listdir(sunbeam_output_dir / "qc" / "cleaned")) == 4
 
 
 @pytest.fixture

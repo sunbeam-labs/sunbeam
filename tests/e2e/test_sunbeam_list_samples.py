@@ -22,8 +22,10 @@ def test_list_samples(list_samples):
         ["sunbeam", "list_samples", f"{test_dir / 'data' / 'reads'}"]
     )
 
-    assert "tests/data/reads/TEST_R1.fastq.gz" in sample_list.decode("utf-8")
-    assert "tests/data/reads/TEST_R2.fastq.gz" in sample_list.decode("utf-8")
+    assert "tests/data/reads/LONG_R1.fastq.gz" in sample_list.decode("utf-8")
+    assert "tests/data/reads/LONG_R2.fastq.gz" in sample_list.decode("utf-8")
+    assert "tests/data/reads/SHORT_R1.fastq.gz" in sample_list.decode("utf-8")
+    assert "tests/data/reads/SHORT_R2.fastq.gz" in sample_list.decode("utf-8")
 
 
 def test_list_samples_single_end(list_samples):
@@ -38,6 +40,9 @@ def test_list_samples_single_end(list_samples):
         ]
     )
 
-    assert "tests/data/single_end_reads/TEST_R1.fastq.gz" in sample_list.decode(
+    assert "tests/data/single_end_reads/LONG_R1.fastq.gz" in sample_list.decode(
+        "utf-8"
+    )
+    assert "tests/data/single_end_reads/SHORT_R1.fastq.gz" in sample_list.decode(
         "utf-8"
     )

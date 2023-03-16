@@ -29,16 +29,27 @@ def setup(init):
 def test_align_to_host(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    human = (
-        sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "human" / "TEST.sam"
+    lhuman = (
+        sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "human" / "LONG.sam"
     )
-    phix = (
+    lphix = (
         sunbeam_output_dir
         / "qc"
         / "decontam"
         / "intermediates"
         / "phix174"
-        / "TEST.sam"
+        / "LONG.sam"
+    )
+    shuman = (
+        sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "human" / "SHORT.sam"
+    )
+    sphix = (
+        sunbeam_output_dir
+        / "qc"
+        / "decontam"
+        / "intermediates"
+        / "phix174"
+        / "SHORT.sam"
     )
 
     sp.check_output(
@@ -50,10 +61,14 @@ def test_align_to_host(setup):
             "--notemp",
             "--allowed-rules=align_to_host",
             "--rerun-triggers=input",
-            f"{human}",
-            f"{phix}",
+            f"{lhuman}",
+            f"{lphix}",
+            f"{shuman}",
+            f"{sphix}",
         ]
     )
 
-    assert human.stat().st_size >= 100000
-    assert phix.stat().st_size >= 100000
+    assert lhuman.stat().st_size >= 500000
+    assert lphix.stat().st_size >= 500000
+    assert shuman.stat().st_size >= 100000
+    assert sphix.stat().st_size >= 100000

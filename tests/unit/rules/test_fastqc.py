@@ -30,8 +30,10 @@ def setup(init):
 def test_fastqc(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    r1 = sunbeam_output_dir / "qc" / "reports" / "TEST_1_fastqc" / "fastqc_data.txt"
-    r2 = sunbeam_output_dir / "qc" / "reports" / "TEST_2_fastqc" / "fastqc_data.txt"
+    lr1 = sunbeam_output_dir / "qc" / "reports" / "LONG_1_fastqc" / "fastqc_data.txt"
+    lr2 = sunbeam_output_dir / "qc" / "reports" / "LONG_2_fastqc" / "fastqc_data.txt"
+    sr1 = sunbeam_output_dir / "qc" / "reports" / "SHORT_1_fastqc" / "fastqc_data.txt"
+    sr2 = sunbeam_output_dir / "qc" / "reports" / "SHORT_2_fastqc" / "fastqc_data.txt"
 
     sp.check_output(
         [
@@ -42,10 +44,14 @@ def test_fastqc(setup):
             "--notemp",
             "--allowed-rules=fastqc",
             "--rerun-triggers=input",
-            f"{r1}",
-            f"{r2}",
+            f"{lr1}",
+            f"{lr2}",
+            f"{sr1}",
+            f"{sr2}",
         ]
     )
 
-    assert r1.stat().st_size >= 30000
-    assert r2.stat().st_size >= 30000
+    assert lr1.stat().st_size >= 5000
+    assert lr2.stat().st_size >= 5000
+    assert sr1.stat().st_size >= 30000
+    assert sr2.stat().st_size >= 30000
