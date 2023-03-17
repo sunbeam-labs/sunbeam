@@ -70,7 +70,7 @@ def test_find_low_complexity(setup):
         ids = [id.strip() for id in f.readlines()]
         for id in expected_long_ids:
             assert id in ids
-    
+
     with open(sr) as f:
         ids = [id.strip() for id in f.readlines()]
         for id in expected_short_ids:

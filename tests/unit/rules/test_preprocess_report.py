@@ -54,17 +54,19 @@ def test_preprocess_report(setup):
 
     with open(r) as f:
         f.readline()  # Headers
-        
-        stats = f.readline().split("\t") # LONG
+
+        stats = f.readline().split("\t")  # LONG
         assert int(stats[1]) == 2000  # Input reads
         assert int(stats[2]) == 2000  # Both kept by trimmomatic
         assert int(stats[10]) + int(stats[11]) == 2000  # Nonhost + komplexity
 
-        stats = f.readline().split("\t") #SHORT
+        stats = f.readline().split("\t")  # SHORT
         assert int(stats[1]) == 400  # Input reads
         assert int(stats[2]) == 400  # Both kept by trimmomatic
         assert (
             int(stats[6]) + int(stats[8]) + int(stats[10]) + int(stats[11]) == 400
         )  # Human + phiX + nonhost + komplexity
         assert int(stats[6]) == int(stats[7])  # Human = human_copy
-        assert int(stats[9]) + int(stats[10]) + int(stats[11]) == 400  # Host + nonhost + komplexity
+        assert (
+            int(stats[9]) + int(stats[10]) + int(stats[11]) == 400
+        )  # Host + nonhost + komplexity

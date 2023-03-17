@@ -40,9 +40,7 @@ def test_list_samples_single_end(list_samples):
         ]
     )
 
-    assert "tests/data/single_end_reads/LONG_R1.fastq.gz" in sample_list.decode(
-        "utf-8"
-    )
+    assert "tests/data/single_end_reads/LONG_R1.fastq.gz" in sample_list.decode("utf-8")
     assert "tests/data/single_end_reads/SHORT_R1.fastq.gz" in sample_list.decode(
         "utf-8"
     )

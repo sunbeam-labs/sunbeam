@@ -13,6 +13,7 @@ from sunbeamlib.parse import parse_fasta
 
 __version__ = str(Version.coerce(os.environ.get("SUNBEAM_VER", "0.0.0")))
 
+
 def load_sample_list(samplelist_fp, paired_end=True, root_proj=""):
     """
     Build a list of samples from a sample list file.
@@ -109,7 +110,7 @@ def circular(seq, kmin, kmax, min_len):
     if len(seq) < min_len:
         return False
     # Short-circuit checking: returns True for the first kmer that matches
-    return any([k for k in range(kmin, kmax+1) if seq[0:k] == seq[len(seq) - k :]])
+    return any([k for k in range(kmin, kmax + 1) if seq[0:k] == seq[len(seq) - k :]])
 
 
 def read_seq_ids(fasta_fp):

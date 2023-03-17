@@ -26,10 +26,10 @@ def setup(init):
 def test_adapter_removal_paired(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    lr1 = sunbeam_output_dir / "qc" / "01_cutadapt" / "SHORT_1.fastq.gz"
-    lr2 = sunbeam_output_dir / "qc" / "01_cutadapt" / "SHORT_2.fastq.gz"
-    sr1 = sunbeam_output_dir / "qc" / "01_cutadapt" / "LONG_1.fastq.gz"
-    sr2 = sunbeam_output_dir / "qc" / "01_cutadapt" / "LONG_2.fastq.gz"
+    lr1 = sunbeam_output_dir / "qc" / "01_cutadapt" / "LONG_1.fastq.gz"
+    lr2 = sunbeam_output_dir / "qc" / "01_cutadapt" / "LONG_2.fastq.gz"
+    sr1 = sunbeam_output_dir / "qc" / "01_cutadapt" / "SHORT_1.fastq.gz"
+    sr2 = sunbeam_output_dir / "qc" / "01_cutadapt" / "SHORT_2.fastq.gz"
 
     sp.check_output(
         [

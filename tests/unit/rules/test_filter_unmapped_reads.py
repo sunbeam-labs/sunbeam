@@ -77,7 +77,7 @@ def test_filter_unmapped_reads(setup):
 
     with gzip.open(lr1) as f1, gzip.open(lr2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())
-    
+
     assert sr1.stat().st_size >= 5000
     assert sr2.stat().st_size >= 5000
     assert sl1.stat().st_size >= 10
