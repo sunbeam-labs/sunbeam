@@ -41,12 +41,20 @@ def init(output_dir):
         parents=True, exist_ok=True
     )
     os.symlink(
-        test_dir / "data" / "reads" / "TEST_R1.fastq.gz",
-        output_dir / "sunbeam_output" / "qc" / "00_samples" / "TEST_1.fastq.gz",
+        test_dir / "data" / "reads" / "LONG_R1.fastq.gz",
+        output_dir / "sunbeam_output" / "qc" / "00_samples" / "LONG_1.fastq.gz",
     )
     os.symlink(
-        test_dir / "data" / "reads" / "TEST_R2.fastq.gz",
-        output_dir / "sunbeam_output" / "qc" / "00_samples" / "TEST_2.fastq.gz",
+        test_dir / "data" / "reads" / "LONG_R2.fastq.gz",
+        output_dir / "sunbeam_output" / "qc" / "00_samples" / "LONG_2.fastq.gz",
+    )
+    os.symlink(
+        test_dir / "data" / "reads" / "SHORT_R1.fastq.gz",
+        output_dir / "sunbeam_output" / "qc" / "00_samples" / "SHORT_1.fastq.gz",
+    )
+    os.symlink(
+        test_dir / "data" / "reads" / "SHORT_R2.fastq.gz",
+        output_dir / "sunbeam_output" / "qc" / "00_samples" / "SHORT_2.fastq.gz",
     )
 
     yield output_dir
