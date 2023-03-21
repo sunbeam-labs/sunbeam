@@ -1,7 +1,7 @@
 name: qc
 channels:
   - bioconda
-  - anaconda
+  - conda-forge
 dependencies:
   - bwa
   - cutadapt

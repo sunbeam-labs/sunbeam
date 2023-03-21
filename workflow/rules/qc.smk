@@ -186,7 +186,7 @@ rule find_low_complexity:
     shell:
         """
         for rp in {input}; do
-          gzip -dc $rp | kz 2>&1 | tee {log} | \
+          gzip -dc $rp | kz | \
           awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> {output}
         done
         """
