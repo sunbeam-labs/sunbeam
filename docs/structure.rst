@@ -12,8 +12,7 @@ Calling ``sunbeam run [args] [options]`` is a call to this wrapper library
 which then invokes the necessary snakemake commands. The main Snakefile can be 
 found in the root directory and it makes use of rules from ``rules/`` and 
 ``extensions/``, scripts from ``scripts/``, and environments from ``envs/``. Tests 
-are managed by a script ``tests/run_tests.bash`` which collects test 
-functions from ``tests/test_suite.bash``. Documentation lives in ``docs/`` and is 
+are run with pytest and live in the ``test/`` directory. Documentation lives in ``docs/`` and is 
 served by ReadTheDocs.
 
 .. tip::
@@ -27,20 +26,21 @@ sunbeam/ (root directory)
 -------------------------
 
 The root sunbeam directory holds a few important files including 
-``environment.yml``, ``setup.py``, and ``Snakefile``. The environment file defines 
+``environment.yml``, ``setup.py``, and ``install.sh``. The environment file defines 
 the dependencies required to run sunbeam and is used to create the main sunbeam 
 environment. The setup file defines the structure and dependencies of the 
-sunbeamlib_ and makes it installable via pip. The snakefile manages all of the 
-snakemake components of the pipeline.
-
-There are also bash scripts for installing sunbeam and managing sunbeam's version 
-called ``install.sh`` and ``manage-version.sh``. These each have their own doc pages.
+sunbeamlib_ and makes it installable via pip. The install script is used to install 
+sunbeam and has its own page in the documentation.
 
 .. tip::
 
     ``environment.yml`` defines the main sunbeam environment that you activate in 
     order to run the pipeline. Internally, sunbeam then manages a number of 
     other environments (defined in envs_) on a per-rule basis.
+
+There is also ``.readthedocs.yaml``, which sets up the Sphinx build of the documentation 
+to be able to import sunbeamlib, and ``MANIFEST.in``, which tells sunbeamlib to include 
+the ``data/`` subdirectory while installing.
 
 docs/
 -----
@@ -54,7 +54,7 @@ then importing ``sunbeamlib`` which stores the version tag in a ``__version__``
 variable using ``semantic_version``.
 
 .. _envs:
-envs/
+workflow/envs/
 -----
 
 This directory contains ``.yml`` files defining environments that will be managed 
@@ -72,14 +72,14 @@ any extensions that you develop as well as a ``.placeholder`` file that is just
 there to make sure the directory always exists. Any extensions should be in 
 their own directories that start with ``sbx_``.
 
-rules/
+workflow/rules/
 ------
 
 This directory contains all of the snakemake rules that get imported by the 
 main ``Snakefile``. The rules are organized into subdirectories by function and 
 each subdirectory has an associated environment to run its rules in ``envs/``.
 
-scripts/
+workflow/scripts/
 --------
 
 This directory contains any python code that needs to be executed by snakemake 
@@ -101,17 +101,13 @@ contains the default profile template and one for slurm.
 tests/
 ------
 
-This directory contains all of the testing framework and tests for sunbeam. The 
-framework is written mostly in bash with ``test_suite.bash`` holding the main 
-test suite and ``run_tests.bash`` to run it. The first step in running the tests 
-is to create dummy data which is generated using ``generate_dummy_data.py`` and 
-any installed extensions are then moved temporarily to the ``extensions/`` 
-subdirectory to avoid any interference from them (extensions should each be 
-tested separately from sunbeam). Some tests will end by calling 
-``find_targets.py`` to check that all of the files specified in ``targets.txt`` or 
-``targets_singleend.txt`` are present. Unit tests for the ``scripts/`` directory 
-live in ``unit_tests/`` subdirectory. Other subdirectories are auxiliary fixtures 
-for running certain tests.
+This directory contains the tests for the core sunbeam pipeline. Under ``data/`` 
+are raw, shortened bacterial genomes and host genomes used for generating the 
+reads used as input. ``e2e/`` contains end-to-end tests for each sunbeam 
+programm: config, extend, init, list_samples, and run. ``unit/`` contains unit 
+tests broken into two sections, ``rules/``, which tests each rule in the 
+pipeline individually, and ``sunbeamlib``, which tests functions within 
+sunbeamlib.
 
 Hidden Directories
 ------------------
@@ -126,7 +122,8 @@ run by CircleCI as well as any scripts that are included in those jobs.
 ********
 
 This directory contains the ``PULL_REQUEST_TEMPLATE.md`` file which defines a 
-template for any pull requests on the sunbeam repository. It is also where 
+template for any pull requests on the sunbeam repository and ``ISSUE_TEMPLATE/`` 
+which contains issue templates for the repository. It is also where 
 the SuperLinter CI job definition lives.
 
 .snakemake/

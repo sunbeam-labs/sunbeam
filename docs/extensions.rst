@@ -12,11 +12,11 @@ reproducible analysis.
 
 A Sunbeam extension consists of a directory that contains a
 *rules* file. The *rules* file must have a name that
-ends with the file extension ".rules".  The name of the extension is
-derived from the name of this file.  It is customary for the name of
+ends with the file extension ".smk". The name of the extension is
+derived from the name of this file. It is customary for the name of
 the extension to start with "sbx_", which is shorthand for "Sunbeam
 extension."  Technically, only the *rules* file is needed for a
-Sunbeam extension.  In practice, almost all extensions include other
+Sunbeam extension. In practice, almost all extensions include other
 files to facilitate the installation of software dependencies, to
 specify parameters in the configuration file, and to give instructions
 to users.
@@ -24,9 +24,9 @@ to users.
 In Sunbeam version 3.0 and higher, extensions can be installed using the
 ``sunbeam extend`` command, followed by the GitHub URL of the 
 extension you're installing. For example, to install an extension to
-run the kaiju classifier, you would run::
+run metagenome assembly, you would run::
 
-    sunbeam extend https://github.com/sunbeam-labs/sbx_kaiju/
+    sunbeam extend https://github.com/sunbeam-labs/sbx_assembly/
 
 Sunbeam extensions are installed by placing the extension directory in
 the ``extensions/`` subdirectory of the Sunbeam software.  Once the
@@ -47,13 +47,13 @@ Example: MetaSPAdes assembler
 
 We'll use the `sbx_metaspades_example
 <https://github.com/sunbeam-labs/sbx_metaspades_example>`_ extension
-to illustrate the basics.  This extension runs the MetaSPAdes assembly
+to illustrate the basics. This extension runs the MetaSPAdes assembly
 program on each pair of host-filtered FASTQ files, producing a folder
 with contigs for each sample.
 
 The rules file contains two rules: one describes how to run the
 MetaSPAdes program, and the other gives the full set of output folders
-we expect to make.  Here is the rule that runs the program::
+we expect to make. Here is the rule that runs the program::
 
     rule run_metaspades:
         input:
@@ -66,7 +66,7 @@ we expect to make.  Here is the rule that runs the program::
         shell:
             "metaspades.py -1 {input.r1} -2 {input.r2} -o {output}"
 
-The first line indicates a new rule named ``run_metaspades``.  The
+The first line indicates a new rule named ``run_metaspades``. The
 ``input`` and ``output`` sections contain patterns for file paths that
 will be used by the command and produced after the command is run. The 
 ``conda`` section specifies which environment the command should be run 
@@ -78,7 +78,7 @@ individual names, like ``r1`` and ``r2``, then refer to these names
 inside the command.
 
 In this example, the input and output filepaths are given as Python
-code.  This is typical for rules in Sunbeam, because we are using info
+code. This is typical for rules in Sunbeam, because we are using info
 from the user's configuration to determine the full filepath.  Let's
 take ``QC_FP/'decontam'/'{sample}_1.fastq.gz'`` and see how it's
 put together.  ``QC_FP`` is a Python variable, which gives the
@@ -115,14 +115,6 @@ extension.  Here are all the patterns you can use:
 | decontaminated        | QC_FP/'decontam'/'{sample}_1.fastq.gz'                         |
 | sequences             | QC_FP/'decontam'/'{sample}_2.fastq.gz'                         |
 +-----------------------+----------------------------------------------------------------+
-| Contig sequences      | ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa'                    |
-+-----------------------+----------------------------------------------------------------+
-| Open reading frame    | ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_nucl.fa'      |
-| nucleotide sequences  |                                                                |
-+-----------------------+----------------------------------------------------------------+
-| Open reading frame    | ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_prot.fa'      |
-| protein sequences     |                                                                |
-+-----------------------+----------------------------------------------------------------+
 
 +-----------------------+-----------------------------------------------+
 | Summary tables        | Target                                        |
@@ -133,9 +125,6 @@ extension.  Here are all the patterns you can use:
 +-----------------------+-----------------------------------------------+
 | Sequence              | QC_FP/'reports'/'fastqc_quality.tsv'          |
 | quality scores        |                                               |
-+-----------------------+-----------------------------------------------+
-| Taxonomic assignments | CLASSIFY_FP/'kraken'/'all_samples.tsv'        |
-| from Kraken           |                                               |
 +-----------------------+-----------------------------------------------+
 
 Very often, you will use one of these patterns directly for input to a
@@ -191,7 +180,7 @@ output from Sunbeam and produces a report.  The extension
 researchers to re-run the analysis for a small methods comaprison.
 
 To make a report from Sunbeam output files, the extension needs only
-one rule.    ::
+one rule.::
 
   rule make_shallowshotgun_report:
       input:
@@ -268,12 +257,12 @@ use in your extensions:
 +-------------------+-------------+-----------------------------------------------+
 | ``QC_FP``         | Path        | Output directory for quality control files.   |
 +-------------------+-------------+-----------------------------------------------+
-| ``ASSEMBLY_FP``   | Path        | Output directory for assembly files.          |
+| ``ASSEMBLY_FP``   | Path        | Output directory for assembly files. (DEPRECATED)|
 +-------------------+-------------+-----------------------------------------------+
-| ``ANNOTATION_FP`` | Path        | Output directory for gene annotation files.   |
+| ``ANNOTATION_FP`` | Path        | Output directory for gene annotation files. (DEPRECATED)|
 +-------------------+-------------+-----------------------------------------------+
 || ``CLASSIFY_FP``  || Path       || Output directory for taxonomic               |
-||                  ||            || classification files.                        |
+||                  ||            || classification files. (DEPRECATED)           |
 +-------------------+-------------+-----------------------------------------------+
 | ``BENCHMARK_FP``  | Path        | Output directory for benchmark files.         |
 +-------------------+-------------+-----------------------------------------------+
@@ -297,6 +286,10 @@ use in your extensions:
 +-------------------+-------------+-----------------------------------------------+
 | ``sunbeam_dir``   | String      | File path where Sunbeam is installed.         |
 +-------------------+-------------+-----------------------------------------------+
+
+..tip::
+
+    Deprecated filepaths will be moved from the main pipeline to the extensions where they are used in a future release.
 
 Further reading
 ---------------
@@ -351,7 +344,7 @@ with groups of samples to co-assemble.::
 
   sbx_coassembly:
     threads: 4
-      group_file: ''
+    group_file: ''
 
 As of version 3.0, config options from extensions are automatically included
 in config files made using ``sunbeam init`` and ``sunbeam config update``. This

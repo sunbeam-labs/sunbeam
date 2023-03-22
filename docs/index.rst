@@ -27,13 +27,10 @@ Sunbeam currently automates the following tasks:
 
 * Quality control, including adaptor trimming, host read removal, and quality
   filtering;
-* Assembly of reads into contigs using `Megahit
-  <https://github.com/voutcn/megahit>`_;
-* ORF prediction using `Prodigal <https://github.com/hyattpd/Prodigal>`_
+* Decontamination of host-contaminated reads
 
 Sunbeam was designed to be modular and extensible. We have 
-:ref:`extensions` available that handle visualization tasks, including contig
-assembly graphs, read alignments, and taxonomic classifications.
+:ref:`extensions` available that handle assembly, annotation, read alignments, taxonomic classifications, and more.
 
 To get started, see our :ref:`quickstart`!
 

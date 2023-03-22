@@ -30,14 +30,14 @@ There are two installation methods available, installing via git or via tar. We 
 
       .. code-block:: shell
 
-         git clone -b stable https://github.com/sunbeam-labs/sunbeam.git
+         git clone --branch v4.0.0 https://github.com/sunbeam-labs/sunbeam.git
          cd sunbeam
          ./install.sh
 
       .. tip::
 
          If you're planning on doing development work on sunbeam, use 
-         'git clone -b stable git@github.com:sunbeam-labs/sunbeam.git' instead.
+         'git clone git@github.com:sunbeam-labs/sunbeam.git' instead.
 
 This installs Sunbeam and all its dependencies, including the `Conda
 <https://conda.io/miniconda.html>`_ environment manager, if required. It will finish 
@@ -46,7 +46,7 @@ by printing instructions to continue that should look like:
 .. code-block:: shell
 
    conda activate ENV_NAME
-   tests/run_tests.bash -e ENV_NAME
+   pytest tests/
 
 This runs some tests to make sure everything was installed correctly.
 
@@ -56,7 +56,7 @@ This runs some tests to make sure everything was installed correctly.
    path. If you're running Bash (the most common terminal shell), the installation 
    script should print the necessary command.
 
-If you see "Tests failed", check out our :ref:`troubleshooting` section or file an issue
+If the tests fail, check out our :ref:`troubleshooting` section or file an issue
 on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.
 
 Setup
@@ -82,10 +82,10 @@ there:
 - ``sunbeam_config.yml`` contains all the configuration parameters for each step
   of the Sunbeam pipeline.
 
-- ``samples.csv`` is a comma-separated list of samples that Sunbeam found the
+- ``samples.csv`` is a comma-separated list of samples that Sunbeam found in the
   given data folder, along with absolute paths to their FASTQ files.
 
-Right now we have everything we need to do basic quality-control and contig assembly. However, let's go ahead and set up contaminant filtering to make things interesting.
+Right now we have everything we need to do basic quality-control. However, let's go ahead and set up contaminant filtering to make things interesting.
 
 Contaminant filtering
 ---------------------
@@ -107,7 +107,7 @@ After you've finished editing your config file, you're ready to run Sunbeam:
    sunbeam run --profile my_project/
 
 By default, this will do a lot, including trimming and quality-controlling your
-reads, removing contaminant, host, and low-complexity sequences, and assembling the reads in each sample into contigs. Each of these steps can also be run independently by adding arguments after the ``sunbeam run`` command. See :ref:`running` for more info. 
+reads and removing contaminant, host, and low-complexity sequences. Each of these steps can also be run independently by adding arguments after the ``sunbeam run`` command. See :ref:`running` for more info.
 
 Viewing results
 ***************

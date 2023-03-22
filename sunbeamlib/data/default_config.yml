@@ -40,8 +40,6 @@ qc:
   # Komplexity
   kz_threshold: 0.55
   # Decontam
-  pct_id: 0.5
-  frac: 0.6
   host_fp: ""
 
 # Taxonomic classifications

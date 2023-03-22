@@ -27,7 +27,7 @@ versions you want)).
    .. tab:: tar install
 
       On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) 
-      then unpack and install it. The tarball is built on a RHEL8.5 machine.
+      then unpack and install it.
 
       .. code-block:: shell
 
@@ -43,24 +43,20 @@ versions you want)).
 
       .. code-block:: shell
 
-         git clone -b stable https://github.com/sunbeam-labs/sunbeam.git
+         git clone --branch v4.0.0 https://github.com/sunbeam-labs/sunbeam.git
          cd sunbeam
          ./install.sh
 
       .. tip::
 
          If you're planning on doing development work on sunbeam, use 
-         'git clone -b stable git@github.com:sunbeam-labs/sunbeam.git' instead.
+         'git clone git@github.com:sunbeam-labs/sunbeam.git' instead.
 
 The installer will check for and install the three components necessary for
 Sunbeam to work. The first is `Conda <https://conda.io>`_, a system for
 downloading and managing software environments. The second is the Sunbeam
 environment, which will contain all the core dependencies. The third is the
 Sunbeam library, which provides the necessary commands to run Sunbeam.
-
-All of this is handled for you automatically. If Sunbeam is already installed,
-you can manage versions using the manage-version.sh script, as described below 
-in the updating_ section.
 
 If you don't have Conda installed prior to this, you will need to add a line
 (displayed during install) to your config file (usually in ``~/.bashrc`` or
@@ -70,13 +66,13 @@ effect.
 Testing
 -------
 
-We've included a test script that should verify all the dependencies are
+We've included tests that should verify all the dependencies are
 installed and Sunbeam can run properly. We strongly recommend running this after
 installing or updating Sunbeam:
 
 .. code-block:: shell
 
-   bash tests/run_tests.bash
+   pytest tests/ -vvl
 
 If the tests fail, you should either refer to our troubleshooting_ guide or file
 an issue on our `Github page <https://github.com/sunbeam-labs/sunbeam/issues>`_.
@@ -109,19 +105,6 @@ Sunbeam v3+ is designed to be installable separately on a system that already
 has sunbeam installed. This means multiple versions of sunbeam can be installed 
 on the same machine in different repositories.
 
-As of v3.1.0, you can also use the manage-version.sh script to install and switch between 
-different versions using './manage-version.sh -s VERSION_ID'. You can see documentation on how to use this script running 
-'./manage-version.sh -h'.
-
-.. tip::
-
-  With './manage-version.sh -s VERSION_ID', you can use a version identifier 
-  (i.e. v3.1.0), dev, stable, or another branch name 
-  (i.e. 342-automate-switching-between-versions-of-sunbeam). 
-  './manage-version.sh -l available' will list available identifiers.
-
-It's a good idea to re-run the tests after using this to make sure everything is working.
-
 .. _uninstall:
 Uninstalling or reinstalling
 ----------------------------
@@ -131,8 +114,8 @@ If things go awry and updating doesn't work, simply uninstall and reinstall Sunb
    .. code-block:: shell
 
       source deactivate
-      ./manage-version.sh -r SUNBEAM_ENV_NAME
-      cd ../ && rm -rf sunbeam
+      conda remove -n sunbeamX.X.X --all
+      cd ../ && rm -rf sunbeam/
 
 Then follow the installation_ instructions above.
 
@@ -144,7 +127,7 @@ followed by the URL of the extension's GitHub repo::
 
     sunbeam extend https://github.com/sunbeam-labs/sbx_kaiju/
 
-For Sunbeam versions prior to 3.0, follow the instructions on the extension to
+For Sunbeam versions prior to 3.0, follow the legacy installation instructions on the extension to
 install.
 
 Setup
@@ -166,12 +149,12 @@ the environment, run ``source deactivate`` or close the terminal.
 .. tip::
 
   You can see a list of installed sunbeam environments using the command 
-  './manage-version.sh -l installed'.
+  'conda env list'.
 
 Creating a new project using local data
 ----------------------
 
-We provide a utility, ``sunbeam init``, to create a new config file and sample
+We provide a utility, ``sunbeam init``, to create a new config file, profile, and sample
 list for a project. The utility takes one required argument: a path to your
 project folder. This folder will be created if it doesn't exist. You can also
 specify the path to your gzipped fastq files, and Sunbeam will try to guess how
@@ -191,10 +174,10 @@ described below.
 
    Sunbeam will do its best to determine how your samples are named in the
    ``data_fp`` you specify. It assumes they are named something regular, like
-   ``MP66_S109_L008_R1_001.fastq.gz`` and ``MP66_S109_L008_R2_001.fastq.gz``. In
+   ``MP66_S109_L008_R1.fastq.gz`` and ``MP66_S109_L008_R2.fastq.gz``. In
    this case, the sample name would be 'MP66_S109_L008' and the read pair
    indicator would be '1' and '2'. Thus, the filename format would look like
-   ``{sample}_R{rp}_001.fastq.gz``, where {sample} defines the sample name and
+   ``{sample}_R{rp}.fastq.gz``, where {sample} defines the sample name and
    {rp} defines the 1 or 2 in the read pair.
 
    If you have single-end reads, you can pass ``--single_end`` to ``sunbeam
@@ -204,7 +187,7 @@ described below.
    filename format after the ``--format`` option in ``sunbeam init``.
 
    Finally, if you don't have your data ready yet, simply omit the ``--data_fp``
-   option. You can create a sample list later with ``sunbeam list_samples``.
+   option. You can create a sample list later with ``sunbeam list_samples > samples.csv``.
 
 If some config values are always the same for all projects (e.g. paths to shared
 databases), you can put these keys in a file and auto-populate your config file
@@ -228,7 +211,8 @@ If you want to customize options in the profile instead, you can create a custom
 template named ``sunbeamlib/data/custom_profile.yaml`` and fill it with whatever options you 
 want included in each sunbeam run. Snakemake has a curated list of common profiles 
 `here <https://github.com/Snakemake-Profiles>`_ for working with HPC platforms and job schedulers. 
-A default and a slurm profile are included by default.
+A default and a slurm profile are included by default. You would use this custom profile with 
+``--profile custom`` as part of the init command.
 
 Further usage information is available by typing ``sunbeam init --help``.
 
@@ -261,11 +245,6 @@ qc
 
 * ``suffix``: the name of the subfolder to hold outputs from the
   quality-control steps
-* ``seq_id_ending``: if your reads are named differently, a regular expression
-  string defining the pattern of the suffix. For example, if your paired read
-  ids are ``@D00728:28:C9W1KANXX:0/1`` and ``@D00728:28:C9W1KANXX:0/2``, this
-  entry of your config file would be:
-  ``seq_id_ending: "/[12]"``
 * ``leading``: (trimmomatic) remove the leading bases of a read if below this
   quality
 * ``trailing``: (trimmomatic) remove the trailing bases of a read if below
@@ -281,10 +260,6 @@ qc
   using cutadapt. Replace with ``""`` to skip.
 * ``cutadapt_opts``: (cutadapt) options to pass to cutadapt. Replace with ``""`` to pass no extra options.
 * ``kz_threshold``: a value between 0 and 1 to determine the low-complexity boundary (1 is most stringent). Ignored if not masking low-complexity sequences.
-* ``pct_id``: (decontaminate) minimum percent identity to host genome to
-  consider match
-* ``frac``: (decontaminate) minimum fraction of the read that must align to
-  consider match
 * ``host_fp``: the path to the folder with host/contaminant genomes (ending in
   *.fasta)
 
@@ -298,7 +273,6 @@ assembly
 ++++++++
 
 * ``suffix``: the name of the folder to hold outputs from the assembly steps
-* ``min_len``: the minimum contig length to keep
 
 annotation
 ++++++++++
@@ -342,7 +316,8 @@ is beyond the scope of this document. Please see the following resources for mor
 .. tip::
 
   These were all moved to extensions in sunbeam v4. Some vestiges remain in the main pipeline 
-  for compatibility with extensions.
+  for compatibility with extensions but these should be considered deprecated and will be 
+  removed in future versions.
 
 .. _running:
 
@@ -363,7 +338,6 @@ the command above and consist of the following:
 
 * ``all_qc``: basic quality control on all reads (no host read removal)
 * ``all_decontam``: quality control and host read removal on all samples
-* ``all_assembly``: build contigs from all qc'd, decontaminated reads
 
 To use one of these options, simply run it like so:
 
@@ -378,8 +352,7 @@ In addition, since Sunbeam is really just a set of `snakemake
 * ``-n`` performs a dry run, and will just list which rules are going to be
   executed without actually doing so.
 * ``-k`` allows the workflow to continue with unrelated rules if one produces an
-  error (useful for malformed samples, which can also be added to the
-  ``exclude`` config option).
+  error (useful for malformed samples).
 * ``-p`` prints the actual shell command executed for each rule, which is very
   helpful for debugging purposes.
 * ``--cores`` specifies the total number of cores used by Sunbeam. For example,
@@ -409,18 +382,12 @@ Outputs
 =======
 
 This section describes all the outputs from Sunbeam. Here is an example output
-directory, where we had two samples (sample1 and sample2), two BLAST
-databases, one nucleotide ('bacteria') and one protein ('card').
+directory.
 
 .. code-block:: shell
 
-   sunbeam_output
-	├ annotation
-	│   └ genes
-	│       └ prodigal
-	│           └ log
-	├ assembly
-	│   └ contigs
+  ├ sunbeam_output
+  ├ logs
 	└ qc
 	    ├ cleaned
 	    ├ decontam
@@ -430,44 +397,21 @@ databases, one nucleotide ('bacteria') and one protein ('card').
 	    │   └ trimmomatic
 	    └ reports
 
-In order of appearance, the folders contain the following:
-
-Contig annotation
------------------
-
-.. code-block:: shell
-
-   sunbeam_output
-	├ annotation
-	│   ├ genes
-	│   │   └ prodigal
-	│   │       └ log
-
-The genes found from Prodigal are available in the ``genes`` folder.
-
-Contig assembly
----------------
-
-.. code-block:: shell
-
-   	├ assembly
-	    └ contigs
-
-
-This contains the assembled contigs for each sample under 'contigs'.
-
 Quality control
 ---------------
 
 .. code-block:: shell
 
    	└ qc
+      ├ 00_samples
+      ├ 01_cutadapt
+      ├ 02_trimmomatic
+      ├ 03_komplexity
 	    ├ cleaned
 	    ├ decontam
 	    ├ log
 	    │   ├ decontam
-	    │   ├ cutadapt
-	    │   └ trimmomatic
+	    │   ├ komplexity
 	    └ reports
 
 

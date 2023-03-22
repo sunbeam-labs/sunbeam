@@ -71,7 +71,7 @@ Usage examples:
 1. To run all targets (not including extensions):
    ``sunbeam run --profile /path/to/project/``
 2. To specify multiple targets:
-   ``sunbeam run --profile /path/to/project/ --target_list all_qc all_assembly all_annotation``
+   ``sunbeam run --profile /path/to/project/ --target_list all_decontam all_assembly all_annotation``
 
 .. code-block:: shell
 
