@@ -74,20 +74,20 @@ def test_sunbeam_run_all(init):
                 print(f"Found target '{target}'")
 
     with open(sunbeam_output_dir / "qc" / "reports" / "preprocess_summary.tsv") as f:
-        f.readline()  # Headers
+        headers = f.readline().split("\t")
 
-        stats = f.readline().split("\t")  # LONG
-        assert int(stats[1]) == 2000, f"Preprocess report: Wrong number of input reads: {stats}"  # Input reads
-        assert int(stats[2]) == 2000, f"Preprocess report: Wrong number of trimmomatic reads: {stats}"  # Both kept by trimmomatic
-        assert int(stats[10]) + int(stats[11]) == 2000, f"Preprocess report: Wrong number of nonhost and komplexity reads: {stats}"  # Nonhost + komplexity
+        stats = dict(zip(headers, f.readline().split("\t")))  # LONG
+        assert int(stats["input"]) == 2000, f"Preprocess report: Wrong number of input reads: {stats}"  # Input reads
+        assert int(stats["both_kept"]) == 2000, f"Preprocess report: Wrong number of trimmomatic reads: {stats}"  # Both kept by trimmomatic
+        assert int(stats["nonhost"]) + int(stats["komplexity"]) == 2000, f"Preprocess report: Wrong number of nonhost and komplexity reads: {stats}"  # Nonhost + komplexity
 
         stats = f.readline().split("\t")  # SHORT
-        assert int(stats[1]) == 400, f"Preprocess report: Wrong number of input reads: {stats}"  # Input reads
-        assert int(stats[2]) == 400, f"Preprocess report: Wrong number of trimmomatic reads: {stats}"  # Both kept by trimmomatic
+        assert int(stats["input"]) == 400, f"Preprocess report: Wrong number of input reads: {stats}"  # Input reads
+        assert int(stats["both_kept"]) == 400, f"Preprocess report: Wrong number of trimmomatic reads: {stats}"  # Both kept by trimmomatic
         assert (
-            int(stats[6]) + int(stats[8]) + int(stats[10]) + int(stats[11]) == 400
+            int(stats["human"]) + int(stats["phix174"]) + int(stats["nonhost"]) + int(stats["komplexity"]) == 400
         ), f"Preprocess report: Wrong number of nonhost, host and komplexity reads: {stats}"  # Human + phiX + nonhost + komplexity
-        assert int(stats[6]) == int(stats[7]), f"Preprocess report: Human doesn't equal human_copy: {stats}"  # Human = human_copy
+        assert int(stats["human"]) == int(stats["human_copy"]), f"Preprocess report: Human doesn't equal human_copy: {stats}"  # Human = human_copy
 
 
 @pytest.fixture
