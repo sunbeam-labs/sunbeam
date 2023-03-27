@@ -74,14 +74,14 @@ def test_sunbeam_run_all(init):
                 print(f"Found target '{target}'")
 
     with open(sunbeam_output_dir / "qc" / "reports" / "preprocess_summary.tsv") as f:
-        headers = f.readline().split("\t")
+        headers = map(str.strip, f.readline().split("\t"))
 
-        stats = dict(zip(headers, f.readline().split("\t")))  # LONG
+        stats = dict(zip(headers, map(str.strip, f.readline().split("\t"))))  # LONG
         assert int(stats["input"]) == 2000, f"Preprocess report: Wrong number of input reads: {stats}"  # Input reads
         assert int(stats["both_kept"]) == 2000, f"Preprocess report: Wrong number of trimmomatic reads: {stats}"  # Both kept by trimmomatic
         assert int(stats["nonhost"]) + int(stats["komplexity"]) == 2000, f"Preprocess report: Wrong number of nonhost and komplexity reads: {stats}"  # Nonhost + komplexity
 
-        stats = f.readline().split("\t")  # SHORT
+        stats = dict(zip(headers, map(str.strip, f.readline().split("\t"))))  # SHORT
         assert int(stats["input"]) == 400, f"Preprocess report: Wrong number of input reads: {stats}"  # Input reads
         assert int(stats["both_kept"]) == 400, f"Preprocess report: Wrong number of trimmomatic reads: {stats}"  # Both kept by trimmomatic
         assert (
