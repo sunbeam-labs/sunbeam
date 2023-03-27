@@ -9,7 +9,10 @@ BLAST6_DEFAULTS = [
     "length",
     "mismatch",
     "gapopen",
-    "qstart", "qend", "sstart", "send",
+    "qstart",
+    "qend",
+    "sstart",
+    "send",
     "evalue",
     "bitscore",
 ]
