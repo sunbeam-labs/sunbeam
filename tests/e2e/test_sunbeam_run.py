@@ -77,17 +77,17 @@ def test_sunbeam_run_all(init):
         f.readline()  # Headers
 
         stats = f.readline().split("\t")  # LONG
-        assert int(stats[1]) == 2000, "Preprocess report: Wrong number of input reads"  # Input reads
-        assert int(stats[2]) == 2000, "Preprocess report: Wrong number of trimmomatic reads"  # Both kept by trimmomatic
-        assert int(stats[10]) + int(stats[11]) == 2000, "Preprocess report: Wrong number of nonhost and komplexity reads"  # Nonhost + komplexity
+        assert int(stats[1]) == 2000, f"Preprocess report: Wrong number of input reads: {stats}"  # Input reads
+        assert int(stats[2]) == 2000, f"Preprocess report: Wrong number of trimmomatic reads: {stats}"  # Both kept by trimmomatic
+        assert int(stats[10]) + int(stats[11]) == 2000, f"Preprocess report: Wrong number of nonhost and komplexity reads: {stats}"  # Nonhost + komplexity
 
         stats = f.readline().split("\t")  # SHORT
-        assert int(stats[1]) == 400, "Preprocess report: Wrong number of input reads"  # Input reads
-        assert int(stats[2]) == 400, "Preprocess report: Wrong number of trimmomatic reads"  # Both kept by trimmomatic
+        assert int(stats[1]) == 400, f"Preprocess report: Wrong number of input reads: {stats}"  # Input reads
+        assert int(stats[2]) == 400, f"Preprocess report: Wrong number of trimmomatic reads: {stats}"  # Both kept by trimmomatic
         assert (
             int(stats[6]) + int(stats[8]) + int(stats[10]) + int(stats[11]) == 400
-        ), "Preprocess report: Wrong number of nonhost, host and komplexity reads"  # Human + phiX + nonhost + komplexity
-        assert int(stats[6]) == int(stats[7]), "Preprocess report: Human doesn't equal human_copy"  # Human = human_copy
+        ), f"Preprocess report: Wrong number of nonhost, host and komplexity reads: {stats}"  # Human + phiX + nonhost + komplexity
+        assert int(stats[6]) == int(stats[7]), f"Preprocess report: Human doesn't equal human_copy: {stats}"  # Human = human_copy
 
 
 @pytest.fixture
