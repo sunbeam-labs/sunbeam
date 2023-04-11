@@ -86,10 +86,10 @@ rule sam_convert_unpaired:
         BENCHMARK_FP / "sam_convert_{host}_{sample}.tsv"
     conda:
         "../envs/qc.yml"
-    #script:
+    # script:
     #    "../scripts/sam_convert_unpaired.py"
     shell:
-        "samtools fastq -1 {output} {input} 2>&1 | tee {log}"
+        "samtools fastq -o {output} {input} 2>&1 | tee {log}"
 
 
 rule sam_convert_paired:
@@ -104,7 +104,7 @@ rule sam_convert_paired:
         BENCHMARK_FP / "sam_convert_{host}_{sample}.tsv"
     conda:
         "../envs/qc.yml"
-    #script:
+    # script:
     #    "../scripts/sam_convert_paired.py"
     shell:
         "samtools fastq -1 {output.rp_1} -2 {output.rp_2} {input} 2>&1 | tee {log}"
