@@ -84,8 +84,12 @@ rule sam_convert_unpaired:
         LOG_FP / "sam_convert_{host}_{sample}.log",
     benchmark:
         BENCHMARK_FP / "sam_convert_{host}_{sample}.tsv"
-    script:
-        "../scripts/sam_convert_unpaired.py"
+    conda:
+        "../envs/qc.yml"
+    #script:
+    #    "../scripts/sam_convert_unpaired.py"
+    shell:
+        "samtools fastq "
 
 
 rule sam_convert_paired:
@@ -98,8 +102,12 @@ rule sam_convert_paired:
         LOG_FP / "sam_convert_{host}_{sample}.log",
     benchmark:
         BENCHMARK_FP / "sam_convert_{host}_{sample}.tsv"
-    script:
-        "../scripts/sam_convert_paired.py"
+    conda:
+        "../envs/qc.yml"
+    #script:
+    #    "../scripts/sam_convert_paired.py"
+    shell:
+        "samtools fastq -1 {output.rp_1} -2 {output.rp_2} {input} 2>&1 | tee {log}"
 
 
 rule filter_unmapped_reads:
