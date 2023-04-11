@@ -28,7 +28,7 @@ Sunbeam was designed to be modular and extensible. Some extensions have been bui
 - [Kaiju](https://github.com/sunbeam-labs/sbx_kaiju), a read classifier that uses BWA rather than kmers
 - [Anvi'o](https://github.com/sunbeam-labs/sbx_anvio), a downstream analysis pipeline that does lots of stuff!
 
-More extensions can be found at the extension page: https://www.sunbeam-labs.org/.
+More extensions can be found at the extension page: https://github.com/sunbeam-labs.
 
 **To get started, see our [documentation](http://sunbeam.readthedocs.io)!**
 
