@@ -89,7 +89,7 @@ rule sam_convert_unpaired:
     #script:
     #    "../scripts/sam_convert_unpaired.py"
     shell:
-        "samtools fastq "
+        "samtools fastq -1 {output} {input} 2>&1 | tee {log}"
 
 
 rule sam_convert_paired:
