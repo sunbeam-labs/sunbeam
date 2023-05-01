@@ -64,6 +64,12 @@ environment will be created if it doesn't exist already and then activated
 while running the rule. These environments are created in ``sunbeam/.snakemake/`` 
 by default.
 
+The accompanying files named something like ``ENV_NAME.ARCH.pin.txt`` are generated 
+with ``snakedeploy``. They list all the packages and exact versions in a given 
+environment (and for the architecture they were generated on, e.g. linux-64) so that 
+snakemake can first try to use that exact environment and only if it fails, try to 
+solve the ``.yml`` file for itself.
+
 extensions/
 -----------
 

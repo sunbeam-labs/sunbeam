@@ -51,7 +51,8 @@ def summarize_qual_decontam(tfile, dfile, kfile, paired_end):
     sys.stderr.write("decontam data: {}\n".format(decontam_data))
     sys.stderr.write("komplexity data: {}\n".format(komplexity_data))
     return pandas.DataFrame(
-        OrderedDict(trim_data, **(decontam_data), **(komplexity_data)), index=[tname]
+        OrderedDict(trim_data, **(decontam_data), **(komplexity_data)),
+        index=[tname.replace("trimmomatic_", "").replace(".log", "")],
     )
 
 
