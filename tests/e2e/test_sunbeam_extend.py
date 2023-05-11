@@ -46,6 +46,8 @@ def init(output_dir):
         except FileExistsError as e:
             pass
 
+    shutil.rmtree(Path(os.environ.get("SUNBEAM_DIR")) / "extensions" / "sbx_template")
+
 
 def test_sunbeam_extend(init):
     output_dir = init
