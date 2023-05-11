@@ -71,7 +71,7 @@ rule get_unmapped_reads:
         "../envs/qc.yml"
     shell:
         """
-        samtools view -f4 {input} -o {output} 2>&1 | tee {log}
+        samtools view -f4 {input} -o {output} -h 2>&1 | tee {log}
         """
 
 

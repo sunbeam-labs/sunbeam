@@ -36,7 +36,10 @@ def validate_paths(cfg, root):
     new_cfg = dict()
     for k, v in cfg.items():
         if k.endswith("_fp"):
-            v = makepath(v)
+            try:
+                v = makepath(v)
+            except TypeError as e:
+                raise TypeError(f"Missing value for key: {k}")
             if not v.is_absolute():
                 v = root / v
             if k != "output_fp":
