@@ -2,7 +2,7 @@
 #
 # Illumina quality control rules
 
-from sunbeamlib import qc
+from sunbeamlib.resources import *
 
 
 rule all_qc:
@@ -21,6 +21,9 @@ rule sample_intake:
         QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
     log:
         LOG_FP / "sample_intake_{sample}_{rp}.log",
+    resources:
+        mem_mb=sample_intake_mem_mb,
+        runtime=sample_intake_runtime,
     script:
         "../scripts/sample_intake.py"
 
