@@ -59,35 +59,41 @@ rule align_to_host:
 
 rule get_mapped_reads:
     input:
-        QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.sam'
+        QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
     output:
-        ids = QC_FP/'decontam'/'intermediates'/'{host}'/'{sample}.ids',
+        ids=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.ids",
     params:
-        pct_id =  Cfg['qc']['pct_id'],
-        frac = Cfg['qc']['frac']
+        pct_id=Cfg["qc"]["pct_id"],
+        frac=Cfg["qc"]["frac"],
     conda:
         "../envs/qc.yml"
     script:
         "../scripts/get_mapped_reads.py"
 
+
 rule aggregate_reads:
     input:
         expand(
-            QC_FP/'decontam'/'intermediates'/'{host}'/'{{sample}}.ids',
-            host=HostGenomes.keys())
+            QC_FP / "decontam" / "intermediates" / "{host}" / "{{sample}}.ids",
+            host=HostGenomes.keys(),
+        ),
     output:
-        temp(QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids'),
+        temp(QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids"),
     script:
         "../scripts/aggregate_reads.py"
 
+
 rule filter_reads:
     input:
-        hostreads = QC_FP/'decontam'/'intermediates'/'{sample}_hostreads.ids',
-        reads = QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz',
-        hostids = expand(QC_FP/'decontam'/'intermediates'/'{host}'/'{{sample}}.ids', host=HostGenomes.keys())
+        hostreads=QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids",
+        reads=QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
+        hostids=expand(
+            QC_FP / "decontam" / "intermediates" / "{host}" / "{{sample}}.ids",
+            host=HostGenomes.keys(),
+        ),
     output:
-        reads = QC_FP/'decontam'/'{sample}_{rp}.fastq.gz',
-        log = QC_FP/'log'/'decontam'/'{sample}_{rp}.txt'
+        reads=QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
+        log=QC_FP / "log" / "decontam" / "{sample}_{rp}.txt",
     conda:
         "../envs/qc.yml"
     script:
