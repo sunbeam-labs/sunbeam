@@ -3,15 +3,6 @@ rule all_decontam:
         TARGET_DECONTAM,
 
 
-if Cfg["all"]["paired_end"]:
-
-    ruleorder: sam_convert_paired > sam_convert_unpaired
-
-else:
-
-    ruleorder: sam_convert_unpaired > sam_convert_paired
-
-
 rule build_host_index:
     input:
         Cfg["qc"]["host_fp"] / "{host}.fasta",
