@@ -30,10 +30,28 @@ def setup(init):
 def test_get_mapped_reads(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    lhuman = sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "human" / "LONG.ids"
-    lphix = sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "phix174" / "LONG.ids"
-    shuman = sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "human" / "SHORT.ids"
-    sphix = sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "phix174" / "SHORT.ids"
+    lhuman = (
+        sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "human" / "LONG.ids"
+    )
+    lphix = (
+        sunbeam_output_dir
+        / "qc"
+        / "decontam"
+        / "intermediates"
+        / "phix174"
+        / "LONG.ids"
+    )
+    shuman = (
+        sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "human" / "SHORT.ids"
+    )
+    sphix = (
+        sunbeam_output_dir
+        / "qc"
+        / "decontam"
+        / "intermediates"
+        / "phix174"
+        / "SHORT.ids"
+    )
 
     sp.check_output(
         [

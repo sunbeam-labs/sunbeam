@@ -18,19 +18,11 @@ def setup(init):
     output_dir = init
 
     shutil.copytree(
+        data_dir / "qc" / "decontam" / "intermediates",
+        output_dir / "sunbeam_output" / "qc" / "decontam" / "intermediates",
+    )
+    shutil.copytree(
         data_dir / "qc" / "cleaned", output_dir / "sunbeam_output" / "qc" / "cleaned"
-    )
-    shutil.copytree(
-        data_dir / "qc" / "decontam" / "human",
-        output_dir / "sunbeam_output" / "qc" / "decontam" / "human",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "decontam" / "human_copy",
-        output_dir / "sunbeam_output" / "qc" / "decontam" / "human_copy",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "decontam" / "phix174",
-        output_dir / "sunbeam_output" / "qc" / "decontam" / "phix174",
     )
 
     yield output_dir
@@ -38,7 +30,7 @@ def setup(init):
     shutil.rmtree(output_dir / "sunbeam_output")
 
 
-def test_filter_unmapped_reads(setup):
+def test_filter_reads(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
     lr1 = sunbeam_output_dir / "qc" / "decontam" / "LONG_1.fastq.gz"
@@ -57,7 +49,7 @@ def test_filter_unmapped_reads(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
-            "--allowed-rules=filter_unmapped_reads",
+            "--allowed-rules=filter_reads",
             "--rerun-triggers=input",
             f"{lr1}",
             f"{lr2}",
