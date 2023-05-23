@@ -27,13 +27,13 @@ def setup(init):
     shutil.rmtree(output_dir / "sunbeam_output")
 
 
-def test_get_unmapped_reads(setup):
+def test_get_mapped_reads(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
-    lhuman = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_LONG.sam"
-    lphix = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_LONG.sam"
-    shuman = sunbeam_output_dir / "qc" / "decontam" / "human" / "unmapped_SHORT.sam"
-    sphix = sunbeam_output_dir / "qc" / "decontam" / "phix174" / "unmapped_SHORT.sam"
+    lhuman = sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "human" / "LONG.ids"
+    lphix = sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "phix174" / "LONG.ids"
+    shuman = sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "human" / "SHORT.ids"
+    sphix = sunbeam_output_dir / "qc" / "decontam" / "intermediates" / "phix174" / "SHORT.ids"
 
     sp.check_output(
         [
@@ -42,7 +42,7 @@ def test_get_unmapped_reads(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
-            "--allowed-rules=get_unmapped_reads",
+            "--allowed-rules=get_mapped_reads",
             "--rerun-triggers=input",
             f"{lhuman}",
             f"{lphix}",
