@@ -51,7 +51,9 @@ with open(snakemake.log[0], "w") as l:
             done = True
 
     if not done:
-        with gzip.open(snakemake.input.reads, "rt") as f_in, open(snakemake.input.hostreads) as f_ids, gzip.open(snakemake.output.reads, "wt") as f_out:
+        with gzip.open(snakemake.input.reads, "rt") as f_in, open(
+            snakemake.input.hostreads
+        ) as f_ids, gzip.open(snakemake.output.reads, "wt") as f_out:
             ids = [x.strip() for x in f_ids.readlines()]
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
                 if any([id in header_str for id in ids]):
@@ -59,5 +61,5 @@ with open(snakemake.log[0], "w") as l:
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
-    
+
     sys.stderr.write("filter_reads script finished\n")
