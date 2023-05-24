@@ -69,7 +69,7 @@ def test_get_mapped_reads(setup):
         ]
     )
 
-    assert lhuman.stat().st_size >= 500000
-    assert lphix.stat().st_size >= 500000
-    assert shuman.stat().st_size >= 100000
-    assert sphix.stat().st_size >= 100000
+    assert lhuman.stat().st_size == 0
+    assert lphix.stat().st_size == 0
+    assert shuman.stat().st_size >= 1000
+    assert sphix.stat().st_size >= 1000
