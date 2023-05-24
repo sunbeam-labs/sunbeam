@@ -65,8 +65,8 @@ def test_filter_reads(setup):
     assert lr1.stat().st_size >= 50000
     assert lr2.stat().st_size >= 50000
     with open(ll1) as f:
-        assert f.readline() == "human\thuman_copy\tphix174\thost\tnonhost"
-        assert f.readline() == "0\t0\t0\t0\t1995"
+        assert f.readline() == "human\thuman_copy\tphix174\thost\tnonhost\n"
+        assert f.readline() == "0\t0\t0\t0\t1995\n"
 
     with gzip.open(lr1) as f1, gzip.open(lr2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())
@@ -74,8 +74,8 @@ def test_filter_reads(setup):
     assert sr1.stat().st_size >= 5000
     assert sr2.stat().st_size >= 5000
     with open(sl1) as f:
-        assert f.readline() == "human\thuman_copy\tphix174\thost\tnonhost"
-        assert f.readline() == "94\t94\t100\t194\t198"
+        assert f.readline() == "human\thuman_copy\tphix174\thost\tnonhost\n"
+        assert f.readline() == "94\t94\t100\t194\t198\n"
 
     with gzip.open(sr1) as f1, gzip.open(sr2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())
