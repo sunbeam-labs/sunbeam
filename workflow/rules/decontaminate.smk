@@ -53,6 +53,10 @@ rule get_mapped_reads:
         QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
     output:
         ids=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.ids",
+    log:
+        LOG_FP / "get_mapped_reads_{host}_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "get_mapped_reads_{host}_{sample}.tsv"
     params:
         pct_id=Cfg["qc"]["pct_id"],
         frac=Cfg["qc"]["frac"],
@@ -85,6 +89,10 @@ rule filter_reads:
     output:
         reads=QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
         log=QC_FP / "log" / "decontam" / "{sample}_{rp}.txt",
+    log:
+        LOG_FP / "filter_reads_{sample}_{rp}.log",
+    benchmark:
+        BENCHMARK_FP / "filter_reads_{sample}_{rp}.tsv"
     conda:
         "../envs/qc.yml"
     script:

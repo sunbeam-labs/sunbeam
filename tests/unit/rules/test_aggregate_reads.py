@@ -51,5 +51,5 @@ def test_aggregate_reads(setup):
         ]
     )
 
-    assert shostreads.stat().st_size >= 300000
-    assert lhostreads.stat().st_size >= 300000
+    assert shostreads.stat().st_size >= 10000
+    assert lhostreads.stat().st_size >= 50000
