@@ -46,7 +46,7 @@ by printing instructions to continue that should look like:
 .. code-block:: shell
 
    conda activate ENV_NAME
-   pytest tests/
+   python -m pytest tests/
 
 This runs some tests to make sure everything was installed correctly.
 

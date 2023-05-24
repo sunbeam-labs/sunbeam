@@ -72,7 +72,7 @@ installing or updating Sunbeam:
 
 .. code-block:: shell
 
-   pytest tests/ -vvl
+   python -m pytest tests/ -vvl
 
 If the tests fail, you should either refer to our troubleshooting_ guide or file
 an issue on our `Github page <https://github.com/sunbeam-labs/sunbeam/issues>`_.

@@ -6,6 +6,7 @@ dependencies:
   - bwa
   - cutadapt
   - fastqc
+  - pysam
   - samtools=1.9
   - trimmomatic
   - python>3

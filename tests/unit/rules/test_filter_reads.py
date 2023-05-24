@@ -18,19 +18,11 @@ def setup(init):
     output_dir = init
 
     shutil.copytree(
+        data_dir / "qc" / "decontam" / "intermediates",
+        output_dir / "sunbeam_output" / "qc" / "decontam" / "intermediates",
+    )
+    shutil.copytree(
         data_dir / "qc" / "cleaned", output_dir / "sunbeam_output" / "qc" / "cleaned"
-    )
-    shutil.copytree(
-        data_dir / "qc" / "decontam" / "human",
-        output_dir / "sunbeam_output" / "qc" / "decontam" / "human",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "decontam" / "human_copy",
-        output_dir / "sunbeam_output" / "qc" / "decontam" / "human_copy",
-    )
-    shutil.copytree(
-        data_dir / "qc" / "decontam" / "phix174",
-        output_dir / "sunbeam_output" / "qc" / "decontam" / "phix174",
     )
 
     yield output_dir
@@ -38,7 +30,7 @@ def setup(init):
     shutil.rmtree(output_dir / "sunbeam_output")
 
 
-def test_filter_unmapped_reads(setup):
+def test_filter_reads(setup):
     output_dir = setup
     sunbeam_output_dir = output_dir / "sunbeam_output"
     lr1 = sunbeam_output_dir / "qc" / "decontam" / "LONG_1.fastq.gz"
@@ -57,7 +49,7 @@ def test_filter_unmapped_reads(setup):
             "--profile",
             f"{output_dir}",
             "--notemp",
-            "--allowed-rules=filter_unmapped_reads",
+            "--allowed-rules=filter_reads",
             "--rerun-triggers=input",
             f"{lr1}",
             f"{lr2}",
@@ -72,16 +64,18 @@ def test_filter_unmapped_reads(setup):
 
     assert lr1.stat().st_size >= 50000
     assert lr2.stat().st_size >= 50000
-    assert ll1.stat().st_size >= 10
-    assert ll2.stat().st_size >= 10
+    with open(ll1) as f:
+        assert f.readline() == "human\thuman_copy\tphix174\thost\tnonhost\n"
+        assert f.readline() == "0\t0\t0\t0\t1995\n"
 
     with gzip.open(lr1) as f1, gzip.open(lr2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())
 
     assert sr1.stat().st_size >= 5000
     assert sr2.stat().st_size >= 5000
-    assert sl1.stat().st_size >= 10
-    assert sl2.stat().st_size >= 10
+    with open(sl1) as f:
+        assert f.readline() == "human\thuman_copy\tphix174\thost\tnonhost\n"
+        assert f.readline() == "94\t94\t100\t194\t198\n"
 
     with gzip.open(sr1) as f1, gzip.open(sr2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())
