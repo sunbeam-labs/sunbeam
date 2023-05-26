@@ -26,7 +26,7 @@ def calculate_counts(fp: str, net_hostlist: set) -> tuple:
     return host, nonhost
 
 
-def write_log(f: TextIOWrapper, hostdict: dict, host: int, nonhost: int):
+def write_log(f: TextIOWrapper, hostdict: OrderedDict, host: int, nonhost: int):
     f.write("{}\n".format("\t".join(list(hostdict.keys()) + ["host", "nonhost"])))
     f.write(
         "{}\n".format("\t".join(map(str, list(hostdict.values()) + [host, nonhost])))
@@ -37,7 +37,7 @@ with open(snakemake.log[0], "w") as l:
     hostdict = OrderedDict()
     done = False
     net_hostlist = set()
-    for hostid in snakemake.input.hostids:
+    for hostid in sorted(snakemake.input.hostids):
         count_host_reads(hostid, hostdict, net_hostlist)
 
     host, nonhost = calculate_counts(snakemake.input.reads, net_hostlist)
@@ -58,6 +58,7 @@ with open(snakemake.log[0], "w") as l:
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
                 if any([id in header_str for id in ids]):
                     write_fastq([header_str, seq_str, plus_str, quality_str], f_out)
+
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
