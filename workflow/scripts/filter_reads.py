@@ -59,7 +59,6 @@ with open(snakemake.log[0], "w") as l:
                 if any([id in header_str for id in ids]):
                     write_fastq([header_str, seq_str, plus_str, quality_str], f_out)
 
-
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
 

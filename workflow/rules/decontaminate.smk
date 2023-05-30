@@ -74,6 +74,10 @@ rule aggregate_reads:
         ),
     output:
         temp(QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids"),
+    log:
+        LOG_FP / "aggregate_reads_{sample}.log",
+    params:
+        host_fp=Cfg["qc"]["host_fp"],
     script:
         "../scripts/aggregate_reads.py"
 
