@@ -65,6 +65,7 @@ with open(snakemake.log[0], "w") as l:
                 ):  # Chunk gzip writer to improve runtime but not use up too much mem
                     write_many_fastq(grouper, f_out)
                     grouper = []
+            write_many_fastq(grouper, f_out)
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
