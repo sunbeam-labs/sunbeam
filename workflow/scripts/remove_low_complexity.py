@@ -1,5 +1,3 @@
-import gzip
-import shutil
 from sunbeamlib.qc import filter_ids, remove_pair_id
 
 with open(snakemake.log[0], "w") as log:
