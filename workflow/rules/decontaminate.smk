@@ -97,6 +97,8 @@ rule filter_reads:
         LOG_FP / "filter_reads_{sample}_{rp}.log",
     benchmark:
         BENCHMARK_FP / "filter_reads_{sample}_{rp}.tsv"
+    params:
+        reads=QC_FP / "decontam" / "{sample}_{rp}.fastq",
     conda:
         "../envs/qc.yml"
     script:

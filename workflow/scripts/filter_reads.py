@@ -5,7 +5,7 @@ import subprocess as sp
 import sys
 from collections import OrderedDict
 from io import TextIOWrapper
-from sunbeamlib.parse import parse_fastq, write_many_fastq
+from sunbeamlib.parse import parse_fastq, write_many_fastq, write_fastq
 
 
 def count_host_reads(fp: str, hostdict: dict, net_hostlist: set):
@@ -53,19 +53,16 @@ with open(snakemake.log[0], "w") as l:
     if not done:
         with gzip.open(snakemake.input.reads, "rt") as f_in, open(
             snakemake.input.hostreads
-        ) as f_ids, gzip.open(snakemake.output.reads, "wt") as f_out:
+        ) as f_ids, open(snakemake.params.reads, "wt") as f_out:
             ids = [x.strip() for x in f_ids.readlines()]
-            grouper = []
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
                 if any([id in header_str for id in ids]):
-                    grouper.append([header_str, seq_str, plus_str, quality_str])
+                    write_fastq([header_str, seq_str, plus_str, quality_str], f_out)
 
-                if (
-                    len(grouper) > 100000
-                ):  # Chunk gzip writer to improve runtime but not use up too much mem
-                    write_many_fastq(grouper, f_out)
-                    grouper = []
-            write_many_fastq(grouper, f_out)
+        with open(snakemake.params.reads) as f_in, gzip.open(
+            snakemake.output.reads, "wt"
+        ) as f_out:
+            f_out.writelines(f_in.readlines())
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
