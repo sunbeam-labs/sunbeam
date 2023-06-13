@@ -62,18 +62,13 @@ with open(snakemake.log[0], "w") as l:
         ids.sort(key=lambda x: x)
         fastqs.sort(key=lambda x: x[0])
 
-        with open(snakemake.params.reads, "wt") as f_out:
+        with gzip.open(snakemake.output.reads, "wt") as f_out:
             for record in fastqs:
                 if ids[0] in record[0]:
                     ids.pop(0)
                     write_fastq(record, f_out)
                 if not ids:
                     break
-
-        with open(snakemake.params.reads) as f_in, gzip.open(
-            snakemake.output.reads, "wt"
-        ) as f_out:
-            f_out.writelines(f_in.readlines())
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
