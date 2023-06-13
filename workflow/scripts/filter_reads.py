@@ -67,6 +67,8 @@ with open(snakemake.log[0], "w") as l:
                 if ids[0] in record[0]:
                     ids.pop(0)
                     write_fastq(record, f_out)
+                if not ids:
+                    break
 
         with open(snakemake.params.reads) as f_in, gzip.open(
             snakemake.output.reads, "wt"
