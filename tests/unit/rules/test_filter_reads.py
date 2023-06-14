@@ -42,6 +42,11 @@ def test_filter_reads(setup):
     sl1 = sunbeam_output_dir / "qc" / "log" / "decontam" / "SHORT_1.txt"
     sl2 = sunbeam_output_dir / "qc" / "log" / "decontam" / "SHORT_2.txt"
 
+    clr1 = sunbeam_output_dir / "qc" / "cleaned" / "LONG_1.fastq.gz"
+    clr2 = sunbeam_output_dir / "qc" / "cleaned" / "LONG_2.fastq.gz"
+    csr1 = sunbeam_output_dir / "qc" / "cleaned" / "SHORT_1.fastq.gz"
+    csr2 = sunbeam_output_dir / "qc" / "cleaned" / "SHORT_2.fastq.gz"
+
     out = sp.check_output(
         [
             "sunbeam",
@@ -64,6 +69,10 @@ def test_filter_reads(setup):
 
     assert lr1.stat().st_size >= 50000
     assert lr2.stat().st_size >= 50000
+
+    assert clr1.stat().st_size == lr1.stat().st_size
+    assert clr2.stat().st_size == lr2.stat().st_size
+
     with open(ll1) as f:
         assert f.readline() == "human\thuman_copy\tphix174\thost\tnonhost\n"
         assert f.readline() == "0\t0\t0\t0\t1995\n"
@@ -73,6 +82,10 @@ def test_filter_reads(setup):
 
     assert sr1.stat().st_size >= 5000
     assert sr2.stat().st_size >= 5000
+    
+    assert csr1.stat().st_size > sr1.stat().st_size
+    assert csr2.stat().st_size > sr2.stat().st_size
+
     with open(sl1) as f:
         assert f.readline() == "human\thuman_copy\tphix174\thost\tnonhost\n"
         assert f.readline() == "94\t94\t100\t194\t198\n"
