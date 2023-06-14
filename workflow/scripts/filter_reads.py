@@ -51,24 +51,11 @@ with open(snakemake.log[0], "w") as l:
             done = True
 
     if not done:
-        ids = []
-        fastqs = []
-        with open(snakemake.input.hostreads) as f:
-            ids = [x.strip() for x in f.readlines()]
-        with gzip.open(snakemake.input.reads, "rt") as f:
-            for header_str, seq_str, plus_str, quality_str in parse_fastq(f):
-                fastqs.append([header_str, seq_str, plus_str, quality_str])
-        
-        ids.sort(key=lambda x: x)
-        fastqs.sort(key=lambda x: x[0])
-
-        with gzip.open(snakemake.output.reads, "wt") as f_out:
-            for record in fastqs:
-                if ids[0] in record[0]:
-                    ids.pop(0)
-                    write_fastq(record, f_out)
-                if not ids:
-                    break
+        with gzip.open(snakemake.input.reads, "rt") as f_in, gzip.open(snakemake.output.reads, "wt") as f_out, open(snakemake.input.hostreads) as f_ids:
+            ids = {k.strip(): 1 for k in f_ids.readlines()}
+            for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
+                if not header_str in ids and not header_str.replace("/1", "").replace("/2", "") in ids:
+                    write_fastq([header_str, seq_str, plus_str, quality_str], f_out)
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
