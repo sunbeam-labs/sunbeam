@@ -56,7 +56,7 @@ with open(snakemake.log[0], "w") as l:
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
                 if not header_str in ids and not header_str.replace("/1", "").replace("/2", "") in ids:
                     write_fastq([header_str, seq_str, plus_str, quality_str], f_out)
-                    print(f"{header_str}: {ids[0]}")
+                    print(f"{header_str}: {ids.keys()[0]}")
                     sys.exit()
 
     with open(snakemake.output.log, "w") as log:
