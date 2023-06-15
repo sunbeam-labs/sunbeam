@@ -54,10 +54,8 @@ with open(snakemake.log[0], "w") as l:
         with gzip.open(snakemake.input.reads, "rt") as f_in, gzip.open(snakemake.output.reads, "wt") as f_out, open(snakemake.input.hostreads) as f_ids:
             ids = {k.strip(): 1 for k in f_ids.readlines()}
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
-                if not header_str in ids and not header_str.replace("/1", "").replace("/2", "") in ids:
+                if not header_str.split(" ")[0] in ids and not header_str.replace("/1", "").replace("/2", "") in ids:
                     write_fastq([header_str, seq_str, plus_str, quality_str], f_out)
-                    print(f"{header_str}: {list(ids.keys())[0]}")
-                    sys.exit()
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
