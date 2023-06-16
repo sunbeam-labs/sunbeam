@@ -5,7 +5,8 @@ import subprocess as sp
 import sys
 from collections import OrderedDict
 from io import TextIOWrapper
-from sunbeamlib.parse import parse_fastq, write_many_fastq, write_fastq
+from pathlib import Path
+from sunbeamlib.parse import parse_fastq, write_fastq
 
 
 def count_host_reads(fp: str, hostdict: dict, net_hostlist: set):
@@ -56,6 +57,13 @@ with open(snakemake.log[0], "w") as l:
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
                 if not header_str.split(" ")[0] in ids and not header_str.replace("/1", "").replace("/2", "") in ids:
                     write_fastq([header_str, seq_str, plus_str, quality_str], f_out)
+
+        # Check that the output file is about the right size given the number of ids removed
+        if Path(snakemake.input.reads).stat().st_size == Path(snakemake.output.reads).stat().st_size and Path(snakemake.input.hostreads).stat().st_size != 0:
+            s = f"ERROR: {snakemake.input.hostreads} is not empty but {snakemake.input.reads} and {snakemake.output.reads} are the same size. Something went wrong in the filtering."
+            l.write(s)
+            sys.stderr.write(s)
+            sys.exit(1)
 
     with open(snakemake.output.log, "w") as log:
         write_log(log, hostdict, host, nonhost)
