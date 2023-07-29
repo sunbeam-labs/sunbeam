@@ -47,6 +47,16 @@ See how people are using Sunbeam:
 
 ### Changelog:
 
+#### v4.0.0 (July 29, 2023)
+
+- Many components of sunbeam have been moved extensions to minimize installation and usage issues with the core pipeline, qc and decontam are the remaining core components
+- Deprecated --cluster-config snakemake option replaced with profiles, also reduces sunbeam's command line interface by moving options to the profile
+- Improved logging and reporting standards for sunbeam and extensions
+- Restructured to snakemake standards for tarball installation methods
+- Switch test suite from bash to pytest to increase ease and efficiency of testing
+- Updated documentation
+- Improved filter_reads efficiency on large hostid sets and catch errors in sequence header matching
+
 #### v3.1.1 (October 19, 2022)
 
  - Upgrade manage-version.sh to work with any version (before or after 3.1) and always keep itself on the latest version
