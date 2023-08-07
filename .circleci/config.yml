@@ -39,7 +39,7 @@ jobs:
           when: always
           command: |
             bash .circleci/dump_conda_env.bash
-            bash dev_scripts/dump_.snakemake.sh
+            sh dev_scripts/dump_.snakemake.sh
 
       - run:
           name: log dump
