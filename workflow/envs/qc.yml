@@ -9,4 +9,4 @@ dependencies:
   - pysam
   - samtools=1.9
   - trimmomatic
-  - python>3
+  - python>=3.10
