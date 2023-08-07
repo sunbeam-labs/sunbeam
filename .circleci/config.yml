@@ -26,6 +26,7 @@ jobs:
           name: dump_env
           command: |
             bash .circleci/dump_conda_env.bash
+            bash dev_scripts/dump_.snakemake.sh
 
       - run:
           name: run tests
