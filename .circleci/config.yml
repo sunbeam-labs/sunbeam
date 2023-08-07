@@ -23,12 +23,6 @@ jobs:
           no_output_timeout: 20m
 
       - run:
-          name: dump_env
-          command: |
-            bash .circleci/dump_conda_env.bash
-            bash dev_scripts/dump_.snakemake.sh
-
-      - run:
           name: run tests
           command: |
             export PATH=$PATH:$HOME/miniconda3/bin
@@ -39,6 +33,13 @@ jobs:
             conda activate sunbeam${TAG:1}
             pytest tests/ -vvl
           no_output_timeout: 40m
+
+      - run:
+          name: dump_env
+          when: always
+          command: |
+            bash .circleci/dump_conda_env.bash
+            bash dev_scripts/dump_.snakemake.sh
 
       - run:
           name: log dump
