@@ -1,0 +1,9 @@
+name: qc
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - bwa
+  - fastqc
+  - trimmomatic
+  - python>=3.10

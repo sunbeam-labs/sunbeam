@@ -4,9 +4,6 @@
 User Guide
 ==========
 
-.. contents::
-   :depth: 3
-
 Requirements
 ============
 
@@ -19,23 +16,47 @@ Windows using the Ubuntu [WSL](https://docs.microsoft.com/en-us/windows/wsl/abou
 Installation
 ============
 
-Clone the stable branch of Sunbeam and run the installation script:
+Sunbeam has two options for installation, either with git or with tar. For development work 
+on sunbeam, use git. For standard usage, installing each version of sunbeam that you need 
+from tarballs into separate directories is recommended (i.e. if you want versions 3 and 4 installed, 
+you would repeat the tar install process below for sunbeam3.1.1 and sunbeam4.0.0 (or whatever specific 
+versions you want)).
 
-.. code-block:: shell
+.. tabs::
 
-   git clone -b stable https://github.com/sunbeam-labs/sunbeam
-   cd sunbeam
-   bash install.sh
+   .. tab:: tar install
+
+      On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) 
+      then unpack and install it.
+
+      .. code-block:: shell
+
+         wget https://github.com/sunbeam-labs/sunbeam/releases/download/v4.0.0/sunbeam.tar.gz
+         mkdir sunbeam4.0.0
+         tar -zxf sunbeam4.0.0.tar.gz -C sunbeam4.0.0
+         cd sunbeam4.0.0 && ./install.sh
+
+   .. tab:: git install
+
+      On a Linux machine, download a copy of Sunbeam from our GitHub repository, and
+      install.
+
+      .. code-block:: shell
+
+         git clone --branch v4.0.0 https://github.com/sunbeam-labs/sunbeam.git
+         cd sunbeam
+         ./install.sh
+
+      .. tip::
+
+         If you're planning on doing development work on sunbeam, use 
+         'git clone git@github.com:sunbeam-labs/sunbeam.git' instead.
 
 The installer will check for and install the three components necessary for
 Sunbeam to work. The first is `Conda <https://conda.io>`_, a system for
 downloading and managing software environments. The second is the Sunbeam
 environment, which will contain all the core dependencies. The third is the
 Sunbeam library, which provides the necessary commands to run Sunbeam.
-
-All of this is handled for you automatically. If Sunbeam is already installed,
-you can manage versions using the manage-version.sh script, as described below 
-in the updating_ section.
 
 If you don't have Conda installed prior to this, you will need to add a line
 (displayed during install) to your config file (usually in ``~/.bashrc`` or
@@ -45,13 +66,13 @@ effect.
 Testing
 -------
 
-We've included a test script that should verify all the dependencies are
+We've included tests that should verify all the dependencies are
 installed and Sunbeam can run properly. We strongly recommend running this after
 installing or updating Sunbeam:
 
 .. code-block:: shell
 
-   bash tests/run_tests.bash
+   python -m pytest tests/ -vvl
 
 If the tests fail, you should either refer to our troubleshooting_ guide or file
 an issue on our `Github page <https://github.com/sunbeam-labs/sunbeam/issues>`_.
@@ -80,22 +101,9 @@ upgrades, we will increment the patch or minor numbers (e.g. 1.0.0 ->
    git pull
    ./install.sh --upgrade all
 
-Sunbeam v3 is designed to be installable separately on a system that already 
-has sunbeam 2 installed. Follow the v3 installation instructions to run both versions 
-side by side.
-
-As of v3.1.0, the manage-version.sh script can be used to install and switch between 
-different versions using './manage-version.sh -s VERSION_ID'. You can see documentation on how to use this script running 
-'./manage-version.sh -h'.
-
-.. tip::
-
-  With './manage-version.sh -s VERSION_ID', you can use a version identifier 
-  (i.e. v3.1.0), dev, stable, or another branch name 
-  (i.e. 342-automate-switching-between-versions-of-sunbeam). 
-  './manage-version.sh -l available' will list available identifiers.
-
-It's a good idea to re-run the tests after using this to make sure everything is working.
+Sunbeam v3+ is designed to be installable separately on a system that already 
+has sunbeam installed. This means multiple versions of sunbeam can be installed 
+on the same machine in different repositories.
 
 .. _uninstall:
 Uninstalling or reinstalling
@@ -106,8 +114,8 @@ If things go awry and updating doesn't work, simply uninstall and reinstall Sunb
    .. code-block:: shell
 
       source deactivate
-      ./manage-version.sh -r SUNBEAM_ENV_NAME
-      rm -rf sunbeam
+      conda remove -n sunbeamX.X.X --all
+      cd ../ && rm -rf sunbeam/
 
 Then follow the installation_ instructions above.
 
@@ -119,7 +127,7 @@ followed by the URL of the extension's GitHub repo::
 
     sunbeam extend https://github.com/sunbeam-labs/sbx_kaiju/
 
-For Sunbeam versions prior to 3.0, follow the instructions on the extension to
+For Sunbeam versions prior to 3.0, follow the legacy installation instructions on the extension to
 install.
 
 Setup
@@ -141,12 +149,12 @@ the environment, run ``source deactivate`` or close the terminal.
 .. tip::
 
   You can see a list of installed sunbeam environments using the command 
-  './manage-version.sh -l installed'.
+  'conda env list'.
 
 Creating a new project using local data
 ----------------------
 
-We provide a utility, ``sunbeam init``, to create a new config file and sample
+We provide a utility, ``sunbeam init``, to create a new config file, profile, and sample
 list for a project. The utility takes one required argument: a path to your
 project folder. This folder will be created if it doesn't exist. You can also
 specify the path to your gzipped fastq files, and Sunbeam will try to guess how
@@ -157,17 +165,19 @@ your samples are named, and whether they're paired.
    sunbeam init --data_fp /path/to/fastq/files /path/to/my_project
 
 In this directory, a new config file and a new sample list were created (by
-default named ``sunbeam_config.yml`` and ``samplelist.csv``, respectively). Edit
-the config file in your favorite text editor- all the keys are described below.
+default named ``sunbeam_config.yml`` and ``samplelist.csv``, respectively) as well as a 
+profile file (named ``config.yaml``). Edit
+the config and profile files in your favorite text editor. All the keys for the config are 
+described below.
 
 .. note::
 
    Sunbeam will do its best to determine how your samples are named in the
    ``data_fp`` you specify. It assumes they are named something regular, like
-   ``MP66_S109_L008_R1_001.fastq.gz`` and ``MP66_S109_L008_R2_001.fastq.gz``. In
+   ``MP66_S109_L008_R1.fastq.gz`` and ``MP66_S109_L008_R2.fastq.gz``. In
    this case, the sample name would be 'MP66_S109_L008' and the read pair
    indicator would be '1' and '2'. Thus, the filename format would look like
-   ``{sample}_R{rp}_001.fastq.gz``, where {sample} defines the sample name and
+   ``{sample}_R{rp}.fastq.gz``, where {sample} defines the sample name and
    {rp} defines the 1 or 2 in the read pair.
 
    If you have single-end reads, you can pass ``--single_end`` to ``sunbeam
@@ -177,18 +187,18 @@ the config file in your favorite text editor- all the keys are described below.
    filename format after the ``--format`` option in ``sunbeam init``.
 
    Finally, if you don't have your data ready yet, simply omit the ``--data_fp``
-   option. You can create a sample list later with ``sunbeam list_samples``.
+   option. You can create a sample list later with ``sunbeam list_samples > samples.csv``.
 
 If some config values are always the same for all projects (e.g. paths to shared
 databases), you can put these keys in a file and auto-populate your config file
-with them during initialization. For instance, if your Kraken databases are
-located at ``/shared/kraken/standard``, you could have a file containing the
+with them during initialization. For instance, if you have a custom trimmomatic adapter template 
+located at ``/home/user/adapter.fa``, you could have a file containing the
 following called ``common_values.yml``:
 
 .. code-block:: yaml
 
-   classify:
-     kraken_db_fp: "/shared/kraken/standard"
+   qc:
+     adapter_template: "/home/user/adapter.fa"
 
 When you make a new Sunbeam project, use the ``--defaults common_values.yml`` as
 part of the init command.
@@ -196,6 +206,13 @@ part of the init command.
 If you have Sunbeam extensions installed, in Sunbeam >= 3.0, the extension config
 options will be automatically included in new config files generated by
 ``sunbeam init``.
+
+If you want to customize options in the profile instead, you can create a custom profile 
+template named ``sunbeamlib/data/custom_profile.yaml`` and fill it with whatever options you 
+want included in each sunbeam run. Snakemake has a curated list of common profiles 
+`here <https://github.com/Snakemake-Profiles>`_ for working with HPC platforms and job schedulers. 
+A default and a slurm profile are included by default. You would use this custom profile with 
+``--profile custom`` as part of the init command.
 
 Further usage information is available by typing ``sunbeam init --help``.
 
@@ -220,8 +237,6 @@ all
   list_samples``.
 * ``paired_end``: 'true' or 'false' depending on whether you are using paired-
   or single-end reads.
-* ``download_reads``: 'true' or 'false' depending on whether you are using reads
-  from NCBI SRA.
 * ``version``: Automatically added for you by ``sunbeam init``. Ensures
   compatibility with the right version of Sunbeam.
 
@@ -230,13 +245,6 @@ qc
 
 * ``suffix``: the name of the subfolder to hold outputs from the
   quality-control steps
-* ``threads``: the number of threads to use for rules in this section
-* ``seq_id_ending``: if your reads are named differently, a regular expression
-  string defining the pattern of the suffix. For example, if your paired read
-  ids are ``@D00728:28:C9W1KANXX:0/1`` and ``@D00728:28:C9W1KANXX:0/2``, this
-  entry of your config file would be:
-  ``seq_id_ending: "/[12]"``
-* ``java_heapsize``: the memory available to Trimmomatic
 * ``leading``: (trimmomatic) remove the leading bases of a read if below this
   quality
 * ``trailing``: (trimmomatic) remove the trailing bases of a read if below
@@ -246,51 +254,30 @@ qc
 * ``minlength``: (trimmomatic) drop reads smaller than this length
 * ``adapter_template``: (trimmomatic) path to the Illumina paired-end adaptors (templated with ``$CONDA_ENV``)
   (autofilled)
-* ``fwd_adaptors``: (cutadapt) custom forward adaptor sequences to remove
+* ``fwd_adapters``: (cutadapt) custom forward adaptor sequences to remove
   using cutadapt. Replace with ``""`` to skip.
-* ``rev_adaptors``: (cutadapt) custom reverse adaptor sequences to remove
+* ``rev_adapters``: (cutadapt) custom reverse adaptor sequences to remove
   using cutadapt. Replace with ``""`` to skip.
-* ``mask_low_complexity``: [true/false] mask low-complexity sequences with Ns
+* ``cutadapt_opts``: (cutadapt) options to pass to cutadapt. Replace with ``""`` to pass no extra options.
 * ``kz_threshold``: a value between 0 and 1 to determine the low-complexity boundary (1 is most stringent). Ignored if not masking low-complexity sequences.
-* ``kz_window``: window size to use (in bp) for local complexity
-  assessment. Ignored if not masking low-complexity sequences.
-* ``pct_id``: (decontaminate) minimum percent identity to host genome to
-  consider match
-* ``frac``: (decontaminate) minimum fraction of the read that must align to
-  consider match
 * ``host_fp``: the path to the folder with host/contaminant genomes (ending in
   *.fasta)
-
 
 classify
 ++++++++
 
   * ``suffix``: the name of the subfolder to hold outputs from the taxonomic
     classification steps
-  * ``threads``: threads to use for Kraken
-  * ``kraken_db_fp``: path to Kraken database
-
 
 assembly
 ++++++++
 
 * ``suffix``: the name of the folder to hold outputs from the assembly steps
-* ``min_len``: the minimum contig length to keep
-* ``threads``: threads to use for the MEGAHIT assembler
 
 annotation
 ++++++++++
 
 * ``suffix``: the name of the folder to hold contig annotation results
-* ``min_contig_length``: minimum length of contig to annotate (shorter contigs are skipped)
-* ``circular_kmin``: smallest length of kmers used to search for circularity
-* ``circular_kmax``: longest length of kmers used to search for circularity
-* ``circular_min_length``: smallest length of contig to check for circularity
-
-blast
-+++++
-
-* ``threads``: number of threads provided to all BLAST programs
 
 .. _blastdbs:
 
@@ -298,47 +285,21 @@ blastdbs
 ++++++++
 
 * ``root_fp``: path to a directory containing BLAST databases (if they're all in the same place)
-* ``nucleotide``: the section to define any nucleotide BLAST databases (see tip below for syntax)
-* ``protein``: the section to define any protein BLAST databases (see tip below)
-
-  .. tip::
-
-     The structure for this section allows you to specify arbitrary numbers of
-     BLAST databases of either type. For example, if you had a local copy of nt
-     and a couple of custom protein databases, your section here would look like
-     this (assuming they're all in the same parent directory):
-
-     .. code-block:: yaml
-
-	blastdbs:
-          root_fp: "/local/blast_databases"
-	  nucleotide:
-	    nt: "nt/nt"
-	  protein:
-	    vfdb: "virulence_factors/virdb"
-	    card: "/some/other/path/card_db/card"
-
-     This tells Sunbeam you have three BLAST databases, two of which live in
-     ``/local/blast_databases`` and a third that lives in
-     ``/some/other/path``. It will run nucleotide blast on the nucleotide
-     databases and BLASTX and BLASTP on the protein databases.
 
 mapping
 +++++++
 
 * ``suffix``: the name of the subfolder to create for mapping output (bam files, etc)
-* ``genomes_fp``: path to a directory with an arbitrary number of target genomes
-  upon which to map reads. Genomes should be in FASTA format, and Sunbeam will
-  create the indexes if necessary.
-* ``threads``: number of threads to use for alignment to the target genomes
-* ``samtools_opts``: a string added to the ``samtools view`` command during
-  mapping. This is a good place to add '-F4' to keep only mapped reads and
-  decrease the space these files occupy.
 
-download
-++++++++
-* ``suffix``: the name of the subfolder to create for download output (fastq.gz files)
-* ``threads``: number of threads to use for downloading (too many at once may make NCBI unhappy)
+benchmarks
+++++++++++
+
+* ``suffix``: the name of the subfolder to create for benchmark data
+
+logs
+++++
+
+* ``suffix``: the name of the subfolder to create for logs
 
 .. _dbs:
 
@@ -350,7 +311,13 @@ is beyond the scope of this document. Please see the following resources for mor
 
 * `BLAST databases <https://www.ncbi.nlm.nih.gov/books/NBK279688/>`_
 * `kraken databases <https://ccb.jhu.edu/software/kraken/MANUAL.html#kraken-databases>`_
-* `kraken2 databases <https://ccb.jhu.edu/software/kraken2/index.shtml?t=manual>`_ (used in Sunbeam v3.0 and higher)
+* `kraken2 databases <https://ccb.jhu.edu/software/kraken2/index.shtml?t=manual>`_
+
+.. tip::
+
+  These were all moved to extensions in sunbeam v4. Some vestiges remain in the main pipeline 
+  for compatibility with extensions but these should be considered deprecated and will be 
+  removed in future versions.
 
 .. _running:
 
@@ -361,7 +328,7 @@ To run Sunbeam, make sure you've activated the sunbeam environment. Then run:
 
 .. code-block:: shell
 
-   sunbeam run --configfile ~/path/to/config.yml
+   sunbeam run --profile path/to/project/
 
 There are many options that you can use to determine which outputs you want. By
 default, if nothing is specified, this runs the entire pipeline. However, each
@@ -371,17 +338,12 @@ the command above and consist of the following:
 
 * ``all_qc``: basic quality control on all reads (no host read removal)
 * ``all_decontam``: quality control and host read removal on all samples
-* ``all_mapping``: align reads to target genomes
-* ``all_classify``: classify taxonomic provenance of all qc'd, decontaminated
-  reads
-* ``all_assembly``: build contigs from all qc'd, decontaminated reads
-* ``all_annotate``: annotate contigs using defined BLAST databases
 
 To use one of these options, simply run it like so:
 
 .. code-block:: shell
 
-   sunbeam run -- --configfile ~/path/to/config.yml all_classify
+   sunbeam run --profile path/to/project/ all_qc
 
 In addition, since Sunbeam is really just a set of `snakemake
 <http://snakemake.readthedocs.io/en/latest/executable.html>`_ rules, all the
@@ -390,8 +352,7 @@ In addition, since Sunbeam is really just a set of `snakemake
 * ``-n`` performs a dry run, and will just list which rules are going to be
   executed without actually doing so.
 * ``-k`` allows the workflow to continue with unrelated rules if one produces an
-  error (useful for malformed samples, which can also be added to the
-  ``exclude`` config option).
+  error (useful for malformed samples).
 * ``-p`` prints the actual shell command executed for each rule, which is very
   helpful for debugging purposes.
 * ``--cores`` specifies the total number of cores used by Sunbeam. For example,
@@ -405,49 +366,28 @@ Cluster options
 
 Sunbeam inherits its cluster abilities from Snakemake. There's nothing special
 about installing Sunbeam on a cluster, but in order to distribute work to
-cluster nodes, you have to use the ``--cluster`` and ``--jobs`` flags. For
-example, if we wanted each rule to run on a 12-thread node, and a max of 100
-rules executing in parallel, we would use the following command on our cluster:
+cluster nodes, you have to use the ``--cluster`` and ``--jobs`` flags. This is 
+handled by using a cluster profile instead of the default. Sunbeam comes with a 
+slurm profile template but you can create others or use existing ones from 
+`here <https://github.com/Snakemake-Profiles>`_. Once you've initialized a 
+project with a cluster profile, run it as normal:
 
 .. code-block:: shell
 
-   sunbeam run -- --configfile ~/path/to/config.yml --cluster "bsub -n 12" -j 100 -w 90
+   sunbeam run --profile /path/to/cluster/project/
 
-The ``-w 90`` flag is provided to account for filesystem latency that often
-causes issues on clusters. It asks Snakemake to wait for 90 seconds before
-complaining that an expected output file is missing.
+Edit any options set in the profile as if they are snakemake command line arguments.
 
 Outputs
 =======
 
 This section describes all the outputs from Sunbeam. Here is an example output
-directory, where we had two samples (sample1 and sample2), two BLAST
-databases, one nucleotide ('bacteria') and one protein ('card').
+directory.
 
 .. code-block:: shell
 
-   sunbeam_output
-	├ annotation
-	│   ├ blastn
-	│   │   └ bacteria
-	│   │       └ contig
-	│   ├ blastp
-	│   │   └ card
-	│   │       └ prodigal
-	│   ├ blastx
-	│   │   └ card
-	│   │       └ prodigal
-	│   ├ genes
-	│   │   └ prodigal
-	│   │       └ log
-	│   └ summary
-	├ assembly
-	│   ├ contigs
-	├ classify
-	│   └ kraken
-	│       └ raw
-	├ mapping
-   	│   └ genome1
+  ├ sunbeam_output
+  ├ logs
 	└ qc
 	    ├ cleaned
 	    ├ decontam
@@ -457,89 +397,21 @@ databases, one nucleotide ('bacteria') and one protein ('card').
 	    │   └ trimmomatic
 	    └ reports
 
-In order of appearance, the folders contain the following:
-
-Contig annotation
------------------
-
-.. code-block:: shell
-
-   sunbeam_output
-	├ annotation
-	│   ├ blastn
-	│   │   └ bacteria
-	│   │       └ contig
-	│   ├ blastp
-	│   │   └ card
-	│   │       └ prodigal
-	│   ├ blastx
-	│   │   └ card
-	│   │       └ prodigal
-	│   ├ genes
-	│   │   └ prodigal
-	│   │       └ log
-	│   └ summary
-
-This contains the BLAST/Diamond results in blast tabular format from the assembled contigs. ``blastn``
-contains the results from directly BLASTing the contig nucleotide sequences
-against the nucleotide databases. ``blastp`` and ``blastx`` use genes identified
-by the ORF finding program Prodigal to search for hits in the protein databases.
-
-The genes found from Prodigal are available in the ``genes`` folder.
-
-Finally, the ``summary`` folder contains an aggregated report of the number and
-types of hits of each contig against the BLAST databases, as well as length and
-circularity.
-
-Contig assembly
----------------
-
-.. code-block:: shell
-
-   	├ assembly
-	│   ├ contigs
-
-
-This contains the assembled contigs for each sample under 'contigs'.
-
-Taxonomic classification
-------------------------
-
-.. code-block:: shell
-
-	├ classify
-	│   └ kraken
-	│       └ raw
-
-This contains the taxonomic outputs from Kraken, both the raw output as well as
-summarized results. The primary output file is ``all_samples.tsv``, which is a
-BIOM-style format with samples as columns and taxonomy IDs as rows, and number
-of reads assigned to each in each cell.
-
-Alignment to genomes
---------------------
-
-.. code-block:: shell
-
-   	├ mapping
-   	│   └ genome1
-
-
-Alignment files (in BAM format) to each target genome are contained in
-subfolders named for the genome, such as 'genome1'.
-
 Quality control
 ---------------
 
 .. code-block:: shell
 
    	└ qc
+      ├ 00_samples
+      ├ 01_cutadapt
+      ├ 02_trimmomatic
+      ├ 03_komplexity
 	    ├ cleaned
 	    ├ decontam
 	    ├ log
 	    │   ├ decontam
-	    │   ├ cutadapt
-	    │   └ trimmomatic
+	    │   ├ komplexity
 	    └ reports
 
 

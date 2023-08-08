@@ -1,0 +1,7 @@
+name: reports
+channels:
+  - conda-forge
+dependencies:
+  - numpy
+  - pandas
+  - python>=3.10

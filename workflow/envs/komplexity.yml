@@ -1,0 +1,7 @@
+name: komplexity
+channels:
+  - eclarke
+  - conda-forge
+dependencies:
+  - komplexity
+  - python>=3.10

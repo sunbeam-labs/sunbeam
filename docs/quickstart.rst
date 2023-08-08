@@ -4,27 +4,40 @@
 Quickstart Guide
 =====================
 
-.. contents::
-   :depth: 2
-
 Installation
 ************
 
-On a Linux machine, download a copy of Sunbeam from our GitHub repository, and
-install. We do not currently support non-Linux environments.
+There are two installation methods available, installing via git or via tar. We do not currently support non-Linux environments.
 
-.. code-block:: shell
+.. tabs::
 
-   git clone -b stable https://github.com/sunbeam-labs/sunbeam.git
-   cd sunbeam
-   ./install.sh
+   .. tab:: tar install
 
-.. tip::
+      On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) 
+      then unpack and install it.
 
-   If you're planning on doing development work on sunbeam, use 
-   'git clone -b stable git@github.com:sunbeam-labs/sunbeam.git' instead. This will 
-   require having `SSH setup with your GitHub account <https://docs.github.com/en/authentication/connecting-to-github-with-ssh>`_ 
-   and the machine that you are installing sunbeam on.
+      .. code-block:: shell
+
+         wget https://github.com/sunbeam-labs/sunbeam/releases/download/v4.0.0/sunbeam.tar.gz
+         mkdir sunbeam4.0.0
+         tar -zxf sunbeam4.0.0.tar.gz -C sunbeam4.0.0
+         cd sunbeam4.0.0 && ./install.sh
+
+   .. tab:: git install
+
+      On a Linux machine, download a copy of Sunbeam from our GitHub repository, and
+      install.
+
+      .. code-block:: shell
+
+         git clone --branch v4.0.0 https://github.com/sunbeam-labs/sunbeam.git
+         cd sunbeam
+         ./install.sh
+
+      .. tip::
+
+         If you're planning on doing development work on sunbeam, use 
+         'git clone git@github.com:sunbeam-labs/sunbeam.git' instead.
 
 This installs Sunbeam and all its dependencies, including the `Conda
 <https://conda.io/miniconda.html>`_ environment manager, if required. It will finish 
@@ -33,7 +46,7 @@ by printing instructions to continue that should look like:
 .. code-block:: shell
 
    conda activate ENV_NAME
-   tests/run_tests.bash -e ENV_NAME
+   python -m pytest tests/
 
 This runs some tests to make sure everything was installed correctly.
 
@@ -43,7 +56,7 @@ This runs some tests to make sure everything was installed correctly.
    path. If you're running Bash (the most common terminal shell), the installation 
    script should print the necessary command.
 
-If you see "Tests failed", check out our :ref:`troubleshooting` section or file an issue
+If the tests fail, check out our :ref:`troubleshooting` section or file an issue
 on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.
 
 Setup
@@ -58,19 +71,21 @@ Let's create a new Sunbeam project (we'll call it ``my_project``):
 
 .. code-block:: shell
 
-   source activate sunbeam3
+   source activate ENV_NAME
    sunbeam init my_project --data_fp /sequencing/project/reads
 
-Sunbeam will create a new folder called ``my_project`` and put two files
+Sunbeam will create a new folder called ``my_project`` and put three files
 there:
+
+- ``config.yaml`` contains a `snakemake profile<https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>`_ that will be used to run ``my_project``.
 
 - ``sunbeam_config.yml`` contains all the configuration parameters for each step
   of the Sunbeam pipeline.
 
-- ``samples.csv`` is a comma-separated list of samples that Sunbeam found the
+- ``samples.csv`` is a comma-separated list of samples that Sunbeam found in the
   given data folder, along with absolute paths to their FASTQ files.
 
-Right now we have everything we need to do basic quality-control and contig assembly. However, let's go ahead and set up contaminant filtering and some basic taxonomy databases to make things interesting.
+Right now we have everything we need to do basic quality-control. However, let's go ahead and set up contaminant filtering to make things interesting.
 
 Contaminant filtering
 ---------------------
@@ -82,34 +97,6 @@ To use this, make a folder containing all the target sequences in FASTA
 format. The filenames should end in "fasta" to be recognized by Sunbeam. In your ``sunbeam_config.yml`` file, edit the ``host_fp:`` line in the ``qc``
 section to point to this folder.
 
-Taxonomic classification
-------------------------
-
-Sunbeam can use Kraken to assign putative taxonomic identities to your
-reads. While creating a Kraken database is beyond the scope of this guide,
-pre-built ones are available at the `Kraken homepage
-<http://ccb.jhu.edu/software/kraken/>`_. Download or build one, then add the
-path to the database under ``classify:kraken_db_fp:``.
-
-Contig annotation
------------------
-
-Sunbeam can automatically BLAST your contigs against any number of
-nucleotide or protein databases and summarize the top hits. Download or create
-your BLAST databases, then add the paths to your config file, following the
-instructions on here: :ref:`blastdbs`. For some general advice on database
-building, check out the `Sunbeam databases repository
-<https://github.com/zhaoc1/sunbeam_databases>`_ and for specific links please
-see the usage section: :ref:`dbs`.
-
-Reference mapping
------------------
-
-If you'd like to map the reads against a set of reference genomes of interest,
-follow the same method as for the host/contaminant sequences above. Make a
-folder containing FASTA files for each reference genome, then add the path to
-that folder in ``mapping:genomes_fp:``.
-
 Running
 *******
 
@@ -117,12 +104,10 @@ After you've finished editing your config file, you're ready to run Sunbeam:
 
 .. code-block:: bash
 
-   sunbeam run --configfile my_project/sunbeam_config.yml
+   sunbeam run --profile my_project/
 
 By default, this will do a lot, including trimming and quality-controlling your
-reads, removing contaminant, host, and low-complexity sequences, assigning
-read-level taxonomy, assembling the reads in each sample into contigs, and then
-BLASTing those contigs against your databases. Each of these steps can also be run independently by adding arguments after the ``sunbeam run`` command. See :ref:`running` for more info. 
+reads and removing contaminant, host, and low-complexity sequences. Each of these steps can also be run independently by adding arguments after the ``sunbeam run`` command. See :ref:`running` for more info.
 
 Viewing results
 ***************

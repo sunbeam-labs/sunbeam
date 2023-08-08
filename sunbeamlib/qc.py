@@ -3,29 +3,42 @@ Supporting functions for QC rules.
 """
 
 import gzip
-import re
-from Bio import SeqIO
+from sunbeamlib.parse import parse_fastq, write_many_fastq
 
-def strip_seq_id_suffix(fp_in, fp_out, suffix_pattern):
-    """Remove sequence ID suffix from entries in a FASTQ file.
+
+def filter_ids(fp_in, fp_out, ids, log):
+    """Remove ids from FASTQ file.
 
     fp_in: path to input FASTQ
     fp_out: path to output FASTQ
-    suffix_pattern: regular expression for suffix to remove, e.g., "/[12]".
-    This will be anchored to the end of the ID string.
+    ids: list of ids to be removed
     """
-    try:
-        if fp_in.endswith(".gz"):
-            f_in = gzip.open(fp_in, "rt")
-        else:
-            f_in = open(fp_in, "rU")
-        if fp_out.endswith(".gz"):
-            f_out = gzip.open(fp_out, "wt")
-        else:
-            f_out = open(fp_out, "w")
-        for record in SeqIO.parse(f_in, "fastq"):
-            record.id = re.sub(suffix_pattern + "$", "", record.id)
-            SeqIO.write(record, f_out, "fastq")
-    finally:
-        f_in.close()
-        f_out.close()
+    with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
+        records = [r for r in parse_fastq(f_in)]
+        records.sort(key=lambda t: t[0])
+        ids.sort()
+        # Use list(records) so that it's a different object in memory and
+        # you're free to remove items from the original
+        for record in list(records):
+            if not ids:
+                log.write("IDs list empty, finished filtering\n")
+                break
+            if ids[0] in record[0]:
+                log.write(f"{record[0]} filtered\n")
+                ids.pop(0)
+                records.remove(record)
+
+        write_many_fastq(records, f_out)
+
+
+def remove_pair_id(id, log):
+    """Remove the 1 or 2 from a paired read ID
+
+    id: id string
+    """
+    id = id.strip()
+    if id[-2:] == "/1" or id[-2:] == "/2":
+        return id[:-2]
+
+    # Assuming it's the newer id variant where komplexity removes the second half (containing pair number)
+    return id

@@ -12,11 +12,11 @@ reproducible analysis.
 
 A Sunbeam extension consists of a directory that contains a
 *rules* file. The *rules* file must have a name that
-ends with the file extension ".rules".  The name of the extension is
-derived from the name of this file.  It is customary for the name of
+ends with the file extension ".smk". The name of the extension is
+derived from the name of this file. It is customary for the name of
 the extension to start with "sbx_", which is shorthand for "Sunbeam
 extension."  Technically, only the *rules* file is needed for a
-Sunbeam extension.  In practice, almost all extensions include other
+Sunbeam extension. In practice, almost all extensions include other
 files to facilitate the installation of software dependencies, to
 specify parameters in the configuration file, and to give instructions
 to users.
@@ -24,9 +24,9 @@ to users.
 In Sunbeam version 3.0 and higher, extensions can be installed using the
 ``sunbeam extend`` command, followed by the GitHub URL of the 
 extension you're installing. For example, to install an extension to
-run the kaiju classifier, you would run::
+run metagenome assembly, you would run::
 
-    sunbeam extend https://github.com/sunbeam-labs/sbx_kaiju/
+    sunbeam extend https://github.com/sunbeam-labs/sbx_assembly/
 
 Sunbeam extensions are installed by placing the extension directory in
 the ``extensions/`` subdirectory of the Sunbeam software.  Once the
@@ -47,26 +47,26 @@ Example: MetaSPAdes assembler
 
 We'll use the `sbx_metaspades_example
 <https://github.com/sunbeam-labs/sbx_metaspades_example>`_ extension
-to illustrate the basics.  This extension runs the MetaSPAdes assembly
+to illustrate the basics. This extension runs the MetaSPAdes assembly
 program on each pair of host-filtered FASTQ files, producing a folder
 with contigs for each sample.
 
 The rules file contains two rules: one describes how to run the
 MetaSPAdes program, and the other gives the full set of output folders
-we expect to make.  Here is the rule that runs the program::
+we expect to make. Here is the rule that runs the program::
 
     rule run_metaspades:
         input:
-            r1 = str(QC_FP/'decontam'/'{sample}_1.fastq.gz'),
-            r2 = str(QC_FP/'decontam'/'{sample}_2.fastq.gz')
+            r1 = QC_FP/'decontam'/'{sample}_1.fastq.gz',
+            r2 = QC_FP/'decontam'/'{sample}_2.fastq.gz'
         output:
-            str(ASSEMBLY_FP/'metaspades'/'{sample}')
+            ASSEMBLY_FP/'metaspades'/'{sample}'
         conda:
             "metaspades_example_env.yaml"
         shell:
             "metaspades.py -1 {input.r1} -2 {input.r2} -o {output}"
 
-The first line indicates a new rule named ``run_metaspades``.  The
+The first line indicates a new rule named ``run_metaspades``. The
 ``input`` and ``output`` sections contain patterns for file paths that
 will be used by the command and produced after the command is run. The 
 ``conda`` section specifies which environment the command should be run 
@@ -78,16 +78,14 @@ individual names, like ``r1`` and ``r2``, then refer to these names
 inside the command.
 
 In this example, the input and output filepaths are given as Python
-code.  This is typical for rules in Sunbeam, because we are using info
+code. This is typical for rules in Sunbeam, because we are using info
 from the user's configuration to determine the full filepath.  Let's
-take ``str(QC_FP/'decontam'/'{sample}_1.fastq.gz')`` and see how it's
+take ``QC_FP/'decontam'/'{sample}_1.fastq.gz'`` and see how it's
 put together.  ``QC_FP`` is a Python variable, which gives the
 absolute path to the directory containing quality control results in
 Sunbeam.  This value is a special ``Path`` object in Python, which
 means that we can add subdirectories using the division symbol ``/``.
-As punishment for this convenience, we have to convert this ``Path``
-object back to an ordinary string before it can be used in the rule.
-The ``str()`` function accomplishes this.  Here, ``decontam`` is the
+Here, ``decontam`` is the
 name of a subdirectory inside the main quality control directory. The
 last part, ``{sample}_1.fastq.gz`` looks like the name of a gzipped
 FASTQ file, but has something going on inside those curly braces.
@@ -109,35 +107,24 @@ extension.  Here are all the patterns you can use:
 +-----------------------+----------------------------------------------------------------+
 | Sequence data files   | Target                                                         |
 +=======================+================================================================+
-| Quality-controlled,   | str(QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz')                  |
-| non-decontaminated    | str(QC_FP/'cleaned'/'{sample}_1.fastq.gz')                     |
-| sequences             | str(QC_FP/'cleaned'/'{sample}_2.fastq.gz')                     |
+| Quality-controlled,   | QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'                       |
+| non-decontaminated    | QC_FP/'cleaned'/'{sample}_1.fastq.gz'                          |
+| sequences             | QC_FP/'cleaned'/'{sample}_2.fastq.gz'                          |
 +-----------------------+----------------------------------------------------------------+
-| Quality-controlled,   | str(QC_FP/'decontam'/'{sample}_{rp}.fastq.gz')                 |
-| decontaminated        | str(QC_FP/'decontam'/'{sample}_1.fastq.gz')                    |
-| sequences             | str(QC_FP/'decontam'/'{sample}_2.fastq.gz')                    |
-+-----------------------+----------------------------------------------------------------+
-| Contig sequences      | str(ASSEMBLY_FP/'contigs'/'{sample}-contigs.fa')               |
-+-----------------------+----------------------------------------------------------------+
-| Open reading frame    | str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_nucl.fa') |
-| nucleotide sequences  |                                                                |
-+-----------------------+----------------------------------------------------------------+
-| Open reading frame    | str(ANNOTATION_FP/'genes'/'prodigal'/'{sample}_genes_prot.fa') |
-| protein sequences     |                                                                |
+| Quality-controlled,   | QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'                      |
+| decontaminated        | QC_FP/'decontam'/'{sample}_1.fastq.gz'                         |
+| sequences             | QC_FP/'decontam'/'{sample}_2.fastq.gz'                         |
 +-----------------------+----------------------------------------------------------------+
 
 +-----------------------+-----------------------------------------------+
 | Summary tables        | Target                                        |
 +=======================+===============================================+
-| Attrition from        | str(QC_FP/'reports'/'preprocess_summary.tsv') |
+| Attrition from        | QC_FP/'reports'/'preprocess_summary.tsv'      |
 | decontamination and   |                                               |
 | quality control       |                                               |
 +-----------------------+-----------------------------------------------+
-| Sequence              | str(QC_FP/'reports'/'fastqc_quality.tsv')     |
+| Sequence              | QC_FP/'reports'/'fastqc_quality.tsv'          |
 | quality scores        |                                               |
-+-----------------------+-----------------------------------------------+
-| Taxonomic assignments | str(CLASSIFY_FP/'kraken'/'all_samples.tsv')   |
-| from Kraken           |                                               |
 +-----------------------+-----------------------------------------------+
 
 Very often, you will use one of these patterns directly for input to a
@@ -152,7 +139,7 @@ by MetaSPAdes for every sample::
 
     rule all_metaspades:
         input:
-            expand(str(ASSEMBLY_FP/'metaspades'/'{sample}'),
+            expand(ASSEMBLY_FP/'metaspades'/'{sample}',
                    sample=Samples.keys())
 
 This rule is critical for the ``{sample}`` pattern to work inside the
@@ -193,16 +180,16 @@ output from Sunbeam and produces a report.  The extension
 researchers to re-run the analysis for a small methods comaprison.
 
 To make a report from Sunbeam output files, the extension needs only
-one rule.    ::
+one rule.::
 
   rule make_shallowshotgun_report:
       input:
-          kraken = str(CLASSIFY_FP/'kraken'/'all_samples.tsv'),
-          preprocess = str(QC_FP/'preprocess_summary.tsv'),
-          quality = str(QC_FP/'fastqc_quality.tsv'),
+          kraken = CLASSIFY_FP/'kraken'/'all_samples.tsv',
+          preprocess = QC_FP/'preprocess_summary.tsv',
+          quality = QC_FP/'fastqc_quality.tsv',
           sampleinfo = sunbeam_dir + '/extensions/sbx_shallowshotgun_pilot/data/sampleinfo.tsv'
       output:
-          str(Cfg['all']['output_fp']/'reports/ShallowShotgun_Pilot_Report.html')
+          Cfg['all']['output_fp']/'reports/ShallowShotgun_Pilot_Report.html'
       script:
           'shallowshotgun_pilot_report.Rmd'
 
@@ -230,8 +217,7 @@ In the output section, we need to specify a file path for the final
 report.  Here, we use the configuration parameter
 ``Cfg['all']['output_fp']`` to get the base directory for output from
 Sunbeam.  The value of this configuration parameter is a ``Path``
-object, so we use the ``/`` symbol to add the rest of the filepath,
-and surround the whole thing with the ``str()`` function.  Just as a
+object, so we use the ``/`` symbol to add the rest of the filepath.  Just as a
 note, Snakemake will create the ``reports/`` subdirectory if needed,
 so you don't have to worry about directories being present ahead of
 time to accommodate your output files.
@@ -266,36 +252,44 @@ Variables provided by Sunbeam
 Here is a table of all the Python variables provided by Sunbeam for
 use in your extensions:
 
-+-------------------+-------------+----------------------------------------------+
-| Variable name     | Type        | Description                                  |
-+-------------------+-------------+----------------------------------------------+
-| ``QC_FP``         | Path        | Output directory for quality control files.  |
-+-------------------+-------------+----------------------------------------------+
-| ``ASSEMBLY_FP``   | Path        | Output directory for assembly files.         |
-+-------------------+-------------+----------------------------------------------+
-| ``ANNOTATION_FP`` | Path        | Output directory for gene annotation files.  |
-+-------------------+-------------+----------------------------------------------+
-| ``CLASSIFY_FP``   | Path        | Output directory for taxonomic               |
-|                   |             | classification files.                        |
-+-------------------+-------------+----------------------------------------------+
-| ``Samples``       | Dictionary  | Key is the sample name, value is a dictionary|
-|                   |             | with keys "1" and "2", values are the        |
-|                   |             | the gzipped FASTQ files at the start of the  |
-|                   |             | workflow.  For unpaired reads the value for  |
-|                   |             | "2" is the empty string.                     |
-+-------------------+-------------+----------------------------------------------+
-| ``Pairs``         | List        | For paired reads, ["1", "2"]. For unpaired   |
-|                   |             | reads, ["1"].                                |
-+-------------------+-------------+----------------------------------------------+
-| ``Cfg``           | Dictionary  | Parameters found in the configuration file.  |
-|                   |             | For any parameter ending in "_fp", the value |
-|                   |             | is converted to a Path object.  The most     |
-|                   |             | commonly used parameter is                   |
-|                   |             | ``Cfg['all']['output_dir']``, which gives the|
-|                   |             | base output directory.                       |
-+-------------------+-------------+----------------------------------------------+
-| ``sunbeam_dir``   | String      | File path where Sunbeam is installed.        |
-+-------------------+-------------+----------------------------------------------+
++-------------------+-------------+-----------------------------------------------+
+| Variable name     | Type        | Description                                   |
++-------------------+-------------+-----------------------------------------------+
+| ``QC_FP``         | Path        | Output directory for quality control files.   |
++-------------------+-------------+-----------------------------------------------+
+| ``ASSEMBLY_FP``   | Path        | Output directory for assembly files. (DEPRECATED)|
++-------------------+-------------+-----------------------------------------------+
+| ``ANNOTATION_FP`` | Path        | Output directory for gene annotation files. (DEPRECATED)|
++-------------------+-------------+-----------------------------------------------+
+|| ``CLASSIFY_FP``  || Path       || Output directory for taxonomic               |
+||                  ||            || classification files. (DEPRECATED)           |
++-------------------+-------------+-----------------------------------------------+
+| ``BENCHMARK_FP``  | Path        | Output directory for benchmark files.         |
++-------------------+-------------+-----------------------------------------------+
+| ``LOG_FP``        | Path        | Output directory for logs.                    |
++-------------------+-------------+-----------------------------------------------+
+|| ``Samples``      || Dictionary ||                                              |
+||                  ||            || with keys "1" and "2", values are the        |
+||                  ||            || the gzipped FASTQ files at the start of the  |
+||                  ||            || workflow. For unpaired reads the value for   |
+||                  ||            || "2" is the empty string.                     |
++-------------------+-------------+-----------------------------------------------+
+|| ``Pairs``        || List       || For paired reads, ["1", "2"]. For unpaired   |
+||                  ||            || reads, ["1"].                                |
++-------------------+-------------+-----------------------------------------------+
+|| ``Cfg``          || Dictionary || Parameters found in the configuration file.  |
+||                  ||            || For any parameter ending in "_fp", the value |
+||                  ||            || is converted to a Path object. The most      |
+||                  ||            || commonly used parameter is                   |
+||                  ||            || base output directory.                       |
+||                  ||            ||                                              |
++-------------------+-------------+-----------------------------------------------+
+| ``sunbeam_dir``   | String      | File path where Sunbeam is installed.         |
++-------------------+-------------+-----------------------------------------------+
+
+..tip::
+
+    Deprecated filepaths will be moved from the main pipeline to the extensions where they are used in a future release.
 
 Further reading
 ---------------
@@ -350,7 +344,7 @@ with groups of samples to co-assemble.::
 
   sbx_coassembly:
     threads: 4
-      group_file: ''
+    group_file: ''
 
 As of version 3.0, config options from extensions are automatically included
 in config files made using ``sunbeam init`` and ``sunbeam config update``. This
@@ -384,13 +378,8 @@ A good example to follow is the `sbx_coassembly
 Publishing at sunbeam-labs.org
 ==============================
 
-You are welcome to add your Sunbeam extensions to the directory at
-`sunbeam-labs.org <https://sunbeam-labs.org/>`_.  To submit your
-extension to the directory, please go to the `development page for
-sunbeam-labs.org
-<https://github.com/sunbeam-labs/sunbeam-labs.github.io>`_ and `open
-an issue
-<https://github.com/sunbeam-labs/sunbeam-labs.github.io/issues>`_ with
-the GitHub URL of your extension. If you know Javascript, you can edit
-the list at the top of the file ``main.js`` and `send us a pull request
-<https://github.com/sunbeam-labs/sunbeam-labs.github.io/pulls>`_.
+You are welcome to add your Sunbeam extensions to the organization at
+`sunbeam-labs <https://github.com/sunbeam-labs>`_.  To submit your
+extension, please go to the `sunbeam Issues page
+<https://github.com/sunbeam-labs/sunbeam/issues>`_ and open and issue with
+the GitHub URL of your extension.

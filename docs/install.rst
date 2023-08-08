@@ -4,18 +4,11 @@
 install.sh
 ==========
 
-.. contents::
-   :depth: 2
-
 Overview
 ========
 
 This script enables users of sunbeam to easily install the necessary software 
-and environments to run sunbeam. For the typical user, this script will be 
-called to perform the initial install of sunbeam and thereafter any upgrades 
-will be handled by the manage-version script. If you are doing development work 
-on sunbeam you will likely make use of this script more often, in particular 
-the --update argument.
+and environments to run sunbeam.
 
 Options
 =======
@@ -27,13 +20,13 @@ All available options for the command line, used with ``./install.sh [options]``
 
 Environment to install to. Default: "sunbeam" followed by the version tag 
 (e.g. sunbeam3.1.0). This version tag can get more complicated for non-release 
-branches and can be shown with ``./manage-version.sh -a``.
+branches.
 
 -s/--sunbeam_dir [arg]
 +++++++++++++++++++++++++++++++
 
 Location of Sunbeam source code. Default: root sunbeam directory. This should 
-rarely be changed. These scripts are intended to be run from the root dir.
+rarely be changed. The script is intended to be run from the root dir.
 
 -c/--conda [arg]
 +++++++++++++++++++++++++
@@ -52,9 +45,8 @@ doesn't point to your desired conda installation you can specify that here.
 
 Update sunbeam [lib]rary, conda [env], or [all]. The sunbeam library is all 
 code under the 'sunbeamlib/' directory. If you have major or incompatible 
-changes to make to the environment you should be creating a new one using 
-``./manage-version.sh -s ENV_NAME``. This way you will maintain the option to 
-easily switch back and forth if you make breaking changes in the new one.
+changes to make to the environment you should consider creating a new one under a 
+different name so that you always have a working version installed.
 
 -m/--no_mamba
 ++++++++++++++++

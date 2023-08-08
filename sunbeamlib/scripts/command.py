@@ -1,6 +1,5 @@
 import sys
 import argparse
-import subprocess
 import sunbeamlib
 from sunbeamlib.scripts.run import main as Run
 from sunbeamlib.scripts.init import main as Init
@@ -8,8 +7,8 @@ from sunbeamlib.scripts._config import main as Config
 from sunbeamlib.scripts.list_samples import main as ListSamples
 from sunbeamlib.scripts.extend import main as Extend
 
-def main():
 
+def main():
     usage_str = "%(prog)s [-h/--help,-v/--version] <subcommand>"
     description_str = (
         "subcommands:\n"
@@ -26,13 +25,16 @@ def main():
         description=description_str,
         epilog="For more help, see the docs at http://sunbeam.readthedocs.io.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        add_help=False
+        add_help=False,
     )
 
     parser.add_argument("command", help=argparse.SUPPRESS, nargs="?")
     parser.add_argument(
-        "-v", "--version", action="version",
-        version="%(prog)s v{}".format(sunbeamlib.__version__))
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s v{}".format(sunbeamlib.__version__),
+    )
 
     args, remaining = parser.parse_known_args()
 
@@ -49,4 +51,3 @@ def main():
     else:
         parser.print_help()
         sys.stderr.write("Unrecognized command.\n")
-

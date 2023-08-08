@@ -2,7 +2,7 @@
 
 # Sunbeam: a robust, extensible metagenomic sequencing pipeline 
 
-[![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev) [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=stable)](https://sunbeam.readthedocs.io/en/stable/?badge=stable) [![DOI:10.1186/s40168-019-0658-x](https://img.shields.io/badge/Published%20in-Microbiome-1abc9c.svg)](https://doi.org/10.1186/s40168-019-0658-x)
+[![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/dev) [![Super-Linter](https://github.com/sunbeam-labs/sunbeam/actions/workflows/linter.yml/badge.svg)](https://github.com/sunbeam-labs/sunbeam/actions/workflows/linter.yml) [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=stable)](https://sunbeam.readthedocs.io/en/stable/?badge=stable) [![DOI:10.1186/s40168-019-0658-x](https://img.shields.io/badge/Published%20in-Microbiome-1abc9c.svg)](https://doi.org/10.1186/s40168-019-0658-x)
 
 Sunbeam is a pipeline written in [snakemake](http://snakemake.readthedocs.io)
 that simplifies and automates many of the steps in metagenomic sequencing
@@ -28,7 +28,7 @@ Sunbeam was designed to be modular and extensible. Some extensions have been bui
 - [Kaiju](https://github.com/sunbeam-labs/sbx_kaiju), a read classifier that uses BWA rather than kmers
 - [Anvi'o](https://github.com/sunbeam-labs/sbx_anvio), a downstream analysis pipeline that does lots of stuff!
 
-More extensions can be found at the extension page: https://www.sunbeam-labs.org/.
+More extensions can be found at the extension page: https://github.com/sunbeam-labs.
 
 **To get started, see our [documentation](http://sunbeam.readthedocs.io)!**
 
@@ -46,6 +46,16 @@ See how people are using Sunbeam:
 ------
 
 ### Changelog:
+
+#### v4.0.0 (July 29, 2023)
+
+- Many components of sunbeam have been moved extensions to minimize installation and usage issues with the core pipeline, qc and decontam are the remaining core components
+- Deprecated --cluster-config snakemake option replaced with profiles, also reduces sunbeam's command line interface by moving options to the profile
+- Improved logging and reporting standards for sunbeam and extensions
+- Restructured to snakemake standards for tarball installation methods
+- Switch test suite from bash to pytest to increase ease and efficiency of testing
+- Updated documentation
+- Improved filter_reads efficiency on large hostid sets and catch errors in sequence header matching
 
 #### v3.1.1 (October 19, 2022)
 
@@ -150,5 +160,6 @@ See how people are using Sunbeam:
 - Chunyu Zhao ([@zhaoc1](https://github.com/zhaoc1))
 - Jesse Connell ([@ressy](https://github.com/ressy))
 - Louis Taylor ([@louiejtaylor](https://github.com/louiejtaylor))
+- Charlie Bushman ([@ulthran](https://github.com/ulthran))
 - Kyle Bittinger ([@kylebittinger](https://github.com/kylebittinger))
 

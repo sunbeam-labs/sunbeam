@@ -14,7 +14,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v3-dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
+          - dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
 
       - run:
           name: install
@@ -23,21 +23,48 @@ jobs:
           no_output_timeout: 20m
 
       - run:
-          name: dump_env
-          command: |
-            bash .circleci/dump_conda_env.bash
-
-      - run:
           name: run tests
           command: |
+            export PATH=$PATH:$HOME/miniconda3/bin
+            CONDA_BASE=$(conda info --base)
+            source $CONDA_BASE/etc/profile.d/conda.sh
+            
             TAG=$(git describe --tag)
-            bash tests/run_tests.bash -e sunbeam${TAG:1}
-          no_output_timeout: 20m
+            conda activate sunbeam${TAG:1}
+            pytest tests/ -vvl
+          no_output_timeout: 40m
+
+      - run:
+          name: dump_env
+          when: always
+          command: |
+            bash .circleci/dump_conda_env.bash
+            bash dev_scripts/dump_.snakemake.sh
+
+      - run:
+          name: log dump
+          when: always
+          command: tail -n +1 output_*/sunbeam_output/logs/*
+
+      - run:
+          name: output tree dump
+          when: always
+          command: ls -lRh output_*
+      
+      - run:
+          name: reports dump
+          when: always
+          command: cat output_*/sunbeam_output/qc/reports/preprocess_summary.tsv
+
+      - run:
+          name: benchmark dump
+          when: always
+          command: cat output_*/stats/*
 
       - save_cache:
           paths:
             - ~/miniconda3
-          key: v3-dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
+          key: dependencies-{{ .Branch }}-{{ checksum "environment.yml" }}
 
 workflows:
   version: 2

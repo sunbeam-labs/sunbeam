@@ -8,6 +8,7 @@ from semantic_version import Version
 import ruamel.yaml
 from sunbeamlib import __version__
 
+
 def makepath(path):
     return Path(path).expanduser()
 
@@ -18,8 +19,8 @@ def verify(path):
         return path.resolve()
     else:
         raise ValueError("Path %s does not exist" % path)
-    
-    
+
+
 def validate_paths(cfg, root):
     """Process paths in config file subsection.
 
@@ -28,65 +29,54 @@ def validate_paths(cfg, root):
     - ensured to be an absolute path, by appending `root` if needed
     - ensured to exist, if it is not the value from `output_fp`
     - expanded home directory ~
-    
+
     :param cfg: a config file subsection
     :returns: an updated copy of cfg
     """
     new_cfg = dict()
     for k, v in cfg.items():
-        if k.endswith('_fp'):
-            v = makepath(v)
+        if k.endswith("_fp"):
+            try:
+                v = makepath(v)
+            except TypeError as e:
+                raise TypeError(f"Missing value for key: {k}")
             if not v.is_absolute():
-                v = root/v
-            if k != 'output_fp':
-                try: v = verify(v)
+                v = root / v
+            if k != "output_fp":
+                try:
+                    v = verify(v)
                 except ValueError:
-                    raise ValueError(
-                        "For key '%s': path '%s' does not exist" % (k,v))
+                    raise ValueError("For key '%s': path '%s' does not exist" % (k, v))
         new_cfg[k] = v
     return new_cfg
+
 
 def check_compatibility(cfg):
     """Returns the major version numbers from the package and config file, respectively"""
 
-    cfg_version = Version(cfg['all'].get('version', '0.0.0'))
+    cfg_version = Version(cfg["all"].get("version", "0.0.0"))
     pkg_version = Version(__version__)
 
     return (pkg_version.major, cfg_version.major)
-    
+
+
 def check_config(cfg):
     """Resolve root in config file, then validate paths."""
-    
-    if 'root' in cfg['all']:
-        root = verify(cfg['all']['root'])
+
+    if "root" in cfg["all"]:
+        root = verify(cfg["all"]["root"])
     else:
         root = Path.cwd()
     # Iteratively check paths for each subsection
     new_cfg = dict()
     for section, values in cfg.items():
         new_cfg[section] = validate_paths(values, root)
-    new_cfg['all']['root'] = root
+    new_cfg["all"]["root"] = root
     return new_cfg
 
 
 def output_subdir(cfg, section):
-    return cfg['all']['output_fp']/cfg[section]['suffix']
-
-
-def process_databases(db_dict):
-    """Process the list of databases.
-
-    Expands the nucleotide and protein databases specified
-    """
-    dbs = {'nucl':{}, 'prot':{}}
-    root = verify(makepath(db_dict['root_fp']))
-    nucl = db_dict.get('nucleotide')
-    prot = db_dict.get('protein')
-    if nucl:
-        dbs['nucl'] = {db: str(root/path) for db, path in nucl.items()}
-    if prot:
-        dbs['prot'] = {db: str(root/path) for db, path in prot.items()}
-    return dbs
+    return cfg["all"]["output_fp"] / cfg[section]["suffix"]
 
 
 def _update_dict(target, new):
@@ -102,6 +92,7 @@ def _update_dict(target, new):
             target[k] = v
     return target
 
+
 def _update_dict_strict(target, new):
     for k, v in new.items():
         if isinstance(v, Mapping) and k in target.keys():
@@ -113,58 +104,63 @@ def _update_dict_strict(target, new):
             continue
     return target
 
+
 def update(config_str, new, strict=False):
     config = ruamel.yaml.round_trip_load(config_str)
     if strict:
         config = _update_dict_strict(config, new)
     else:
-        config = _update_dict(config, new)
         sbx_config = ruamel.yaml.round_trip_load(extension_config())
         if sbx_config:
-            config = _update_dict(config, sbx_config)
+            for k, v in sbx_config.items():
+                if k not in config.keys():
+                    # Only update sbx_config if that sbx isn't in the config file yet
+                    config = _update_dict(config, {k: v})
+        config = _update_dict(config, new)
     return config
 
-def new(
-        project_fp,
-        version=__version__,
-        template=None):
+
+def new(project_fp, version=__version__, template=None):
     if template:
         config = template.read()
     else:
-        config = str(resource_stream(
-            "sunbeamlib", "data/default_config.yml").read().decode())
+        config = str(
+            resource_stream("sunbeamlib", "data/default_config.yml").read().decode()
+        )
         # add config from extensions
         config = config + extension_config()
 
-    return config.format(
-        PROJECT_FP=project_fp,
-        SB_VERSION=version)
+    return config.format(PROJECT_FP=project_fp, SB_VERSION=version)
+
 
 def extension_config():
     config = ""
     sunbeam_dir = Path(os.getenv("SUNBEAM_DIR", os.getcwd()))
-    for sbx in os.listdir(sunbeam_dir/"extensions"):
-        if sbx == ".placeholder":
+    for sbx in os.listdir(sunbeam_dir / "extensions"):
+        if sbx[:3] != "sbx":
             continue
         try:
-            sbx_files = os.listdir(sunbeam_dir/"extensions"/sbx)
+            sbx_files = os.listdir(sunbeam_dir / "extensions" / sbx)
         except NotADirectoryError:
             continue
-        if 'config.yml' in sbx_files:
+        if "config.yml" in sbx_files:
             # append it to the existing config
-            sbx_config_fp = sunbeam_dir/"extensions"/sbx/"config.yml"
+            sbx_config_fp = sunbeam_dir / "extensions" / sbx / "config.yml"
             sbx_configfile = open(sbx_config_fp)
-            sbx_config = "\n"+sbx_configfile.read()
-            sbx_configfile.close() 
+            sbx_config = "\n" + sbx_configfile.read()
+            sbx_configfile.close()
             config = str(config + sbx_config)
     return config
 
+
 def load_defaults(default_name):
     return ruamel.yaml.safe_load(
-        resource_stream(
-            "sunbeamlib", "data/{}.yml".format(default_name)
-        ).read().decode())
-    
+        resource_stream("sunbeamlib", "data/{}.yml".format(default_name))
+        .read()
+        .decode()
+    )
+
+
 def dump(config, out=sys.stdout):
     if isinstance(config, Mapping):
         ruamel.yaml.round_trip_dump(config, out)

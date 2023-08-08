@@ -1,0 +1,10 @@
+PASS	Basic Statistics	SHORT_1.fastq.gz
+FAIL	Per base sequence quality	SHORT_1.fastq.gz
+FAIL	Per sequence quality scores	SHORT_1.fastq.gz
+WARN	Per base sequence content	SHORT_1.fastq.gz
+FAIL	Per sequence GC content	SHORT_1.fastq.gz
+PASS	Per base N content	SHORT_1.fastq.gz
+PASS	Sequence Length Distribution	SHORT_1.fastq.gz
+PASS	Sequence Duplication Levels	SHORT_1.fastq.gz
+WARN	Overrepresented sequences	SHORT_1.fastq.gz
+PASS	Adapter Content	SHORT_1.fastq.gz
