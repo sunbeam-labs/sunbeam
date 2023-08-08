@@ -4,9 +4,6 @@ channels:
   - conda-forge
 dependencies:
   - bwa
-  - cutadapt>3
   - fastqc
   - trimmomatic
   - python>=3.10
-  - pip:
-    - xopen>=1.6

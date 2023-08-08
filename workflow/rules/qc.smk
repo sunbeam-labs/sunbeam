@@ -38,7 +38,7 @@ rule adapter_removal_unpaired:
         str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
     threads: 4
     conda:
-        "../envs/qc.yml"
+        "../envs/cutadapt.yml"
     script:
         "../scripts/adapter_removal_unpaired.py"
 
@@ -59,7 +59,7 @@ rule adapter_removal_paired:
         r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
     threads: 4
     conda:
-        "../envs/qc.yml"
+        "../envs/cutadapt.yml"
     script:
         "../scripts/adapter_removal_paired.py"
 
