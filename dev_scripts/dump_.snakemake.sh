@@ -11,7 +11,7 @@ conda activate sunbeam${TAG:1}
 DIR=$SUNBEAM_DIR/.snakemake/
 
 ls -la $DIR
-cat *.pin.txt
+cat $DIR/*.pin.txt
 #for fp in $DIR/*.yaml; do
 #    cat $fp
 #    ENV=${fp%.yaml}
