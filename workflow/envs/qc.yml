@@ -5,9 +5,7 @@ channels:
 dependencies:
   - bwa
   - fastqc
-  - samtools
   - trimmomatic
   - python>=3.10
   - pip:
     - cutadapt
-    - pysam
