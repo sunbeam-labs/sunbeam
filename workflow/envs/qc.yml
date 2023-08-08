@@ -4,9 +4,10 @@ channels:
   - conda-forge
 dependencies:
   - bwa
-  - cutadapt
   - fastqc
-  - pysam
-  - samtools=1.9
+  - samtools
   - trimmomatic
   - python>=3.10
+  - pip:
+    - cutadapt
+    - pysam
