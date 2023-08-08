@@ -82,7 +82,7 @@ def test_filter_reads(setup):
 
     assert sr1.stat().st_size >= 5000
     assert sr2.stat().st_size >= 5000
-    
+
     assert csr1.stat().st_size > sr1.stat().st_size
     assert csr2.stat().st_size > sr2.stat().st_size
 
