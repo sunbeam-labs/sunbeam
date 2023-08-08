@@ -75,8 +75,7 @@ workflows:
           filters:
             branches:
               only:
-                - dev
-                - stable
+                - main
     jobs:
       - build
   default:
