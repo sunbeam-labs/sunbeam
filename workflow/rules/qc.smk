@@ -232,7 +232,7 @@ rule clean_qc:
         touch(QC_FP / ".qc_cleaned"),
     shell:
         """
-        rm -r {params.cutadapt_fp} && \
-        rm -r {params.trimmomatic_fp} && \
+        rm -r {params.cutadapt_fp}
+        rm -r {params.trimmomatic_fp}
         rm -r {params.komplexity_fp}
         """
