@@ -3,3 +3,4 @@ biopython
 ruamel.yaml
 semantic_version
 sphinx-tabs
+sphinx_rtd_theme
