@@ -74,7 +74,7 @@ installing or updating Sunbeam:
 
    python -m pytest tests/ -vvl
 
-If the tests fail, you should either refer to our troubleshooting_ guide or file
+If the tests fail, you should either refer to our troubleshooting guide or file
 an issue on our `Github page <https://github.com/sunbeam-labs/sunbeam/issues>`_.
 
 .. tip::
