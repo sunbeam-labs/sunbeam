@@ -177,7 +177,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Sunbeam', 'Sunbeam Documentation',
-     author, 'Sunbeam', 'One line description of project.',
+     author, 'Sunbeam', 'A shotgun sequencing data bioinformatics pipeline',
      'Miscellaneous'),
 ]
 

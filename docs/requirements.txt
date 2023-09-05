@@ -2,5 +2,3 @@ snakemake>=7.8.5
 biopython
 ruamel.yaml
 semantic_version
-sphinx-tabs
-sphinx_rtd_theme
