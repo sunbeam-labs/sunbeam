@@ -31,7 +31,7 @@ jobs:
             
             TAG=$(git describe --tag)
             conda activate sunbeam${TAG:1}
-            pytest tests/ -vvl
+            python -m pytest tests/ -vvl
           no_output_timeout: 40m
 
       - run:
