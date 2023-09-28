@@ -23,3 +23,5 @@ jobs:
       
       - name: Check Conda Envs
         uses: Ulthran/conda_env_check@v0
+        with:
+          envs: "*.yml|*.yaml|workflow/envs/*.yml|workflow/envs/*.yaml"
