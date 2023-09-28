@@ -5,6 +5,12 @@ on:
     branches: [main]
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      envs:
+        description: 'Regex for envs'     
+        required: false
+        default: '*.yml|*.yaml|envs/*.yml|envs/*.yaml'
 
 jobs:
   check_conda_envs:
