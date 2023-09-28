@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/python:3.10
+      - image: continuumio/miniconda3
 
     steps:
       - checkout
@@ -31,8 +31,7 @@ jobs:
             
             TAG=$(git describe --tag)
             conda activate sunbeam${TAG:1}
-            python -m pip install .
-            python -m pytest tests/ -vvl
+            pytest tests/ -vvl
           no_output_timeout: 40m
 
       - run:
