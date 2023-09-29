@@ -10,7 +10,7 @@ on:
       envs:
         description: 'Regex for envs'     
         required: false
-        default: '*.yml|*.yaml|envs/*.yml|envs/*.yaml'
+        default: './,workflow/envs/'
 
 jobs:
   check_conda_envs:
@@ -24,4 +24,4 @@ jobs:
       - name: Check Conda Envs
         uses: Ulthran/conda_env_check@v0
         with:
-          envs: "*.yml|*.yaml|workflow/envs/*.yml|workflow/envs/*.yaml"
+          envs: "./,workflow/envs/"
