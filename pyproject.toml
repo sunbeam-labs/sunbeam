@@ -17,7 +17,8 @@ name = "sunbeamlib"  # Required
 #
 # For a discussion on single-sourcing the version, see
 # https://packaging.python.org/guides/single-sourcing-package-version/
-version = "0.0.0"  # Required
+#version = "0.0.0"  # Required
+dynamic = ["version"]
 
 # This is a one-line description or tagline of what your project does. This
 # corresponds to the "Summary" metadata field:
@@ -51,7 +52,7 @@ requires-python = ">=3.7"
 # Note that this is a list of additional keywords, separated
 # by commas, to be used to assist searching for the distribution in a
 # larger catalog.
-keywords = ["bioinformatics", "metagenomics"]  # Optional
+#keywords = ["bioinformatics", "metagenomics"]  # Optional
 
 # This should be your name or the name of the organization who originally
 # authored the project, and a valid email address corresponding to the name
@@ -63,9 +64,9 @@ keywords = ["bioinformatics", "metagenomics"]  # Optional
 # This should be your name or the names of the organization who currently
 # maintains the project, and a valid email address corresponding to the name
 # listed.
-# maintainers = [
-#   {name = "A. Great Maintainer", email = "maintainer@example.com" } # Optional
-# ]
+maintainers = [
+  {name = "Charlie Bushman", email = "ctbushman@gmail.com" } # Optional
+]
 
 # Classifiers help users find your project by categorizing it.
 #
@@ -75,11 +76,11 @@ classifiers = [  # Optional
   #   3 - Alpha
   #   4 - Beta
   #   5 - Production/Stable
-  "Development Status :: 5 - Stable",
+  "Development Status :: 5 - Production/Stable",
 
   # Indicate who your project is intended for
   # "Intended Audience :: Developers",
-  "Topic :: Bioinformatics",
+  #"Topic :: Bioinformatics",
 
   # Pick your license as you wish
   "License :: OSI Approved :: MIT License",
@@ -104,7 +105,7 @@ classifiers = [  # Optional
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [ # Optional
   "more-itertools",
-  "semantic_version",
+  "semantic-version",
   "ruamel.yaml",
 ]
 
@@ -117,7 +118,7 @@ dependencies = [ # Optional
 # Similar to `dependencies` above, these must be valid existing
 # projects.
 [project.optional-dependencies] # Optional
-# dev = ["check-manifest"]
+dev = ["black"]
 test = ["pytest"]
 
 # List URLs that are relevant to your project
@@ -136,7 +137,7 @@ test = ["pytest"]
 "Docs" = "https://sunbeam.readthedocs.io/en/stable/"
 # "Funding" = "https://donate.pypi.org"
 # "Say Thanks!" = "http://saythanks.io/to/example"
-# "Source" = "https://github.com/pypa/sampleproject/"
+"Source" = "https://github.com/sunbeam-labs/sunbeam"
 
 # The following would provide a command line executable called `sample`
 # which executes the function `main` from this package when invoked.
@@ -148,15 +149,19 @@ sunbeam = "sunbeamlib.scripts.command:main"
 [tool.setuptools]
 # If there are data files included in your packages that need to be
 # installed, specify them here.
-package-data = {"sunbeamlib" = ["sunbeamlib/data/*.yml", "sunbeamlib/data/*.yaml"]}
+package-data = {"sunbeamlib" = ["src/sunbeamlib/data/*.yml", "src/sunbeamlib/data/*.yaml"]}
 
 [build-system]
 # These are the assumed default build requirements from pip:
 # https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support
-requires = ["setuptools>=43.0.0", "wheel"]
+requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-where = ["sunbeamlib"]
+#[tool.setuptools.packages.find]
+#where = ["src/sunbeamlib"]
 # include = ["pkg*"]  # alternatively: `exclude = ["additional*"]`
-namespaces = false
+#exclude = ["src/sunbeamlib/data"]
+#namespaces = false
+
+[tool.setuptools.dynamic]
+version = {attr = "sunbeamlib.__version__"}

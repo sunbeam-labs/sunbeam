@@ -3,6 +3,5 @@ channels:
   - bioconda
 dependencies:
   - snakemake
-  - semantic_version
   - git # Ensure sunbeam extend works even with tar installation of main pipeline
   - python>=3.10
