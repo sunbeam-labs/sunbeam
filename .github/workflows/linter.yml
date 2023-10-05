@@ -2,7 +2,7 @@ name: Super-Linter
 
 on:
   pull_request:
-    branches: [master, main, stable, dev]
+    branches: [main]
 
 jobs:
   super-linter:
