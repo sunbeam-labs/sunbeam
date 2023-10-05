@@ -5,7 +5,7 @@ import argparse
 import ruamel.yaml
 from pathlib import Path
 
-from .list_samples import (
+from sunbeamlib.script_list_samples import (
     build_sample_list,
     MissingMatePairError,
     SampleFormatError,

@@ -105,7 +105,6 @@ classifiers = [  # Optional
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [ # Optional
   "more-itertools",
-  "semantic-version",
   "ruamel.yaml",
 ]
 
@@ -149,7 +148,7 @@ sunbeam = "sunbeamlib.scripts.command:main"
 [tool.setuptools]
 # If there are data files included in your packages that need to be
 # installed, specify them here.
-package-data = {"sunbeamlib" = ["src/sunbeamlib/data/*.yml", "src/sunbeamlib/data/*.yaml"]}
+package-data = {"sunbeamlib" = ["*.yml", "*.yaml"]}
 
 [build-system]
 # These are the assumed default build requirements from pip:
@@ -158,9 +157,8 @@ requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 #[tool.setuptools.packages.find]
-#where = ["src/sunbeamlib"]
+#where = ["src/"]
 # include = ["pkg*"]  # alternatively: `exclude = ["additional*"]`
-#exclude = ["src/sunbeamlib/data"]
 #namespaces = false
 
 [tool.setuptools.dynamic]

@@ -1,12 +1,11 @@
 import os
+import ruamel.yaml
 import sys
 from collections.abc import Mapping
 from pathlib import Path
 from pkg_resources import resource_stream
 
-from semantic_version import Version
-import ruamel.yaml
-from sunbeamlib import __version__
+from sunbeamlib import __version__, Version
 
 
 def makepath(path):

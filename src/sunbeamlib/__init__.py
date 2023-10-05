@@ -8,10 +8,30 @@ import csv
 
 from pathlib import Path
 
-from semantic_version import Version
 from sunbeamlib.parse import parse_fasta
 
-__version__ = str(Version.coerce(os.environ.get("SUNBEAM_VER", "0.0.0")))
+class Version():
+    def __init__(self, version: str) -> None:
+        self.version = version
+        if self.version.startswith("v"):
+            self.version = self.version[1:]
+        
+        version_parts = self.version.split(".")
+        self.major = version_parts[0]
+        try:
+            self.minor = version_parts[1]
+        except IndexError:
+            self.minor = 0
+        try:
+            self.patch = version_parts[2]
+        except IndexError:
+            self.patch = 0
+    
+    def __str__(self) -> str:
+        return f"{self.major}.{self.minor}.{self.patch}"
+
+
+__version__ = str(Version(os.environ.get("SUNBEAM_VER", "0.0.0")))
 
 
 def load_sample_list(samplelist_fp, paired_end=True, root_proj=""):
