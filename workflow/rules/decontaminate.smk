@@ -136,6 +136,7 @@ rule clean_decontam:
             sample=Samples.keys(),
             rp=Pairs,
         ),
+        QC_FP / ".qc_cleaned",
     params:
         cutadapt_fp=QC_FP / "01_cutadapt",
         trimmomatic_fp=QC_FP / "02_trimmomatic",
@@ -146,9 +147,6 @@ rule clean_decontam:
         touch(QC_FP / ".decontam_cleaned"),
     shell:
         """
-        rm -r {params.cutadapt_fp}
-        rm -r {params.trimmomatic_fp}
-        rm -r {params.komplexity_fp}
-        rm -r {params.clean_qc}
-        rm -r {params.intermediates}
+        rm -r {params.clean_qc} || true
+        rm -r {params.intermediates} || true
         """
