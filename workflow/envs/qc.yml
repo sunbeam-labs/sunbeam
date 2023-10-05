@@ -1,3 +1,4 @@
+name: qc
 channels:
   - bioconda
   - conda-forge
@@ -6,4 +7,3 @@ dependencies:
   - fastqc
   - trimmomatic
   - python =3.11.5
-name: qc
