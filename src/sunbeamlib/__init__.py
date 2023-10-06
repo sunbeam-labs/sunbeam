@@ -1,6 +1,3 @@
-__author__ = "Erik Clarke"
-__license__ = "GPL2+"
-
 import os
 import re
 import sys
@@ -8,14 +5,13 @@ import csv
 
 from pathlib import Path
 
-from sunbeamlib.parse import parse_fasta
 
-class Version():
+class Version:
     def __init__(self, version: str) -> None:
         self.version = version
         if self.version.startswith("v"):
             self.version = self.version[1:]
-        
+
         version_parts = self.version.split(".")
         self.major = version_parts[0]
         try:
@@ -26,15 +22,19 @@ class Version():
             self.patch = version_parts[2]
         except IndexError:
             self.patch = 0
-    
+        if len(self.patch.split("-")) > 1:
+            self.patch = self.patch.split("-")[0]
+
     def __str__(self) -> str:
         return f"{self.major}.{self.minor}.{self.patch}"
 
 
 __version__ = str(Version(os.environ.get("SUNBEAM_VER", "0.0.0")))
+__author__ = "Erik Clarke"
+__license__ = "GPL2+"
 
 
-def load_sample_list(samplelist_fp, paired_end=True, root_proj=""):
+def load_sample_list(samplelist_fp, paired_end=True):
     """
     Build a list of samples from a sample list file.
     :param samplelist_fp: a Path to a whitespace-delimited samplelist file,
@@ -126,16 +126,9 @@ def circular(seq, kmin, kmax, min_len):
     """Determine if a sequence is circular.
 
     Checks for repeated k-mer at beginning and end of a sequence for a given
-    range of values for k."""
+    range of values for k.
+    """
     if len(seq) < min_len:
         return False
     # Short-circuit checking: returns True for the first kmer that matches
     return any([k for k in range(kmin, kmax + 1) if seq[0:k] == seq[len(seq) - k :]])
-
-
-def read_seq_ids(fasta_fp):
-    """
-    Return the sequence identifiers for a given fasta filename.
-    """
-    with open(str(fasta_fp)) as f:
-        return list(parse_fasta(f))

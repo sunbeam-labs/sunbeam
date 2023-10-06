@@ -32,6 +32,14 @@ def parse_fasta(f):
         yield (header_str, seq_str)
 
 
+def read_seq_ids(fasta_fp):
+    """
+    Return the sequence identifiers for a given fasta filepath.
+    """
+    with open(str(fasta_fp)) as f:
+        return list(parse_fasta(f))
+
+
 def write_fasta(record, f):
     f.write(f">{record[0]}\n")
     f.write(f"{record[1]}\n")

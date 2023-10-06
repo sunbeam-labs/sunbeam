@@ -17,8 +17,9 @@ from pathlib import Path, PurePath
 from snakemake.utils import update_config, listfiles
 from snakemake.exceptions import WorkflowError
 
-from sunbeamlib import load_sample_list, read_seq_ids
+from sunbeamlib import load_sample_list
 from sunbeamlib.config import *
+from sunbeamlib.parse import read_seq_ids
 from sunbeamlib.post import *
 from sunbeamlib.reports import *
 
