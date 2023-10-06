@@ -14,7 +14,6 @@ from sunbeamlib import (
     guess_format_string,
     _verify_path,
     circular,
-    read_seq_ids,
 )
 
 data_dir = Path(__file__).parent / "data"
