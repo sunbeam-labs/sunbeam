@@ -189,7 +189,7 @@ def write_config(args, project_fp, samplelists):
 
 def write_profile(args, project_fp):
     sunbeam_dir = Path(os.getenv("SUNBEAM_DIR", os.getcwd()))
-    template_fp = sunbeam_dir / "sunbeamlib" / "data" / f"{args.profile}_profile.yaml"
+    template_fp = sunbeam_dir / "sunbeamlib" / f"{args.profile}_profile.yaml"
     config_fp = project_fp / "config.yaml"
     shutil.copyfile(template_fp, config_fp)
     with open(config_fp, "a") as f:

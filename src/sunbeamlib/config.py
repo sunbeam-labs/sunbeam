@@ -122,7 +122,7 @@ def new(
         config = template.read()
     else:
         config = str(
-            resource_stream("sunbeamlib", "data/default_config.yml").read().decode()
+            resource_stream("sunbeamlib", "default_config.yml").read().decode()
         )
         # add config from extensions
         config = config + extension_config()
@@ -152,7 +152,7 @@ def extension_config() -> str:
 
 def load_defaults(default_name: str) -> Dict[str, Union[str, Dict]]:
     return yaml.safe_load(
-        resource_stream("sunbeamlib", "data/{}.yml".format(default_name))
+        resource_stream("sunbeamlib", "{}.yml".format(default_name))
         .read()
         .decode()
     )
