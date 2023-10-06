@@ -148,18 +148,13 @@ sunbeam = "sunbeamlib.script_sunbeam:main"
 [tool.setuptools]
 # If there are data files included in your packages that need to be
 # installed, specify them here.
-package-data = {"sunbeamlib" = ["*.yml", "*.yaml"]}
+#package-data = {"sunbeamlib" = ["*.yml", "*.yaml"]}
 
 [build-system]
 # These are the assumed default build requirements from pip:
 # https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support
 requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
-
-#[tool.setuptools.packages.find]
-#where = ["src/"]
-# include = ["pkg*"]  # alternatively: `exclude = ["additional*"]`
-#namespaces = false
 
 [tool.setuptools.dynamic]
 version = {attr = "sunbeamlib.__version__"}

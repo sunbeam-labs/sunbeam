@@ -1,2 +1,2 @@
-include sunbeamlib/data/*.yml
-include sunbeamlib/data/*.yaml
+include src/sunbeamlib/*.yml
+include src/sunbeamlib/*.yaml
