@@ -1,7 +1,6 @@
 import os
 import sys
 import yaml
-from collections.abc import Mapping
 from pathlib import Path
 from pkg_resources import resource_stream
 from typing import Dict, TextIO, Tuple, Union
@@ -160,7 +159,7 @@ def load_defaults(default_name: str) -> Dict[str, Union[str, Dict]]:
 
 
 def dump(config: Union[str, Dict], out: TextIO = sys.stdout) -> None:
-    if isinstance(config, Mapping):
+    if isinstance(config, dict):
         yaml.safe_dump(config, out)
     else:
         out.write(config)
