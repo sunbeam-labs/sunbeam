@@ -3,33 +3,32 @@ import pytest
 import shutil
 import sys
 import tempfile
+import yaml
 from pathlib import Path
-from ruamel.yaml import YAML
 
 
 @pytest.fixture
 def config():
     tests_dir = Path(__file__).parent.resolve()
 
-    yaml = YAML(typ="safe")
     with open(tests_dir / "test_config.yml") as f:
-        config_dict = yaml.load(f)
+        config_dict = yaml.safe_load(f)
 
     yield config_dict
 
 
 @pytest.fixture
 def output_dir(config):
-    yaml = config
+    config = config
     output_dir = Path()
 
-    if not yaml["output_dir"]:
+    if not config["output_dir"]:
         output_dir = Path(tempfile.mkdtemp())
     else:
-        output_dir = Path(yaml["output_dir"])
+        output_dir = Path(config["output_dir"])
         output_dir.mkdir(parents=True, exist_ok=True)
         if not os.listdir(output_dir) == []:
-            if yaml["overwrite"]:
+            if config["overwrite"]:
                 shutil.rmtree(output_dir)
                 output_dir.mkdir()
             else:
@@ -37,7 +36,7 @@ def output_dir(config):
                     "overwrite is set to false but output_dir points to a non-empty directory"
                 )
 
-    if not yaml["temp_env"]:
+    if not config["temp_env"]:
         pass
     else:
         # TODO: Create temp_env
@@ -62,5 +61,5 @@ def output_dir(config):
         shutil.move(extensions_moved_fp, extensions_fp)
     except FileNotFoundError as e:
         pass
-    if not yaml["output_dir"]:
+    if not config["output_dir"]:
         shutil.rmtree(output_dir)

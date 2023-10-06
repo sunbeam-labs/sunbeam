@@ -1,5 +1,5 @@
 import sys
-import ruamel.yaml
+import yaml
 import argparse
 
 from sunbeamlib import config
@@ -107,7 +107,7 @@ def update(args):
             "to prevent unexpected loss of config settings."
         )
 
-    old_config = ruamel.yaml.safe_load(args.config_file)
+    old_config = yaml.safe_load(args.config_file)
 
     # Remove the old version number
     old_config.get("all", {}).pop("version", None)
@@ -134,7 +134,7 @@ def update(args):
 
 def modify(args):
     update_src = args.str if args.str else args.file
-    new_values = ruamel.yaml.safe_load(update_src)
+    new_values = yaml.safe_load(update_src)
     if isinstance(new_values, str) and args.str:
         raise SystemExit(
             "Invalid YAML in --str. Did you make sure to put spaces between "

@@ -1,6 +1,6 @@
 import os
-import ruamel.yaml
 import sys
+import yaml
 from collections.abc import Mapping
 from pathlib import Path
 from pkg_resources import resource_stream
@@ -80,38 +80,33 @@ def output_subdir(cfg: Dict[str, Dict[str, str]], section: str) -> Path:
     return cfg["all"]["output_fp"] / cfg[section]["suffix"]
 
 
-def _update_dict(target: Dict[str, Union[str, Dict]], new: Dict[str, Union[str, Dict]]) -> Dict[str, Union[str, Dict]]:
+def _update_dict(
+    target: Dict[str, Union[str, Dict]], new: Dict[str, Union[str, Dict]]
+) -> Dict[str, Union[str, Dict]]:
     for k, v in new.items():
-        if isinstance(v, Mapping):
-            # We could use .get() here but ruamel.yaml's weird Mapping
-            # subclass outputs errors to stdout if the key doesn't exist
-            if k in target:
-                target[k] = _update_dict(target[k], v)
-            else:
-                target[k] = _update_dict({}, v)
+        if isinstance(v, dict):
+            target[k] = _update_dict(target.get(k, {}), v)
         else:
             target[k] = v
     return target
 
 
-def _update_dict_strict(target: Dict[str, Union[str, Dict]], new: Dict[str, Union[str, Dict]]) -> Dict[str, Union[str, Dict]]:
+def _update_dict_strict(
+    target: Dict[str, Union[str, Dict]], new: Dict[str, Union[str, Dict]]
+) -> Dict[str, Union[str, Dict]]:
     for k, v in new.items():
-        if isinstance(v, Mapping) and k in target.keys():
-            target[k] = _update_dict_strict(target.get(k, {}), v)
-        elif k in target.keys():
-            target[k] = v
-        else:
-            sys.stderr.write("Key '%s' not found in target, skipping\n" % k)
-            continue
+        target[k] = _update_dict_strict(target.get(k, {}), v)
     return target
 
 
-def update(config_str: str, new: Dict[str, Union[str, Dict]], strict: bool = False) -> Dict[str, Union[str, Dict]]:
-    config = ruamel.yaml.round_trip_load(config_str)
+def update(
+    config_str: str, new: Dict[str, Union[str, Dict]], strict: bool = False
+) -> Dict[str, Union[str, Dict]]:
+    config = yaml.safe_load(config_str)
     if strict:
         config = _update_dict_strict(config, new)
     else:
-        sbx_config = ruamel.yaml.round_trip_load(extension_config())
+        sbx_config = yaml.safe_load(extension_config())
         if sbx_config:
             for k, v in sbx_config.items():
                 if k not in config.keys():
@@ -121,7 +116,9 @@ def update(config_str: str, new: Dict[str, Union[str, Dict]], strict: bool = Fal
     return config
 
 
-def new(project_fp: Union[str, Path], version: str = __version__, template: TextIO = None) -> str:
+def new(
+    project_fp: Union[str, Path], version: str = __version__, template: TextIO = None
+) -> str:
     if template:
         config = template.read()
     else:
@@ -155,7 +152,7 @@ def extension_config() -> str:
 
 
 def load_defaults(default_name: str) -> Dict[str, Union[str, Dict]]:
-    return ruamel.yaml.safe_load(
+    return yaml.safe_load(
         resource_stream("sunbeamlib", "data/{}.yml".format(default_name))
         .read()
         .decode()
@@ -164,6 +161,6 @@ def load_defaults(default_name: str) -> Dict[str, Union[str, Dict]]:
 
 def dump(config: Union[str, Dict], out: TextIO = sys.stdout) -> None:
     if isinstance(config, Mapping):
-        ruamel.yaml.round_trip_dump(config, out)
+        yaml.safe_dump(config, out)
     else:
         out.write(config)

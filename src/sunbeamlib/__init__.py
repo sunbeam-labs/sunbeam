@@ -34,7 +34,9 @@ __author__ = "Erik Clarke"
 __license__ = "GPL2+"
 
 
-def load_sample_list(samplelist_fp: Path, paired_end: bool = True) -> Dict[str, Dict[str, str]]:
+def load_sample_list(
+    samplelist_fp: Path, paired_end: bool = True
+) -> Dict[str, Dict[str, str]]:
     """
     Build a list of samples from a sample list file.
     :param samplelist_fp: a Path to a whitespace-delimited samplelist file,
@@ -64,7 +66,9 @@ def load_sample_list(samplelist_fp: Path, paired_end: bool = True) -> Dict[str, 
     return Samples
 
 
-def guess_format_string(fnames: List[str], paired_end: bool = True, split_pattern: str = "([_.])") -> str:
+def guess_format_string(
+    fnames: List[str], paired_end: bool = True, split_pattern: str = "([_.])"
+) -> str:
     """
     Try to guess the format string given a list of filenames.
     :param fnames: a list of filename strings

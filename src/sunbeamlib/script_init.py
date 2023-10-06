@@ -2,7 +2,7 @@ import os
 import shutil
 import sys
 import argparse
-import ruamel.yaml
+import yaml
 from pathlib import Path
 
 from sunbeamlib.script_list_samples import (
@@ -170,7 +170,7 @@ def write_config(args, project_fp, samplelists):
         cfg = config.new(project_fp=project_fp, template=args.template)
         defaults = {}
         if args.defaults:
-            defaults = ruamel.yaml.safe_load(args.defaults)
+            defaults = yaml.safe_load(args.defaults)
         # Override loaded config defaults (if any) for a few specific items.
         paired = layout == "paired"
         defaults["all"] = defaults.get("all", {})
