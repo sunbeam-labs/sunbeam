@@ -15,11 +15,6 @@ def config():
     with open(tests_dir / "test_config.yml") as f:
         config_dict = yaml.load(f)
 
-    if not shutil.which("mamba"):
-        sys.exit(
-            "Sunbeam needs mamba to be installed to run tests `conda install -c conda-forge mamba`. If you want to run sunbeam (not the tests) without mamba you can use `sunbeam run --profile /path/to/project/ --conda-frontend=conda`."
-        )
-
     yield config_dict
 
 
