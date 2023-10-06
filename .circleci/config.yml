@@ -19,7 +19,7 @@ jobs:
       - run:
           name: install
           command: |
-            bash install.sh -u lib -v -m
+            bash install.sh -u lib -v
           no_output_timeout: 20m
 
       - run:

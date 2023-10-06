@@ -2,8 +2,8 @@ import os
 import re
 import sys
 import csv
-
 from pathlib import Path
+from typing import Dict, List
 
 
 class Version:
@@ -34,11 +34,12 @@ __author__ = "Erik Clarke"
 __license__ = "GPL2+"
 
 
-def load_sample_list(samplelist_fp, paired_end=True):
+def load_sample_list(samplelist_fp: Path, paired_end: bool = True) -> Dict[str, Dict[str, str]]:
     """
     Build a list of samples from a sample list file.
     :param samplelist_fp: a Path to a whitespace-delimited samplelist file,
        where the first entry is the sample name and the rest is ignored.
+    :param paired_end: if True, will look for a second column with mate pair
     :returns: A dictionary of samples with sample name and associated file(s)
     """
     Samples = {}
@@ -63,7 +64,7 @@ def load_sample_list(samplelist_fp, paired_end=True):
     return Samples
 
 
-def guess_format_string(fnames, paired_end=True, split_pattern="([_.])"):
+def guess_format_string(fnames: List[str], paired_end: bool = True, split_pattern: str = "([_.])") -> str:
     """
     Try to guess the format string given a list of filenames.
     :param fnames: a list of filename strings
@@ -113,7 +114,7 @@ class SampleFormatError(Exception):
     pass
 
 
-def _verify_path(fp):
+def _verify_path(fp: str) -> str:
     if not fp:
         raise ValueError("Missing filename")
     path = Path(fp)
@@ -122,7 +123,7 @@ def _verify_path(fp):
     return str(path.resolve())
 
 
-def circular(seq, kmin, kmax, min_len):
+def circular(seq: str, kmin: int, kmax: int, min_len: int) -> bool:
     """Determine if a sequence is circular.
 
     Checks for repeated k-mer at beginning and end of a sequence for a given
