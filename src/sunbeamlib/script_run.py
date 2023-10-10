@@ -61,6 +61,8 @@ def main(argv=sys.argv):
                 str(snakefile),
                 "--conda-prefix",
                 str(conda_prefix),
+                "--conda-frontend",
+                "conda",
                 target,
             ]
             if arg
