@@ -97,12 +97,15 @@ def parse_sam(
 
         cigar_tuples = []
         current_length = ""
-        for char in result["CIGAR"]:
-            if char.isdigit():
-                current_length += char
-            else:
-                cigar_tuples.append((int(current_length), char))
-                current_length = ""
+
+        if result["CIGAR"]:
+            for char in result["CIGAR"]:
+                if char.isdigit():
+                    current_length += char
+                else:
+                    cigar_tuples.append((int(current_length), char))
+                    current_length = ""
+        
         result["CIGAR"] = cigar_tuples
 
         # Parse optional fields
