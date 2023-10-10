@@ -152,9 +152,7 @@ def extension_config() -> str:
 
 def load_defaults(default_name: str) -> Dict[str, Union[str, Dict]]:
     return yaml.safe_load(
-        resource_stream("sunbeamlib", "{}.yml".format(default_name))
-        .read()
-        .decode()
+        resource_stream("sunbeamlib", "{}.yml".format(default_name)).read().decode()
     )
 
 

@@ -73,43 +73,45 @@ def write_many_fastq(record_list: List[Tuple[str, str, str, str]], f: TextIO) ->
     f.writelines(record_list)
 
 
-def parse_sam(f: TextIO) -> Iterator[Dict[str, Union[int, float, str, Tuple[int, str]]]]:
+def parse_sam(
+    f: TextIO,
+) -> Iterator[Dict[str, Union[int, float, str, Tuple[int, str]]]]:
     for line in f:
-        if line.startswith('@'):
+        if line.startswith("@"):
             continue
 
-        fields = line.strip().split('\t')
+        fields = line.strip().split("\t")
         result = {
-            'QNAME': fields[0],
-            'FLAG': int(fields[1]),
-            'RNAME': fields[2],
-            'POS': int(fields[3]),
-            'MAPQ': int(fields[4]),
-            'CIGAR': fields[5],
-            'RNEXT': fields[6],
-            'PNEXT': int(fields[7]),
-            'TLEN': int(fields[8]),
-            'SEQ': fields[9],
-            'QUAL': fields[10]
+            "QNAME": fields[0],
+            "FLAG": int(fields[1]),
+            "RNAME": fields[2],
+            "POS": int(fields[3]),
+            "MAPQ": int(fields[4]),
+            "CIGAR": fields[5],
+            "RNEXT": fields[6],
+            "PNEXT": int(fields[7]),
+            "TLEN": int(fields[8]),
+            "SEQ": fields[9],
+            "QUAL": fields[10],
         }
 
         cigar_tuples = []
-        current_length = ''
-        for char in result['CIGAR']:
+        current_length = ""
+        for char in result["CIGAR"]:
             if char.isdigit():
                 current_length += char
             else:
                 cigar_tuples.append((int(current_length), char))
-                current_length = ''
+                current_length = ""
         result["CIGAR"] = cigar_tuples
 
         # Parse optional fields
         optional_fields = fields[11:]
         for field in optional_fields:
-            tag, data_type, value = field.split(':')
-            if data_type == 'i':
+            tag, data_type, value = field.split(":")
+            if data_type == "i":
                 value = int(value)
-            elif data_type == 'f':
+            elif data_type == "f":
                 value = float(value)
             result[tag] = value
 
