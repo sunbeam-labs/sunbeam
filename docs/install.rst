@@ -48,14 +48,6 @@ code under the 'sunbeamlib/' directory. If you have major or incompatible
 changes to make to the environment you should consider creating a new one under a 
 different name so that you always have a working version installed.
 
--m/--no_mamba
-++++++++++++++++
-
-Don't use mamba in base environment as dependency solver. It is the default 
-option to use mamba because it is considerably faster than conda in solving new 
-environments. However it can also sometimes be a pain to install, especially 
-with crowded 'base' environments.
-
 -v/--verbose
 +++++++++++++++
 

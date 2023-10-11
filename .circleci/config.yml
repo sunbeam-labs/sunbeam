@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/python:3.10
+      - image: continuumio/miniconda3
 
     steps:
       - checkout

@@ -60,8 +60,6 @@ rule get_mapped_reads:
     params:
         pct_id=Cfg["qc"]["pct_id"],
         frac=Cfg["qc"]["frac"],
-    conda:
-        "../envs/samtools.yml"
     script:
         "../scripts/get_mapped_reads.py"
 

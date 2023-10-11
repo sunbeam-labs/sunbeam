@@ -2,10 +2,10 @@ import os
 import shutil
 import sys
 import argparse
-import ruamel.yaml
+import yaml
 from pathlib import Path
 
-from .list_samples import (
+from sunbeamlib.script_list_samples import (
     build_sample_list,
     MissingMatePairError,
     SampleFormatError,
@@ -170,7 +170,7 @@ def write_config(args, project_fp, samplelists):
         cfg = config.new(project_fp=project_fp, template=args.template)
         defaults = {}
         if args.defaults:
-            defaults = ruamel.yaml.safe_load(args.defaults)
+            defaults = yaml.safe_load(args.defaults)
         # Override loaded config defaults (if any) for a few specific items.
         paired = layout == "paired"
         defaults["all"] = defaults.get("all", {})
@@ -189,7 +189,7 @@ def write_config(args, project_fp, samplelists):
 
 def write_profile(args, project_fp):
     sunbeam_dir = Path(os.getenv("SUNBEAM_DIR", os.getcwd()))
-    template_fp = sunbeam_dir / "sunbeamlib" / "data" / f"{args.profile}_profile.yaml"
+    template_fp = sunbeam_dir / "src" / "sunbeamlib" / f"{args.profile}_profile.yaml"
     config_fp = project_fp / "config.yaml"
     shutil.copyfile(template_fp, config_fp)
     with open(config_fp, "a") as f:

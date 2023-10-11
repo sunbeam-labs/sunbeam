@@ -1,11 +1,12 @@
-import sys
 import argparse
+import sys
+
 import sunbeamlib
-from sunbeamlib.scripts.run import main as Run
-from sunbeamlib.scripts.init import main as Init
-from sunbeamlib.scripts._config import main as Config
-from sunbeamlib.scripts.list_samples import main as ListSamples
-from sunbeamlib.scripts.extend import main as Extend
+from sunbeamlib.script_run import main as Run
+from sunbeamlib.script_init import main as Init
+from sunbeamlib.script_config import main as Config
+from sunbeamlib.script_list_samples import main as ListSamples
+from sunbeamlib.script_extend import main as Extend
 
 
 def main():

@@ -1,24 +1,47 @@
-__author__ = "Erik Clarke"
-__license__ = "GPL2+"
-
 import os
 import re
 import sys
 import csv
-
 from pathlib import Path
-
-from semantic_version import Version
-from sunbeamlib.parse import parse_fasta
-
-__version__ = str(Version.coerce(os.environ.get("SUNBEAM_VER", "0.0.0")))
+from typing import Dict, List
 
 
-def load_sample_list(samplelist_fp, paired_end=True, root_proj=""):
+class Version:
+    def __init__(self, version: str) -> None:
+        self.version = version
+        if self.version.startswith("v"):
+            self.version = self.version[1:]
+
+        version_parts = self.version.split(".")
+        self.major = version_parts[0]
+        try:
+            self.minor = version_parts[1]
+        except IndexError:
+            self.minor = 0
+        try:
+            self.patch = version_parts[2]
+        except IndexError:
+            self.patch = 0
+        if len(self.patch.split("-")) > 1:
+            self.patch = self.patch.split("-")[0]
+
+    def __str__(self) -> str:
+        return f"{self.major}.{self.minor}.{self.patch}"
+
+
+__version__ = str(Version(os.environ.get("SUNBEAM_VER", "0.0.0")))
+__author__ = "Erik Clarke"
+__license__ = "GPL2+"
+
+
+def load_sample_list(
+    samplelist_fp: Path, paired_end: bool = True
+) -> Dict[str, Dict[str, str]]:
     """
     Build a list of samples from a sample list file.
     :param samplelist_fp: a Path to a whitespace-delimited samplelist file,
        where the first entry is the sample name and the rest is ignored.
+    :param paired_end: if True, will look for a second column with mate pair
     :returns: A dictionary of samples with sample name and associated file(s)
     """
     Samples = {}
@@ -43,7 +66,9 @@ def load_sample_list(samplelist_fp, paired_end=True, root_proj=""):
     return Samples
 
 
-def guess_format_string(fnames, paired_end=True, split_pattern="([_.])"):
+def guess_format_string(
+    fnames: List[str], paired_end: bool = True, split_pattern: str = "([_.])"
+) -> str:
     """
     Try to guess the format string given a list of filenames.
     :param fnames: a list of filename strings
@@ -93,7 +118,7 @@ class SampleFormatError(Exception):
     pass
 
 
-def _verify_path(fp):
+def _verify_path(fp: str) -> str:
     if not fp:
         raise ValueError("Missing filename")
     path = Path(fp)
@@ -102,20 +127,13 @@ def _verify_path(fp):
     return str(path.resolve())
 
 
-def circular(seq, kmin, kmax, min_len):
+def circular(seq: str, kmin: int, kmax: int, min_len: int) -> bool:
     """Determine if a sequence is circular.
 
     Checks for repeated k-mer at beginning and end of a sequence for a given
-    range of values for k."""
+    range of values for k.
+    """
     if len(seq) < min_len:
         return False
     # Short-circuit checking: returns True for the first kmer that matches
     return any([k for k in range(kmin, kmax + 1) if seq[0:k] == seq[len(seq) - k :]])
-
-
-def read_seq_ids(fasta_fp):
-    """
-    Return the sequence identifiers for a given fasta filename.
-    """
-    with open(str(fasta_fp)) as f:
-        return list(parse_fasta(f))

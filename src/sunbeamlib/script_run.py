@@ -28,6 +28,12 @@ def main(argv=sys.argv):
         help="Path to Sunbeam installation",
     )
     parser.add_argument(
+        "-m",
+        "--mamba",
+        action="store_true",
+        help="Use mamba instead of conda to manage environments",
+    )
+    parser.add_argument(
         "--target_list", nargs="+", default=[], help="List of sunbeam targets"
     )
 
@@ -42,6 +48,8 @@ def main(argv=sys.argv):
         sys.exit(1)
 
     conda_prefix = Path(args.sunbeam_dir) / ".snakemake"
+
+    conda_cmd = "conda" if not args.mamba else "mamba"
 
     cmds = list()
     if args.target_list == []:
@@ -61,6 +69,8 @@ def main(argv=sys.argv):
                 str(snakefile),
                 "--conda-prefix",
                 str(conda_prefix),
+                "--conda-frontend",
+                conda_cmd,
                 target,
             ]
             if arg

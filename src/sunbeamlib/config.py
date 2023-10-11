@@ -1,19 +1,18 @@
 import os
 import sys
-from collections.abc import Mapping
+import yaml
 from pathlib import Path
 from pkg_resources import resource_stream
+from typing import Dict, TextIO, Tuple, Union
 
-from semantic_version import Version
-import ruamel.yaml
-from sunbeamlib import __version__
+from sunbeamlib import __version__, Version
 
 
-def makepath(path):
+def makepath(path: str) -> Path:
     return Path(path).expanduser()
 
 
-def verify(path):
+def verify(path: str) -> Path:
     path = Path(path)
     if path.exists():
         return path.resolve()
@@ -21,7 +20,7 @@ def verify(path):
         raise ValueError("Path %s does not exist" % path)
 
 
-def validate_paths(cfg, root):
+def validate_paths(cfg: Dict[str, str], root: Path) -> Dict[str, Union[str, Path]]:
     """Process paths in config file subsection.
 
     For each key ending in _fp, the value is:
@@ -31,6 +30,7 @@ def validate_paths(cfg, root):
     - expanded home directory ~
 
     :param cfg: a config file subsection
+    :param root: the root directory for the project
     :returns: an updated copy of cfg
     """
     new_cfg = dict()
@@ -51,7 +51,7 @@ def validate_paths(cfg, root):
     return new_cfg
 
 
-def check_compatibility(cfg):
+def check_compatibility(cfg: Dict[str, Dict[str, str]]) -> Tuple[str, str]:
     """Returns the major version numbers from the package and config file, respectively"""
 
     cfg_version = Version(cfg["all"].get("version", "0.0.0"))
@@ -60,7 +60,7 @@ def check_compatibility(cfg):
     return (pkg_version.major, cfg_version.major)
 
 
-def check_config(cfg):
+def check_config(cfg: Dict[str, Dict[str, str]]) -> Dict[str, Dict[str, str]]:
     """Resolve root in config file, then validate paths."""
 
     if "root" in cfg["all"]:
@@ -75,42 +75,37 @@ def check_config(cfg):
     return new_cfg
 
 
-def output_subdir(cfg, section):
+def output_subdir(cfg: Dict[str, Dict[str, str]], section: str) -> Path:
     return cfg["all"]["output_fp"] / cfg[section]["suffix"]
 
 
-def _update_dict(target, new):
+def _update_dict(
+    target: Dict[str, Union[str, Dict]], new: Dict[str, Union[str, Dict]]
+) -> Dict[str, Union[str, Dict]]:
     for k, v in new.items():
-        if isinstance(v, Mapping):
-            # We could use .get() here but ruamel.yaml's weird Mapping
-            # subclass outputs errors to stdout if the key doesn't exist
-            if k in target:
-                target[k] = _update_dict(target[k], v)
-            else:
-                target[k] = _update_dict({}, v)
+        if isinstance(v, dict):
+            target[k] = _update_dict(target.get(k, {}), v)
         else:
             target[k] = v
     return target
 
 
-def _update_dict_strict(target, new):
+def _update_dict_strict(
+    target: Dict[str, Union[str, Dict]], new: Dict[str, Union[str, Dict]]
+) -> Dict[str, Union[str, Dict]]:
     for k, v in new.items():
-        if isinstance(v, Mapping) and k in target.keys():
-            target[k] = _update_dict_strict(target.get(k, {}), v)
-        elif k in target.keys():
-            target[k] = v
-        else:
-            sys.stderr.write("Key '%s' not found in target, skipping\n" % k)
-            continue
+        target[k] = _update_dict_strict(target.get(k, {}), v)
     return target
 
 
-def update(config_str, new, strict=False):
-    config = ruamel.yaml.round_trip_load(config_str)
+def update(
+    config_str: str, new: Dict[str, Union[str, Dict]], strict: bool = False
+) -> Dict[str, Union[str, Dict]]:
+    config = yaml.safe_load(config_str)
     if strict:
         config = _update_dict_strict(config, new)
     else:
-        sbx_config = ruamel.yaml.round_trip_load(extension_config())
+        sbx_config = yaml.safe_load(extension_config())
         if sbx_config:
             for k, v in sbx_config.items():
                 if k not in config.keys():
@@ -120,12 +115,14 @@ def update(config_str, new, strict=False):
     return config
 
 
-def new(project_fp, version=__version__, template=None):
+def new(
+    project_fp: Union[str, Path], version: str = __version__, template: TextIO = None
+) -> str:
     if template:
         config = template.read()
     else:
         config = str(
-            resource_stream("sunbeamlib", "data/default_config.yml").read().decode()
+            resource_stream("sunbeamlib", "default_config.yml").read().decode()
         )
         # add config from extensions
         config = config + extension_config()
@@ -133,7 +130,7 @@ def new(project_fp, version=__version__, template=None):
     return config.format(PROJECT_FP=project_fp, SB_VERSION=version)
 
 
-def extension_config():
+def extension_config() -> str:
     config = ""
     sunbeam_dir = Path(os.getenv("SUNBEAM_DIR", os.getcwd()))
     for sbx in os.listdir(sunbeam_dir / "extensions"):
@@ -153,16 +150,14 @@ def extension_config():
     return config
 
 
-def load_defaults(default_name):
-    return ruamel.yaml.safe_load(
-        resource_stream("sunbeamlib", "data/{}.yml".format(default_name))
-        .read()
-        .decode()
+def load_defaults(default_name: str) -> Dict[str, Union[str, Dict]]:
+    return yaml.safe_load(
+        resource_stream("sunbeamlib", "{}.yml".format(default_name)).read().decode()
     )
 
 
-def dump(config, out=sys.stdout):
-    if isinstance(config, Mapping):
-        ruamel.yaml.round_trip_dump(config, out)
+def dump(config: Union[str, Dict], out: TextIO = sys.stdout) -> None:
+    if isinstance(config, dict):
+        yaml.safe_dump(config, out)
     else:
         out.write(config)
