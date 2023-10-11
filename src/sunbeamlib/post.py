@@ -3,7 +3,7 @@ import datetime
 import os
 
 
-def compile_benchmarks(benchmark_fp: str, stats_fp: str):
+def compile_benchmarks(benchmark_fp: str, stats_fp: str) -> None:
     """Aggregate all the benchmark files into one and put it in stats_fp"""
     benchmarks = []
     try:

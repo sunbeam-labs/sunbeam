@@ -3,10 +3,12 @@ Supporting functions for QC rules.
 """
 
 import gzip
+from pathlib import Path
 from sunbeamlib.parse import parse_fastq, write_many_fastq
+from typing import List, TextIO
 
 
-def filter_ids(fp_in, fp_out, ids, log):
+def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
     """Remove ids from FASTQ file.
 
     fp_in: path to input FASTQ
@@ -31,7 +33,7 @@ def filter_ids(fp_in, fp_out, ids, log):
         write_many_fastq(records, f_out)
 
 
-def remove_pair_id(id, log):
+def remove_pair_id(id: str, log: TextIO) -> str:
     """Remove the 1 or 2 from a paired read ID
 
     id: id string

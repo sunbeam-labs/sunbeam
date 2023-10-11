@@ -1,13 +1,13 @@
-from collections import OrderedDict
+import pandas
 import re
 import os
 import sys
-
-import pandas
+from collections import OrderedDict
 from io import StringIO
+from typing import TextIO
 
 
-def parse_trim_summary_paired(f):
+def parse_trim_summary_paired(f: TextIO) -> OrderedDict[str, str]:
     for line in f.readlines():
         if line.startswith("Input Read"):
             vals = re.findall("\D+\: (\d+)", line)
@@ -15,7 +15,7 @@ def parse_trim_summary_paired(f):
             return OrderedDict(zip(keys, vals))
 
 
-def parse_trim_summary_single(f):
+def parse_trim_summary_single(f: TextIO) -> OrderedDict[str, str]:
     for line in f:
         if line.startswith("Input Read"):
             vals = re.findall("\D+\: (\d+)", line)
@@ -23,17 +23,19 @@ def parse_trim_summary_single(f):
             return OrderedDict(zip(keys, vals))
 
 
-def parse_decontam_log(f):
+def parse_decontam_log(f: TextIO) -> OrderedDict[str, str]:
     keys = f.readline().rstrip().split("\t")
     vals = f.readline().rstrip().split("\t")
     return OrderedDict(zip(keys, vals))
 
 
-def parse_komplexity_log(f):
-    return OrderedDict([("komplexity", len(f.readlines()))])
+def parse_komplexity_log(f: TextIO) -> OrderedDict[str, str]:
+    return OrderedDict([("komplexity", str(len(f.readlines())))])
 
 
-def summarize_qual_decontam(tfile, dfile, kfile, paired_end):
+def summarize_qual_decontam(
+    tfile: str, dfile: str, kfile: str, paired_end: bool
+) -> pandas.DataFrame:
     """Return a dataframe for summary information for trimmomatic and decontam rule"""
     tname = os.path.basename(tfile).split(".out")[0]
     with open(tfile) as tf:
@@ -56,7 +58,7 @@ def summarize_qual_decontam(tfile, dfile, kfile, paired_end):
     )
 
 
-def parse_fastqc_quality(filename):
+def parse_fastqc_quality(filename: str) -> pandas.DataFrame:
     with open(filename) as f:
         report = f.read()
     try:
