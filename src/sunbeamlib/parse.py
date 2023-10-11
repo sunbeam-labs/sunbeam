@@ -104,7 +104,7 @@ def parse_sam(
             else:
                 cigar_tuples.append((int(current_length), char))
                 current_length = "0"
-        
+
         result["CIGAR"] = cigar_tuples
 
         # Parse optional fields
