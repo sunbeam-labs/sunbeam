@@ -1,0 +1,33 @@
+name: Test Tarball on Release
+
+on:
+  release:
+    types: [published]
+    
+
+jobs:
+  test-tarball:
+    name: Test Tarball
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: setup-conda
+        uses: s-weigand/setup-conda@v1.2.1
+        with:
+          # Additional channels like 'conda-forge' which can be used to install packages
+          conda-channels: '' # optional, default is 
+
+      - name: Download and Extract
+        shell: bash
+        run: |
+          wget https://github.com/sunbeam-labs/sunbeam/releases/latest/download/sunbeam.tar.gz
+          mkdir sunbeam
+          tar -zxf sunbeam.tar.gz -C sunbeam
+          cd sunbeam && ./install.sh -e sunbeam
+      
+      - name: Run Tests
+        shell: bash
+        run: |
+          source activate sunbeam
+          cd sunbeam
+          pytest -vvl tests/
