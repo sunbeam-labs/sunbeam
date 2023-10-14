@@ -25,11 +25,11 @@ jobs:
           wget https://github.com/sunbeam-labs/sunbeam/releases/latest/download/sunbeam.tar.gz
           mkdir sunbeam
           tar -zxf sunbeam.tar.gz -C sunbeam
-          cd sunbeam && ./install.sh -e sunbeam
+          cd sunbeam && ./install.sh -e sunbeam -m
       
       - name: Run Tests
         shell: bash
         run: |
-          conda activate sunbeam
+          source activate sunbeam
           cd sunbeam
           pytest -vvl tests/
