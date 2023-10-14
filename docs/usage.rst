@@ -31,9 +31,9 @@ versions you want)).
 
       .. code-block:: shell
 
-         wget https://github.com/sunbeam-labs/sunbeam/releases/download/v4.0.0/sunbeam.tar.gz
+         wget https://github.com/sunbeam-labs/sunbeam/releases/latest/download/sunbeam.tar.gz
          mkdir sunbeam4.0.0
-         tar -zxf sunbeam4.0.0.tar.gz -C sunbeam4.0.0
+         tar -zxf sunbeam.tar.gz -C sunbeam4.0.0
          cd sunbeam4.0.0 && ./install.sh
 
    .. tab:: git install
