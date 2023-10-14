@@ -3,8 +3,6 @@ name: Test Tarball on Release
 on:
   release:
     types: [published]
-  pull_request:
-    branches: [ main, master ]
     
 
 jobs:
@@ -25,7 +23,7 @@ jobs:
           wget https://github.com/sunbeam-labs/sunbeam/releases/latest/download/sunbeam.tar.gz
           mkdir sunbeam
           tar -zxf sunbeam.tar.gz -C sunbeam
-          cd sunbeam && ./install.sh -e sunbeam -m
+          cd sunbeam && ./install.sh -e sunbeam
       
       - name: Run Tests
         shell: bash
