@@ -1,4 +1,4 @@
-name: Test Tarball on Release
+name: Test Tar
 
 on:
   release:
