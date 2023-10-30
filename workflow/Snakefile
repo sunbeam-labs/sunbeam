@@ -141,6 +141,35 @@ rule samples:
         [print(sample) for sample in sorted(list(Samples.keys()))]
 
 
+rules_dict = rules._rules
+for n, r in rules_dict.items():
+    print(n)
+    try:
+        rule:
+            name: n + "_benchmark"
+            input:
+                r.output,
+                r.benchmark,
+            run:
+                print(n)
+    except TypeError:
+        pass
+
+rule:
+    name: 
+        str(rules.sample_intake.rule)
+    input:
+        rules.sample_intake.output,
+        #rules.sample_intake.benchmark,
+    output:
+        "TEST.txt"
+    shell:
+        "echo 'yea'"
+
+
+sys.stderr.write(str(rules.sample_intake.rule))
+
+
 onstart:
     try:
         shutil.rmtree(BENCHMARK_FP)
