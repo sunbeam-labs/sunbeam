@@ -33,3 +33,20 @@ def compile_benchmarks(benchmark_fp: str, stats_fp: str) -> None:
                 reader = csv.reader(g, delimiter="\t")
                 next(reader)  # Headers line
                 writer.writerow([fp[:-4]] + next(reader))
+
+import sys
+def update_benchmark(func):
+    # added arguments inside the inner1,
+    # if function takes any arguments,
+    # can be added like this.
+    def inner1(*args, **kwargs):
+ 
+        # storing time before function execution
+        sys.stderr.write("B")
+         
+        func(*args, **kwargs)
+ 
+        # storing time after function execution
+        sys.stderr.write("A")
+ 
+    return inner1
