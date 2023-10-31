@@ -132,42 +132,42 @@ for sbx_path, wildcards in sbxs:
 rule all:
     input:
         TARGET_ALL,
+    localrule: True
 
 
 rule samples:
     message:
         "Samples to be processed:"
+    localrule: True
     run:
         [print(sample) for sample in sorted(list(Samples.keys()))]
 
 
-rules_dict = rules._rules
+rules_dict = {n: r for n, r in rules._rules.items()}
 for n, r in rules_dict.items():
-    print(n)
+    wildcard_str = ""
+    if r.rule._wildcard_names:
+        wildcard_str = "_{" + "}_{".join(r.rule._wildcard_names) + "}"
     try:
         rule:
-            name: n + "_benchmark"
+            name: n + "_post"
             input:
                 r.output,
                 r.benchmark,
+            output:
+                BENCHMARK_FP / "post" / f".{n}{wildcard_str}.done"
+            localrule: True
             run:
                 print(n)
     except TypeError:
         pass
 
-rule:
-    name: 
-        str(rules.sample_intake.rule)
+
+rule all_post:
     input:
-        rules.sample_intake.output,
-        #rules.sample_intake.benchmark,
-    output:
-        "TEST.txt"
-    shell:
-        "echo 'yea'"
-
-
-sys.stderr.write(str(rules.sample_intake.rule))
+        [BENCHMARK_FP / "post" / f".{n}.done" for n, r in rules_dict.items()]
+    localrule: True
+    
 
 
 onstart:
