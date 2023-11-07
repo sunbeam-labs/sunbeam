@@ -56,9 +56,7 @@ def main(argv=sys.argv):
         str(conda_prefix),
         "--conda-frontend",
         conda_cmd,
-    ] + remaining + [
-        "all_post"
-    ]
+    ] + remaining
     print("Running: " + " ".join(snakemake_args))
 
     cmd = subprocess.run(snakemake_args)
