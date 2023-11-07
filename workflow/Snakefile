@@ -143,33 +143,6 @@ rule samples:
         [print(sample) for sample in sorted(list(Samples.keys()))]
 
 
-rules_dict = {n: r for n, r in rules._rules.items()}
-for n, r in rules_dict.items():
-    wildcard_str = ""
-    if r.rule._wildcard_names:
-        wildcard_str = "_{" + "}_{".join(r.rule._wildcard_names) + "}"
-    try:
-        rule:
-            name: n + "_post"
-            input:
-                r.output,
-                r.benchmark,
-            output:
-                BENCHMARK_FP / "post" / f".{n}{wildcard_str}.done"
-            localrule: True
-            run:
-                print(n)
-    except TypeError:
-        pass
-
-
-rule all_post:
-    input:
-        [BENCHMARK_FP / "post" / f".{n}.done" for n, r in rules_dict.items()]
-    localrule: True
-    
-
-
 onstart:
     try:
         shutil.rmtree(BENCHMARK_FP)
@@ -180,9 +153,9 @@ onstart:
 
 onsuccess:
     print("Sunbeam finished!")
-    compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
+    compile_benchmarks(BENCHMARK_FP, Cfg)
 
 
 onerror:
     print("Sunbeam failed with error.")
-    compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
+    compile_benchmarks(BENCHMARK_FP, Cfg)
