@@ -153,9 +153,9 @@ onstart:
 
 onsuccess:
     print("Sunbeam finished!")
-    compile_benchmarks(BENCHMARK_FP, Cfg)
+    compile_benchmarks(BENCHMARK_FP, Cfg, rules)
 
 
 onerror:
     print("Sunbeam failed with error.")
-    compile_benchmarks(BENCHMARK_FP, Cfg)
+    compile_benchmarks(BENCHMARK_FP, Cfg, rules)
