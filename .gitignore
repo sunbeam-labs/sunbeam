@@ -19,5 +19,5 @@ docs/_build
 extensions/*
 !extensions/.placeholder
 build
-.vscode/
 projects/
+.vscode/
