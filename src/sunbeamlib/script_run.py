@@ -33,6 +33,9 @@ def main(argv=sys.argv):
         action="store_true",
         help="Use mamba instead of conda to manage environments",
     )
+    parser.add_argument(
+        "--target_list", nargs="+", default=[], help="List of sunbeam targets (DEPRECATED)"
+    )
 
     # The remaining args (after --) are passed to Snakemake
     args, remaining = parser.parse_known_args(argv)
@@ -56,7 +59,7 @@ def main(argv=sys.argv):
         str(conda_prefix),
         "--conda-frontend",
         conda_cmd,
-    ] + remaining
+    ] + remaining + args.target_list
     print("Running: " + " ".join(snakemake_args))
 
     cmd = subprocess.run(snakemake_args)
