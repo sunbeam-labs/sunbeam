@@ -34,7 +34,10 @@ def main(argv=sys.argv):
         help="Use mamba instead of conda to manage environments",
     )
     parser.add_argument(
-        "--target_list", nargs="+", default=[], help="List of sunbeam targets (DEPRECATED)"
+        "--target_list",
+        nargs="+",
+        default=[],
+        help="List of sunbeam targets (DEPRECATED)",
     )
 
     # The remaining args (after --) are passed to Snakemake
@@ -51,15 +54,19 @@ def main(argv=sys.argv):
 
     conda_cmd = "conda" if not args.mamba else "mamba"
 
-    snakemake_args = [
-        "snakemake",
-        "--snakefile",
-        str(snakefile),
-        "--conda-prefix",
-        str(conda_prefix),
-        "--conda-frontend",
-        conda_cmd,
-    ] + remaining + args.target_list
+    snakemake_args = (
+        [
+            "snakemake",
+            "--snakefile",
+            str(snakefile),
+            "--conda-prefix",
+            str(conda_prefix),
+            "--conda-frontend",
+            conda_cmd,
+        ]
+        + remaining
+        + args.target_list
+    )
     print("Running: " + " ".join(snakemake_args))
 
     cmd = subprocess.run(snakemake_args)

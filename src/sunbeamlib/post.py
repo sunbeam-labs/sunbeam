@@ -6,7 +6,9 @@ from snakemake.common import Rules
 from typing import Dict
 
 
-def compile_benchmarks(benchmark_fp: str, Cfg: Dict[str, Dict | str], rules: Rules) -> None:
+def compile_benchmarks(
+    benchmark_fp: str, Cfg: Dict[str, Dict | str], rules: Rules
+) -> None:
     """Aggregate all the benchmark files into one and put it in stats_fp"""
     stats_fp = Path(Cfg["all"]["root"]) / "stats"
     benchmarks = []
@@ -25,7 +27,7 @@ def compile_benchmarks(benchmark_fp: str, Cfg: Dict[str, Dict | str], rules: Rul
 
     if not os.path.exists(stats_fp):
         os.makedirs(stats_fp)
-    
+
     dt = str(int(datetime.datetime.now().timestamp() * 1000))
     stats_file = os.path.join(stats_fp, f"{dt}_benchmarks.tsv")
 
@@ -37,11 +39,13 @@ def compile_benchmarks(benchmark_fp: str, Cfg: Dict[str, Dict | str], rules: Rul
                 reader = csv.reader(g, delimiter="\t")
                 next(reader)  # Headers line
                 writer.writerow([fp[:-4]] + next(reader))
-    
+
     compile_file_stats(stats_fp, Cfg, dt, rules)
 
 
-def compile_file_stats(stats_fp: str, Cfg: Dict[str, Dict | str], dt: str, rules: Rules) -> None:
+def compile_file_stats(
+    stats_fp: str, Cfg: Dict[str, Dict | str], dt: str, rules: Rules
+) -> None:
     """Collect data on all inputs and outputs (as long as they still exist at this point) as well as dbs"""
     file_stats = {}
     output_fp = Path(Cfg["all"]["root"]) / Cfg["all"]["output_fp"]
@@ -70,7 +74,7 @@ def compile_file_stats(stats_fp: str, Cfg: Dict[str, Dict | str], dt: str, rules
                         param_fps.add(Path(p))
                     except TypeError:
                         continue
-    
+
     for fp in param_fps:
         if fp.exists():
             if fp.is_file():
