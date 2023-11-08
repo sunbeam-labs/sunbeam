@@ -132,15 +132,18 @@ for sbx_path, wildcards in sbxs:
 rule all:
     input:
         TARGET_ALL,
-    localrule: True
 
 
 rule samples:
     message:
         "Samples to be processed:"
-    localrule: True
     run:
         [print(sample) for sample in sorted(list(Samples.keys()))]
+
+
+localrules:
+    all,
+    samples,
 
 
 onstart:
