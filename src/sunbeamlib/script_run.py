@@ -54,6 +54,12 @@ def main(argv=sys.argv):
 
     conda_cmd = "conda" if not args.mamba else "mamba"
 
+    if args.target_list:
+        sys.stderr.write(
+            "Warning: passing targets to '--target_list' is deprecated. "
+            "Please use 'sunbeam run <opts> target1 target2 target3' instead.\n"
+        )
+
     snakemake_args = (
         [
             "snakemake",
