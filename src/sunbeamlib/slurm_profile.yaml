@@ -70,8 +70,8 @@ set-resources:
   - remove_low_complexity:runtime=120
   - align_to_host:mem_mb=16000
   - align_to_host:runtime=240
-  - filter_unmapped_reads:mem_mb=24000
-  - filter_unmapped_reads:runtime=240
+  - filter_reads:mem_mb=24000
+  - filter_reads:runtime=240
   - megahit_paired:mem_mb=20000
   - megahit_paired:runtime=720
   - final_filter:mem_mb=4000

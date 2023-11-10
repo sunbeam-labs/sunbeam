@@ -2,6 +2,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - snakemake
+  - snakemake >=7.32.0
   - git # Ensure sunbeam extend works even with tar installation of main pipeline
   - python =3.12.0

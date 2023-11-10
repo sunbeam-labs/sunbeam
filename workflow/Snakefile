@@ -141,6 +141,11 @@ rule samples:
         [print(sample) for sample in sorted(list(Samples.keys()))]
 
 
+localrules:
+    all,
+    samples,
+
+
 onstart:
     try:
         shutil.rmtree(BENCHMARK_FP)
@@ -151,9 +156,9 @@ onstart:
 
 onsuccess:
     print("Sunbeam finished!")
-    compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
+    compile_benchmarks(BENCHMARK_FP, Cfg, rules)
 
 
 onerror:
     print("Sunbeam failed with error.")
-    compile_benchmarks(BENCHMARK_FP, Cfg["all"]["root"] / "stats")
+    compile_benchmarks(BENCHMARK_FP, Cfg, rules)

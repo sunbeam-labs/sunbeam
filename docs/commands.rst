@@ -71,13 +71,15 @@ Usage examples:
 1. To run all targets (not including extensions):
    ``sunbeam run --profile /path/to/project/``
 2. To specify multiple targets:
+   ``sunbeam run --profile /path/to/project/ all_decontam all_assembly all_annotation``
+3. The equivalent of 2, using the deprecated ``--target_list`` option:
    ``sunbeam run --profile /path/to/project/ --target_list all_decontam all_assembly all_annotation``
 
 .. code-block:: shell
 
     -h/--help: Display help.
     -s/--sunbeam_dir: Path to sunbeam installation.
-    --target_list: A list of targets to run successively.
+    --target_list: A list of targets to run successively. (DEPRECATED)
     <snakemake options>: You can pass further arguments to Snakemake after ``--``, e.g: ``$ sunbeam run -- --cores 12``. See http://snakemake.readthedocs.io for more information.
 
 .. tip::
