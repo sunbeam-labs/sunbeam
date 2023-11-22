@@ -27,7 +27,7 @@ with open(snakemake.log[0], "w") as log:
                 "--cores",
                 str(snakemake.threads),
             ]
-            args += snakemake.config["qc"]["cutadapt_opts"].split(" ")
+            args += snakemake.config["qc"]["cutadapt_opts"].split(" ") if snakemake.config["qc"]["cutadapt_opts"] else []
             args += fwd_adapter_str.split(" ")
             args += rev_adapter_str.split(" ")
             args += [
