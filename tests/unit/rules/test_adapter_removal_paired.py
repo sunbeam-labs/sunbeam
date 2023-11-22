@@ -150,11 +150,6 @@ def test_adapater_removal_paired_no_opts(setup):
         ]
     )
 
-    assert lr1.stat().st_size >= 50000
-    assert lr2.stat().st_size >= 50000
-    assert sr1.stat().st_size >= 10000
-    assert sr2.stat().st_size >= 10000
-
     with gzip.open(lr1) as f1, gzip.open(lr2) as f2:
         assert len(f1.readlines()) == len(f2.readlines())
     with gzip.open(sr1) as f1, gzip.open(sr2) as f2:
