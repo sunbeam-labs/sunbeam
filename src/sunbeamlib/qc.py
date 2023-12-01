@@ -33,7 +33,7 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
                 ids.pop(0)
                 records.remove(record)
             elif i==rec_count:
-                log.write(f”ERROR: {ids[0]} not found! Please fix me.\n”)
+                log.write(f"{ids[0]} not found in unfiltered reads file! Please fix me.\n")
                 raise ValueError("ID provided cannot be missing from the unfiltered file")
             elif len(ids)==0:
                 log.write("Successfully reached the end of the list of reads to drop.")
