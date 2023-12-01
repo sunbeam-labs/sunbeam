@@ -18,10 +18,12 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
     with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
         records = [r for r in parse_fastq(f_in)]
         records.sort(key=lambda t: t[0])
-        ids = list(set(ids)) # sunbeam4 chucks the paired read info after the whitespace, so you're left with duplicate read IDs which silently breaks this
+        ids = list(
+            set(ids)
+        )  # sunbeam4 chucks the paired read info after the whitespace, so you're left with duplicate read IDs which silently breaks this
         ids.sort()
-        rec_count=len(records)
-        i=1
+        rec_count = len(records)
+        i = 1
         # Use list(records) so that it's a different object in memory and
         # you're free to remove items from the original
         for record in list(records):
@@ -32,14 +34,18 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
                 log.write(f"{record[0]} filtered\n")
                 ids.pop(0)
                 records.remove(record)
-            elif i==rec_count:
-                log.write(f"{ids[0]} not found in unfiltered reads file! Please fix me.\n")
-                raise ValueError("ID provided cannot be missing from the unfiltered file")
-            elif len(ids)==0:
+            elif i == rec_count:
+                log.write(
+                    f"{ids[0]} not found in unfiltered reads file! Please fix me.\n"
+                )
+                raise ValueError(
+                    "ID provided cannot be missing from the unfiltered file"
+                )
+            elif len(ids) == 0:
                 log.write("Successfully reached the end of the list of reads to drop.")
             else:
                 continue
-            i=i+1
+            i = i + 1
 
         write_many_fastq(records, f_out)
 
