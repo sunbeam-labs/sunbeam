@@ -112,7 +112,7 @@ rule preprocess_report:
             sample=sorted(Samples.keys()),
         ),
         komplexity_files=expand(
-            QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
+            LOG_FP / "remove_low_complexity_{sample}.log",
             sample=sorted(Samples.keys()),
         ),
     output:

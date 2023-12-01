@@ -172,40 +172,43 @@ rule fastqc_report:
         "../scripts/fastqc_report.py"
 
 
-rule find_low_complexity:
-    input:
-        expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
+# REMOVE THIS ONCE IT'S ON PYPI
+rule install_heyfastq:
     output:
-        QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
-    log:
-        LOG_FP / "find_low_complexity_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "find_low_complexity_{sample}.tsv"
+        touch(QC_FP / ".heyfastq_installed"),
     conda:
-        "../envs/komplexity.yml"
+        "../envs/reports.yml"
     shell:
         """
-        for rp in {input}; do
-          gzip -dc $rp | kz | \
-          awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> {output}
-        done
+        git clone https://github.com/kylebittinger/heyfastq.git
+        pip install heyfastq/
         """
 
 
 rule remove_low_complexity:
     input:
-        reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
-        ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
+        reads=expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
+        installed=QC_FP / ".heyfastq_installed",
     output:
-        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
+        reads=expand(QC_FP / "03_komplexity" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     log:
-        LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
+        LOG_FP / "remove_low_complexity_{sample}.log",
     benchmark:
-        BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
+        BENCHMARK_FP / "remove_low_complexity_{sample}.tsv"
     conda:
         "../envs/reports.yml"
-    script:
-        "../scripts/remove_low_complexity.py"
+    params:
+        min_kscore=Cfg["qc"]["kz_threshold"],
+        ir1=QC_FP / "03_komplexity" / "{{sample}}_1.fastq",
+        ir2=QC_FP / "03_komplexity" / "{sample}_2.fastq",
+        or1=QC_FP / "03_komplexity" / "{sample}_1.fastq",
+        or2=QC_FP / "03_komplexity" / "{sample}_2.fastq",
+    shell:
+        """
+        gzip -d {input.reads}
+        heyfastq filter-kscore --input {params.ir1} {params.ir2} --output {params.or1} {params.or2} --min-kscore {params.min_kscore}
+        gzip {input.reads} {output.reads}
+        """
 
 
 rule qc_final:
