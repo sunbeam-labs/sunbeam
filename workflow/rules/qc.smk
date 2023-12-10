@@ -172,42 +172,22 @@ rule fastqc_report:
         "../scripts/fastqc_report.py"
 
 
-# REMOVE THIS ONCE IT'S ON PYPI
-rule install_heyfastq:
-    output:
-        touch(QC_FP / ".heyfastq_installed"),
-    conda:
-        "../envs/reports.yml"
-    shell:
-        """
-        git clone https://github.com/kylebittinger/heyfastq.git
-        pip install heyfastq/
-        """
-
-
 rule remove_low_complexity:
     input:
         reads=expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
-        installed=QC_FP / ".heyfastq_installed",
     output:
         reads=expand(QC_FP / "03_komplexity" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     log:
         LOG_FP / "remove_low_complexity_{sample}.log",
     benchmark:
         BENCHMARK_FP / "remove_low_complexity_{sample}.tsv"
-    conda:
-        "../envs/reports.yml"
+    #conda:
+    #    "../envs/reports.yml"
     params:
         min_kscore=Cfg["qc"]["kz_threshold"],
-        ir1=QC_FP / "03_komplexity" / "{{sample}}_1.fastq",
-        ir2=QC_FP / "03_komplexity" / "{sample}_2.fastq",
-        or1=QC_FP / "03_komplexity" / "{sample}_1.fastq",
-        or2=QC_FP / "03_komplexity" / "{sample}_2.fastq",
     shell:
         """
-        gzip -d {input.reads}
-        heyfastq filter-kscore --input {params.ir1} {params.ir2} --output {params.or1} {params.or2} --min-kscore {params.min_kscore}
-        gzip {input.reads} {output.reads}
+        heyfastq filter-kscore --input {input.reads} --output {output.reads} --min-kscore {params.min_kscore}
         """
 
 
