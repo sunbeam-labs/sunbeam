@@ -50,6 +50,8 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
                 filtered_records_ids = records_ids.difference(ids)
                 print("Length of expected files")
                 print(len(filtered_records_ids))
+                #                from joblib import Parallel, delayed  # attempt to parallelize TODO
+                #                Parallel(n_jobs=2)(delayed(records.remove(records_dict[ids[i]]))(i ** 2) for i in range(len(ids)))
                 for unwanted_key in ids:
                     records.remove(records_dict[unwanted_key])
                 print("Length of filtered file")
