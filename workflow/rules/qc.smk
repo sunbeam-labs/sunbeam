@@ -194,19 +194,14 @@ rule find_low_complexity:
 
 rule remove_low_complexity:
     input:
-        reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
+        read1=QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
+        read2=QC_FP / "02_trimmomatic" / "{sample}_2.fastq.gz",
         ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
     output:
-        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
-    log:
-        LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
-    benchmark:
-        BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
-    conda:
-        "../envs/reports.yml"
+        out1=QC_FP / "03_komplexity" / "{sample}_1.fastq.gz",
+        out2=QC_FP / "03_komplexity" / "{sample}_2.fastq.gz",
     script:
-        "../scripts/remove_low_complexity.py"
-
+        "../scripts/remove_low_complexity_grep.sh"
 
 rule qc_final:
     input:
