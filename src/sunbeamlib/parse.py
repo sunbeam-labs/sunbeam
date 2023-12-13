@@ -54,7 +54,7 @@ def parse_fastq(f: TextIO) -> Iterator[Tuple[str, str, str, str]]:
         plus_str = g[2].strip()
         quality_str = g[3].strip()
 
-        yield (header_str , seq_str, plus_str, quality_str)
+        yield (header_str, seq_str, plus_str, quality_str)
 
 
 def write_fastq(record: Tuple[str, str, str, str], f: TextIO) -> None:
