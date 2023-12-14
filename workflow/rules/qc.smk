@@ -203,6 +203,7 @@ rule remove_low_complexity:
     script:
         "../scripts/remove_low_complexity_grep.sh"
 
+
 rule qc_final:
     input:
         QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
