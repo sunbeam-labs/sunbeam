@@ -194,12 +194,10 @@ rule find_low_complexity:
 
 rule remove_low_complexity:
     input:
-        read1=QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
-        read2=QC_FP / "02_trimmomatic" / "{sample}_2.fastq.gz",
+        reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
         ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
     output:
-        out1=QC_FP / "03_komplexity" / "{sample}_1.fastq.gz",
-        out2=QC_FP / "03_komplexity" / "{sample}_2.fastq.gz",
+        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
     script:
         "../scripts/remove_low_complexity_grep.sh"
 
