@@ -22,7 +22,7 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
             record_id=record[0].split(" ")[0]
             record_id=re.sub('\/1', '', record_id)
             record_id=re.sub('\/2', '', record_id)
-                if not record_id in ids:
+                if record_id not in ids:
                     write_fastq(record, f_out)
                 else:
                     log.write(f"{record[0]} filtered\n")		
