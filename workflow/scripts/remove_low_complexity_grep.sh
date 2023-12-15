@@ -28,10 +28,10 @@ newheaders=$( zgrep -c "^@" $out1 )
 newlines=$( zcat $out1 | wc -l )
 numids=$(< ${log_fp}/${SAMPLEID}.komplexity_keep_ids wc -l )
 explines=$(( "$numids" + "$numids" + "$numids" + "$numids" ))
-echo $newheaders >> $log 2>&1 | tee {log}
-echo $numids >> $log 2>&1 | tee {log}
-echo $newlines >> $log 2>&1 | tee {log}
-echo $explines >> $log 2>&1 | tee {log}
+echo $newheaders >> $log 2>&1 | tee ${log}
+echo $numids >> $log 2>&1 | tee ${log}
+echo $newlines >> $log 2>&1 | tee ${log}
+echo $explines >> $log 2>&1 | tee ${log}
 if [ "$newheaders" -eq "$numids" ]; then
 	if [ "$newlines" -ne "$explines" ]; then
 		exitcode=$(( "$exitcode" + 1 ))	
