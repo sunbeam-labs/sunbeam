@@ -10,7 +10,7 @@ log_fp="$(dirname "${ids}")"
 base_name="$(basename "${read1}")"
 SAMPLEID=${base_name%.fastq.gz}
 
-echo $read1 > $log
+echo $read1 > $log 2>&1 | tee {log}
 #echo "make list of trimmomatic output IDs" >> $log
 zgrep "^@" $read1 > ${log_fp}/${SAMPLEID}.trimm_verbose_ids
 sed 's/ .*$//g' ${log_fp}/${SAMPLEID}.trimm_verbose_ids | sed 's/\/[1-2]$//g' | sort -u > ${log_fp}/${SAMPLEID}.trimm_ids
@@ -28,10 +28,10 @@ newheaders=$( zgrep -c "^@" $out1 )
 newlines=$( zcat $out1 | wc -l )
 numids=$(< ${log_fp}/${SAMPLEID}.komplexity_keep_ids wc -l )
 explines=$(( "$numids" + "$numids" + "$numids" + "$numids" ))
-echo $newheaders >> $log
-echo $numids >> $log
-echo $newlines >> $log
-echo $explines >> $log
+echo $newheaders >> $log 2>&1 | tee {log}
+echo $numids >> $log 2>&1 | tee {log}
+echo $newlines >> $log 2>&1 | tee {log}
+echo $explines >> $log 2>&1 | tee {log}
 if [ "$newheaders" -eq "$numids" ]; then
 	if [ "$newlines" -ne "$explines" ]; then
 		exitcode=$(( "$exitcode" + 1 ))	
