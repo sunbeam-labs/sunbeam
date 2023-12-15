@@ -3,8 +3,9 @@ Supporting functions for QC rules.
 """
 
 import gzip
+import re
 from pathlib import Path
-from sunbeamlib.parse import parse_fastq, write_many_fastq
+from sunbeamlib.parse import parse_fastq, write_fastq
 from typing import List, TextIO
 
 
@@ -16,38 +17,15 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
     ids: list of ids to be removed
     """
     with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
-        records = [r for r in parse_fastq(f_in)]
-        records.sort(key=lambda t: t[0])
-        ids = list(
-            set(ids)
-        )  # sunbeam4 chucks the paired read info after the whitespace, so you're left with duplicate read IDs which silently breaks this
-        ids.sort()
-        rec_count = len(records)
-        i = 1
-        # Use list(records) so that it's a different object in memory and
-        # you're free to remove items from the original
-        for record in list(records):
-            if not ids:
-                log.write("IDs list empty, finished filtering\n")
-                break
-            if ids[0] in record[0]:
-                log.write(f"{record[0]} filtered\n")
-                ids.pop(0)
-                records.remove(record)
-            elif i == rec_count:
-                log.write(
-                    f"{ids[0]} not found in unfiltered reads file! Please fix me.\n"
-                )
-                raise ValueError(
-                    "ID provided cannot be missing from the unfiltered file"
-                )
-            elif len(ids) == 0:
-                log.write("Successfully reached the end of the list of reads to drop.")
-            else:
-                continue
-            i = i + 1
-
-        write_many_fastq(records, f_out)
+	  ids = set(ids)
+	  for record in parse_fastq(f_in):
+		record_id=record[0].split(" ")[0]
+		record_id=re.sub('\/1', '', record_id)
+		record_id=re.sub('\/2', '', record_id)
+		if not record[0] in ids:
+			write_fastq(record, f_out)
+		else:
+			log.write(f"{record[0]} filtered\n")		
 
 
 def remove_pair_id(id: str, log: TextIO) -> str:
