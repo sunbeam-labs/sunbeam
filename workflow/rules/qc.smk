@@ -198,6 +198,10 @@ rule remove_low_complexity:
         ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
     output:
         QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
+    log:
+        LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
+    benchmark:
+        BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
     script:
         "../scripts/remove_low_complexity_grep.sh"
 
