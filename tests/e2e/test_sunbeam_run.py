@@ -296,6 +296,7 @@ def test_sunbeam_run_all_single_end(init_single_end):
         assert int(stats[7]) == 200  # Host
         assert int(stats[8]) == 200  # Nonhost
 
+
 @pytest.fixture
 def init_spaces(output_dir):
     output_dir = output_dir / "sunbeam_run_space_in_header"
