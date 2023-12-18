@@ -22,7 +22,6 @@ komp_fp="$(dirname "${out1}")"
 mkdir -p $komp_fp &>/dev/null # be silent
 zgrep -A 3 -f ${log_fp}/${SAMPLEID}.komplexity_keep_ids $read1 | sed '/^--$/d' | gzip > $out1
 
-exitcode=$?
 
 newheaders=$( zgrep -c "^@" $out1 )
 newlines=$( zcat $out1 | wc -l )
@@ -34,13 +33,14 @@ echo $newlines &>> $log
 echo $explines &>> $log
 if [ "$newheaders" -eq "$numids" ]; then
 	if [ "$newlines" -ne "$explines" ]; then
-		exitcode=1	
 		echo "Your filtered list of IDs does not have the expected length" &>> $log
+		exit 1
 	else
 		echo "Your filtered list of IDs has the expected length" &>> $log
 	fi
 fi
 
+exitcode=$?
 if [ $exitcode -eq 1 ]
 then
     exit 1
