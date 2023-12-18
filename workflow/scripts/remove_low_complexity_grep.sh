@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-bash --version
+
 set +e
 
 read1="${snakemake_input[reads]}"
