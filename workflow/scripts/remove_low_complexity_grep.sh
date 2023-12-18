@@ -36,6 +36,7 @@ echo $explines &>> $log
 if [ "$newheaders" -ne "$numids" ]; then
 	echo "ERROR: Your filtered list of IDs does not have the expected length" &>> $log
 	exit 1
+fi
 if [ "$newlines" -ne "$explines" ]; then
 	echo "ERROR: Your filtered fastq file does not have the expected length" &>> $log
 	exit 1
