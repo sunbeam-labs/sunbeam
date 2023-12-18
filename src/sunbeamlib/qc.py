@@ -12,6 +12,7 @@ from typing import List, TextIO
 from pathlib import Path
 import gzip
 
+
 def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
     """
     Filter FASTQ records based on a list of IDs.
@@ -35,15 +36,17 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
         counter_kept = 0
         for record in parse_fastq(f_in):
             counter += 1
-            record = (remove_pair_id(record[0], log) , record[1], record[2], record[3])
+            record = (remove_pair_id(record[0], log), record[1], record[2], record[3])
             if record[0] in ids_set:
                 ids_set.remove(record[0])
             else:
                 counter_kept += 1
                 write_fastq(record, f_out)
-        
+
         if counter - counter_kept != len(ids):
-            log.write(f"ERROR: Got rid of too many ids (Removed: {counter - counter_kept}, Supposed to remove: {len(ids)})\n")
+            log.write(
+                f"ERROR: Got rid of too many ids (Removed: {counter - counter_kept}, Supposed to remove: {len(ids)})\n"
+            )
             assert False
 
         if len(ids_set) > 0:
@@ -67,7 +70,7 @@ def remove_pair_id(id: str, log: TextIO) -> str:
     id = id.strip()
     if id[-2:] == "/1" or id[-2:] == "/2":
         return id[:-2]
-    
+
     if " " in id:
         return id.split(" ")[0]
 
