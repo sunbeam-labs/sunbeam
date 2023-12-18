@@ -35,9 +35,9 @@ echo $explines &>> $log
 if [ "$newheaders" -eq "$numids" ]; then
 	if [ "$newlines" -ne "$explines" ]; then
 		exitcode=1	
-		echo "Your filtered file does not have the expected length" >> $log
+		echo "Your filtered list of IDs does not have the expected length" &>> $log
 	else
-		echo "Your filtered file has the expected length" &>> $log
+		echo "Your filtered list of IDs has the expected length" &>> $log
 	fi
 fi
 
