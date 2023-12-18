@@ -9,8 +9,10 @@ out1="${snakemake_output}"
 log_fp="$(dirname "${ids}")"
 base_name="$(basename "${read1}")"
 SAMPLEID=${base_name%.fastq.gz}
+#NAME=${base_name%_[1-2].fastq.gz}
 
-echo $read1 &>> ${log}
+#echo $NAME
+echo $read1 &>> $log
 echo $SAMPLEID &>> $log
 zgrep "^@" $read1 > ${log_fp}/${SAMPLEID}.trimm_verbose_ids
 sed 's/ .*$//g' ${log_fp}/${SAMPLEID}.trimm_verbose_ids | sed 's/\/[1-2]$//g' | sort -u > ${log_fp}/${SAMPLEID}.trimm_ids
@@ -29,7 +31,7 @@ explines=$(( "$numids" + "$numids" + "$numids" + "$numids" ))
 echo $newheaders &>> $log
 echo $numids &>> $log
 echo $newlines &>> $log
-echo $explines &>> ${log}
+echo $explines &>> $log
 if [ "$newheaders" -eq "$numids" ]; then
 	if [ "$newlines" -ne "$explines" ]; then
 		exitcode=1	
