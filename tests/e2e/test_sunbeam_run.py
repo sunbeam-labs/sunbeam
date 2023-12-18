@@ -320,9 +320,9 @@ def init_spaces(output_dir):
             pass
 
 
-def test_sunbeam_run_all_space_in_header(init):
-    output_dir = init
-    sunbeam_output_dir = output_dir / "sunbeam_output"
+def test_sunbeam_run_all_space_in_header(init_spaces):
+    output_dir = init_spaces
+    sunbeam_output_dir = output_dir / "sunbeam_output_run_space_in_header"
 
     sp.check_output(
         [
