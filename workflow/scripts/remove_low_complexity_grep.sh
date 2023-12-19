@@ -20,7 +20,7 @@ sed 's/ .*$//g' ${ids} | sed 's/\/[1-2]$//g' | sort -u > ${ids}_unique
 grep -vF -f ${ids}_unique ${log_fp}/${SAMPLEID}.trimm_ids > ${log_fp}/${SAMPLEID}.komplexity_keep_ids
 komp_fp="$(dirname "${out1}")"
 mkdir -p $komp_fp &>/dev/null # be silent
-zgrep -F -A 3 -f ${log_fp}/${SAMPLEID}.komplexity_keep_ids $read1 | sed '/^--$/d' | gzip > $out1
+LC_ALL='C' zgrep -F -A 3 -f ${log_fp}/${SAMPLEID}.komplexity_keep_ids $read1 | sed '/^--$/d' | gzip > $out1
 mistakes=$( zgrep -F -c -m 1 -f $ids $out1 ) 2>/dev/null
 newheaders=$( zgrep -c "^@" $out1 )
 newlines=$( zcat $out1 | wc -l )
