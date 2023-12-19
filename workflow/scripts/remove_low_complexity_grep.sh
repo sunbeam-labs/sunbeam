@@ -18,7 +18,7 @@ zgrep "^@" $read1 > ${log_fp}/${SAMPLEID}.trimm_verbose_ids
 #sed 's/ .*$//g' ${log_fp}/${SAMPLEID}.trimm_verbose_ids | sed 's/\/[1-2]$//g' | sort -u > ${log_fp}/${SAMPLEID}.trimm_ids
 sed 's/ .*$//g' ${ids} | sed 's/\/[1-2]$//g' | sort -u > ${ids}_unique
 grep -vF -f ${ids}_unique ${log_fp}/${SAMPLEID}.trimm_verbose_ids | sed 's/ //g' > ${log_fp}/${SAMPLEID}.komplexity_keep_ids
-zcat $read1 | sed 's/ 2:N:0/_2:N:0/g' | gzip > $read1
+zcat $read1 | sed 's/ 2:N:0/_2:N:0/g' | sed 's/ 1:N:0/_1:N:0/g' | gzip > $read1
 
 komp_fp="$(dirname "${out1}")"
 mkdir -p $komp_fp &>/dev/null # be silent
