@@ -4,4 +4,7 @@ channels:
 dependencies:
   - snakemake >=7.32.0
   - git # Ensure sunbeam extend works even with tar installation of main pipeline
+<<<<<<< HEAD
   - python =3.12.0
+=======
+>>>>>>> 7786c8eccd2d0601a1e78e7ab9acd56d3404684f
