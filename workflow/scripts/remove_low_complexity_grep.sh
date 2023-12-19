@@ -23,7 +23,7 @@ mkdir -p $komp_fp &>/dev/null # be silent
 zgrep -A 3 -f ${log_fp}/${SAMPLEID}.komplexity_keep_ids $read1 | sed '/^--$/d' | gzip > $out1
 
 
-mistakes=$( zgrep -c -f $ids $out1 )
+mistakes=$( zgrep -c -f $ids $out1 ) 2>/dev/null
 newheaders=$( zgrep -c "^@" $out1 )
 newlines=$( zcat $out1 | wc -l )
 numids=$(< ${log_fp}/${SAMPLEID}.komplexity_keep_ids wc -l )
