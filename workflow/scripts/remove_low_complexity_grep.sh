@@ -23,6 +23,7 @@ mkdir -p $komp_fp &>/dev/null # be silent
 zgrep -A 3 -f ${log_fp}/${SAMPLEID}.komplexity_keep_ids $read1 | sed '/^--$/d' | gzip > $out1
 
 
+mistakes=$( zgrep -c -f $ids $out1 ) 2>/dev/null
 newheaders=$( zgrep -c "^@" $out1 )
 newlines=$( zcat $out1 | wc -l )
 numids=$(< ${log_fp}/${SAMPLEID}.komplexity_keep_ids wc -l )
@@ -31,13 +32,21 @@ echo $newheaders &>> $log
 echo $numids &>> $log
 echo $newlines &>> $log
 echo $explines &>> $log
-if [ "$newheaders" -eq "$numids" ]; then
-	if [ "$newlines" -ne "$explines" ]; then
-		echo "Your filtered list of IDs does not have the expected length" &>> $log
-		exit 1
-	else
-		echo "Your filtered list of IDs has the expected length" &>> $log
-	fi
+
+if [ "$newheaders" -ne "$numids" ]; then
+	echo "ERROR: Your filtered list of IDs does not have the expected length" &>> $log
+	exit 1
+fi
+if [ "$newlines" -ne "$explines" ]; then
+	echo "ERROR: Your filtered fastq file does not have the expected length" &>> $log
+	exit 1
+else
+	echo "Your filtered list of IDs and output fastq file have the expected length" &>> $log
+fi
+
+if [ "$mistakes" -gt 0 ]; then
+	echo "ERROR: Your filtered fastq file contains illegal reads." &>> $log
+	exit 1
 fi
 
 exitcode=$?
