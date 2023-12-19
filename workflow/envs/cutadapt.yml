@@ -3,5 +3,5 @@ channels:
   - conda-forge
 dependencies:
   - cutadapt
-  - python <3.12.0
+  - python =3.12.0
 name: cutadapt
