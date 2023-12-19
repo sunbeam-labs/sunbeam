@@ -202,6 +202,8 @@ rule remove_low_complexity:
         LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
     benchmark:
         BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
+    conda:
+        "../envs/seqtk.yml"
     script:
         "../scripts/remove_low_complexity_grep.sh"
 
