@@ -33,15 +33,18 @@ echo $explines &>> $log
 
 if [ "$mistakes" -gt 0 ]; then
 	echo "ERROR: Your filtered fastq file contains illegal reads. Try increasing memory and threads" &>> $log
+	rm $out1
 	exit 1
 fi
 
 if [ "$newheaders" -ne "$numids" ]; then
 	echo "ERROR: Your filtered list of IDs does not have the expected length" &>> $log
+	rm $out1
 	exit 1
 fi
 if [ "$newlines" -ne "$explines" ]; then
 	echo "ERROR: Your filtered fastq file does not have the expected length" &>> $log
+	rm $out1
 	exit 1
 else
 	echo "Your filtered list of IDs and output fastq file have the expected length" &>> $log
