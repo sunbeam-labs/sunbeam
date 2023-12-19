@@ -15,12 +15,17 @@ SAMPLEID=${base_name%.fastq.gz}
 echo $read1 &>> $log
 echo $SAMPLEID &>> $log
 zgrep "^@" $read1 > ${log_fp}/${SAMPLEID}.trimm_verbose_ids
-sed 's/ .*$//g' ${log_fp}/${SAMPLEID}.trimm_verbose_ids | sed 's/\/[1-2]$//g' | sort -u > ${log_fp}/${SAMPLEID}.trimm_ids
+#sed 's/ .*$//g' ${log_fp}/${SAMPLEID}.trimm_verbose_ids | sed 's/\/[1-2]$//g' | sort -u > ${log_fp}/${SAMPLEID}.trimm_ids
 sed 's/ .*$//g' ${ids} | sed 's/\/[1-2]$//g' | sort -u > ${ids}_unique
-grep -vF -f ${ids}_unique ${log_fp}/${SAMPLEID}.trimm_ids > ${log_fp}/${SAMPLEID}.komplexity_keep_ids
+grep -vF -f ${ids}_unique ${log_fp}/${SAMPLEID}.trimm_verbose_ids | sed 's/ //g' > ${log_fp}/${SAMPLEID}.komplexity_keep_ids
+zcat $read1 | sed 's/ 2:N:0/_2:N:0/g' | gzip > $read1
+
 komp_fp="$(dirname "${out1}")"
 mkdir -p $komp_fp &>/dev/null # be silent
-LC_ALL='C' zgrep -F -A 3 -f ${log_fp}/${SAMPLEID}.komplexity_keep_ids $read1 | sed '/^--$/d' | gzip > $out1
+
+seqtk subseq $read1 ${log_fp}/${SAMPLEID}.komplexity_keep_ids 
+#LC_ALL='C' zgrep -F -A 3 -f ${log_fp}/${SAMPLEID}.komplexity_keep_ids $read1 | sed '/^--$/d' | gzip > $out1
+
 mistakes=$( zgrep -F -c -m 1 -f $ids $out1 ) 2>/dev/null
 newheaders=$( zgrep -c "^@" $out1 )
 newlines=$( zcat $out1 | wc -l )
