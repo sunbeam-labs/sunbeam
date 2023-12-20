@@ -32,6 +32,7 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
     """
     with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
         ids_set = set(ids)
+        num_ids = len(ids_set)
         counter = 0
         counter_kept = 0
         for record in parse_fastq(f_in):
@@ -43,11 +44,12 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
                 counter_kept += 1
                 write_fastq(record, f_out)
 
-        if counter - counter_kept != len(ids):
+        if counter - counter_kept != num_ids:
             log.write(
-                f"ERROR: Got rid of too many ids (Removed: {counter - counter_kept}, Supposed to remove: {len(ids)})\n"
+                f"ERROR: Mismatch (Removed: {counter - counter_kept}, Supposed to remove: {num_ids})\n"
             )
-            assert False
+            log.write(f"IDs not found: {ids_set}\n")
+            assert False, f"ERROR: Mismatch (Removed: {counter - counter_kept}, Supposed to remove: {num_ids})"
 
         if len(ids_set) > 0:
             log.write(f"WARNING: {len(ids_set)} ids not found in FASTQ\n")
