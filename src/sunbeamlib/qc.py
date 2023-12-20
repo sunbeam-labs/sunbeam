@@ -49,7 +49,9 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
                 f"ERROR: Mismatch (Removed: {counter - counter_kept}, Supposed to remove: {num_ids})\n"
             )
             log.write(f"IDs not found: {ids_set}\n")
-            assert False, f"ERROR: Mismatch (Removed: {counter - counter_kept}, Supposed to remove: {num_ids})"
+            assert (
+                False
+            ), f"ERROR: Mismatch (Removed: {counter - counter_kept}, Supposed to remove: {num_ids})"
 
         if len(ids_set) > 0:
             log.write(f"WARNING: {len(ids_set)} ids not found in FASTQ\n")
