@@ -4,60 +4,74 @@ Supporting functions for QC rules.
 
 import gzip
 from pathlib import Path
-from sunbeamlib.parse import parse_fastq, write_many_fastq
+from sunbeamlib.parse import parse_fastq, write_fastq
 from typing import List, TextIO
 
 
-def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
-    """Remove ids from FASTQ file.
+from typing import List, TextIO
+from pathlib import Path
+import gzip
 
-    fp_in: path to input FASTQ
-    fp_out: path to output FASTQ
-    ids: list of ids to be removed
+
+def filter_ids(fp_in: Path, fp_out: Path, ids: List[str], log: TextIO) -> None:
+    """
+    Filter FASTQ records based on a list of IDs.
+
+    Args:
+        fp_in (Path): Path to the input FASTQ file.
+        fp_out (Path): Path to the output FASTQ file.
+        ids (List[str]): List of IDs to filter.
+        log (TextIO): TextIO object to write log messages.
+
+    Returns:
+        None: This function does not return anything.
+
+    Raises:
+        AssertionError: If the number of removed IDs does not match the expected count.
+
     """
     with gzip.open(fp_in, "rt") as f_in, gzip.open(fp_out, "wt") as f_out:
-        records = [r for r in parse_fastq(f_in)]
-        records.sort(key=lambda t: t[0])
-        ids = list(
-            set(ids)
-        )  # sunbeam4 chucks the paired read info after the whitespace, so you're left with duplicate read IDs which silently breaks this
-        ids.sort()
-        rec_count = len(records)
-        i = 1
-        # Use list(records) so that it's a different object in memory and
-        # you're free to remove items from the original
-        for record in list(records):
-            if not ids:
-                log.write("IDs list empty, finished filtering\n")
-                break
-            if ids[0] in record[0]:
-                log.write(f"{record[0]} filtered\n")
-                ids.pop(0)
-                records.remove(record)
-            elif i == rec_count:
-                log.write(
-                    f"{ids[0]} not found in unfiltered reads file! Please fix me.\n"
-                )
-                raise ValueError(
-                    "ID provided cannot be missing from the unfiltered file"
-                )
-            elif len(ids) == 0:
-                log.write("Successfully reached the end of the list of reads to drop.")
+        ids_set = set(ids)
+        counter = 0
+        counter_kept = 0
+        for record in parse_fastq(f_in):
+            counter += 1
+            record = (remove_pair_id(record[0], log), record[1], record[2], record[3])
+            if record[0] in ids_set:
+                ids_set.remove(record[0])
             else:
-                continue
-            i = i + 1
+                counter_kept += 1
+                write_fastq(record, f_out)
 
-        write_many_fastq(records, f_out)
+        if counter - counter_kept != len(ids):
+            log.write(
+                f"ERROR: Got rid of too many ids (Removed: {counter - counter_kept}, Supposed to remove: {len(ids)})\n"
+            )
+            assert False
+
+        if len(ids_set) > 0:
+            log.write(f"WARNING: {len(ids_set)} ids not found in FASTQ\n")
+            log.write(f"IDs not found: {ids_set}\n")
+        else:
+            log.write("IDs list empty, finished filtering\n")
 
 
 def remove_pair_id(id: str, log: TextIO) -> str:
-    """Remove the 1 or 2 from a paired read ID
+    """
+    Removes the pair identifier from the given ID.
 
-    id: id string
+    Args:
+        id (str): The ID to remove the pair identifier from.
+        log (TextIO): The log file to write any messages to.
+
+    Returns:
+        str: The ID with the pair identifier removed.
     """
     id = id.strip()
     if id[-2:] == "/1" or id[-2:] == "/2":
         return id[:-2]
 
-    # Assuming it's the newer id variant where komplexity removes the second half (containing pair number)
+    if " " in id:
+        return id.split(" ")[0]
+
     return id
