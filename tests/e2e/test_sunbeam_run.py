@@ -295,3 +295,43 @@ def test_sunbeam_run_all_single_end(init_single_end):
         assert int(stats[4]) == int(stats[5])  # Human = human_copy
         assert int(stats[7]) == 200  # Host
         assert int(stats[8]) == 200  # Nonhost
+
+
+@pytest.fixture
+def init_spaces(output_dir):
+    output_dir = output_dir / "sunbeam_run_space_in_header"
+
+    sp.check_output(
+        [
+            "sunbeam",
+            "init",
+            "--data_fp",
+            f"{test_dir / 'data' / 'spaces'}",
+            output_dir,
+        ]
+    )
+
+    yield output_dir
+
+    if os.environ.get("CI", False):
+        try:
+            shutil.copytree(output_dir, "output_sunbeam_run_space_in_header/")
+        except FileExistsError as e:
+            pass
+
+
+def test_sunbeam_run_all_space_in_header(init_spaces):
+    output_dir = init_spaces
+    sunbeam_output_dir = output_dir / "sunbeam_output"
+
+    sp.check_output(
+        [
+            "sunbeam",
+            "run",
+            "--profile",
+            f"{output_dir}",
+            "--notemp",
+        ]
+    )
+
+    assert len(os.listdir(sunbeam_output_dir / "qc" / "cleaned")) == 4
