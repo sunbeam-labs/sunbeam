@@ -1,7 +1,4 @@
 import gzip
-import os
-import pytest
-import shutil
 import sys
 from pathlib import Path
 

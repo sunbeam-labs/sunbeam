@@ -41,7 +41,7 @@ rule adapter_removal_unpaired:
         str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
     threads: 4
     conda:
-        "../envs/qc.yml"
+        "../envs/cutadapt.yml"
     script:
         "../scripts/adapter_removal_unpaired.py"
 
@@ -62,7 +62,7 @@ rule adapter_removal_paired:
         r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
     threads: 4
     conda:
-        "../envs/qc.yml"
+        "../envs/cutadapt.yml"
     script:
         "../scripts/adapter_removal_paired.py"
 
@@ -235,7 +235,7 @@ rule clean_qc:
         touch(QC_FP / ".qc_cleaned"),
     shell:
         """
-        rm -r {params.cutadapt_fp} && \
-        rm -r {params.trimmomatic_fp} && \
-        rm -r {params.komplexity_fp}
+        rm -r {params.cutadapt_fp} || true
+        rm -r {params.trimmomatic_fp} || true
+        rm -r {params.komplexity_fp} || true
         """

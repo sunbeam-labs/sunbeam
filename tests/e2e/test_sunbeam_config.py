@@ -3,8 +3,8 @@ import pytest
 import shutil
 import subprocess as sp
 import sys
+import yaml
 from pathlib import Path
-from ruamel.yaml import YAML
 
 test_dir = Path(__file__).parent.parent.resolve()
 sys.path.append(test_dir)
@@ -58,9 +58,8 @@ def config_modify(init):
 def test_config_modify(config_modify):
     output_dir, hosts_fp = config_modify
 
-    yaml = YAML(typ="safe")
     with open(output_dir / "sunbeam_config.yml") as f:
-        config_dict = yaml.load(f)
+        config_dict = yaml.safe_load(f)
 
     assert config_dict["qc"]["host_fp"] == str(hosts_fp)
 

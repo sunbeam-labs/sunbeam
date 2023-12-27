@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-__version_tag=$(if git describe --tags >/dev/null 2>&1 ; then git describe --tags; else echo v4.0.0; fi) # <--- Update this on each version release
+__version_tag=$(if git describe --tags >/dev/null 2>&1 ; then git describe --tags; else echo v4.1.0; fi) # <--- Update this on each version release
 __version_tag="${__version_tag:1}" # Remove the 'v' prefix
 
 read -r -d '' __usage <<-'EOF'
@@ -9,7 +9,6 @@ read -r -d '' __usage <<-'EOF'
   -s --sunbeam_dir  [arg] Location of Sunbeam source code. Default: this directory
   -c --conda  [arg]       Location of Conda installation. Default: $CONDA_PREFIX
   -u --update [arg]       Update sunbeam [lib]rary, conda [env], or [all].
-  -m --no_mamba           Don't use mamba in base environment as dependency solver.
   -v --verbose            Show subcommand output.
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
@@ -67,16 +66,11 @@ __sunbeam_dir="${arg_s:-$(readlink -f ${__dir})}"
 __sunbeam_env="${arg_e:-sunbeam${__version_tag}}"
 __update_lib=false
 __update_env=false
-__install_mamba=true
 if [[ "${arg_u}" = "all" || "${arg_u}" = "env" ]]; then
     __update_lib=true
     __update_env=true
 elif [[ "${arg_u}" = "lib" ]]; then
     __update_lib=true
-fi
-
-if [[ "${arg_m:?}" = "1" ]]; then
-    __install_mamba=false
 fi
 
 __old_path=$PATH
@@ -92,10 +86,6 @@ function __git_dir_exists() {
 
 function __test_conda() {
     command -v conda &> /dev/null && echo true || echo false
-}
-
-function __test_mamba() {
-    command -v mamba &> /dev/null && echo true || echo false
 }
 
 function __detect_conda_install() {
@@ -160,12 +150,7 @@ function install_conda () {
 }
 
 function install_environment () {
-    if [[ $(__test_mamba) = true ]]; then
-        cmd=mamba
-    else
-        cmd=conda
-    fi
-    debug_capture $cmd env create --name=$__sunbeam_env \
+    debug_capture conda env create --name=$__sunbeam_env \
               --quiet --file environment.yml
     if [[ $(__test_env) != true ]]; then
 	installation_error "Environment creation"
@@ -198,8 +183,6 @@ info "    Sunbeam env:  '${__sunbeam_env}'"
 debug "Components detected:"
 __conda_installed=$(__test_conda)
 debug "    Conda:       ${__conda_installed}"
-__mamba_installed=$(__test_mamba)
-debug "    Mamba:       ${__mamba_installed}"
 __env_exists=$(__test_env)
 debug "    Environment: ${__env_exists}"
 __sunbeam_installed=$(__test_sunbeam)
@@ -219,16 +202,6 @@ else
     info "Installing Conda..."
     install_conda
     __env_changed=true
-fi
-
-# Install mamba
-if [[ $__mamba_installed = true ]]; then
-    info "Mamba already installed."
-else
-    if [[ $__install_mamba = true ]]; then
-        info "Installing mamba..."
-        conda install --yes --quiet -n base -c conda-forge mamba || (info "Mamba failed to install, this is usually because you have too many packages already installed to your base environment. Install again without mamba (--no_mamba) or try to fix conflicts in base env." && exit 1)
-    fi
 fi
 
 conda config --set channel_priority strict # Set channel priority on new install

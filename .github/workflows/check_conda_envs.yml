@@ -1,0 +1,27 @@
+name: Check Conda Envs
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      envs:
+        description: 'Regex for envs'     
+        required: false
+        default: './,workflow/envs/'
+
+jobs:
+  check_conda_envs:
+    name: Check Conda Envs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      - name: Check Conda Envs
+        uses: Ulthran/conda_env_check@v0
+        with:
+          envs: "./,workflow/envs/"

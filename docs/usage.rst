@@ -31,9 +31,9 @@ versions you want)).
 
       .. code-block:: shell
 
-         wget https://github.com/sunbeam-labs/sunbeam/releases/download/v4.0.0/sunbeam.tar.gz
+         wget https://github.com/sunbeam-labs/sunbeam/releases/latest/download/sunbeam.tar.gz
          mkdir sunbeam4.0.0
-         tar -zxf sunbeam4.0.0.tar.gz -C sunbeam4.0.0
+         tar -zxf sunbeam.tar.gz -C sunbeam4.0.0
          cd sunbeam4.0.0 && ./install.sh
 
    .. tab:: git install
@@ -72,17 +72,10 @@ installing or updating Sunbeam:
 
 .. code-block:: shell
 
-   pytest tests/ -vvl
+   python -m pytest tests/ -vvl
 
-If the tests fail, you should either refer to our troubleshooting_ guide or file
+If the tests fail, you should either refer to our troubleshooting guide or file
 an issue on our `Github page <https://github.com/sunbeam-labs/sunbeam/issues>`_.
-
-.. tip::
-
-  You can speed up the testing process by using the environment created during 
-  the install process with something like this 
-  'bash tests/run_tests.bash -e SUNBEAM_ENV_NAME'. Without this argument the 
-  script will create a temporary environment.
 
 .. _updating:
 Updating
@@ -101,9 +94,9 @@ upgrades, we will increment the patch or minor numbers (e.g. 1.0.0 ->
    git pull
    ./install.sh --upgrade all
 
-Sunbeam v3+ is designed to be installable separately on a system that already 
+Sunbeam is designed to be installable separately on a system that already 
 has sunbeam installed. This means multiple versions of sunbeam can be installed 
-on the same machine in different repositories.
+on the same machine in different repositories and different environments.
 
 .. _uninstall:
 Uninstalling or reinstalling
@@ -260,6 +253,8 @@ qc
   using cutadapt. Replace with ``""`` to skip.
 * ``cutadapt_opts``: (cutadapt) options to pass to cutadapt. Replace with ``""`` to pass no extra options.
 * ``kz_threshold``: a value between 0 and 1 to determine the low-complexity boundary (1 is most stringent). Ignored if not masking low-complexity sequences.
+* ``pct_id``: the percent identity threshold for filtering mapped reads.
+* ``frac``: the minimum fraction of the read that must be mapped to the reference to be kept.
 * ``host_fp``: the path to the folder with host/contaminant genomes (ending in
   *.fasta)
 

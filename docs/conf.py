@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.abspath('.'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx_tabs.tabs']
+extensions = ['sphinx_rtd_theme', 'sphinx_tabs.tabs']
 
 sphinx_tabs_disable_tab_closing = True
 
@@ -74,7 +74,7 @@ release = version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -177,7 +177,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Sunbeam', 'Sunbeam Documentation',
-     author, 'Sunbeam', 'One line description of project.',
+     author, 'Sunbeam', 'A shotgun sequencing data bioinformatics pipeline',
      'Miscellaneous'),
 ]
 
