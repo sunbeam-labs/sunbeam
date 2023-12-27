@@ -69,6 +69,7 @@ def main(argv=sys.argv):
             str(conda_prefix),
             "--conda-frontend",
             conda_cmd,
+            "--default-resources",
         ]
         + remaining
         + args.target_list

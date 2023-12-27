@@ -1,3 +1,6 @@
+localrules: all_decontam, aggregate_reads, clean_decontam
+
+
 rule all_decontam:
     input:
         TARGET_DECONTAM,
@@ -38,6 +41,9 @@ rule align_to_host:
         LOG_FP / "align_to_host_{host}_{sample}.log",
     benchmark:
         BENCHMARK_FP / "align_to_host_{host}_{sample}.tsv"
+    resources:
+        mem_mb=lambda wc: max(MIN_MEM_MB, 16000),
+        runtime=lambda wc: max(MIN_RUNTIME, 240),
     threads: 4
     conda:
         "../envs/qc.yml"
@@ -95,6 +101,9 @@ rule filter_reads:
         LOG_FP / "filter_reads_{sample}_{rp}.log",
     benchmark:
         BENCHMARK_FP / "filter_reads_{sample}_{rp}.tsv"
+    resources:
+        mem_mb=lambda wc: max(MIN_MEM_MB, 24000),
+        runtime=lambda wc: max(MIN_RUNTIME, 240),
     conda:
         "../envs/qc.yml"
     script:

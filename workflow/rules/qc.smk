@@ -3,20 +3,13 @@
 # Illumina quality control rules
 
 
-import os
-
-
-MIN_MEM_MB = os.getenv("SUNBEAM_MIN_MEM_MB", 1000)
-MIN_RUNTIME = os.getenv("SUNBEAM_MIN_RUNTIME", 60)
+localrules: all_qc, sample_intake, qc_final, clean_qc
 
 
 rule all_qc:
     """Runs trimmomatic and fastqc on all input files."""
     input:
         TARGET_QC,
-
-
-ruleorder: adapter_removal_paired > adapter_removal_unpaired
 
 
 rule sample_intake:
@@ -26,11 +19,11 @@ rule sample_intake:
         QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
     log:
         LOG_FP / "sample_intake_{sample}_{rp}.log",
-    resources:
-        mem_mb=lambda wc: MIN_MEM_MB,
-        runtime=lambda wc: MIN_RUNTIME,
     script:
         "../scripts/sample_intake.py"
+
+
+ruleorder: adapter_removal_paired > adapter_removal_unpaired
 
 
 rule adapter_removal_unpaired:
@@ -44,6 +37,8 @@ rule adapter_removal_unpaired:
         BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
     params:
         str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
+    resources:
+        runtime=lambda wc: max(MIN_RUNTIME, 60),
     threads: 4
     conda:
         "../envs/cutadapt.yml"
@@ -65,6 +60,8 @@ rule adapter_removal_paired:
     params:
         r1=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
         r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
+    resources:
+        runtime=lambda wc: max(MIN_RUNTIME, 60),
     threads: 4
     conda:
         "../envs/cutadapt.yml"
@@ -87,6 +84,8 @@ rule trimmomatic_unpaired:
     params:
         sw_start=Cfg["qc"]["slidingwindow"][0],
         sw_end=Cfg["qc"]["slidingwindow"][1],
+    resources:
+        runtime=lambda wc: max(MIN_RUNTIME, 240),
     threads: 4
     conda:
         "../envs/qc.yml"
@@ -124,6 +123,8 @@ rule trimmomatic_paired:
     params:
         sw_start=Cfg["qc"]["slidingwindow"][0],
         sw_end=Cfg["qc"]["slidingwindow"][1],
+    resources:
+        runtime=lambda wc: max(MIN_RUNTIME, 240),
     threads: 4
     conda:
         "../envs/qc.yml"
@@ -154,6 +155,8 @@ rule fastqc:
         BENCHMARK_FP / "fastqc_{sample}.tsv"
     params:
         outdir=QC_FP / "reports",
+    resources:
+        runtime=lambda wc: max(MIN_RUNTIME, 120),
     conda:
         "../envs/qc.yml"
     shell:
