@@ -1,4 +1,7 @@
-localrules: all_decontam, aggregate_reads, clean_decontam
+localrules:
+    all_decontam,
+    aggregate_reads,
+    clean_decontam,
 
 
 rule all_decontam:
