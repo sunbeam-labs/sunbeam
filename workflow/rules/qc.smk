@@ -65,7 +65,7 @@ rule adapter_removal_paired:
         r1=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
         r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
     resources:
-        runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
+        runtime=lambda wc, input: max(MIN_RUNTIME, input.r1.size_mb / 5),
     threads: 4
     conda:
         "../envs/cutadapt.yml"
@@ -129,7 +129,7 @@ rule trimmomatic_paired:
         sw_start=Cfg["qc"]["slidingwindow"][0],
         sw_end=Cfg["qc"]["slidingwindow"][1],
     resources:
-        mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 1000) * MIN_MEM_MB),
+        mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.r1.size_mb / 1000) * MIN_MEM_MB),
         runtime=lambda wc: max(MIN_RUNTIME, 240),
     threads: 4
     conda:
