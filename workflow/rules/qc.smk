@@ -2,7 +2,12 @@
 #
 # Illumina quality control rules
 
-from sunbeamlib.resources import *
+
+import os
+
+
+MIN_MEM_MB = os.getenv("SUNBEAM_MIN_MEM_MB", 1000)
+MIN_RUNTIME = os.getenv("SUNBEAM_MIN_RUNTIME", 60)
 
 
 rule all_qc:
@@ -22,8 +27,8 @@ rule sample_intake:
     log:
         LOG_FP / "sample_intake_{sample}_{rp}.log",
     resources:
-        mem_mb=sample_intake_mem_mb,
-        runtime=sample_intake_runtime,
+        mem_mb=lambda wc: MIN_MEM_MB,
+        runtime=lambda wc: MIN_RUNTIME,
     script:
         "../scripts/sample_intake.py"
 
