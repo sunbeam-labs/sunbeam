@@ -46,8 +46,8 @@ except KeyError:
         "running this from the Sunbeam conda env?"
     )
 
-MIN_MEM_MB = os.getenv("SUNBEAM_MIN_MEM_MB", 8000)
-MIN_RUNTIME = os.getenv("SUNBEAM_MIN_RUNTIME", 15)
+MIN_MEM_MB = int(os.getenv("SUNBEAM_MIN_MEM_MB", 8000))
+MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 # Check for major version compatibility
 pkg_major, cfg_major = check_compatibility(config)
