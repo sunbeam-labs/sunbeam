@@ -160,10 +160,10 @@ function install_environment () {
 function install_env_vars () {
     activate_sunbeam
     mkdir -p ${CONDA_PREFIX}/etc/conda/activate.d
-    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}\nexport SUNBEAM_VER=${__version_tag}" > \
+    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}\nexport SUNBEAM_VER=${__version_tag}\nexport SUNBEAM_MIN_MEM_MB=1000\nexport SUNBEAM_MIN_RUNTIME=60" > \
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
     mkdir -p ${CONDA_PREFIX}/etc/conda/deactivate.d
-    echo -ne "#/bin/sh\nunset SUNBEAM_DIR\nunset SUNBEAM_VER" > \
+    echo -ne "#/bin/sh\nunset SUNBEAM_DIR\nunset SUNBEAM_VER\nunset SUNBEAM_MIN_MEM_MB\nunset SUNBEAM_MIN_RUNTIME" > \
 	 ${CONDA_PREFIX}/etc/conda/deactivate.d/env_vars.sh
 }
 
