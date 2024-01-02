@@ -57,10 +57,10 @@ with open(snakemake.log[0], "w") as l:
         ) as f_out, open(snakemake.input.hostreads) as f_ids:
             ids = {k.strip(): 1 for k in f_ids.readlines()}
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
-                if (
-                    not header_str.split(" ")[0] in ids
-                    and not header_str.replace("/1", "").replace("/2", "") in ids
-                ):
+                parsed_header = (
+                    header_str.split(" ")[0].replace("/1", "").replace("/2", "")
+                )
+                if not parsed_header in ids:
                     write_fastq([header_str, seq_str, plus_str, quality_str], f_out)
 
         # Check that the output file is about the right size given the number of ids removed

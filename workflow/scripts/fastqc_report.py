@@ -1,5 +1,4 @@
 import pandas
-import sys
 from sunbeamlib import reports
 
 with open(snakemake.log[0], "w") as l:
