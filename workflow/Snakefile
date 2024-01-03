@@ -143,7 +143,10 @@ for sbx_path, wildcards in sbxs:
             )
             continue
 
-    sys.stderr.write("Including extension {sbx} in folder {sbx_folder}\n".format(**wildcards))
+    sys.stderr.write(
+        "Including extension {sbx} in folder {sbx_folder}\n".format(**wildcards)
+    )
+
     include: sbx_path
 
 

@@ -71,11 +71,9 @@ def main(argv=sys.argv):
             "Warning: passing targets to '--target_list' is deprecated. "
             "Please use 'sunbeam run <opts> target1 target2 target3' instead.\n"
         )
-    
+
     if args.include and args.exclude:
-        sys.stderr.write(
-            "Error: cannot pass both --include and --exclude\n"
-        )
+        sys.stderr.write("Error: cannot pass both --include and --exclude\n")
         sys.exit(1)
 
     os.environ["SUNBEAM_EXTS_INCLUDE"] = ""
