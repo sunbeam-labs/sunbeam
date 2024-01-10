@@ -9,26 +9,7 @@ on:
       - main
 
 jobs:
-  setup-dependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: s-weigand/setup-conda@v1.2.1
-
-  setup-sunbeam:
-    needs: setup-dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Sunbeam
-        shell: bash
-        run: |
-          cd $GITHUB_WORKSPACE
-
-          bash install.sh -e sunbeam -v
-
   test-slurm:
-    needs: setup-sunbeam
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -39,13 +20,21 @@ jobs:
           - "8888:3306"
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
+      - uses: actions/checkout@v4
+      - uses: s-weigand/setup-conda@v1.2.1
       - uses: koesterlab/setup-slurm-action@v1
+
+      - name: Install Sunbeam
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE
+          bash install.sh -e sunbeam -v
       
       - name: Run Sunbeam
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          source activate sunbeam
+          conda activate sunbeam
           mkdir projects/
 
           pip install snakemake-executor-plugin-slurm
@@ -55,18 +44,25 @@ jobs:
           sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
 
   test-apptainer:
-    needs: setup-sunbeam
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: s-weigand/setup-conda@v1.2.1
       - uses: eWaterCycle/setup-apptainer@v2
         with:
           apptainer-version: 1.1.2
+
+      - name: Install Sunbeam
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE
+          bash install.sh -e sunbeam -v
 
       - name: Run Sunbeam
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          source activate sunbeam
+          conda activate sunbeam
           mkdir projects/
 
           sunbeam init --data_fp tests/data/reads/ --profile apptainer projects/test/
