@@ -22,8 +22,7 @@ jobs:
       - name: Install Sunbeam
         shell: bash
         run: |
-          git clone --depth 1 --branch ${{ github.head_ref }}
-          https://github.com/sunbeam-labs/sunbeam sunbeam
+          git clone --depth 1 --branch ${{ github.head_ref }} https://github.com/sunbeam-labs/sunbeam sunbeam
 
           cd sunbeam
 
