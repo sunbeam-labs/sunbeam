@@ -67,4 +67,4 @@ jobs:
 
           sunbeam init --data_fp tests/data/reads/ --profile apptainer projects/test/
 
-          sunbeam run --profile projects/test/ test
+          sunbeam run --profile projects/test/
