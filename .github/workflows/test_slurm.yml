@@ -37,6 +37,8 @@ jobs:
                 cd sunbeam
                 source activate sunbeam
 
+                pip install snakemake-executor-plugin-slurm
+
                 mkdir projects/
                 sunbeam init --data_fp tests/data/reads/ --profile slurm projects/test/
 
