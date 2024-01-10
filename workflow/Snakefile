@@ -139,7 +139,11 @@ rule all:
 
 rule test:
     input:
-        expand(QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz", sample=Samples.keys(), rp=Pairs),
+        expand(
+            QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
+            sample=Samples.keys(),
+            rp=Pairs,
+        ),
     run:
         print("TEST COMPLETE")
 
