@@ -42,4 +42,4 @@ jobs:
                 mkdir projects/
                 sunbeam init --data_fp tests/data/reads/ --profile slurm projects/test/
 
-                sunbeam run --profile projects/test/ --default-resources slurm_account=runner test
+                sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
