@@ -137,6 +137,13 @@ rule all:
         TARGET_ALL,
 
 
+rule test:
+    input:
+        expand(QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz", sample=Samples.keys(), rp=Pairs),
+    run:
+        print("TEST COMPLETE")
+
+
 rule samples:
     message:
         "Samples to be processed:"

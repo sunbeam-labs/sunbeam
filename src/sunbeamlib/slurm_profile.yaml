@@ -14,12 +14,12 @@ software-deployment-method: "conda"
 # Cluster configuration
 executor: "slurm"
 jobs: 10
-cores: 24 # 'all' uses all available cores, but seems to be broken at least on CHOP cluster
+cores: 24
 
 # Default resource configuration
 default-resources:
-  - slurm_account="hpcusers"
-  - slurm_partition="defq"
+  - slurm_account="hpcusers" # EDIT THIS TO MATCH YOUR CLUSTER'S ACCOUNT NAME
+  - slurm_partition="defq" # EDIT THIS TO MATCH YOUR CLUSTER'S PARTITION NAME
   - mem_mb=8000
   - runtime=15
   - disk_mb=1000
