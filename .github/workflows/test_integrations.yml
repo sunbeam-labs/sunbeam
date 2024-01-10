@@ -55,7 +55,7 @@ jobs:
 
                 sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
     
-    test-singularity:
+    test-apptainer:
         needs: setup-sunbeam
         runs-on: ubuntu-latest
 
@@ -71,6 +71,6 @@ jobs:
                 source activate sunbeam
 
                 mkdir projects/
-                sunbeam init --data_fp tests/data/reads/ --profile singularity projects/test/
+                sunbeam init --data_fp tests/data/reads/ --profile apptainer projects/test/
 
                 sunbeam run --profile projects/test/ test
