@@ -1,5 +1,5 @@
 # Default options for running sunbeam
-software-deployment-method: "conda"
+software-deployment-method: "apptainer"
 cores: 'all' # 'all' uses all available cores, you can also specify a number
 
 # Default resource configuration

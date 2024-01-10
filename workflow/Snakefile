@@ -24,6 +24,10 @@ from sunbeamlib.post import *
 from sunbeamlib.reports import *
 
 
+# Allow conda envs to be loaded from prebuilt image
+containerized: "docker://ctbushman/sunbeam:4.2.0"
+
+
 # Disallow slashes in our sample names during Snakemake's wildcard evaluation.
 # Slashes should always be interpreted as directory separators.
 wildcard_constraints:
@@ -127,13 +131,13 @@ include: "rules/decontaminate.smk"
 
 
 for sbx_path, wildcards in sbxs:
-    if os.environ["SUNBEAM_EXTS_INCLUDE"]:
+    if os.getenv("SUNBEAM_EXTS_INCLUDE", ""):
         if not wildcards[0] in os.environ["SUNBEAM_EXTS_INCLUDE"].split(", "):
             sys.stderr.write(
                 "Excluding extension {sbx} in folder {sbx_folder}\n".format(**wildcards)
             )
             continue
-    if os.environ["SUNBEAM_EXTS_EXCLUDE"]:
+    if os.getenv("SUNBEAM_EXTS_EXCLUDE", ""):
         if (
             wildcards[0] in os.environ["SUNBEAM_EXTS_EXCLUDE"].split(", ")
             or os.environ["SUNBEAM_EXTS_EXCLUDE"] == "all"

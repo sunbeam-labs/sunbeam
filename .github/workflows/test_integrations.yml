@@ -1,0 +1,76 @@
+name: Test Integrations
+
+on:
+    pull_request:
+      branches: [main]
+    push:
+      branches: [main]
+
+jobs:
+    setup-dependencies:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: s-weigand/setup-conda@v1.2.1
+
+    setup-sunbeam:
+        needs: setup-dependencies
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Install Sunbeam
+              shell: bash
+              run: |
+                git clone --depth 1 --branch ${{ github.head_ref }} https://github.com/sunbeam-labs/sunbeam sunbeam
+                cd sunbeam
+                bash install.sh -e sunbeam -v
+    
+    test-slurm:
+        needs: setup-sunbeam
+        runs-on: ubuntu-latest
+        services:
+            mysql:
+            image: mysql:8.0
+            env:
+                MYSQL_ROOT_PASSWORD: root
+            ports:
+                - "8888:3306"
+            options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+        steps:
+            - uses: koesterlab/setup-slurm-action@v1
+            
+            - name: Run Sunbeam
+              shell: bash
+              run: |
+                cd sunbeam
+                source activate sunbeam
+
+                pip install snakemake-executor-plugin-slurm
+
+                mkdir projects/
+                sunbeam init --data_fp tests/data/reads/ --profile slurm projects/test/
+
+                sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
+    
+    test-singularity:
+        needs: setup-sunbeam
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: eWaterCycle/setup-apptainer@v2
+              with:
+                apptainer-version: 1.1.2
+
+            - name: Run Sunbeam
+              shell: bash
+              run: |
+                cd sunbeam
+                source activate sunbeam
+
+                mkdir projects/
+                sunbeam init --data_fp tests/data/reads/ --profile singularity projects/test/
+
+                sunbeam run --profile projects/test/ test
