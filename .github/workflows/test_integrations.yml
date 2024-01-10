@@ -34,7 +34,7 @@ jobs:
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          conda activate sunbeam
+          source activate sunbeam
           mkdir projects/
 
           pip install snakemake-executor-plugin-slurm
@@ -62,7 +62,7 @@ jobs:
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          conda activate sunbeam
+          source activate sunbeam
           mkdir projects/
 
           sunbeam init --data_fp tests/data/reads/ --profile apptainer projects/test/
