@@ -127,6 +127,25 @@ include: "rules/decontaminate.smk"
 
 
 for sbx_path, wildcards in sbxs:
+    if os.environ["SUNBEAM_EXTS_INCLUDE"]:
+        if not wildcards[0] in os.environ["SUNBEAM_EXTS_INCLUDE"].split(", "):
+            sys.stderr.write(
+                "Excluding extension {sbx} in folder {sbx_folder}\n".format(**wildcards)
+            )
+            continue
+    if os.environ["SUNBEAM_EXTS_EXCLUDE"]:
+        if (
+            wildcards[0] in os.environ["SUNBEAM_EXTS_EXCLUDE"].split(", ")
+            or os.environ["SUNBEAM_EXTS_EXCLUDE"] == "all"
+        ):
+            sys.stderr.write(
+                "Excluding extension {sbx} in folder {sbx_folder}\n".format(**wildcards)
+            )
+            continue
+
+    sys.stderr.write(
+        "Including extension {sbx} in folder {sbx_folder}\n".format(**wildcards)
+    )
 
     include: sbx_path
 

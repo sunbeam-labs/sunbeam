@@ -39,6 +39,18 @@ def main(argv=sys.argv):
         default=[],
         help="List of sunbeam targets (DEPRECATED)",
     )
+    parser.add_argument(
+        "--include",
+        nargs="+",
+        default=[],
+        help="List of extensions to include in run",
+    )
+    parser.add_argument(
+        "--exclude",
+        nargs="+",
+        default=[],
+        help="List of extensions to exclude from run, use 'all' to exclude all extensions",
+    )
 
     # The remaining args (after --) are passed to Snakemake
     args, remaining = parser.parse_known_args(argv)
@@ -59,6 +71,17 @@ def main(argv=sys.argv):
             "Warning: passing targets to '--target_list' is deprecated. "
             "Please use 'sunbeam run <opts> target1 target2 target3' instead.\n"
         )
+
+    if args.include and args.exclude:
+        sys.stderr.write("Error: cannot pass both --include and --exclude\n")
+        sys.exit(1)
+
+    os.environ["SUNBEAM_EXTS_INCLUDE"] = ""
+    os.environ["SUNBEAM_EXTS_EXCLUDE"] = ""
+    if args.include:
+        os.environ["SUNBEAM_EXTS_INCLUDE"] = ", ".join(args.include)
+    if args.exclude:
+        os.environ["SUNBEAM_EXTS_EXCLUDE"] = ", ".join(args.exclude)
 
     snakemake_args = (
         [
