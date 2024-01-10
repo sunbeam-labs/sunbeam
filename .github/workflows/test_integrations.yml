@@ -18,13 +18,12 @@ jobs:
     needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Install Sunbeam
         shell: bash
         run: |
-          git clone --depth 1 --branch ${{ github.head_ref }} https://github.com/sunbeam-labs/sunbeam sunbeam
-
-          cd sunbeam
+          cd $GITHUB_WORKSPACE
 
           bash install.sh -e sunbeam -v
 
@@ -41,10 +40,11 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - uses: koesterlab/setup-slurm-action@v1
+      
       - name: Run Sunbeam
         shell: bash
         run: |
-          cd sunbeam
+          cd $GITHUB_WORKSPACE
           source activate sunbeam
           mkdir projects/
 
@@ -61,10 +61,11 @@ jobs:
       - uses: eWaterCycle/setup-apptainer@v2
         with:
           apptainer-version: 1.1.2
+
       - name: Run Sunbeam
         shell: bash
         run: |
-          cd sunbeam
+          cd $GITHUB_WORKSPACE
           source activate sunbeam
           mkdir projects/
 
