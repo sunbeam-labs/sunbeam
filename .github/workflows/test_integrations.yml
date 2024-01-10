@@ -34,33 +34,26 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: 'mysql:8.0'
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
         ports:
-          - '8888:3306'
-        options: "--health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3"
+          - "8888:3306"
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - uses: koesterlab/setup-slurm-action@v1
       - name: Run Sunbeam
         shell: bash
         run: |
           cd sunbeam
-
           source activate sunbeam
-
+          mkdir projects/
 
           pip install snakemake-executor-plugin-slurm
 
+          sunbeam init --data_fp tests/data/reads/ --profile slurm projects/test/
 
-          mkdir projects/
-
-          sunbeam init --data_fp tests/data/reads/ --profile slurm
-          projects/test/
-
-
-          sunbeam run --default-resources slurm_account=runner --profile
-          projects/test/ test
+          sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
 
   test-apptainer:
     needs: setup-sunbeam
@@ -73,14 +66,9 @@ jobs:
         shell: bash
         run: |
           cd sunbeam
-
           source activate sunbeam
-
-
           mkdir projects/
 
-          sunbeam init --data_fp tests/data/reads/ --profile apptainer
-          projects/test/
-
+          sunbeam init --data_fp tests/data/reads/ --profile apptainer projects/test/
 
           sunbeam run --profile projects/test/ test
