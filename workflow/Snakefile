@@ -25,7 +25,8 @@ from sunbeamlib.reports import *
 
 
 # Allow conda envs to be loaded from prebuilt image
-containerized: "docker://ctbushman/sunbeam:4.2.0"
+# NOT WORKING, SEE https://github.com/snakemake/snakemake/issues/2602
+#containerized: "docker://ctbushman/sunbeam:4.2.0"
 
 
 # Disallow slashes in our sample names during Snakemake's wildcard evaluation.
