@@ -23,6 +23,8 @@ jobs:
         run: pip install .[test] setuptools
     
       - name: Run tests
+        env:
+            SUNBEAM_VER: "0.0.0.dev0"
         run: pytest ./tests/unit/
 
   lint:
