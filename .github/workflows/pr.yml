@@ -10,7 +10,7 @@ on:
 
 jobs:
     run-tests:
-        uses: sunbeam-labs/sunbeam/.github/workflows/tests.yml@${{ github.head_ref || github.ref_name }}
+        uses: ./.github/workflows/tests.yml
         secrets: inherit
 
     
