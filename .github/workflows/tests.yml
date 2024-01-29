@@ -24,7 +24,7 @@ jobs:
     
       - name: Run tests
         env:
-            SUNBEAM_VER: "0.0.0.dev0"
+            SUNBEAM_VER: "999"
         run: pytest ./tests/unit/
 
   lint:
