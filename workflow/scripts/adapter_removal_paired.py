@@ -4,6 +4,7 @@ import shutil
 import subprocess as sp
 import sys
 
+
 with open(snakemake.log[0], "w") as log:
     fwd_adapters = snakemake.config["qc"]["fwd_adapters"]
     rev_adapters = snakemake.config["qc"]["rev_adapters"]

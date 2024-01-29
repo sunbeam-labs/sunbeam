@@ -96,7 +96,7 @@ def main(argv=sys.argv):
         + remaining
         + args.target_list
     )
-    print("Running: " + " ".join(snakemake_args))
+    sys.stderr.write("Running: " + " ".join(snakemake_args))
 
     cmd = subprocess.run(snakemake_args)
 
