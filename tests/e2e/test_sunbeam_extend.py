@@ -1,4 +1,6 @@
 import os
+import pytest
+import shutil
 import subprocess as sp
 import sys
 from pathlib import Path
@@ -8,7 +10,8 @@ sys.path.append(test_dir)
 from config_fixture import output_dir, config
 
 
-def test_sunbeam_extend():
+@pytest.fixture
+def extend_template():
     sp.check_output(
         [
             "sunbeam",
@@ -17,5 +20,12 @@ def test_sunbeam_extend():
         ]
     )
 
-    template_fp = Path(os.environ.get("SUNBEAM_DIR")) / "extensions" / "sbx_template"
+    yield Path(os.environ.get("SUNBEAM_DIR")) / "extensions" / "sbx_template"
+
+    shutil.rmtree(Path(os.environ.get("SUNBEAM_DIR")) / "extensions" / "sbx_template")
+
+
+def test_sunbeam_extend(extend_template):
+    template_fp = extend_template
+
     assert template_fp.exists()

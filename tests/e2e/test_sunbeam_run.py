@@ -52,13 +52,7 @@ def test_sunbeam_run_all(init):
     sunbeam_output_dir = output_dir / "sunbeam_output"
 
     sp.check_output(
-        [
-            "sunbeam",
-            "run",
-            "--profile",
-            f"{output_dir}",
-            "--notemp",
-        ]
+        ["sunbeam", "run", "--profile", f"{output_dir}", "--notemp", "--exclude", "all"]
     )
 
     with open(test_dir / "targets.txt") as f:
@@ -152,13 +146,7 @@ def test_sunbeam_run_all_dirty(init_dirty):
     sunbeam_output_dir = output_dir / "sunbeam_output"
 
     sp.check_output(
-        [
-            "sunbeam",
-            "run",
-            "--profile",
-            f"{output_dir}",
-            "--notemp",
-        ]
+        ["sunbeam", "run", "--profile", f"{output_dir}", "--notemp", "--exclude", "all"]
     )
 
     with open(sunbeam_output_dir / "qc" / "reports" / "preprocess_summary.tsv") as f:
@@ -203,13 +191,7 @@ def test_sunbeam_run_all_no_host(init):
     sunbeam_output_dir = output_dir / "sunbeam_output"
 
     sp.check_output(
-        [
-            "sunbeam",
-            "run",
-            "--profile",
-            f"{output_dir}",
-            "--notemp",
-        ]
+        ["sunbeam", "run", "--profile", f"{output_dir}", "--notemp", "--exclude", "all"]
     )
 
     assert len(os.listdir(sunbeam_output_dir / "qc" / "cleaned")) == 4
@@ -260,13 +242,7 @@ def test_sunbeam_run_all_single_end(init_single_end):
     sunbeam_output_dir = output_dir / "sunbeam_output"
 
     sp.check_output(
-        [
-            "sunbeam",
-            "run",
-            "--profile",
-            f"{output_dir}",
-            "--notemp",
-        ]
+        ["sunbeam", "run", "--profile", f"{output_dir}", "--notemp", "--exclude", "all"]
     )
 
     with open(test_dir / "targets_single_end.txt") as f:
@@ -325,13 +301,7 @@ def test_sunbeam_run_all_space_in_header(init_spaces):
     sunbeam_output_dir = output_dir / "sunbeam_output"
 
     sp.check_output(
-        [
-            "sunbeam",
-            "run",
-            "--profile",
-            f"{output_dir}",
-            "--notemp",
-        ]
+        ["sunbeam", "run", "--profile", f"{output_dir}", "--notemp", "--exclude", "all"]
     )
 
     assert len(os.listdir(sunbeam_output_dir / "qc" / "cleaned")) == 4

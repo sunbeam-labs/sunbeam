@@ -42,24 +42,7 @@ def output_dir(config):
         # TODO: Create temp_env
         pass
 
-    sunbeam_dir = Path(os.environ.get("SUNBEAM_DIR"))
-    extensions_fp = sunbeam_dir / "extensions"
-    extensions_moved_fp = sunbeam_dir / "extensions_moved"
-    try:
-        shutil.move(extensions_fp, extensions_moved_fp)
-        extensions_fp.mkdir()
-        with open(extensions_fp / ".test", "w") as f:
-            f.write("")
-    except FileNotFoundError as e:
-        pass
-
     yield output_dir
 
-    if (extensions_fp / ".test").exists():
-        shutil.rmtree(extensions_fp)
-    try:
-        shutil.move(extensions_moved_fp, extensions_fp)
-    except FileNotFoundError as e:
-        pass
     if not config["output_dir"]:
         shutil.rmtree(output_dir)

@@ -2,31 +2,28 @@
 rerun-incomplete: True
 rerun-triggers: "mtime"
 latency-wait: 90
-jobs: 10
 keep-going: True
 notemp: True
 printshellcmds: True
 nolock: True
 verbose: True
-use-conda: True
-cores: 24 # 'all' uses all available cores, but seems to be broken at least on CHOP cluster
-cluster: "sbatch \
-          --account={resources.account} \
-          --partition={resources.partition} \
-          --mem={resources.mem_mb} \
-          --cpus-per-task={threads} \
-          --time={resources.runtime} \
-          --job-name={rule} \
-          --output=slurm_%x_%j.out"
 
+# Environment
+software-deployment-method: "conda"
+
+# Cluster configuration
+executor: "slurm"
+jobs: 10
+cores: 24
 
 # Default resource configuration
 default-resources:
-  - account="hpcusers"
-  - partition="defq"
+  - slurm_account="hpcusers" # EDIT THIS TO MATCH YOUR CLUSTER'S ACCOUNT NAME
+  - slurm_partition="defq" # EDIT THIS TO MATCH YOUR CLUSTER'S PARTITION NAME
   - mem_mb=8000
   - runtime=15
   - disk_mb=1000
+  - slurm_extra="--job-name={rule} --output=slurm_{rule}_%j.out"
 # set-threads: map rule names to threads
 set-threads:
   - diamond_reads=8
@@ -38,7 +35,6 @@ set-threads:
   - run_diamond_blastp=4
   - run_diamond_blastx=4
   - align_to_genome=4
-  # - samtools_convert=4
 # set-resources: map rule names to resources in general
 set-resources:
   - fq_2_fa:mem_mb=8000
