@@ -37,9 +37,31 @@ jobs:
           source activate sunbeam
           pytest ./tests/unit/
 
+  lint:
+    name: Lint Codebase
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+            python-version: 3.12
+      - name: Install Dependencies
+        run: pip install black snakefmt
+
+      - name: Lint Code Base
+        run: |
+            black --check workflow/scripts/ src/sunbeamlib/ tests/
+            snakefmt --check workflow/rules/ workflow/Snakefile
+
   e2e_tests:
     name: E2E Tests
     runs-on: ubuntu-latest
+    needs:
+        - unit_tests
+        - lint
 
     steps:
       - uses: actions/checkout@v4
@@ -61,27 +83,9 @@ jobs:
         run: |
             source activate sunbeam
             pytest ./tests/e2e/
-
-  lint:
-    name: Lint Codebase
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Run Super-Linter
-        uses: github/super-linter@v5
-        env:
-          VALIDATE_ALL_CODEBASE: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-          VALIDATE_SNAKEMAKE_SNAKEFMT: true
-          VALIDATE_PYTHON_BLACK: true
-
-          FILTER_REGEX_INCLUDE: scripts/.*|rules/.*|sunbeamlib/.*|tests/.*|Snakefile
     
   test-slurm:
+    name: Slurm Test
     runs-on: ubuntu-latest
     services:
         mysql:
@@ -91,6 +95,9 @@ jobs:
           ports:
             - "8888:3306"
           options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    needs:
+        - unit_tests
+        - lint
 
     steps:
         - uses: actions/checkout@v4
@@ -117,7 +124,12 @@ jobs:
             sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
 
   test-apptainer:
+    name: Apptainer Test
     runs-on: ubuntu-latest
+    needs:
+        - unit_tests
+        - lint
+
     steps:
         - uses: actions/checkout@v4
         - uses: s-weigand/setup-conda@v1.2.1
