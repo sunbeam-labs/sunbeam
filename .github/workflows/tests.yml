@@ -20,7 +20,7 @@ jobs:
         with:
             python-version: 3.12
       - name: Install Dependencies
-        run: pip install .[test]
+        run: pip install .[test] setuptools
     
       - name: Run tests
         run: pytest ./tests/unit/
