@@ -21,3 +21,5 @@ extensions/*
 build
 projects/
 .vscode/
+.cache/
+.java/

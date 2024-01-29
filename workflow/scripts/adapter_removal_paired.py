@@ -4,8 +4,6 @@ import shutil
 import subprocess as sp
 import sys
 
-#os.environ["PATH"] += os.pathsep + "/conda-envs/08b0272f8c744b8bb162030774cf9917/bin/"
-#sp.run([".", "activate", "/conda-envs/08b0272f8c744b8bb162030774cf9917/"])
 
 with open(snakemake.log[0], "w") as log:
     fwd_adapters = snakemake.config["qc"]["fwd_adapters"]
