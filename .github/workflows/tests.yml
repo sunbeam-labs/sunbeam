@@ -19,12 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Mambaforge
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            use-mamba: true
+      - uses: s-weigand/setup-conda@v1.2.1
     
       - name: Install Sunbeam
         shell: bash
@@ -66,12 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Mambaforge
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            use-mamba: true
+      - uses: s-weigand/setup-conda@v1.2.1
     
       - name: Install Sunbeam
         shell: bash
