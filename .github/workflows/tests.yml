@@ -1,0 +1,29 @@
+name: Tests
+
+on:
+  workflow_call:
+
+  workflow_dispatch:
+
+jobs:
+  unit_tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: s-weigand/setup-conda@v1.2.1
+
+      - name: Install Sunbeam
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE
+          bash install.sh -e sunbeam -v
+
+      - name: Run Sunbeam
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE
+          source activate sunbeam
+          
+          pytest tests/

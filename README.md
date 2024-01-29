@@ -3,8 +3,7 @@
 # Sunbeam: a robust, extensible metagenomic sequencing pipeline 
 
 [![CircleCI](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/main.svg?style=shield)](https://circleci.com/gh/sunbeam-labs/sunbeam/tree/main)
-[![Super-Linter](https://github.com/sunbeam-labs/sunbeam/actions/workflows/linter.yml/badge.svg)](https://github.com/sunbeam-labs/sunbeam/actions/workflows/linter.yml)
-[![Conda Envs Status](https://byob.yarr.is/sunbeam-labs/sunbeam/env_check)](https://github.com/sunbeam-labs/sunbeam/actions/workflows/check_conda_envs.yml)
+[![DockerHub](https://img.shields.io/docker/pulls/ctbushman/sunbeam)](https://hub.docker.com/repository/docker/ctbushman/sunbeam/)
 [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=stable)](https://sunbeam.readthedocs.io/en/stable/?badge=stable)
 [![DOI:10.1186/s40168-019-0658-x](https://img.shields.io/badge/Published%20in-Microbiome-1abc9c.svg)](https://doi.org/10.1186/s40168-019-0658-x)
 
