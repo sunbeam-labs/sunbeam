@@ -8,9 +8,6 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
-env:
-  CACHE_NUMBER: 0  # increase to reset cache manually
-
 jobs:
   unit_tests:
     name: Unit Tests
@@ -19,18 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: s-weigand/setup-conda@v1.2.1
-    
-      - name: Install Sunbeam
-        shell: bash
-        run: |
-            cd $GITHUB_WORKSPACE
-            bash install.sh -e sunbeam -v
+      - uses: actions/setup-python@v5
+        with:
+            python-version: 3.12
+      - name: Install Dependencies
+        run: pip install sunbeam/[test]
     
       - name: Run tests
-        run: |
-          source activate sunbeam
-          pytest ./tests/unit/
+        run: pytest ./tests/unit/
 
   lint:
     name: Lint Codebase
