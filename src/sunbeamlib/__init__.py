@@ -14,14 +14,16 @@ class Version:
 
         version_parts = self.version.split(".")
         self.major = version_parts[0]
+
         try:
             self.minor = version_parts[1]
         except IndexError:
-            self.minor = 0
+            self.minor = "0"
+
         try:
             self.patch = version_parts[2]
         except IndexError:
-            self.patch = 0
+            self.patch = "0"
         if len(self.patch.split("-")) > 1:
             self.patch = self.patch.split("-")[0]
 
