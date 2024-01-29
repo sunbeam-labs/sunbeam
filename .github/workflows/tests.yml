@@ -20,7 +20,9 @@ jobs:
         with:
             python-version: 3.12
       - name: Install Dependencies
-        run: pip install sunbeam/[test]
+        run: |
+          cd sunbeam/
+          pip install .[test]
     
       - name: Run tests
         run: pytest ./tests/unit/
