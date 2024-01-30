@@ -14,6 +14,11 @@ In Sunbeam version 3.0 and higher, extensions can be installed using the ``sunbe
 
 Sunbeam extensions are installed by placing the extension directory in the ``extensions/`` subdirectory of the Sunbeam software.  Once the extension is in place, Sunbeam will find the *rules* file and incorporate the new functionality into the Sunbeam workflow.
 
+Using sbx_template
+==================
+
+We've created a GitHub template for creating new Sunbeam extensions easily. To use the template, go to the `sbx_template <https://github.com/sunbeam-labs/sbx_template>`_ and click the Use this template button in the top right. Once you've created the new repository, wait a minute for the CI to update all the names and links, then clone the repository to your computer. You can then edit the files in the repository to create your extension.
+
 Writing the rules file
 ======================
 
@@ -84,7 +89,8 @@ Fortunately, there is a basic pattern employed to write rules like this.  Here, 
 When the user runs the extension, they specify the rule name, ``all_metaspades``.  Using the full list of output directories, Snakemake figures out what sample files it needs to use, figures out what commands to run, runs the commands in parallel if possible, and lets you know if there were any problems.
 
 Example: a reproducible report
-----------------------------
+------------------------------
+
 As another example, we'll look at an extension that takes standard output from Sunbeam and produces a report.  The extension `sbx_shallowshotgun_pilot <https://github.com/junglee0713/sbx_shallowshotgun_pilot>`_ enables researchers to re-run the analysis for a small methods comaprison.
 
 To make a report from Sunbeam output files, the extension needs only one rule.::
@@ -117,6 +123,7 @@ The `R Markdown tutorial <https://rmarkdown.rstudio.com/lesson-1.html>`_ and `bo
 
 Variables provided by Sunbeam
 -----------------------------
+
 Here is a table of all the Python variables provided by Sunbeam for use in your extensions:
 +-------------------+-------------+-----------------------------------------------+
 | Variable name     | Type        | Description                                   |
@@ -157,18 +164,23 @@ Here is a table of all the Python variables provided by Sunbeam for use in your 
 
 Further reading
 ---------------
+
 We're only scratching the surface of what you can do with rules in Snakemake.  The `official Snakemake documentation <https://snakemake.readthedocs.io/en/stable/index.html>`_ gives excellent instructions with more examples.
 
 Software dependencies
 =====================
-If your extension requires additional software to be installed, there are a couple ways to manage these dependencies. The preferred method is to create an environment file named ``sbx_ext_name.yaml`` that looks something like this::
-        name: metaspades_example
-        channels:
-            - bioconda
-            - other-channels
-        dependencies:
-            - spades
-            - other-packages
+
+If your extension requires additional software to be installed, there are a couple ways to manage these dependencies. The preferred method is to create an environment file named ``sbx_ext_name.yaml`` that looks something like this:
+
+.. code-block:: yaml
+    name: metaspades_example
+    channels:
+        - bioconda
+        - other-channels
+    dependencies:
+        - spades
+        - other-packages
+
 You then attach this environment to any rules that require any of the listed dependencies with ``conda``.
 NOTE: If this method is used with sunbeam version <3.0, the ``--use-conda`` flag has to be included in the ``sunbeam run`` command (i.e. ``sunbeam run all_metaspades --use-conda --configfile /path/to/config``).
 Alternatively, you can provide the names of `Conda packages <https://conda.io/docs/>`_ inside a file named ``requirements.txt``.  This file contains the package names, one per line.  To install Conda packages in this file, users of your extension will run the ``conda install`` command with this file as an additonal argument (while the sunbeam environment is active)::
@@ -176,10 +188,14 @@ Alternatively, you can provide the names of `Conda packages <https://conda.io/do
 
 Configuration
 =============
-Your extension can include its own section in the configuration file. To take advantage of this, you would write an example configuration file named ``config.yml``. This file should contain only one additional configuration section, specifying parameters for your extension.  For example, the `sbx_coassembly <https://github.com/sunbeam-labs/sbx_coassembly>`_ extension includes two parameters: the number of threads to use, and the path to a file with groups of samples to co-assemble.::
+
+Your extension can include its own section in the configuration file. To take advantage of this, you would write an example configuration file named ``config.yml``. This file should contain only one additional configuration section, specifying parameters for your extension.  For example, the `sbx_coassembly <https://github.com/sunbeam-labs/sbx_coassembly>`_ extension includes two parameters: the number of threads to use, and the path to a file with groups of samples to co-assemble.
+
+.. code-block:: yaml
     sbx_coassembly:
         threads: 4
         group_file: ''
+        
 As of version 3.0, config options from extensions are automatically included in config files made using ``sunbeam init`` and ``sunbeam config update``. This functionality depends on the extension's configuration file being named ``config.yml``.
 In version <3.0, users can copy this example section to the end of their configuration file, using ``cat``::
     cat config.yml >> /path/to/user/sunbeam_config.yml
@@ -187,6 +203,7 @@ In your *rules* file, you can access parameters in the configuration like this: 
 
 The README file
 ===============
+
 We recommend that you include a README file in your extension.  The contents of the file should be in Markdown format, and the file should be named ``README.md``.  Here's what you should cover in the README file:
 1. A short summary of what your extension does
 2. Any relevant citations
@@ -197,4 +214,5 @@ A good example to follow is the `sbx_coassembly <https://github.com/sunbeam-labs
 
 Publishing at sunbeam-labs.org
 ==============================
+
 You are welcome to add your Sunbeam extensions to the organization at `sunbeam-labs <https://github.com/sunbeam-labs>`_.  To submit your extension, please go to the `sunbeam Issues page <https://github.com/sunbeam-labs/sunbeam/issues>`_ and open and issue with the GitHub URL of your extension.
