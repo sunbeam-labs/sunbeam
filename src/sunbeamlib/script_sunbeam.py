@@ -34,7 +34,7 @@ def main():
         "-v",
         "--version",
         action="version",
-        version="%(prog)s v{}".format(sunbeamlib.__version__),
+        version=sunbeamlib.__version__,
     )
 
     args, remaining = parser.parse_known_args()

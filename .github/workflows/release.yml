@@ -11,17 +11,55 @@ jobs:
         uses: ./.github/workflows/tests.yml
         secrets: inherit
     
+    check-version:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v4
+          - uses: s-weigand/setup-conda@v1.2.1
+          - name: Install Sunbeam
+            shell: bash
+            run: |
+                cd $GITHUB_WORKSPACE
+                GIT_VERSION=$(bash install.sh -w)
+                echo "GIT_VERSION=$GIT_VERSION" >> $GITHUB_ENV
+
+          - name: Download and Extract
+            shell: bash
+            run: |
+                wget https://github.com/sunbeam-labs/sunbeam/releases/latest/download/sunbeam.tar.gz
+                mkdir tar_sunbeam
+                tar -zxf sunbeam.tar.gz -C tar_sunbeam
+                cd tar_sunbeam
+                TAR_VERSION=$(bash install.sh -w)
+                echo "TAR_VERSION=$TAR_VERSION" >> $GITHUB_ENV
+
+          - id: get_version
+            uses: battila7/get-version-action@v2
+
+          - name: Check version
+            run: |
+                GITHUB_VERSION=${{ steps.get_version.outputs.version-without-v }}
+                if [[ $LIBRARY_VERSION == env.GIT_VERSION ]] && [[ env.GIT_VERSION == env.TAR_VERSION ]]; then
+                echo "Versions match, continuing..."
+                else
+                echo "Versions don't match, exiting..."
+                echo "Library version: $LIBRARY_VERSION"
+                echo "GitHub version: env.GIT_VERSION"
+                echo "Tarball version: env.TAR_VERSION"
+                exit 1
+                fi
+    
     test-tarball:
         name: Test Tarball
         runs-on: ubuntu-latest
-        needs: run-tests
+        needs:
+          - run-tests
+          - check-version
     
         steps:
           - name: setup-conda
-            uses: s-weigand/setup-conda@v1.2.1
-            with:
-              # Additional channels like 'conda-forge' which can be used to install packages
-              conda-channels: '' # optional, default is 
+            uses: s-weigand/setup-conda@v1.2.1 
     
           - name: Download and Extract
             shell: bash
@@ -37,3 +75,17 @@ jobs:
               source activate sunbeam
               cd sunbeam
               pytest -vvl tests/
+
+    push-dockerhub:
+        name: Push to Dockerhub
+        runs-on: ubuntu-latest
+        needs: run-tests
+    
+        steps:
+          - name: setup-conda
+            uses: s-weigand/setup-conda@v1.2.1 
+    
+          - name: Download and Extract
+            shell: bash
+            run: |
+              wget
