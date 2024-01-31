@@ -104,3 +104,10 @@ jobs:
               push: true
               tags: ${{ steps.meta.outputs.tags }}
               labels: ${{ steps.meta.outputs.labels }}
+        
+    run-integration-tests:
+        uses: ./.github/workflows/integration-tests.yml
+        secrets: inherit
+        needs:
+            - push-dockerhub
+            - test-tarball
