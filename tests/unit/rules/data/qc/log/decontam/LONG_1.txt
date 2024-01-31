@@ -1,2 +1,0 @@
-human	human_copy	phix174	host	nonhost
-0	0	0	0	1995

@@ -1,0 +1,19 @@
+name: Tests
+
+on:
+    pull_request:
+      branches:
+        - main
+    push:
+      branches:
+        - main
+
+jobs:
+    run-tests:
+        uses: ./.github/workflows/tests.yml
+        secrets: inherit
+
+    run-integration-tests:
+        uses: ./.github/workflows/integration-tests.yml
+        secrets: inherit
+    

@@ -1,3 +1,0 @@
-Samples	input	both_kept	fwd_only	rev_only	dropped	human	human_copy	phix174	host	nonhost	komplexity
-LONG	2000	2000	0	0	0	0	0	0	0	1995	5
-SHORT	400	400	0	0	0	94	94	100	194	198	8

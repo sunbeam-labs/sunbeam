@@ -1,0 +1,70 @@
+name: Tests
+
+on:
+  workflow_call:
+
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  unit_tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+            python-version: 3.12
+      - name: Install Dependencies
+        run: pip install .[test] setuptools
+    
+      - name: Run tests
+        env:
+            SUNBEAM_VER: "999"
+        run: pytest ./tests/unit/
+
+  lint:
+    name: Lint Codebase
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+            python-version: 3.12
+      - name: Install Dependencies
+        run: pip install black snakefmt
+
+      - name: Lint Code Base
+        run: |
+            black --check workflow/scripts/ src/sunbeamlib/ tests/
+            snakefmt --check workflow/rules/ workflow/Snakefile
+
+  e2e_tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs:
+        - unit_tests
+        - lint
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: s-weigand/setup-conda@v1.2.1
+    
+      - name: Install Sunbeam
+        shell: bash
+        run: |
+            cd $GITHUB_WORKSPACE
+            bash install.sh -e sunbeam -v
+    
+      - name: Run tests
+        run: |
+            source activate sunbeam
+            pytest ./tests/e2e/

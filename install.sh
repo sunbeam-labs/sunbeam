@@ -12,6 +12,7 @@ read -r -d '' __usage <<-'EOF'
   -v --verbose            Show subcommand output.
   -d --debug              Run in debug mode.
   -h --help               Display this message and exit.
+  -w --version            Display version information and exit.
 EOF
 
 read -r -d '' __helptext <<-'EOF'
@@ -33,8 +34,15 @@ trap '__err_report "${FUNCNAME:-.}" ${LINENO}' ERR
 
 # help mode
 if [[ "${arg_h:?}" = "1" ]]; then
-    # Help exists with code 1
+    # Help exits with code 1
     help "Help using ${0}:"
+fi
+
+# version mode
+if [[ "${arg_w:?}" = "1" ]]; then
+    # Version info exits with code 2
+    echo "Sunbeam version ${__version_tag}"
+    exit 2
 fi
 
 # verbose mode

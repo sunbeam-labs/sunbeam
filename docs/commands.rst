@@ -5,99 +5,81 @@ Sunbeam Commands
 ================
 
 .. code-block:: shell
+
     
-    sunbeam [-h | -v] <subcommand>
+        sunbeam [-h | -v] <subcommand>
 
-.. code-block:: shell
+    .. code-block:: shell
+        -h/--help: Display help.
+        -v/--version: Display version.
 
-    -h/--help: Display help.
-    -v/--version: Display version.
+    init
+    ====
+    Initialize a new Sunbeam project in a given directory, creating a new config file and (optionally) a sample list.
 
-.. tip::
+    .. code-block:: shell
+        sunbeam init [-h] [-f] [--output FILE] [--defaults FILE] [--template FILE] [--data_fp PATH] [--format STR] [--single_end] [--profile STR] project_fp
 
-    This is the version given by ``semantic_version`` in sunbeamlib. For commits 
-    and branches this may differ from the version given by ``git`` that is used 
-    for things like environment naming.
+    .. code-block:: shell
+        -h/--help: Display help.
+        -f/--force: Overwrite files if they already exist.
+        --output: Name of config file (default: sunbeam_config.yml).
 
-init
-====
+    Config file options:
+    .. code-block:: shell
+        --defaults: Set of default values to use to populate config file.
+        --template: Custom config file template, in YAML format.
 
-Initialize a new Sunbeam project in a given directory, creating a new config 
-file and (optionally) a sample list.
+    Sample list options:
+    .. code-block:: shell
+        --data_fp: Path to folder containing ``.fastq.gz`` files.
+        --format: Filename format for --data_fp (default: guessed).
+        --single_end: Fastq files are in single-end, not paired-end, format for --data_fp.
+        project_fp: Project directory (will be created if it does not exist).
 
-.. code-block:: shell
+    Profile file options:
+    .. code-block:: shell
+        --profile: Name of the profile template to use (e.g. default, slurm) (default: default)
 
-    sunbeam init [-h] [-f] [--output FILE] [--defaults FILE] [--template FILE] [--data_fp PATH] [--format STR] [--single_end] [--profile STR] project_fp
+    run
+    ===
+    Executes the Sunbeam pipeline by calling Snakemake.
 
-.. code-block:: shell
+    .. code-block:: shell
+        sunbeam run [-h] [-m] [-s PATH] [--target_list [TARGETS, ...]] [--include [INCLUDES, ...]] [--exclude [EXCLUDE, ...]] -- <snakemake options>
 
-    -h/--help: Display help.
-    -f/--force: Overwrite files if they already exist.
-    --output: Name of config file (default: sunbeam_config.yml).
+    .. tip::
+        The ``--target_list`` option is deprecated. Pass the targets directly to ``sunbeam run`` instead.
 
-Config file options:
+    Usage examples:
+    1. To run all targets (not including extensions):
+       ``sunbeam run --profile /path/to/project/``
+    2. To specify multiple targets:
+       ``sunbeam run --profile /path/to/project/ all_decontam all_assembly all_annotation``
+    3. The equivalent of 2, using the deprecated ``--target_list`` option:
+       ``sunbeam run --profile /path/to/project/ --target_list all_decontam all_assembly all_annotation``
 
-.. code-block:: shell
+    .. code-block:: shell
+        -h/--help: Display help.
+        -m/--mamba: Use mamba instead of conda to manage environments.
+        -s/--sunbeam_dir: Path to sunbeam installation.
+        --target_list: A list of targets to run successively. (DEPRECATED)
+        --include: List of extensions to include in run.
+        --exclude: List of extensions to exclude from run, use 'all' to exclude all extensions.
+        <snakemake options>: You can pass further arguments to Snakemake after ``--``, e.g: ``$ sunbeam run -- --cores 12``. See http://snakemake.readthedocs.io for more information.
 
-    --defaults: Set of default values to use to populate config file.
-    --template: Custom config file template, in YAML format.
+    .. tip::
+        The ``--profile`` option is a snakemake option but should be used whenever using ``sunbeam run``. The main sunbeam snakefile requires a config object to be defined and the profile created by ``sunbeam init`` will always specify a config file to get that from.
 
-Sample list options:
+    config
+    ======
+    .. code-block:: shell
+        sunbeam config [-h] {update,modify} ...
 
-.. code-block:: shell
+    .. code-block:: shell
+        -h/--help: Display help.
 
-    --data_fp: Path to folder containing ``.fastq.gz`` files.
-    --format: Filename format for --data_fp (default: guessed).
-    --single_end: Fastq files are in single-end, not paired-end, format for --data_fp.
-    project_fp: Project directory (will be created if it does not exist).
-
-Profile file options:
-
-.. code-block:: shell
-
-    --profile: Name of the profile template to use (e.g. default, slurm) (default: default)
-
-run
-===
-
-Executes the Sunbeam pipeline by calling Snakemake.
-
-.. code-block:: shell
-
-    sunbeam run [-h] [-s PATH] [--target_list [TARGETS, ...]] -- <snakemake options>
-
-Usage examples:
-
-1. To run all targets (not including extensions):
-   ``sunbeam run --profile /path/to/project/``
-2. To specify multiple targets:
-   ``sunbeam run --profile /path/to/project/ all_decontam all_assembly all_annotation``
-3. The equivalent of 2, using the deprecated ``--target_list`` option:
-   ``sunbeam run --profile /path/to/project/ --target_list all_decontam all_assembly all_annotation``
-
-.. code-block:: shell
-
-    -h/--help: Display help.
-    -s/--sunbeam_dir: Path to sunbeam installation.
-    --target_list: A list of targets to run successively. (DEPRECATED)
-    <snakemake options>: You can pass further arguments to Snakemake after ``--``, e.g: ``$ sunbeam run -- --cores 12``. See http://snakemake.readthedocs.io for more information.
-
-.. tip::
-
-    The ``--profile`` option is a snakemake option but should be used whenever using ``sunbeam run``. The main sunbeam snakefile requires a config object to be defined and the profile created by ``sunbeam init`` will always specify a config file to get that from.
-
-config
-======
-
-.. code-block:: shell
-
-    sunbeam config [-h] {update,modify} ...
-
-.. code-block:: shell
-
-    -h/--help: Display help.
-
-update
+    update
 ******
 
 Updates a config file to be compatible with the active version of sunbeam.

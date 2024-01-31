@@ -13,8 +13,7 @@ There are two installation methods available, installing via git or via tar. We 
 
    .. tab:: tar install
 
-      On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) 
-      then unpack and install it.
+      On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) then unpack and install it.
 
       .. code-block:: shell
 
@@ -25,8 +24,7 @@ There are two installation methods available, installing via git or via tar. We 
 
    .. tab:: git install
 
-      On a Linux machine, download a copy of Sunbeam from our GitHub repository, and
-      install.
+      On a Linux machine, download a copy of Sunbeam from our GitHub repository, and install.
 
       .. code-block:: shell
 
@@ -36,66 +34,69 @@ There are two installation methods available, installing via git or via tar. We 
 
       .. tip::
 
-         If you're planning on doing development work on sunbeam, use 
-         'git clone git@github.com:sunbeam-labs/sunbeam.git' instead.
+         If you're planning on doing development work on sunbeam, use SSH or HTTPS with a PAT.
 
-This installs Sunbeam and all its dependencies, including the `Conda
-<https://conda.io/miniconda.html>`_ environment manager, if required. It will finish 
-by printing instructions to continue that should look like:
+This installs Sunbeam and all its dependencies, including the `Conda <https://conda.io/miniconda.html>`_ environment manager, if required. It will finish by printing instructions to continue that should look like:
 
 .. code-block:: shell
 
    conda activate ENV_NAME
-   python -m pytest tests/
+   pytest tests/
 
 This runs some tests to make sure everything was installed correctly.
 
 .. tip::
 
-   If you've never installed Conda before, you'll need to add it to your shell's
-   path. If you're running Bash (the most common terminal shell), the installation 
-   script should print the necessary command.
+   If you've never installed Conda before, you'll need to add it to your shell's path. If you're running Bash (the most common terminal shell), the installation script should print the necessary command.
 
-If the tests fail, check out our :ref:`troubleshooting` section or file an issue
-on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.
+If the tests fail, check out our :ref:`troubleshooting` section or file an issue on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.
 
 Setup
 *****
 
-Let's say your sequencing reads live in a folder called
-``/sequencing/project/reads``, with one or two files per sample (for single- and
-paired-end sequencing, respectively). These files *must* be in gzipped FASTQ
-format.
+Let's say your sequencing reads live in a folder called ``/sequencing/project/reads``, with one or two files per sample (for single- and paired-end sequencing, respectively). These files *must* be in gzipped FASTQ format.
 
 Let's create a new Sunbeam project (we'll call it ``my_project``):
 
-.. code-block:: shell
+.. tabs::
 
-   source activate ENV_NAME
-   sunbeam init my_project --data_fp /sequencing/project/reads
+   .. tab:: Standard (Conda, local)
 
-Sunbeam will create a new folder called ``my_project`` and put three files
-there:
+      .. code-block:: shell
 
-- ``config.yaml`` contains a `snakemake profile<https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>`_ that will be used to run ``my_project``.
+         source activate ENV_NAME
+         sunbeam init my_project --data_fp /sequencing/project/reads
+   
+   .. tab:: Slurm
 
-- ``sunbeam_config.yml`` contains all the configuration parameters for each step
-  of the Sunbeam pipeline.
+      .. code-block:: shell
 
-- ``samples.csv`` is a comma-separated list of samples that Sunbeam found in the
-  given data folder, along with absolute paths to their FASTQ files.
+         source activate ENV_NAME
+         sunbeam init my_project --data_fp /sequencing/project/reads --profile slurm
+
+   .. tab:: Apptainer/Singularity
+
+      .. code-block:: shell
+
+         source activate ENV_NAME
+         sunbeam init my_project --data_fp /sequencing/project/reads --profile apptainer
+
+Sunbeam will create a new folder called ``my_project`` and put three files there:
+
+- ``config.yaml`` contains a `snakemake profile <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>`_ that will be used to run ``my_project``.
+
+- ``sunbeam_config.yml`` contains all the configuration parameters for each step of the Sunbeam pipeline.
+
+- ``samples.csv`` is a comma-separated list of samples that Sunbeam found in the given data folder, along with absolute paths to their FASTQ files.
 
 Right now we have everything we need to do basic quality-control. However, let's go ahead and set up contaminant filtering to make things interesting.
 
 Contaminant filtering
 ---------------------
 
-Sunbeam can align your reads to an arbitrary number of contaminant sequences or
-host genomes and remove reads that map above a given threshold.
+Sunbeam can align your reads to an arbitrary number of contaminant sequences or host genomes and remove reads that map above a given threshold.
 
-To use this, make a folder containing all the target sequences in FASTA
-format. The filenames should end in "fasta" to be recognized by Sunbeam. In your ``sunbeam_config.yml`` file, edit the ``host_fp:`` line in the ``qc``
-section to point to this folder.
+To use this, make a folder containing all the target sequences in FASTA format. The filenames should end in "fasta" to be recognized by Sunbeam. In your ``sunbeam_config.yml`` file, edit the ``host_fp:`` line in the ``qc`` section to point to this folder.
 
 Running
 *******

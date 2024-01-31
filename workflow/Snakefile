@@ -17,14 +17,16 @@ from pathlib import Path, PurePath
 from snakemake.utils import update_config, listfiles
 from snakemake.exceptions import WorkflowError
 
-from sunbeamlib import load_sample_list
+from sunbeamlib import load_sample_list, __version__
 from sunbeamlib.config import *
 from sunbeamlib.parse import read_seq_ids
 from sunbeamlib.post import *
 from sunbeamlib.reports import *
 
+print(__version__)
 
-containerized: "docker://ctbushman/sunbeam:4.2.0"
+
+containerized: f"docker://ctbushman/sunbeam:{__version__}"
 
 
 # Disallow slashes in our sample names during Snakemake's wildcard evaluation.
