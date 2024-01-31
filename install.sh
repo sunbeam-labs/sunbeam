@@ -40,7 +40,7 @@ fi
 
 # version mode
 if [[ "${arg_w:?}" = "1" ]]; then
-    echo "Sunbeam version ${__version_tag}"
+    echo "${__version_tag}"
     exit 0
 fi
 
