@@ -41,13 +41,13 @@ jobs:
             run: |
                 GITHUB_VERSION=${{ steps.get_version.outputs.version-without-v }}
                 if [[ $LIBRARY_VERSION == ${{ env.GIT_VERSION }} ]] && [[ ${{ env.GIT_VERSION }} == ${{ env.TAR_VERSION }} ]]; then
-                echo "Versions match, continuing..."
+                    echo "Versions match, continuing..."
                 else
-                echo "Versions don't match, exiting..."
-                echo "Library version: ${LIBRARY_VERSION}"
-                echo "GitHub version: ${{ env.GIT_VERSION }}"
-                echo "Tarball version: ${{ env.TAR_VERSION }}"
-                exit 1
+                    echo "Versions don't match, exiting..."
+                    echo "Library version: ${LIBRARY_VERSION}"
+                    echo "GitHub version: ${{ env.GIT_VERSION }}"
+                    echo "Tarball version: ${{ env.TAR_VERSION }}"
+                    exit 1
                 fi
     
     test-tarball:
