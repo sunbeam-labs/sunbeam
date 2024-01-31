@@ -40,13 +40,14 @@ jobs:
           - name: Check version
             run: |
                 RELEASE_VERSION=${{ steps.get_version.outputs.version-without-v }}
+                echo "Release version: ${RELEASE_VERSION}"
+                echo "GitHub version: ${{ env.GIT_VERSION }}"
+                echo "Tarball version: ${{ env.TAR_VERSION }}"
+                
                 if [[ $RELEASE_VERSION == ${{ env.GIT_VERSION }} ]] && [[ ${{ env.GIT_VERSION }} == ${{ env.TAR_VERSION }} ]]; then
                     echo "Versions match, continuing..."
                 else
                     echo "Versions don't match, exiting..."
-                    echo "Release version: ${RELEASE_VERSION}"
-                    echo "GitHub version: ${{ env.GIT_VERSION }}"
-                    echo "Tarball version: ${{ env.TAR_VERSION }}"
                     exit 1
                 fi
     
