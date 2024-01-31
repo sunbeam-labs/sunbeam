@@ -189,40 +189,23 @@ rule fastqc_report:
         "../scripts/fastqc_report.py"
 
 
-rule find_low_complexity:
-    input:
-        expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
-    output:
-        QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
-    log:
-        LOG_FP / "find_low_complexity_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "find_low_complexity_{sample}.tsv"
-    conda:
-        "../envs/komplexity.yml"
-    shell:
-        """
-        for rp in {input}; do
-          gzip -dc $rp | kz | \
-          awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> {output}
-        done
-        """
-
-
 rule remove_low_complexity:
     input:
-        reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
-        ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
+        reads=expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
-        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
+        reads=expand(QC_FP / "03_komplexity" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     log:
-        LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
+        LOG_FP / "remove_low_complexity_{sample}.log",
     benchmark:
-        BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
-    conda:
-        "../envs/reports.yml"
-    script:
-        "../scripts/remove_low_complexity.py"
+        BENCHMARK_FP / "remove_low_complexity_{sample}.tsv"
+    #conda:
+    #    "../envs/reports.yml"
+    params:
+        min_kscore=Cfg["qc"]["kz_threshold"],
+    shell:
+        """
+        heyfastq filter-kscore --input {input.reads} --output {output.reads} --min-kscore {params.min_kscore}
+        """
 
 
 rule qc_final:
