@@ -40,9 +40,8 @@ fi
 
 # version mode
 if [[ "${arg_w:?}" = "1" ]]; then
-    # Version info exits with code 2
     echo "Sunbeam version ${__version_tag}"
-    exit 2
+    exit 0
 fi
 
 # verbose mode
