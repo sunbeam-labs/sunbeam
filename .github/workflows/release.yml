@@ -43,7 +43,7 @@ jobs:
                 echo "Release version: ${RELEASE_VERSION}"
                 echo "GitHub version: ${{ env.GIT_VERSION }}"
                 echo "Tarball version: ${{ env.TAR_VERSION }}"
-                
+
                 if [[ $RELEASE_VERSION == ${{ env.GIT_VERSION }} ]] && [[ ${{ env.GIT_VERSION }} == ${{ env.TAR_VERSION }} ]]; then
                     echo "Versions match, continuing..."
                 else
@@ -78,33 +78,11 @@ jobs:
               pytest -vvl tests/
 
     push-dockerhub:
-        name: Push to Dockerhub
-        runs-on: ubuntu-latest
+        uses: ./.github/workflows/dockerhub.yml
+        secrets: inherit
         needs:
           - run-tests
           - check-version
-    
-        steps:
-          - name: Log in to Docker Hub
-            uses: docker/login-action@v3
-            with:
-              username: ${{ secrets.DOCKER_USERNAME }}
-              password: ${{ secrets.DOCKER_PASSWORD }}
-          
-          - name: Extract metadata (tags, labels) for Docker
-            id: meta
-            uses: docker/metadata-action@v5
-            with:
-              images: ctbushman/sunbeam
-          
-          - name: Build and push Docker image
-            uses: docker/build-push-action@v5
-            with:
-              context: .
-              file: ./Dockerfile
-              push: true
-              tags: ${{ steps.meta.outputs.tags }}
-              labels: ${{ steps.meta.outputs.labels }}
         
     run-integration-tests:
         uses: ./.github/workflows/integration-tests.yml
