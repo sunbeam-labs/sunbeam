@@ -223,8 +223,15 @@ else
 fi
 
 # Always update the env_vars.sh in the sunbeam environment
-debug "Updating \$SUNBEAM_DIR variable to point to ${__sunbeam_dir}"
+if [[ $SUNBEAM_VER != ${__version_tag} ]]; then
+    echo "Updating SUNBEAM_VER from ${SUNBEAM_VER} to ${__version_tag}"
+fi
+if [[ $SUNBEAM_DIR != ${__sunbeam_dir} ]]; then
+    echo "Updating SUNBEAM_DIR from ${SUNBEAM_DIR} to ${__sunbeam_dir}"
+fi
+
 install_env_vars
+source ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
 
 # Install sunbeamlib into environment if changed or requested
 if [[ $__env_changed = true ]]; then

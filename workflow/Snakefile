@@ -23,10 +23,8 @@ from sunbeamlib.parse import read_seq_ids
 from sunbeamlib.post import *
 from sunbeamlib.reports import *
 
-print(__version__)
 
-
-containerized: f"docker://ctbushman/sunbeam:{__version__}"
+containerized: f"docker://ctbushman/sunbeam:v{__version__}"
 
 
 # Disallow slashes in our sample names during Snakemake's wildcard evaluation.
