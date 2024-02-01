@@ -43,7 +43,7 @@ jobs:
     
                 sunbeam init --data_fp tests/data/reads/ --profile GH_slurm projects/test/
     
-                sunbeam run --profile projects/test/ all_qc
+                sunbeam run --profile projects/test/ test
     
     test-apptainer:
         name: Apptainer Test

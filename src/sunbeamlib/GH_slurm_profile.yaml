@@ -19,7 +19,7 @@ cores: 24
 # Default resource configuration
 default-resources:
   - slurm_account="runner"
-  - slurm_extra="--job-name=slurm_%x_%j"
+  - slurm_extra="--job-name=slurm_%x_%j --output=slurm_%x_%j"
 # set-threads: map rule names to threads
 set-threads:
   - diamond_reads=8
