@@ -18,7 +18,7 @@ Sunbeam currently automates the following tasks:
 * Mapping to reference genomes ([sbx_mapping](https://))
 * ORF prediction using [Prodigal](https://github.com/hyattpd/Prodigal) ([sbx_assembly](https://github.com/sunbeam-labs/sbx_assembly)).
 
-More extensions can be found at: https://github.com/sunbeam-labs.
+More extensions can be found at https://github.com/sunbeam-labs.
 
 **To get started, see our [documentation](http://sunbeam.readthedocs.io)!**
 
