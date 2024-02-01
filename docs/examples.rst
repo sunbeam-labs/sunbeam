@@ -29,9 +29,32 @@ You have a dataset on your institutions HPC (which uses slurm to manage jobs) an
     sunbeam extend https://github.com/sunbeam-labs/sbx_assembly
     sunbeam init --data_fp /data/ --profile slurm /projects/my_project/
     pip install snakemake-executor-plugin-slurm
+
+Now you're ready to run the project, but you want to be able to put the main node on the cluster as well so you can logoff, so you create a bash script called ``run_sunbeam.sh``:
+
+.. code-block:: bash
+
+    #!/bin/bash
+    #SBATCH --time=72:00:00
+    #SBATCH -n 1
+    #SBATCH --mem=8G
+    #SBATCH --mail-type=END,FAIL
+    #SBATCH --mail-user=your_email@your_institution.edu
+    #SBATCH --no-requeue
+    #SBATCH --output=slurm_%x_%j.out
+
+    # Conda env must be activate for this to work
+    set -x
+    set -e
     sunbeam run --profile /projects/my_project all_assembly
 
-Once this run completes, you will have a directory called ``/projects/my_project/sunbeam_output/`` that contains all of the output from the run. Look in ``/projects/my_project/sunbeam_output/assembly/contigs/`` for the assembled contigs.
+Then you submit the job:
+
+.. code-block:: bash
+
+    sbatch run_sunbeam.sh
+
+Once this run completes, you will have a directory called ``/projects/my_project/sunbeam_output/`` that contains all of the output from the run and ``slurm_*`` files wherever you ran the main script from that contains logs for each job. Look in ``/projects/my_project/sunbeam_output/assembly/contigs/`` for the assembled contigs.
 
 Using Containerized Environments
 --------------------------------
