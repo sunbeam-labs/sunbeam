@@ -43,7 +43,7 @@ jobs:
     
                 sunbeam init --data_fp tests/data/reads/ --profile slurm projects/test/
     
-                sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
+                sunbeam run --default-resources slurm_account=runner slurm_extra='--job-name="{rule}"' --profile projects/test/ all_qc
     
     test-apptainer:
         name: Apptainer Test
