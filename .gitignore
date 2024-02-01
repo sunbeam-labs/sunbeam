@@ -17,7 +17,7 @@ configs/respublica_config.yml
 *.egg-*
 docs/_build
 extensions/*
-!extensions/.placeholder
+!extensions/.gitkeep
 build
 projects/
 .vscode/
