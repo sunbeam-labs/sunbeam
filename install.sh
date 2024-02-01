@@ -223,15 +223,11 @@ else
 fi
 
 # Always update the env_vars.sh in the sunbeam environment
-if [[ $SUNBEAM_VER != ${__version_tag} ]]; then
-    echo "Updating SUNBEAM_VER from ${SUNBEAM_VER} to ${__version_tag}"
-fi
-if [[ $SUNBEAM_DIR != ${__sunbeam_dir} ]]; then
-    echo "Updating SUNBEAM_DIR from ${SUNBEAM_DIR} to ${__sunbeam_dir}"
-fi
-
 install_env_vars
 source ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
+
+info "Updated SUNBEAM_VER to ${SUNBEAM_VER}"
+info "Updated SUNBEAM_DIR to ${SUNBEAM_DIR}"
 
 # Install sunbeamlib into environment if changed or requested
 if [[ $__env_changed = true ]]; then
@@ -247,22 +243,9 @@ else
     info "Sunbeam library already installed (use '--update lib' to update)"
 fi
 
-# Check if on pre-existing path
-if [[ $__old_path != *"${__conda_path}/bin"* ]]; then
-    warning "** Conda was not detected on your PATH. **"
-    warning "This is normal if you haven't installed Conda before."
-    warning "To add it to your path, run "
-    warning "   'echo \"export PATH=\$PATH:${__conda_path}/bin\" >> ~/.bashrc'"
-    warning "and close and re-open your terminal session to apply."
-    warning "When finished, run 'conda activate ${__sunbeam_env}' to begin."
-    warning "Optionally, then run 'pytest tests'"
-    warning "to make sure the installation is working properly."
-else
-    info "Done. Run 'conda activate ${__sunbeam_env}' to begin."
-    info "Optionally, then run 'pytest tests'"
-    info "to make sure the installation is working properly."
-fi
 
-   
-
-
+info "Done. Run 'conda activate ${__sunbeam_env}' to begin."
+info "Optionally, then run 'pytest tests/'"
+info "to make sure the installation is working properly."
+info "If the SUNBEAM_VER or SUNBEAM_DIR environment variables haven't updated,"
+info "either reactivate your environment or rerun this script with 'source install.sh ...'"
