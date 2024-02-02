@@ -247,5 +247,5 @@ fi
 info "Done. Run 'conda activate ${__sunbeam_env}' to begin."
 info "Optionally, then run 'pytest tests/'"
 info "to make sure the installation is working properly."
-info "If the SUNBEAM_VER or SUNBEAM_DIR environment variables haven't updated,"
-info "either reactivate your environment or rerun this script with 'source install.sh ...'"
+info "If the SUNBEAM_VER or SUNBEAM_DIR environment variables"
+info "haven't updated, reactivate your environment."
