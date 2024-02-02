@@ -9,6 +9,9 @@ Overview
 
 This script enables users of sunbeam to easily install the necessary software and environments to run sunbeam.
 
+.. note::
+    Running this script with ``source install.sh ...`` or ``. install.sh ...`` will exit the current shell if it fails. It has also been known to cause issues with the current shell's autocomplete. Using ``bash install.sh ...`` or ``./install.sh ...`` is recommended.
+
 Options
 =======
 
