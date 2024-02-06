@@ -183,8 +183,9 @@ localrules:
 
 
 for rule in rules._rules:
-    getattr(rules, rule).rule.resources["slurm_extra"] = f"--job-name={rule} --output=slurm_{rule}_%j"
-    print(getattr(rules, rule).rule.resources)
+    getattr(rules, rule).rule.resources[
+        "slurm_extra"
+    ] = f"--job-name={rule} --output=slurm_{rule}_%j"
 
 
 onstart:
