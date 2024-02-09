@@ -182,8 +182,6 @@ localrules:
     samples,
 
 
-
-
 onstart:
     try:
         shutil.rmtree(BENCHMARK_FP)
