@@ -183,7 +183,15 @@ localrules:
 
 
 for rule in rules._rules:
-    slurm_extra = f"--job-name={rule} --output=slurm_{rule}_%j"
+    wcs = getattr(rules, rule).rule._wildcard_names
+    output = f"slurm_{rule}"
+    if wcs:
+        for wc in wcs:
+            output += f"_{{{wc}}}"
+    output += "_%j"
+    
+    slurm_extra = f"--output={output}"
+
     getattr(rules, rule).rule.resources["slurm_extra"] = slurm_extra
 
 
