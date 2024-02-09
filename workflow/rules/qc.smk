@@ -18,11 +18,13 @@ rule all_qc:
 
 rule sample_intake:
     input:
-        lambda wildcards: Samples[wildcards.sample][wildcards.rp],
+        lambda wc: Samples[wc.sample][wc.rp],
     output:
         QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
     log:
         LOG_FP / "sample_intake_{sample}_{rp}.log",
+    resources:
+        TEST=lambda wc: wc.sample == "test",
     script:
         "../scripts/sample_intake.py"
 
@@ -219,6 +221,9 @@ rule remove_low_complexity:
         LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
     benchmark:
         BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
+    resources:
+        mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.ids.size_mb),
+        runtime=lambda wc: max(MIN_RUNTIME, 120),
     conda:
         "../envs/reports.yml"
     script:
