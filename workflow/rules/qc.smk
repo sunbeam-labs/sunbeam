@@ -18,13 +18,11 @@ rule all_qc:
 
 rule sample_intake:
     input:
-        lambda wc: Samples[wc.sample][wc.rp],
+        lambda wildcards: Samples[wildcards.sample][wildcards.rp],
     output:
         QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
     log:
         LOG_FP / "sample_intake_{sample}_{rp}.log",
-    resources:
-        TEST=lambda wc: wc.sample == "test",
     script:
         "../scripts/sample_intake.py"
 

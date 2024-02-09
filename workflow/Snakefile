@@ -182,8 +182,6 @@ localrules:
     samples,
 
 
-for rule in rules._rules:
-    getattr(rules, rule).rule.resources["slurm_extra"] = f"--output=slurm_{rule}_%j"
 
 
 onstart:
