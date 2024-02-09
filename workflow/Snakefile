@@ -183,12 +183,7 @@ localrules:
 
 
 for rule in rules._rules:
-    wcs = getattr(rules, rule).rule._wildcard_names
-
-    if wcs:
-        getattr(rules, rule).rule.resources["slurm_extra"] = lambda wc: f"--output=slurm_{rule}_{'_'.join([wc.x for x in wcs])}_%j"
-    else:
-        getattr(rules, rule).rule.resources["slurm_extra"] = f"--output=slurm_{rule}_%j"
+    getattr(rules, rule).rule.resources["slurm_extra"] = f"--output=slurm_{rule}_%j"
 
 
 onstart:
