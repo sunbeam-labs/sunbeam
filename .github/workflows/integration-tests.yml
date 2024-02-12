@@ -49,6 +49,7 @@ jobs:
               shell: bash
               run: |
                 cd $GITHUB_WORKSPACE
+                ls -l .
                 ls -l .snakemake/slurm_logs/
     
     test-apptainer:

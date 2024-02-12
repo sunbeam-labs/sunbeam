@@ -23,9 +23,6 @@ default-resources:
   - mem_mb=8000
   - runtime=15
   - disk_mb=1000
-  # Passing the rule name to slurm_extra isn't working
-  # See https://github.com/sunbeam-labs/sunbeam/pull/454/commits/77d283e1a3ccab7e0701ffaa38f5cdb811a9e3d4 for temp fix
-  #- slurm_extra="--job-name={rule} --output=slurm_{rule}_%j.out"
 # set-threads: map rule names to threads
 set-threads:
   - diamond_reads=8
