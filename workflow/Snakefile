@@ -186,7 +186,9 @@ for rule_name in rules._rules:
     rule_obj = getattr(rules, rule_name).rule
     wcs = rule_obj._wildcard_names
     if wcs:
-        rule_obj.resources["slurm_extra"] = lambda wc, rule_name=rule_name, wcs=wcs: f"--output=slurm_{rule_name}_{'_'.join([getattr(wc, x) for x in wcs])}_%j"
+        rule_obj.resources["slurm_extra"] = (
+            lambda wc, rule_name=rule_name, wcs=wcs: f"--output=slurm_{rule_name}_{'_'.join([getattr(wc , x) for x in wcs])}_%j"
+        )
     else:
         rule_obj.resources["slurm_extra"] = "--output=slurm_{rule_name}_%j"
 
