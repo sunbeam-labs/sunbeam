@@ -220,7 +220,7 @@ rule remove_low_complexity:
     benchmark:
         BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
     resources:
-        mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.ids.size_mb),
+        mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.size_mb),
         runtime=lambda wc: max(MIN_RUNTIME, 120),
     conda:
         "../envs/reports.yml"
