@@ -49,7 +49,7 @@ jobs:
               shell: bash
               run: |
                 cd $GITHUB_WORKSPACE
-                ls -l slurm_*
+                ls -l .snakemake/
     
     test-apptainer:
         name: Apptainer Test
