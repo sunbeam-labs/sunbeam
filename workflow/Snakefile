@@ -190,7 +190,7 @@ for rule_name in rules._rules:
             lambda wc, rule_name=rule_name: f"--output=slurm_{rule_name}_{'_'.join(wc)}_%j"
         )
     else:
-        rule_obj.resources["slurm_extra"] = "--output=slurm_{rule_name}_%j"
+        rule_obj.resources["slurm_extra"] = f"--output=slurm_{rule_name}_%j"
 
 
 onstart:
