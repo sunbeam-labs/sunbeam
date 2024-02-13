@@ -5,6 +5,7 @@
 # Created: 2016-04-28
 #
 import configparser
+import docker
 import os
 import re
 import shutil
@@ -23,8 +24,14 @@ from sunbeamlib.parse import read_seq_ids
 from sunbeamlib.post import *
 from sunbeamlib.reports import *
 
-
-containerized: f"docker://ctbushman/sunbeam:v{__version__}"
+client = docker.from_env()
+image_name = f"ctbushman/sunbeam:v{__version__}"
+try:
+    client.images.get(image_name)
+    containerized: f"docker://ctbushman/sunbeam:v{__version__}"
+except docker.errors.ImageNotFound:
+    sys.stderr.write(f"WARNING: {image_name} not found on DockerHub, using latest tag instead.\n")
+    containerized: f"docker://ctbushman/sunbeam:latest"
 
 
 # Disallow slashes in our sample names during Snakemake's wildcard evaluation.
