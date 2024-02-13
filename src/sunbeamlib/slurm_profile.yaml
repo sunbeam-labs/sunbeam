@@ -23,7 +23,6 @@ default-resources:
   - mem_mb=8000
   - runtime=15
   - disk_mb=1000
-  - slurm_extra="--job-name={rule} --output=slurm_{rule}_%j.out"
 # set-threads: map rule names to threads
 set-threads:
   - diamond_reads=8

@@ -44,6 +44,12 @@ jobs:
                 sunbeam init --data_fp tests/data/reads/ --profile slurm projects/test/
     
                 sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
+
+            - name: Check output
+              shell: bash
+              run: |
+                cd $GITHUB_WORKSPACE
+                ls -l . | grep "slurm_test_"
     
     test-apptainer:
         name: Apptainer Test

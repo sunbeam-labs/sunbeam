@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-__version_tag=$(if git describe --tags >/dev/null 2>&1 ; then git describe --tags; else echo v4.3.7; fi) # <--- Update this on each version release
+__version_tag=$(if git describe --tags >/dev/null 2>&1 ; then git describe --tags; else echo v4.4.0; fi) # <--- Update this on each version release
 __version_tag="${__version_tag:1}" # Remove the 'v' prefix
 
 read -r -d '' __usage <<-'EOF'
@@ -167,7 +167,7 @@ function install_environment () {
 function install_env_vars () {
     activate_sunbeam
     mkdir -p ${CONDA_PREFIX}/etc/conda/activate.d
-    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}\nexport SUNBEAM_VER=${__version_tag}\nexport SUNBEAM_MIN_MEM_MB=1000\nexport SUNBEAM_MIN_RUNTIME=60" > \
+    echo -ne "#/bin/sh\nexport SUNBEAM_DIR=${__sunbeam_dir}\nexport SUNBEAM_VER=${__version_tag}\nexport SUNBEAM_MIN_MEM_MB=8000\nexport SUNBEAM_MIN_RUNTIME=60" > \
 	 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
     mkdir -p ${CONDA_PREFIX}/etc/conda/deactivate.d
     echo -ne "#/bin/sh\nunset SUNBEAM_DIR\nunset SUNBEAM_VER\nunset SUNBEAM_MIN_MEM_MB\nunset SUNBEAM_MIN_RUNTIME" > \
