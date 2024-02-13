@@ -28,10 +28,14 @@ client = docker.from_env()
 image_name = f"ctbushman/sunbeam:v{__version__}"
 try:
     client.images.get(image_name)
-    containerized: f"docker://ctbushman/sunbeam:v{__version__}"
 except docker.errors.ImageNotFound:
-    sys.stderr.write(f"WARNING: {image_name} not found on DockerHub, using latest tag instead.\n")
-    containerized: f"docker://ctbushman/sunbeam:latest"
+    sys.stderr.write(
+        f"WARNING: {image_name} not found on DockerHub, using latest tag instead.\n"
+    )
+    image_name = "ctbushman/sunbeam:latest"
+
+
+containerized: f"docker://{image_name}"
 
 
 # Disallow slashes in our sample names during Snakemake's wildcard evaluation.
