@@ -4,6 +4,8 @@ config.yaml
 config.yml
 configs/config*.yml
 .snakemake
+.conda/
+.condarc
 \#*
 output
 __pycache__
@@ -23,3 +25,4 @@ projects/
 .vscode/
 .cache/
 .java/
+sunbeam.tar.gz

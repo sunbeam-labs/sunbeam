@@ -24,11 +24,20 @@ from sunbeamlib.parse import read_seq_ids
 from sunbeamlib.post import *
 from sunbeamlib.reports import *
 
-client = docker.from_env()
 image_name = f"ctbushman/sunbeam:v{__version__}"
+client = None
+
+try:
+    client = docker.from_env()
+except docker.errors.DockerException as e:
+    sys.stderr.write(
+        "WARNING: Docker not found or not running. "
+        "Sunbeam will not be able to use containerized software.\n"
+    )
+
 try:
     client.images.get_registry_data(image_name)
-except docker.errors.NotFound:
+except (docker.errors.NotFound, AttributeError):
     sys.stderr.write(
         f"WARNING: {image_name} not found on DockerHub, using latest tag instead.\n"
     )
@@ -172,13 +181,13 @@ rule all:
 
 rule test:
     input:
-        expand(
+        samples=expand(
             QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
             sample=Samples.keys(),
             rp=Pairs,
         ),
     run:
-        print("TEST COMPLETE")
+        print([x for x in input.samples])
 
 
 rule samples:
@@ -197,9 +206,7 @@ for rule_name in rules._rules:
     rule_obj = getattr(rules, rule_name).rule
     wcs = rule_obj._wildcard_names
     if wcs:
-        rule_obj.resources["slurm_extra"] = (
-            lambda wc, rule_name=rule_name: f"--output=slurm_{rule_name}_{'_'.join(wc)}_%j"
-        )
+        rule_obj.resources["slurm_extra"] = lambda wc, rule_name=rule_name: f"--output=slurm_{rule_name}_{'_'.join(wc)}_%j"
     else:
         rule_obj.resources["slurm_extra"] = f"--output=slurm_{rule_name}_%j"
 
