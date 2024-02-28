@@ -5,5 +5,3 @@ dependencies:
   - snakemake =8
   - git # Ensure sunbeam extend works even with tar installation of main pipeline
   - python =3.12.0
-  - pip:
-    - docker

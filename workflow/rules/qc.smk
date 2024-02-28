@@ -3,6 +3,9 @@
 # Illumina quality control rules
 
 
+from sunbeamlib import __version__
+
+
 localrules:
     all_qc,
     sample_intake,
@@ -46,6 +49,8 @@ rule adapter_removal_unpaired:
     threads: 4
     conda:
         "../envs/cutadapt.yml"
+    container:
+        f"docker://ctbushman/sunbeam-cutadapt:{__version__}"
     script:
         "../scripts/adapter_removal_unpaired.py"
 
@@ -69,6 +74,8 @@ rule adapter_removal_paired:
     threads: 4
     conda:
         "../envs/cutadapt.yml"
+    container:
+        f"docker://ctbushman/sunbeam-cutadapt:{__version__}"
     script:
         "../scripts/adapter_removal_paired.py"
 
@@ -94,6 +101,8 @@ rule trimmomatic_unpaired:
     threads: 4
     conda:
         "../envs/qc.yml"
+    container:
+        f"docker://ctbushman/sunbeam-qc:{__version__}"
     shell:
         """
         trimmomatic \
@@ -134,6 +143,8 @@ rule trimmomatic_paired:
     threads: 4
     conda:
         "../envs/qc.yml"
+    container:
+        f"docker://ctbushman/sunbeam-qc:{__version__}"
     shell:
         """
         trimmomatic \
@@ -165,6 +176,8 @@ rule fastqc:
         runtime=lambda wc: max(MIN_RUNTIME, 120),
     conda:
         "../envs/qc.yml"
+    container:
+        f"docker://ctbushman/sunbeam-qc:{__version__}"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
@@ -185,6 +198,8 @@ rule fastqc_report:
         BENCHMARK_FP / "fastqc_report.tsv"
     conda:
         "../envs/reports.yml"
+    container:
+        f"docker://ctbushman/sunbeam-reports:{__version__}"
     script:
         "../scripts/fastqc_report.py"
 
@@ -200,6 +215,8 @@ rule find_low_complexity:
         BENCHMARK_FP / "find_low_complexity_{sample}.tsv"
     conda:
         "../envs/komplexity.yml"
+    container:
+        f"docker://ctbushman/sunbeam-komplexity:{__version__}"
     shell:
         """
         for rp in {input}; do
@@ -224,6 +241,8 @@ rule remove_low_complexity:
         runtime=lambda wc: max(MIN_RUNTIME, 120),
     conda:
         "../envs/reports.yml"
+    container:
+        f"docker://ctbushman/sunbeam-reports:{__version__}"
     script:
         "../scripts/remove_low_complexity.py"
 

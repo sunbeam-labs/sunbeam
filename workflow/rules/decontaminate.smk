@@ -26,6 +26,8 @@ rule build_host_index:
         index_fp=Cfg["qc"]["host_fp"],
     conda:
         "../envs/qc.yml"
+    container:
+        f"docker://ctbushman/sunbeam-qc:{__version__}"
     shell:
         "cd {Cfg[qc][host_fp]} && bwa index {input} 2>&1 | tee {log}"
 
@@ -50,6 +52,8 @@ rule align_to_host:
     threads: 4
     conda:
         "../envs/qc.yml"
+    container:
+        f"docker://ctbushman/sunbeam-qc:{__version__}"
     shell:
         """
         bwa mem -M -t {threads} {input.host} \
@@ -109,6 +113,8 @@ rule filter_reads:
         runtime=lambda wc: max(MIN_RUNTIME, 240),
     conda:
         "../envs/qc.yml"
+    container:
+        f"docker://ctbushman/sunbeam-qc:{__version__}"
     script:
         "../scripts/filter_reads.py"
 
@@ -135,6 +141,8 @@ rule preprocess_report:
         BENCHMARK_FP / "preprocess_report.tsv"
     conda:
         "../envs/reports.yml"
+    container:
+        f"docker://ctbushman/sunbeam-reports:{__version__}"
     script:
         "../scripts/preprocess_report.py"
 

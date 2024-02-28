@@ -5,7 +5,6 @@
 # Created: 2016-04-28
 #
 import configparser
-import docker
 import os
 import re
 import shutil
@@ -23,28 +22,6 @@ from sunbeamlib.config import *
 from sunbeamlib.parse import read_seq_ids
 from sunbeamlib.post import *
 from sunbeamlib.reports import *
-
-image_name = f"ctbushman/sunbeam:v{__version__}"
-client = None
-
-try:
-    client = docker.from_env()
-except docker.errors.DockerException as e:
-    sys.stderr.write(
-        "WARNING: Docker not found or not running. "
-        "Sunbeam will not be able to use containerized software.\n"
-    )
-
-try:
-    client.images.get_registry_data(image_name)
-except (docker.errors.NotFound, AttributeError):
-    sys.stderr.write(
-        f"WARNING: {image_name} not found on DockerHub, using latest tag instead.\n"
-    )
-    image_name = "ctbushman/sunbeam:latest"
-
-
-containerized: f"docker://{image_name}"
 
 
 # Disallow slashes in our sample names during Snakemake's wildcard evaluation.
