@@ -24,6 +24,11 @@ jobs:
             uses: docker/metadata-action@v5
             with:
               images: ctbushman/sunbeam
+
+          - name: Debug
+            run: |
+              echo "Tags: ${{ steps.meta.outputs.tags }}"
+              echo "Labels: ${{ steps.meta.outputs.labels }}"
           
           - name: Build and push Docker image
             uses: docker/build-push-action@v5
