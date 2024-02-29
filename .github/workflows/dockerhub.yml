@@ -28,6 +28,7 @@ jobs:
           - name: Debug
             run: |
               echo "Tags: ${{ steps.meta.outputs.tags }}"
+              echo "TEST Tags: ${{ steps.meta.outputs.tags }}-TEST"
               echo "Labels: ${{ steps.meta.outputs.labels }}"
           
           - name: Build and push Docker image
