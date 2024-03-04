@@ -134,11 +134,13 @@ Installing Sunbeam extensions
 As of version 3.0, Sunbeam extensions can be installed by running ``sunbeam extend`` followed by the URL of the extension's GitHub repo:
 
 .. code-block:: shell
+
   sunbeam extend https://github.com/sunbeam-labs/sbx_mapping/
 
 For Sunbeam versions prior to 3.0, follow the legacy installation instructions on the extension to install. They should look something like:
 
 .. code-block:: shell
+
   git clone https://github.com/sunbeam-labs/sbx_mapping.git extensions/sbx_mapping
   cat extensions/sbx_mapping/config.yml >> /path/to/project/sunbeam_config.yml
 
@@ -333,24 +335,13 @@ This section describes all the outputs from Sunbeam. Here is an example output d
     ├ benchmarks
     ├ logs
     └ qc
-      ├ 00_samples
-      ├ 01_cutadapt
-      ├ 02_trimmomatic
-      ├ 03_komplexity
-      ├ cleaned
-      ├ decontam
-      ├ log
-      │   ├ decontam
-      │   ├ cutadapt
-      │   └ trimmomatic
-      └ reports
 
 Quality control
 ---------------
 
 .. code-block:: shell
 
-   	└ qc
+   	├ qc
       ├ 00_samples
       ├ 01_cutadapt
       ├ 02_trimmomatic
