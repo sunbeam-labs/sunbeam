@@ -37,26 +37,9 @@ __license__ = "GPL2+"
 
 
 def get_docker_str(repo: str, user: str = "sunbeamlabs") -> str:
-    # Docker import needs to live here to avoid circular imports
-    # pyproject.toml needs __version__ to be defined before installing dependencies
-    import docker
+    docker_tag = os.environ.get("SUNBEAM_DOCKER_TAG", __version__)
 
-    client = None
-    image_name = f"{user}/{repo}:{__version__}"
-
-    try:
-        client = docker.from_env()
-    except docker.errors.DockerException as e:
-        return f"docker://{image_name}"
-
-    try:
-        client.images.get_registry_data(image_name)
-        return f"docker://{image_name}"
-    except docker.errors.NotFound:
-        sys.stderr.write(
-            f"WARNING: {image_name} not found on DockerHub, using latest tag instead.\n"
-        )
-        return f"docker://{user}/{repo}:latest"
+    return f"docker://{user}/{repo}:{docker_tag}"
 
 
 def load_sample_list(

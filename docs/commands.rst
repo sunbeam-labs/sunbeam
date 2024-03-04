@@ -46,7 +46,7 @@ Sunbeam Commands
     Executes the Sunbeam pipeline by calling Snakemake.
 
     .. code-block:: shell
-        sunbeam run [-h] [-m] [-s PATH] [--target_list [TARGETS, ...]] [--include [INCLUDES, ...]] [--exclude [EXCLUDE, ...]] -- <snakemake options>
+        sunbeam run [-h] [-m] [-s PATH] [--target_list [TARGETS, ...]] [--include [INCLUDES, ...]] [--exclude [EXCLUDE, ...]] [--docker_tag TAG] <snakemake options>
 
     .. tip::
         The ``--target_list`` option is deprecated. Pass the targets directly to ``sunbeam run`` instead.
@@ -66,7 +66,8 @@ Sunbeam Commands
         --target_list: A list of targets to run successively. (DEPRECATED)
         --include: List of extensions to include in run.
         --exclude: List of extensions to exclude from run, use 'all' to exclude all extensions.
-        <snakemake options>: You can pass further arguments to Snakemake after ``--``, e.g: ``$ sunbeam run -- --cores 12``. See http://snakemake.readthedocs.io for more information.
+        --docker_tag: Tag to use for internal environment docker images. Try 'latest' if the default tag doesn't work.
+        <snakemake options>: You can pass further arguments to Snakemake, e.g: ``$ sunbeam run --cores 12``. See http://snakemake.readthedocs.io for more information.
 
     .. tip::
         The ``--profile`` option is a snakemake option but should be used whenever using ``sunbeam run``. The main sunbeam snakefile requires a config object to be defined and the profile created by ``sunbeam init`` will always specify a config file to get that from.
