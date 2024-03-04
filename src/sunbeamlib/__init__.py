@@ -41,8 +41,14 @@ def get_docker_str(repo: str, user: str = "sunbeamlabs") -> str:
     # pyproject.toml needs __version__ to be defined before installing dependencies
     import docker
 
-    client = docker.from_env()
+    client = None
     image_name = f"{user}/{repo}:{__version__}"
+
+    try:
+        client = docker.from_env()
+    except docker.errors.DockerException as e:
+        return f"docker://{image_name}"
+
     try:
         client.images.get_registry_data(image_name)
         return f"docker://{image_name}"
