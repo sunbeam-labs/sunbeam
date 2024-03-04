@@ -36,6 +36,23 @@ __author__ = "Erik Clarke"
 __license__ = "GPL2+"
 
 
+def get_docker_str(repo: str, user: str = "sunbeamlabs") -> str:
+    # Docker import needs to live here to avoid circular imports
+    # pyproject.toml needs __version__ to be defined before installing dependencies
+    import docker
+
+    client = docker.from_env()
+    image_name = f"{user}/{repo}:{__version__}"
+    try:
+        client.images.get_registry_data(image_name)
+        return image_name
+    except docker.errors.NotFound:
+        sys.stderr.write(
+            f"WARNING: {image_name} not found on DockerHub, using latest tag instead.\n"
+        )
+        return f"{user}/{repo}:latest"
+
+
 def load_sample_list(
     samplelist_fp: Path, paired_end: bool = True
 ) -> Dict[str, Dict[str, str]]:

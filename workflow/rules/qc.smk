@@ -2,8 +2,7 @@
 #
 # Illumina quality control rules
 
-
-from sunbeamlib import __version__
+from sunbeamlib import get_docker_str
 
 
 localrules:
@@ -50,7 +49,7 @@ rule adapter_removal_unpaired:
     conda:
         "../envs/cutadapt.yml"
     container:
-        f"docker://sunbeamlabs/cutadapt:{__version__}"
+        f"docker://sunbeamlabs/cutadapt:{get_docker_str('cutadapt')}"
     script:
         "../scripts/adapter_removal_unpaired.py"
 
@@ -75,7 +74,7 @@ rule adapter_removal_paired:
     conda:
         "../envs/cutadapt.yml"
     container:
-        f"docker://sunbeamlabs/cutadapt:{__version__}"
+        f"docker://sunbeamlabs/cutadapt:{get_docker_str('cutadapt')}"
     script:
         "../scripts/adapter_removal_paired.py"
 
@@ -102,7 +101,7 @@ rule trimmomatic_unpaired:
     conda:
         "../envs/qc.yml"
     container:
-        f"docker://sunbeamlabs/qc:{__version__}"
+        f"docker://sunbeamlabs/qc:{get_docker_str('qc')}"
     shell:
         """
         trimmomatic \
@@ -144,7 +143,7 @@ rule trimmomatic_paired:
     conda:
         "../envs/qc.yml"
     container:
-        f"docker://sunbeamlabs/qc:{__version__}"
+        f"docker://sunbeamlabs/qc:{get_docker_str('qc')}"
     shell:
         """
         trimmomatic \
@@ -177,7 +176,7 @@ rule fastqc:
     conda:
         "../envs/qc.yml"
     container:
-        f"docker://sunbeamlabs/qc:{__version__}"
+        f"docker://sunbeamlabs/qc:{get_docker_str('qc')}"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
@@ -199,7 +198,7 @@ rule fastqc_report:
     conda:
         "../envs/reports.yml"
     container:
-        f"docker://sunbeamlabs/reports:{__version__}"
+        f"docker://sunbeamlabs/reports:{get_docker_str('reports')}"
     script:
         "../scripts/fastqc_report.py"
 
@@ -216,7 +215,7 @@ rule find_low_complexity:
     conda:
         "../envs/komplexity.yml"
     container:
-        f"docker://sunbeamlabs/komplexity:{__version__}"
+        f"docker://sunbeamlabs/komplexity:{get_docker_str('komplexity')}"
     shell:
         """
         for rp in {input}; do
@@ -242,7 +241,7 @@ rule remove_low_complexity:
     conda:
         "../envs/reports.yml"
     container:
-        f"docker://sunbeamlabs/reports:{__version__}"
+        f"docker://sunbeamlabs/reports:{get_docker_str('reports')}"
     script:
         "../scripts/remove_low_complexity.py"
 
