@@ -27,6 +27,30 @@ jobs:
             uses: docker/metadata-action@v5
             with:
               images: sunbeamlabs/sunbeam
+
+          - name: Build test
+            uses: docker/build-push-action@v5
+            with:
+              context: .
+              file: ./Dockerfile
+              load: true
+              tags: sunbeamlabs/sunbeam:test
+
+          - name: Test
+            run: |
+              docker run --rm sunbeamlabs/sunbeam:test pytest tests/
+            
+          - name: Build slim test
+            uses: docker/build-push-action@v5
+            with:
+              context: .
+              file: ./slim.Dockerfile
+              load: true
+              tags: sunbeamlabs/sunbeam:test-slim
+
+          - name: Test slim
+            run: |
+              docker run --rm sunbeamlabs/sunbeam:test-slim pytest tests/
           
           - name: Build and push Docker image
             uses: docker/build-push-action@v5
