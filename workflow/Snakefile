@@ -5,7 +5,6 @@
 # Created: 2016-04-28
 #
 import configparser
-import docker
 import os
 import re
 import shutil
@@ -23,19 +22,6 @@ from sunbeamlib.config import *
 from sunbeamlib.parse import read_seq_ids
 from sunbeamlib.post import *
 from sunbeamlib.reports import *
-
-client = docker.from_env()
-image_name = f"ctbushman/sunbeam:v{__version__}"
-try:
-    client.images.get_registry_data(image_name)
-except docker.errors.NotFound:
-    sys.stderr.write(
-        f"WARNING: {image_name} not found on DockerHub, using latest tag instead.\n"
-    )
-    image_name = "ctbushman/sunbeam:latest"
-
-
-containerized: f"docker://{image_name}"
 
 
 # Disallow slashes in our sample names during Snakemake's wildcard evaluation.
@@ -172,13 +158,13 @@ rule all:
 
 rule test:
     input:
-        expand(
+        samples=expand(
             QC_FP / "00_samples" / "{sample}_{rp}.fastq.gz",
             sample=Samples.keys(),
             rp=Pairs,
         ),
     run:
-        print("TEST COMPLETE")
+        print([x for x in input.samples])
 
 
 rule samples:

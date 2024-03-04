@@ -19,6 +19,8 @@ Sunbeam was designed to be modular and extensible. We have :ref:`extensions` ava
 
 To get started, see our :ref:`quickstart`!
 
+For lots of examples of common Sunbeam use cases, see our :ref:`examples`.
+
 If you use Sunbeam in your research, please cite:
 
 EL Clarke, LJ Taylor, C Zhao *et al.* Sunbeam: an extensible pipeline for analyzing metagenomic sequencing experiments. *Microbiome* 7:46 (2019)

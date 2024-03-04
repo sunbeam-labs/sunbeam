@@ -2,6 +2,8 @@
 #
 # Illumina quality control rules
 
+from sunbeamlib import get_docker_str
+
 
 localrules:
     all_qc,
@@ -46,6 +48,8 @@ rule adapter_removal_unpaired:
     threads: 4
     conda:
         "../envs/cutadapt.yml"
+    container:
+        get_docker_str("cutadapt")
     script:
         "../scripts/adapter_removal_unpaired.py"
 
@@ -69,6 +73,8 @@ rule adapter_removal_paired:
     threads: 4
     conda:
         "../envs/cutadapt.yml"
+    container:
+        get_docker_str("cutadapt")
     script:
         "../scripts/adapter_removal_paired.py"
 
@@ -94,6 +100,8 @@ rule trimmomatic_unpaired:
     threads: 4
     conda:
         "../envs/qc.yml"
+    container:
+        get_docker_str("qc")
     shell:
         """
         trimmomatic \
@@ -134,6 +142,8 @@ rule trimmomatic_paired:
     threads: 4
     conda:
         "../envs/qc.yml"
+    container:
+        get_docker_str("qc")
     shell:
         """
         trimmomatic \
@@ -165,6 +175,8 @@ rule fastqc:
         runtime=lambda wc: max(MIN_RUNTIME, 120),
     conda:
         "../envs/qc.yml"
+    container:
+        get_docker_str("qc")
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
@@ -185,6 +197,8 @@ rule fastqc_report:
         BENCHMARK_FP / "fastqc_report.tsv"
     conda:
         "../envs/reports.yml"
+    container:
+        get_docker_str("reports")
     script:
         "../scripts/fastqc_report.py"
 
@@ -200,6 +214,8 @@ rule find_low_complexity:
         BENCHMARK_FP / "find_low_complexity_{sample}.tsv"
     conda:
         "../envs/komplexity.yml"
+    container:
+        get_docker_str("komplexity")
     shell:
         """
         for rp in {input}; do
@@ -224,6 +240,8 @@ rule remove_low_complexity:
         runtime=lambda wc: max(MIN_RUNTIME, 120),
     conda:
         "../envs/reports.yml"
+    container:
+        get_docker_str("reports")
     script:
         "../scripts/remove_low_complexity.py"
 

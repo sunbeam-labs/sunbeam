@@ -9,16 +9,16 @@ Requirements
 
 - A relatively-recent Linux computer with more than 4Gb of RAM
 
-We do not currently support Windows or Mac. (You can run this on Windows using the Ubuntu [WSL](https://docs.microsoft.com/en-us/windows/wsl/about)).
+We do not currently support Windows or Mac. (You should be able to run this on Windows using the Ubuntu [WSL](https://docs.microsoft.com/en-us/windows/wsl/about)).
 
 .. _installation:
 Installation
 ============
 
-Sunbeam has two options for installation, either with git or with tar. For development work on sunbeam, use git. For standard usage, installing each version of sunbeam that you need from tarballs into separate directories is recommended (i.e. if you want versions 3 and 4 installed, you would repeat the tar install process below for sunbeam3.1.1 and sunbeam4.0.0 (or whatever specific versions you want)).
+Sunbeam has multiple options for installation. For development work on sunbeam, use git. For standard usage, installing each version of sunbeam that you need from tarballs into separate directories is recommended (i.e. if you want versions 3 and 4 installed, you would repeat the tar install process below for sunbeam3.1.1 and sunbeam4.0.0 (or whatever specific versions you want)). If you are comfortable with Docker, then the containerized version of Sunbeam is also an option.
 
 .. tabs::
-  .. tab:: tar install
+  .. tab:: tar
 
     On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) then unpack and install it.
     
@@ -29,7 +29,7 @@ Sunbeam has two options for installation, either with git or with tar. For devel
       tar -zxf sunbeam.tar.gz -C sunbeam4.0.0
       cd sunbeam4.0.0 && ./install.sh
   
-  .. tab:: git install
+  .. tab:: git
     
     On a Linux machine, download a copy of Sunbeam from our GitHub repository, and install.
     
@@ -42,6 +42,21 @@ Sunbeam has two options for installation, either with git or with tar. For devel
     .. tip::
       
       If you're planning on doing development work on sunbeam, use 'git clone git@github.com:sunbeam-labs/sunbeam.git' instead.
+
+  .. tab:: docker
+
+      On a Linux machine, you can use the Sunbeam Docker image. You'll need to have `Docker <https://docs.docker.com/get-docker/>`_ installed and running.
+
+      .. code-block:: shell
+
+         docker pull sunbeamlabs/sunbeam:latest
+         docker run -v /local/path/to/data/:/mnt/data/ -v /local/path/to/outputs/:/mnt/projects/ -it sunbeamlabs/sunbeam:latest /bin/bash
+
+         ### WITHIN THE CONTAINER ###
+         pytest tests/  # To verify the installation
+         exit
+
+      This will drop you into a shell inside the Sunbeam Docker container. You can then run Sunbeam as you would on a normal machine.
 
 The installer will check for and install the three components necessary for Sunbeam to work. The first is `Conda <https://conda.io>`_, a system for downloading and managing software environments. The second is the Sunbeam environment, which will contain all the core dependencies. The third is the Sunbeam library, which provides the necessary commands to run Sunbeam.
 
@@ -66,16 +81,34 @@ Sunbeam follows semantic versioning practices. In short, this means that the ver
 
 When we update Sunbeam, if your config files and environment will work between upgrades, we will increment the patch or minor numbers (e.g. 1.0.0 -> 1.1.0). All you need to do is the following:
 
-.. code-block:: shell
+.. tabs::
+  .. tab:: tar
+
+    The tar-based install can't be upgraded, so you'll need to download the latest tarball and install it alongside your current version. You can then remove the old version if you want to (or keep it so you know you have a working version to fall back on).
   
-  git pull
-  ./install.sh --upgrade all
+  .. tab:: git
 
-.. tip::
+    If you installed Sunbeam using git, you can simply pull the latest version and run the install script again. This will update the Sunbeam environment and library to the latest version.
 
-  The tar-based install can't be upgraded, so you'll need to download the latest tarball and install it alongside your current version.
+    .. code-block:: shell
+      
+      git pull
+      ./install.sh --upgrade all
 
-Sunbeam is designed to be installable separately on a system that already has sunbeam installed. This means multiple versions of sunbeam can be installed on the same machine in different repositories and different environments.
+  .. tab:: docker
+
+    If you're using the Docker image, you can pull the latest version and run the tests to verify the installation.
+
+    .. code-block:: shell
+
+      docker pull sunbeamlabs/sunbeam:latest
+      docker run -v /local/path/to/data/:/mnt/data/ -v /local/path/to/outputs/:/mnt/projects/ -it sunbeamlabs/sunbeam:latest /bin/bash
+
+      ### WITHIN THE CONTAINER ###
+      pytest tests/  # To verify the installation
+      exit
+
+Sunbeam is designed to be installable separately on a system that already has sunbeam installed. This means multiple versions of sunbeam can be installed on the same machine in different repositories and different environments (or containers).
 
 .. _uninstall:
 Uninstalling or reinstalling
@@ -91,17 +124,32 @@ If things go awry and updating doesn't work, simply uninstall and reinstall Sunb
 
 Then follow the installation_ instructions above.
 
+.. tip::
+
+  If you're using the Docker image, you can simply remove the image and container(s) and pull the latest version.
+
 Installing Sunbeam extensions
 -----------------------------
 
-As of version 3.0, Sunbeam extensions can be installed by running ``sunbeam extend`` followed by the URL of the extension's GitHub repo::
-   
-   sunbeam extend https://github.com/sunbeam-labs/sbx_kaiju/
+As of version 3.0, Sunbeam extensions can be installed by running ``sunbeam extend`` followed by the URL of the extension's GitHub repo:
 
-For Sunbeam versions prior to 3.0, follow the legacy installation instructions on the extension to install.
+.. code-block:: shell
+
+  sunbeam extend https://github.com/sunbeam-labs/sbx_mapping/
+
+For Sunbeam versions prior to 3.0, follow the legacy installation instructions on the extension to install. They should look something like:
+
+.. code-block:: shell
+
+  git clone https://github.com/sunbeam-labs/sbx_mapping.git extensions/sbx_mapping
+  cat extensions/sbx_mapping/config.yml >> /path/to/project/sunbeam_config.yml
 
 Setup
 =====
+
+.. tip::
+
+  From this point on, all instructions will be given assuming either a git or tar install. If you're using the Docker image, you'll need to run all commands within the container. They should look pretty much the same providing you mount the necessary directories to your container. Note that the conda environment does not need to be activated within the container.
 
 Activating Sunbeam
 ------------------
@@ -287,24 +335,13 @@ This section describes all the outputs from Sunbeam. Here is an example output d
     ├ benchmarks
     ├ logs
     └ qc
-      ├ 00_samples
-      ├ 01_cutadapt
-      ├ 02_trimmomatic
-      ├ 03_komplexity
-      ├ cleaned
-      ├ decontam
-      ├ log
-      │   ├ decontam
-      │   ├ cutadapt
-      │   └ trimmomatic
-      └ reports
 
 Quality control
 ---------------
 
 .. code-block:: shell
 
-   	└ qc
+   	├ qc
       ├ 00_samples
       ├ 01_cutadapt
       ├ 02_trimmomatic
