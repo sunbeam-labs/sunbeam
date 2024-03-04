@@ -102,7 +102,7 @@ rule trimmomatic_unpaired:
     conda:
         "../envs/qc.yml"
     container:
-        f"docker:///sunbeamlabs/qc:{__version__}"
+        f"docker://sunbeamlabs/qc:{__version__}"
     shell:
         """
         trimmomatic \
@@ -144,7 +144,7 @@ rule trimmomatic_paired:
     conda:
         "../envs/qc.yml"
     container:
-        f"docker:///sunbeamlabs/qc:{__version__}"
+        f"docker://sunbeamlabs/qc:{__version__}"
     shell:
         """
         trimmomatic \
@@ -177,7 +177,7 @@ rule fastqc:
     conda:
         "../envs/qc.yml"
     container:
-        f"docker:///sunbeamlabs/qc:{__version__}"
+        f"docker://sunbeamlabs/qc:{__version__}"
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
@@ -199,7 +199,7 @@ rule fastqc_report:
     conda:
         "../envs/reports.yml"
     container:
-        f"docker:///sunbeamlabs/reports:{__version__}"
+        f"docker://sunbeamlabs/reports:{__version__}"
     script:
         "../scripts/fastqc_report.py"
 
@@ -216,7 +216,7 @@ rule find_low_complexity:
     conda:
         "../envs/komplexity.yml"
     container:
-        f"docker:///sunbeamlabs/komplexity:{__version__}"
+        f"docker://sunbeamlabs/komplexity:{__version__}"
     shell:
         """
         for rp in {input}; do
@@ -242,7 +242,7 @@ rule remove_low_complexity:
     conda:
         "../envs/reports.yml"
     container:
-        f"docker:///sunbeamlabs/reports:{__version__}"
+        f"docker://sunbeamlabs/reports:{__version__}"
     script:
         "../scripts/remove_low_complexity.py"
 

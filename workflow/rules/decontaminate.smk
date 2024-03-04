@@ -27,7 +27,7 @@ rule build_host_index:
     conda:
         "../envs/qc.yml"
     container:
-        f"docker:///sunbeamlabs/qc:{__version__}"
+        f"docker://sunbeamlabs/qc:{__version__}"
     shell:
         "cd {Cfg[qc][host_fp]} && bwa index {input} 2>&1 | tee {log}"
 
@@ -53,7 +53,7 @@ rule align_to_host:
     conda:
         "../envs/qc.yml"
     container:
-        f"docker:///sunbeamlabs/qc:{__version__}"
+        f"docker://sunbeamlabs/qc:{__version__}"
     shell:
         """
         bwa mem -M -t {threads} {input.host} \
@@ -114,7 +114,7 @@ rule filter_reads:
     conda:
         "../envs/qc.yml"
     container:
-        f"docker:///sunbeamlabs/qc:{__version__}"
+        f"docker://sunbeamlabs/qc:{__version__}"
     script:
         "../scripts/filter_reads.py"
 
@@ -142,7 +142,7 @@ rule preprocess_report:
     conda:
         "../envs/reports.yml"
     container:
-        f"docker:///sunbeamlabs/reports:{__version__}"
+        f"docker://sunbeamlabs/reports:{__version__}"
     script:
         "../scripts/preprocess_report.py"
 
