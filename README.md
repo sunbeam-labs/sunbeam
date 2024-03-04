@@ -4,7 +4,7 @@
 
 [![Tests](https://github.com/sunbeam-labs/sunbeam/actions/workflows/pr.yml/badge.svg)](https://github.com/sunbeam-labs/sunbeam/actions/workflows/pr.yml)
 [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=stable)](https://sunbeam.readthedocs.io/en/stable/?badge=stable)
-[![DockerHub](https://img.shields.io/docker/pulls/ctbushman/sunbeam)](https://hub.docker.com/repository/docker/ctbushman/sunbeam/)
+[![DockerHub](https://img.shields.io/docker/pulls/sunbeamlabs/sunbeam)](https://hub.docker.com/repository/docker/sunbeamlabs/sunbeam/)
 [![DOI:10.1186/s40168-019-0658-x](https://img.shields.io/badge/Published%20in-Microbiome-1abc9c.svg)](https://doi.org/10.1186/s40168-019-0658-x)
 
 Sunbeam is a pipeline written in [snakemake](http://snakemake.readthedocs.io) that simplifies and automates many of the steps in metagenomic sequencing analysis. It uses [conda](http://conda.io) to manage dependencies, so it doesn't have pre-existing dependencies or admin privileges, and can be deployed on most Linux workstations and clusters. Sunbeam was designed to be modular and extensible, allowing anyone to build off the core functionality. To read more, check out [our paper in Microbiome](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-019-0658-x).

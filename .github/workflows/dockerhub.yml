@@ -12,6 +12,9 @@ jobs:
     
         steps:
           - uses: actions/checkout@v4
+
+          - id: get_version
+            uses: battila7/get-version-action@v2
           
           - name: Log in to Docker Hub
             uses: docker/login-action@v3
@@ -31,7 +34,7 @@ jobs:
               context: .
               file: ./Dockerfile
               push: true
-              tags: ${{ steps.meta.outputs.tags }}
+              tags: sunbeamlabs/sunbeam:latest, sunbeamlabs/sunbeam:${{ steps.get_version.outputs.version-without-v }}
               labels: ${{ steps.meta.outputs.labels }}
 
           - name: Build and push slim Docker image
@@ -40,7 +43,7 @@ jobs:
               context: .
               file: ./slim.Dockerfile
               push: true
-              tags: ${{ steps.meta.outputs.tags }}-slim
+              tags: sunbeamlabs/sunbeam:${{ steps.get_version.outputs.version-without-v }}-slim
               labels: ${{ steps.meta.outputs.labels }}
 
     push-cutadapt-dockerhub:
