@@ -7,11 +7,11 @@ Quickstart Guide
 Installation
 ************
 
-There are two installation methods available, installing via git or via tar. We do not currently support non-Linux environments.
+There are multiple installation methods available. We do not currently support non-Linux environments but Sunbeam has been run successfully on macOS and on Windows when using WSL.
 
 .. tabs::
 
-   .. tab:: tar install
+   .. tab:: tar
 
       On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) then unpack and install it.
 
@@ -22,7 +22,7 @@ There are two installation methods available, installing via git or via tar. We 
          tar -zxf sunbeam.tar.gz -C sunbeam4.0.0
          cd sunbeam4.0.0 && ./install.sh
 
-   .. tab:: git install
+   .. tab:: git
 
       On a Linux machine, download a copy of Sunbeam from our GitHub repository, and install.
 
@@ -35,6 +35,25 @@ There are two installation methods available, installing via git or via tar. We 
       .. tip::
 
          If you're planning on doing development work on sunbeam, use SSH or HTTPS with a PAT.
+   
+   .. tab:: docker
+
+      On a Linux machine, you can use the Sunbeam Docker image. You'll need to have `Docker <https://docs.docker.com/get-docker/>`_ installed and running.
+
+      .. code-block:: shell
+
+         docker pull sunbeamlabs/sunbeam:latest
+         docker run -v /local/path/to/data/:/mnt/data/ -v /local/path/to/outputs/:/mnt/projects/ -it sunbeamlabs/sunbeam:latest /bin/bash
+
+         ### WITHIN THE CONTAINER ###
+         pytest tests/  # To verify the installation
+         exit
+
+      This will drop you into a shell inside the Sunbeam Docker container. You can then run Sunbeam as you would on a normal machine.
+
+      .. tip::
+
+         If you're not already familiar with Docker, you may want to read up on it or use a different installation method.
 
 This installs Sunbeam and all its dependencies, including the `Conda <https://conda.io/miniconda.html>`_ environment manager, if required. It will finish by printing instructions to continue that should look like:
 
@@ -49,7 +68,11 @@ This runs some tests to make sure everything was installed correctly.
 
    If you've never installed Conda before, you'll need to add it to your shell's path. If you're running Bash (the most common terminal shell), the installation script should print the necessary command.
 
-If the tests fail, check out our :ref:`troubleshooting` section or file an issue on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.
+If the tests fail, check out our troubleshooting section or file an issue on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.
+
+.. tip::
+
+   Refer to the examples page for lots of walkthroughs of common Sunbeam use cases.
 
 Setup
 *****

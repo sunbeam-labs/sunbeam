@@ -1,8 +1,7 @@
 FROM condaforge/mambaforge:latest
 
 # Setup
-RUN useradd --create-home --shell /bin/bash app_user
-WORKDIR /home/app_user
+WORKDIR /home/sunbeam
 
 RUN mkdir -p etc/
 COPY etc/* etc/
@@ -26,7 +25,7 @@ RUN apt-get update && \
 RUN ./install.sh -e sunbeam -v
 
 ENV PATH="/opt/conda/envs/sunbeam/bin/:${PATH}"
-ENV SUNBEAM_DIR="/home/app_user"
+ENV SUNBEAM_DIR="/home/sunbeam"
 ENV SUNBEAM_VER="4.4.0"
 ENV SUNBEAM_MIN_MEM_MB="8000"
 ENV SUNBEAM_MIN_RUNTIME="60"
@@ -38,7 +37,6 @@ RUN sunbeam run --profile projects/init --conda-create-envs-only --mamba
 RUN rm -r projects
 
 # "Activate" the environment
-USER app_user
 SHELL ["conda", "run", "-n", "sunbeam", "/bin/bash", "-c"]
 #RUN bash /opt/conda/envs/sunbeam/etc/conda/activate.d/env_vars.sh
 
