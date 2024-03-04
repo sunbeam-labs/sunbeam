@@ -49,7 +49,7 @@ rule adapter_removal_unpaired:
     conda:
         "../envs/cutadapt.yml"
     container:
-        get_docker_str('cutadapt')
+        get_docker_str("cutadapt")
     script:
         "../scripts/adapter_removal_unpaired.py"
 
@@ -74,7 +74,7 @@ rule adapter_removal_paired:
     conda:
         "../envs/cutadapt.yml"
     container:
-        get_docker_str('cutadapt')
+        get_docker_str("cutadapt")
     script:
         "../scripts/adapter_removal_paired.py"
 
@@ -101,7 +101,7 @@ rule trimmomatic_unpaired:
     conda:
         "../envs/qc.yml"
     container:
-        get_docker_str('qc')
+        get_docker_str("qc")
     shell:
         """
         trimmomatic \
@@ -143,7 +143,7 @@ rule trimmomatic_paired:
     conda:
         "../envs/qc.yml"
     container:
-        get_docker_str('qc')
+        get_docker_str("qc")
     shell:
         """
         trimmomatic \
@@ -176,7 +176,7 @@ rule fastqc:
     conda:
         "../envs/qc.yml"
     container:
-        get_docker_str('qc')
+        get_docker_str("qc")
     shell:
         "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
 
@@ -198,7 +198,7 @@ rule fastqc_report:
     conda:
         "../envs/reports.yml"
     container:
-        get_docker_str('reports')
+        get_docker_str("reports")
     script:
         "../scripts/fastqc_report.py"
 
@@ -215,7 +215,7 @@ rule find_low_complexity:
     conda:
         "../envs/komplexity.yml"
     container:
-        get_docker_str('komplexity')
+        get_docker_str("komplexity")
     shell:
         """
         for rp in {input}; do
@@ -241,7 +241,7 @@ rule remove_low_complexity:
     conda:
         "../envs/reports.yml"
     container:
-        get_docker_str('reports')
+        get_docker_str("reports")
     script:
         "../scripts/remove_low_complexity.py"
 
