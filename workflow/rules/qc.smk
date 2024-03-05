@@ -112,7 +112,7 @@ rule trimmomatic_unpaired:
         TRAILING:{Cfg[qc][trailing]} \
         SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
         MINLEN:{Cfg[qc][minlen]} \
-        > >(tee {log}) 2> >(tee {log} >&2)
+        2>&1 | tee {log}
         """
 
 
@@ -156,7 +156,7 @@ rule trimmomatic_paired:
         TRAILING:{Cfg[qc][trailing]} \
         SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
         MINLEN:{Cfg[qc][minlen]} \
-        > >(tee {log}) 2> >(tee {log} >&2)
+        2>&1 | tee {log}
         """
 
 

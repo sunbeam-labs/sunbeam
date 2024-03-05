@@ -54,7 +54,7 @@ Then you submit the job:
 
     sbatch run_sunbeam.sh
 
-Once this run completes, you will have a directory called ``/projects/my_project/sunbeam_output/`` that contains all of the output from the run and ``slurm_*`` files wherever you ran the main script from that contains logs for each job. Look in ``/projects/my_project/sunbeam_output/assembly/contigs/`` for the assembled contigs.
+Once this run completes, you will have a directory called ``/projects/my_project/sunbeam_output/`` that contains all of the output from the run and ``.snakemake/slurm_logs/rule_*/`` directories wherever you ran the main script from that contain logs for each job. Look in ``/projects/my_project/sunbeam_output/assembly/contigs/`` for the assembled contigs.
 
 Using Containerized Environments
 --------------------------------

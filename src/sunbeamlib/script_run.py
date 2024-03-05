@@ -4,6 +4,8 @@ import argparse
 import subprocess
 from pathlib import Path
 
+from sunbeamlib import __version__
+
 
 def main(argv=sys.argv):
     epilog_str = (
@@ -51,6 +53,11 @@ def main(argv=sys.argv):
         default=[],
         help="List of extensions to exclude from run, use 'all' to exclude all extensions",
     )
+    parser.add_argument(
+        "--docker_tag",
+        default=__version__,
+        help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version ($SUNBEAM_VER), a good alternative is 'latest' for the latest stable release",
+    )
 
     # The remaining args (after --) are passed to Snakemake
     args, remaining = parser.parse_known_args(argv)
@@ -82,6 +89,8 @@ def main(argv=sys.argv):
         os.environ["SUNBEAM_EXTS_INCLUDE"] = ", ".join(args.include)
     if args.exclude:
         os.environ["SUNBEAM_EXTS_EXCLUDE"] = ", ".join(args.exclude)
+
+    os.environ["SUNBEAM_DOCKER_TAG"] = args.docker_tag
 
     snakemake_args = (
         [

@@ -179,17 +179,6 @@ localrules:
     samples,
 
 
-for rule_name in rules._rules:
-    rule_obj = getattr(rules, rule_name).rule
-    wcs = rule_obj._wildcard_names
-    if wcs:
-        rule_obj.resources["slurm_extra"] = (
-            lambda wc, rule_name=rule_name: f"--output=slurm_{rule_name}_{'_'.join(wc)}_%j"
-        )
-    else:
-        rule_obj.resources["slurm_extra"] = f"--output=slurm_{rule_name}_%j"
-
-
 onstart:
     try:
         shutil.rmtree(BENCHMARK_FP)
