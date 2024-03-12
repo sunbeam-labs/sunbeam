@@ -39,7 +39,7 @@ __license__ = "GPL2+"
 def get_docker_str(repo: str, user: str = "sunbeamlabs") -> str:
     docker_tag = os.environ.get("SUNBEAM_DOCKER_TAG", __version__)
 
-    return f"docker://{user}/{repo}:{docker_tag}"
+    return f"docker://{user}/{repo}:v{docker_tag}"
 
 
 def load_sample_list(
