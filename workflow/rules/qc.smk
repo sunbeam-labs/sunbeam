@@ -36,13 +36,12 @@ rule adapter_removal_unpaired:
     input:
         QC_FP / "00_samples" / "{sample}_1.fastq.gz",
     output:
-        QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
+        r=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
+        ngz=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
     log:
         LOG_FP / "adapter_removal_unpaired_{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
-    params:
-        str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
     threads: 4
@@ -61,13 +60,12 @@ rule adapter_removal_paired:
     output:
         r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
         r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
+        ngz1=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
+        ngz2=temp(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
     log:
         LOG_FP / "adapter_removal_paired_{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
-    params:
-        r1=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
-        r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 10),
     threads: 4

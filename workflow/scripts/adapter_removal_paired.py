@@ -38,9 +38,9 @@ with open(snakemake.log[0], "w") as log:
             args += rev_adapter_str.split(" ")
             args += [
                 "-o",
-                f"{snakemake.params.r1}",
+                f"{snakemake.output.ngz1}",
                 "-p",
-                f"{snakemake.params.r2}",
+                f"{snakemake.output.ngz2}",
                 f"{snakemake.input.r1}",
                 f"{snakemake.input.r2}",
             ]
@@ -53,16 +53,14 @@ with open(snakemake.log[0], "w") as log:
             sys.exit(e.returncode)
         log.write(cutadapt_output.decode())
 
-        with open(snakemake.params.r1, "rb") as f_in, gzip.open(
+        with open(snakemake.output.ngz1, "rb") as f_in, gzip.open(
             snakemake.output.r1, "wb"
         ) as f_out:
             shutil.copyfileobj(f_in, f_out)
-        with open(snakemake.params.r2, "rb") as f_in, gzip.open(
+        with open(snakemake.output.ngz2, "rb") as f_in, gzip.open(
             snakemake.output.r2, "wb"
         ) as f_out:
             shutil.copyfileobj(f_in, f_out)
-        os.remove(snakemake.params.r1)
-        os.remove(snakemake.params.r2)
     else:
         log.write("Adapters not found, skipping adapter removal...")
         os.symlink(snakemake.input.r1, snakemake.output.r1)
