@@ -6,7 +6,7 @@ WORKDIR /home/qc_env
 COPY workflow/envs/qc.yml ./
 
 # Install environment
-RUN conda env create --file qc.yml --name qc
+RUN mamba env create --file qc.yml --name qc
 
 ENV PATH="/opt/conda/envs/qc/bin/:${PATH}"
 
