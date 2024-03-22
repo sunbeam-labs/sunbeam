@@ -158,16 +158,13 @@ rule clean_decontam:
             rp=Pairs,
         ),
         QC_FP / ".qc_cleaned",
-    params:
-        cutadapt_fp=QC_FP / "01_cutadapt",
-        trimmomatic_fp=QC_FP / "02_trimmomatic",
-        komplexity_fp=QC_FP / "03_komplexity",
-        clean_qc_fp=QC_FP / "cleaned",
-        intermediates_fp=QC_FP / "decontam" / "intermediates",
     output:
         touch(QC_FP / ".decontam_cleaned"),
     shell:
         """
-        rm -r {params.clean_qc} || true
-        rm -r {params.intermediates} || true
+        cleaned_dir=$(dirname {input[0]})
+        qc_dir=$(dirname $cleaned_dir)
+
+        rm -r $qc_dir/cleaned || true
+        rm -r $qc_dir/decontam/intermediates || true
         """
