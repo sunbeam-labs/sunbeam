@@ -9,6 +9,8 @@ from sunbeamlib import __version__, Version
 
 
 def makepath(path: str) -> Path:
+    if not path:
+        path = ""
     return Path(path).expanduser()
 
 
