@@ -60,6 +60,7 @@ jobs:
               push: true
               tags: sunbeamlabs/sunbeam:latest, sunbeamlabs/sunbeam:${{ steps.get_version.outputs.version-without-v }}
               labels: ${{ steps.meta.outputs.labels }}
+              build-args: "SUNBEAM_VER=${{ steps.get_version.outputs.version-without-v }}"
 
           - name: Build and push slim Docker image
             uses: docker/build-push-action@v5
@@ -69,6 +70,7 @@ jobs:
               push: true
               tags: sunbeamlabs/sunbeam:${{ steps.get_version.outputs.version-without-v }}-slim
               labels: ${{ steps.meta.outputs.labels }}
+              build-args: "SUNBEAM_VER=${{ steps.get_version.outputs.version-without-v }}"
 
     push-cutadapt-dockerhub:
       name: Push cutadapt env to Dockerhub
