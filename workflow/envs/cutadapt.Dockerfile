@@ -6,5 +6,7 @@ WORKDIR /home/cutadapt_env
 # Install environment
 RUN pip install cutadapt
 
+RUN echo "Python: $(python --version)\nCutadapt $(pip show cutadapt | grep 'Version: ')" > installed_packages.txt
+
 # Run
 CMD ["bash"]

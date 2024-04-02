@@ -38,7 +38,8 @@ RUN rm -r projects
 
 # "Activate" the environment
 SHELL ["conda", "run", "-n", "sunbeam", "/bin/bash", "-c"]
-#RUN bash /opt/conda/envs/sunbeam/etc/conda/activate.d/env_vars.sh
+
+RUN echo "Python: $(python --version)\nSnakemake: $(snakemake --version)\nConda: $(conda --version)" > installed_packages.txt
 
 # Run
 CMD "bash"
