@@ -120,7 +120,7 @@ jobs:
             with:
               token: ${{ secrets.GITHUB_TOKEN }}
               id: ${{ github.event.release.id }}
-              body: "### sunbeamlabs/sunbeam\n${{ needs.push-dockerhub.outputs.sunbeam_package_versions }}\n### sunbeamlabs/cutadapt\n${{ needs.push-dockerhub.outputs.cutadapt_package_versions }}\n### sunbeamlabs/komplexity\n${{ needs.push-dockerhub.outputs.komplexity_package_versions }}\n### sunbeamlabs/qc\n${{ needs.push-dockerhub.outputs.qc_package_versions }}\n### sunbeamlabs/reports\n${{ needs.push-dockerhub.outputs.reports_package_versions }}"
+              body: "### sunbeamlabs/sunbeam\n${{ needs.push-dockerhub.outputs.sunbeam_package_versions }}\n### sunbeamlabs/sunbeam:slim\n${{ needs.push-dockerhub.outputs.sunbeam_package_versions_slim }}\n### sunbeamlabs/cutadapt\n${{ needs.push-dockerhub.outputs.cutadapt_package_versions }}\n### sunbeamlabs/komplexity\n${{ needs.push-dockerhub.outputs.komplexity_package_versions }}\n### sunbeamlabs/qc\n${{ needs.push-dockerhub.outputs.qc_package_versions }}\n### sunbeamlabs/reports\n${{ needs.push-dockerhub.outputs.reports_package_versions }}"
               replacebody: false
         
     run-integration-tests:
