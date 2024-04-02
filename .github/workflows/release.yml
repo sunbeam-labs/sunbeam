@@ -58,6 +58,12 @@ jobs:
           - name: Generate Tarball
             run: bash dev_scripts/generate_archive.sh
 
+          - name: Upload Tarball
+            uses: actions/upload-artifact@v2
+            with:
+              name: sunbeam.tar.gz
+              path: sunbeam.tar.gz
+
           - name: Add Tarball to Release
             uses: irongut/EditRelease@v1.2.0
             with:
