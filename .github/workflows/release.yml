@@ -13,6 +13,10 @@ jobs:
     
     check-version:
         runs-on: ubuntu-latest
+
+        outputs:
+          version-without-v: ${{ steps.get_version.outputs.version-without-v }}
+
         steps:
           - name: Checkout
             uses: actions/checkout@v4
@@ -67,15 +71,16 @@ jobs:
         needs:
           - run-tests
           - check-version
+          - generate-tarball
     
         steps:
           - name: setup-conda
-            uses: s-weigand/setup-conda@v1.2.1 
+            uses: s-weigand/setup-conda@v1.2.1
     
           - name: Download and Extract
             shell: bash
             run: |
-              wget https://github.com/sunbeam-labs/sunbeam/releases/latest/download/sunbeam.tar.gz
+              wget https://github.com/sunbeam-labs/sunbeam/releases/${{ needs.check-version.outputs.version-without-v }}/download/sunbeam.tar.gz
               mkdir sunbeam
               tar -zxf sunbeam.tar.gz -C sunbeam
               cd sunbeam && ./install.sh -e sunbeam
@@ -96,8 +101,8 @@ jobs:
 
     generate-docker-reports-sunbeam:
         runs-on: ubuntu-latest
-        container: sunbeamlabs/sunbeam:latest
-        needs: [push-dockerhub]
+        container: sunbeamlabs/sunbeam:${{ needs.check-version.outputs.version-without-v }}
+        needs: [push-dockerhub, check-version]
 
         outputs:
           package_versions: ${{ steps.report.outputs.package_versions }}
@@ -110,8 +115,8 @@ jobs:
 
     generate-docker-reports-cutadapt:
       runs-on: ubuntu-latest
-      container: sunbeamlabs/cutadapt:latest
-      needs: [push-dockerhub]
+      container: sunbeamlabs/cutadapt:${{ needs.check-version.outputs.version-without-v }}
+      needs: [push-dockerhub, check-version]
 
       outputs:
         package_versions: ${{ steps.report.outputs.package_versions }}
@@ -124,8 +129,8 @@ jobs:
 
     generate-docker-reports-komplexity:
       runs-on: ubuntu-latest
-      container: sunbeamlabs/komplexity:latest
-      needs: [push-dockerhub]
+      container: sunbeamlabs/komplexity:${{ needs.check-version.outputs.version-without-v }}
+      needs: [push-dockerhub, check-version]
 
       outputs:
         package_versions: ${{ steps.report.outputs.package_versions }}
@@ -138,8 +143,8 @@ jobs:
     
     generate-docker-reports-qc:
       runs-on: ubuntu-latest
-      container: sunbeamlabs/qc:latest
-      needs: [push-dockerhub]
+      container: sunbeamlabs/qc:${{ needs.check-version.outputs.version-without-v }}
+      needs: [push-dockerhub, check-version]
 
       outputs:
         package_versions: ${{ steps.report.outputs.package_versions }}
@@ -152,8 +157,8 @@ jobs:
 
     generate-docker-reports-reports:
       runs-on: ubuntu-latest
-      container: sunbeamlabs/reports:latest
-      needs: [push-dockerhub]
+      container: sunbeamlabs/reports:${{ needs.check-version.outputs.version-without-v }}
+      needs: [push-dockerhub, check-version]
 
       outputs:
         package_versions: ${{ steps.report.outputs.package_versions }}
