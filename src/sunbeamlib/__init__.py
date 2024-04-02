@@ -131,7 +131,8 @@ def _verify_path(fp: str) -> str:
         raise ValueError("Missing filename")
     path = Path(fp)
     if not path.is_file():
-        raise ValueError("File not found")
+        sys.stderr.write(f"WARNING: File {str(path)} does not exist locally\n")
+        return str(path)
     return str(path.resolve())
 
 
