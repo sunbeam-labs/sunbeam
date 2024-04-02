@@ -5,6 +5,4 @@
 
 If this is for a release:
 * [ ] I have updated documentation
-* [ ] I have updated all conda pin files (`snakedeploy pin-conda-envs workflow/envs/*.yml`)
 * [ ] I have updated the hardcoded version at the top of `install.sh` to match what this release's version will be
-* [ ] I have created a release archive that will be attached to this release (`bash dev_scripts/generate_archive.sh`)

@@ -24,16 +24,6 @@ jobs:
                 GIT_VERSION=$(bash install.sh -w)
                 echo "GIT_VERSION=$GIT_VERSION" >> $GITHUB_ENV
 
-          - name: Download and Extract
-            shell: bash
-            run: |
-                wget https://github.com/sunbeam-labs/sunbeam/releases/latest/download/sunbeam.tar.gz
-                mkdir tar_sunbeam
-                tar -zxf sunbeam.tar.gz -C tar_sunbeam
-                cd tar_sunbeam
-                TAR_VERSION=$(bash install.sh -w)
-                echo "TAR_VERSION=$TAR_VERSION" >> $GITHUB_ENV
-
           - id: get_version
             uses: battila7/get-version-action@v2
 
@@ -42,14 +32,34 @@ jobs:
                 RELEASE_VERSION=${{ steps.get_version.outputs.version-without-v }}
                 echo "Release version: ${RELEASE_VERSION}"
                 echo "GitHub version: ${{ env.GIT_VERSION }}"
-                echo "Tarball version: ${{ env.TAR_VERSION }}"
 
-                if [[ $RELEASE_VERSION == ${{ env.GIT_VERSION }} ]] && [[ ${{ env.GIT_VERSION }} == ${{ env.TAR_VERSION }} ]]; then
+                if [[ $RELEASE_VERSION == ${{ env.GIT_VERSION }} ]]; then
                     echo "Versions match, continuing..."
                 else
                     echo "Versions don't match, exiting..."
                     exit 1
                 fi
+
+    generate-tarball:
+        name: Generate Tarball and Add to Release
+        runs-on: ubuntu-latest
+        needs:
+          - run-tests
+          - check-version
+    
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v4
+
+          - name: Generate Tarball
+            run: bash dev_scripts/generate_archive.sh
+
+          - name: Add Tarball to Release
+            uses: irongut/EditRelease@v1.2.0
+            with:
+              token: ${{ secrets.GITHUB_TOKEN }}
+              id: ${{ github.event.release.id }}
+              files: "sunbeam.tar.gz"
     
     test-tarball:
         name: Test Tarball
@@ -83,6 +93,95 @@ jobs:
         needs:
           - run-tests
           - check-version
+
+    generate-docker-reports-sunbeam:
+        runs-on: ubuntu-latest
+        container: sunbeamlabs/sunbeam:latest
+        needs: [push-dockerhub]
+
+        outputs:
+          package_versions: ${{ steps.report.outputs.package_versions }}
+
+        steps:
+          - name: Generate image report
+            id: report
+            run: |
+              echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+
+    generate-docker-reports-cutadapt:
+      runs-on: ubuntu-latest
+      container: sunbeamlabs/cutadapt:latest
+      needs: [push-dockerhub]
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
+
+      steps:
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+
+    generate-docker-reports-komplexity:
+      runs-on: ubuntu-latest
+      container: sunbeamlabs/komplexity:latest
+      needs: [push-dockerhub]
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
+
+      steps:
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+    
+    generate-docker-reports-qc:
+      runs-on: ubuntu-latest
+      container: sunbeamlabs/qc:latest
+      needs: [push-dockerhub]
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
+
+      steps:
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+
+    generate-docker-reports-reports:
+      runs-on: ubuntu-latest
+      container: sunbeamlabs/reports:latest
+      needs: [push-dockerhub]
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
+
+      steps:
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+
+    udpate-release-notes:
+        name: Update release notes
+        runs-on: ubuntu-latest
+        needs:
+          - generate-docker-reports-sunbeam
+          - generate-docker-reports-cutadapt
+          - generate-docker-reports-komplexity
+          - generate-docker-reports-qc
+          - generate-docker-reports-reports
+        
+        steps:
+          - name: Add Image Reports to Release
+            uses: irongut/EditRelease@v1.2.0
+            with:
+              token: ${{ secrets.GITHUB_TOKEN }}
+              id: ${{ github.event.release.id }}
+              body: "### sunbeamlabs/sunbeam\n${{ needs.generate-docker-reports-sunbeam.outputs.package_versions }}\n### sunbeamlabs/cutadapt\n${{ needs.generate-docker-reports-cutadapt.outputs.package_versions }}\n### sunbeamlabs/komplexity\n${{ needs.generate-docker-reports-komplexity.outputs.package_versions }}\n### sunbeamlabs/qc\n${{ needs.generate-docker-reports-qc.outputs.package_versions }}\n### sunbeamlabs/reports\n${{ needs.generate-docker-reports-reports.outputs.package_versions }}"
+              replacebody: false
         
     run-integration-tests:
         uses: ./.github/workflows/integration-tests.yml

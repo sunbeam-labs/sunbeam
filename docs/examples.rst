@@ -43,7 +43,7 @@ Now you're ready to run the project, but you want to be able to put the main nod
     #SBATCH --no-requeue
     #SBATCH --output=slurm_%x_%j.out
 
-    # Conda env must be activate for this to work
+    # Conda env must be active for this to work
     set -x
     set -e
     sunbeam run --profile /projects/my_project all_assembly
@@ -107,6 +107,57 @@ You should now be able to see all the coverage reports and other outputs from th
 .. tip::
 
     Including any other database in a containerized run is as simple as mounting the database directory into the container and pointing to it in the config file. For example, if you have a kraken database in ``/kraken_db`` and you want to use it in a containerized run, you would add ``-v /kraken_db:/kraken_db`` to the ``docker run`` command and then set the ``kraken_db_fp`` parameter in the config file to ``/kraken_db`` (after installing ``sbx_kraken``).
+
+Using Slurm with the Containerized Install and Containerized Environments
+-------------------------------------------------------------------------
+
+This is a combination of all of the above. You have a dataset on your institution's HPC (which uses slurm to manage jobs) and you want to run sunbeam to automate qc, decontam, and assembly of metagenomic contigs. Your data is paired end and lives in a directory called ``/data``. You have singularity available on the cluster and you want to use containerized environments (apptainer or similar solutions also work). Run:
+
+.. code-block:: bash
+
+    ### FIND AND LOAD SINGULARITY MODULE IF IT ISN'T ALREADY LOADED ###
+    modulefiles_list | grep singularity
+    module load singularity
+
+    export SINGULARITY_TMPDIR=/path/to/tmpdir
+    export SINGULARITY_CACHEDIR=/path/to/cachedir
+    singularity shell -B /data:/data,/projects:/projects docker://sunbeamlabs/sunbeam
+
+    ### WITHIN THE CONTAINER ###
+    sunbeam extend https://github.com/sunbeam-labs/sbx_assembly
+    sunbeam init --data_fp /data/ --profile slurm /projects/my_project/
+    pip install snakemake-executor-plugin-slurm
+
+    ### BACK OUTSIDE THE CONTAINER ###
+    vi /projects/my_project/config.yaml  # edit the config file to make any desired changes (including switching ``software-deployment-method`` to ``apptainer``)
+
+.. note::
+
+    Setting the ``SINGULARITY_TMPDIR`` environment variable may be necessary to avoid a bug in singularity that causes it to fail when running snakemake. The path should be a directory that is writable by the user running the container and large enough not to run out of space.
+
+Now you're ready to run the project, but you want to be able to put the main node on the cluster as well so you can logoff, so you create a bash script called ``run_sunbeam.sh``:
+
+.. code-block:: bash
+
+    #!/bin/bash
+    #SBATCH --time=72:00:00
+    #SBATCH -n 1
+    #SBATCH --mem=8G
+    #SBATCH --mail-type=END,FAIL
+    #SBATCH --mail-user=your_email@your_institution.edu
+    #SBATCH --no-requeue
+    #SBATCH --output=slurm_%x_%j.out
+
+    # Conda env must be active for this to work
+    set -x
+    set -e
+    singularity run -B /data:/data,/projects:/projects docker://sunbeamlabs/sunbeam sunbeam run --profile /projects/my_project all_assembly
+
+Then you submit the job:
+
+.. code-block:: bash
+
+    sbatch run_sunbeam.sh
 
 Running on AWS Batch with AWS S3 Data
 ======================================
