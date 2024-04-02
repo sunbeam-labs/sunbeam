@@ -63,6 +63,8 @@ jobs:
             with:
               token: ${{ secrets.GITHUB_TOKEN }}
               id: ${{ github.event.release.id }}
+              body: "### Sunbeam Tarball\nDownload the Sunbeam tarball from the release page to install Sunbeam locally.\n[Download Sunbeam Tarball](https://github.com/sunbeam-labs/sunbeam/releases/${{ needs.check-version.outputs.version-without-v }}/download/sunbeam.tar.gz"
+              replacebody: false
               files: "sunbeam.tar.gz"
     
     test-tarball:
@@ -94,90 +96,17 @@ jobs:
 
     push-dockerhub:
         uses: ./.github/workflows/dockerhub.yml
+        with:
+          version: ${{ needs.check-version.outputs.version-without-v }}
         secrets: inherit
         needs:
           - run-tests
           - check-version
 
-    generate-docker-reports-sunbeam:
-        runs-on: ubuntu-latest
-        container: sunbeamlabs/sunbeam:${{ needs.check-version.outputs.version-without-v }}
-        needs: [push-dockerhub, check-version]
-
-        outputs:
-          package_versions: ${{ steps.report.outputs.package_versions }}
-
-        steps:
-          - name: Generate image report
-            id: report
-            run: |
-              echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
-
-    generate-docker-reports-cutadapt:
-      runs-on: ubuntu-latest
-      container: sunbeamlabs/cutadapt:${{ needs.check-version.outputs.version-without-v }}
-      needs: [push-dockerhub, check-version]
-
-      outputs:
-        package_versions: ${{ steps.report.outputs.package_versions }}
-
-      steps:
-        - name: Generate image report
-          id: report
-          run: |
-            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
-
-    generate-docker-reports-komplexity:
-      runs-on: ubuntu-latest
-      container: sunbeamlabs/komplexity:${{ needs.check-version.outputs.version-without-v }}
-      needs: [push-dockerhub, check-version]
-
-      outputs:
-        package_versions: ${{ steps.report.outputs.package_versions }}
-
-      steps:
-        - name: Generate image report
-          id: report
-          run: |
-            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
-    
-    generate-docker-reports-qc:
-      runs-on: ubuntu-latest
-      container: sunbeamlabs/qc:${{ needs.check-version.outputs.version-without-v }}
-      needs: [push-dockerhub, check-version]
-
-      outputs:
-        package_versions: ${{ steps.report.outputs.package_versions }}
-
-      steps:
-        - name: Generate image report
-          id: report
-          run: |
-            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
-
-    generate-docker-reports-reports:
-      runs-on: ubuntu-latest
-      container: sunbeamlabs/reports:${{ needs.check-version.outputs.version-without-v }}
-      needs: [push-dockerhub, check-version]
-
-      outputs:
-        package_versions: ${{ steps.report.outputs.package_versions }}
-
-      steps:
-        - name: Generate image report
-          id: report
-          run: |
-            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
-
     udpate-release-notes:
         name: Update release notes
         runs-on: ubuntu-latest
-        needs:
-          - generate-docker-reports-sunbeam
-          - generate-docker-reports-cutadapt
-          - generate-docker-reports-komplexity
-          - generate-docker-reports-qc
-          - generate-docker-reports-reports
+        needs: push-dockerhub
         
         steps:
           - name: Add Image Reports to Release
@@ -185,7 +114,7 @@ jobs:
             with:
               token: ${{ secrets.GITHUB_TOKEN }}
               id: ${{ github.event.release.id }}
-              body: "### sunbeamlabs/sunbeam\n${{ needs.generate-docker-reports-sunbeam.outputs.package_versions }}\n### sunbeamlabs/cutadapt\n${{ needs.generate-docker-reports-cutadapt.outputs.package_versions }}\n### sunbeamlabs/komplexity\n${{ needs.generate-docker-reports-komplexity.outputs.package_versions }}\n### sunbeamlabs/qc\n${{ needs.generate-docker-reports-qc.outputs.package_versions }}\n### sunbeamlabs/reports\n${{ needs.generate-docker-reports-reports.outputs.package_versions }}"
+              body: "### sunbeamlabs/sunbeam\n${{ needs.push-dockerhub.outputs.sunbeam_package_versions }}\n### sunbeamlabs/cutadapt\n${{ needs.push-dockerhub.outputs.cutadapt_package_versions }}\n### sunbeamlabs/komplexity\n${{ needs.push-dockerhub.outputs.komplexity_package_versions }}\n### sunbeamlabs/qc\n${{ needs.push-dockerhub.outputs.qc_package_versions }}\n### sunbeamlabs/reports\n${{ needs.push-dockerhub.outputs.reports_package_versions }}"
               replacebody: false
         
     run-integration-tests:

@@ -2,6 +2,30 @@ name: Push to DockerHub
 
 on:
   workflow_call:
+    inputs:
+      version:
+        description: "Sunbeam version"
+        required: true
+        type: string
+    outputs:
+      sunbeam_package_versions:
+        description: "Versions in main Sunbeam image"
+        value: ${{ jobs.push-dockerhub.outputs.package_versions }}
+      sunbeam_package_versions_slim:
+        description: "Versions in slim Sunbeam image"
+        value: ${{ jobs.push-dockerhub.outputs.package_versions_slim }}
+      cutadapt_package_versions:
+        description: "Versions in cutadapt image"
+        value: ${{ jobs.push-cutadapt-dockerhub.outputs.package_versions }}
+      komplexity_package_versions:
+        description: "Versions in komplexity image"
+        value: ${{ jobs.push-komplexity-dockerhub.outputs.package_versions }}
+      qc_package_versions:
+        description: "Versions in qc image"
+        value: ${{ jobs.push-qc-dockerhub.outputs.package_versions }}
+      reports_package_versions:
+        description: "Versions in reports image"
+        value: ${{ jobs.push-reports-dockerhub.outputs.package_versions }}
 
   workflow_dispatch:
 
@@ -9,12 +33,13 @@ jobs:
     push-dockerhub:
         name: Push to Dockerhub
         runs-on: ubuntu-latest
+
+        outputs:
+          package_versions: ${{ steps.report.outputs.package_versions }}
+          package_versions_slim: ${{ steps.report.outputs.package_versions_slim }}
     
         steps:
           - uses: actions/checkout@v4
-
-          - id: get_version
-            uses: battila7/get-version-action@v2
           
           - name: Log in to Docker Hub
             uses: docker/login-action@v3
@@ -58,9 +83,9 @@ jobs:
               context: .
               file: ./Dockerfile
               push: true
-              tags: sunbeamlabs/sunbeam:latest, sunbeamlabs/sunbeam:${{ steps.get_version.outputs.version-without-v }}
+              tags: sunbeamlabs/sunbeam:latest, sunbeamlabs/sunbeam:${{ inputs.version }}
               labels: ${{ steps.meta.outputs.labels }}
-              build-args: "SUNBEAM_VER=${{ steps.get_version.outputs.version-without-v }}"
+              build-args: "SUNBEAM_VER=${{ inputs.version }}"
 
           - name: Build and push slim Docker image
             uses: docker/build-push-action@v5
@@ -68,13 +93,22 @@ jobs:
               context: .
               file: ./slim.Dockerfile
               push: true
-              tags: sunbeamlabs/sunbeam:${{ steps.get_version.outputs.version-without-v }}-slim
+              tags: sunbeamlabs/sunbeam:${{ inputs.version }}-slim
               labels: ${{ steps.meta.outputs.labels }}
-              build-args: "SUNBEAM_VER=${{ steps.get_version.outputs.version-without-v }}"
+              build-args: "SUNBEAM_VER=${{ inputs.version }}"
+
+          - name: Generate image report
+            id: report
+            run: |
+              echo "package_versions=$(docker run --rm sunbeamlabs/sunbeam:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+              echo "package_versions_slim=$(docker run --rm sunbeamlabs/sunbeam:${{ inputs.version }}-slim cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
 
     push-cutadapt-dockerhub:
       name: Push cutadapt env to Dockerhub
       runs-on: ubuntu-latest
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
   
       steps:
         - uses: actions/checkout@v4
@@ -100,9 +134,17 @@ jobs:
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
 
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(docker run --rm sunbeamlabs/cutadapt:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+
     push-komplexity-dockerhub:
       name: Push komplexity env to Dockerhub
       runs-on: ubuntu-latest
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
   
       steps:
         - uses: actions/checkout@v4
@@ -128,9 +170,17 @@ jobs:
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
 
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(docker run --rm sunbeamlabs/komplexity:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+
     push-qc-dockerhub:
       name: Push qc env to Dockerhub
       runs-on: ubuntu-latest
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
   
       steps:
         - uses: actions/checkout@v4
@@ -156,9 +206,17 @@ jobs:
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
 
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(docker run --rm sunbeamlabs/qc:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+
     push-reports-dockerhub:
       name: Push reports env to Dockerhub
       runs-on: ubuntu-latest
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
   
       steps:
         - uses: actions/checkout@v4
@@ -183,3 +241,8 @@ jobs:
             push: true
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
+
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(docker run --rm sunbeamlabs/reports:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
