@@ -6,7 +6,7 @@ WORKDIR /home/reports_env
 # Install environment
 RUN pip install numpy pandas
 
-RUN echo "Python: $(python --version)\nNumpy $(pip show numpy | grep 'Version: ')\nPandas $(pip show pandas | grep 'Version: ')" > installed_packages.txt
+RUN echo "Python: $(python --version), Numpy $(pip show numpy | grep 'Version: '), Pandas $(pip show pandas | grep 'Version: ')" > installed_packages.txt
 
 # Run
 CMD ["bash"]
