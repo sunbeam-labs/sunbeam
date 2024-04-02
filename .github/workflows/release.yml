@@ -90,15 +90,13 @@ jobs:
         needs: [push-dockerhub]
 
         outputs:
-          snakemake_version: ${{ steps.sunbeam.outputs.snakemake_version }}
-          python_version: ${{ steps.sunbeam.outputs.python_version }}
+          package_versions: ${{ steps.report.outputs.package_versions }}
 
         steps:
-          - name: Generate sunbeam image report
-            id: sunbeam
+          - name: Generate image report
+            id: report
             run: |
-              echo "snakemake_version=$(snakemake --version)" >> "$GITHUB_OUTPUT"
-              echo "python_version=$(python --version)" >> "$GITHUB_OUTPUT"
+              echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
 
     generate-docker-reports-cutadapt:
       runs-on: ubuntu-latest
@@ -106,13 +104,55 @@ jobs:
       needs: [push-dockerhub]
 
       outputs:
-        cutadapt_version: ${{ steps.cutadapt.outputs.cutadapt_version }}
+        package_versions: ${{ steps.report.outputs.package_versions }}
 
       steps:
-        - name: Generate cutadapt image report
-          id: cutadapt
+        - name: Generate image report
+          id: report
           run: |
-            echo "cutadapt_version=$(cutadapt --version)" >> "$GITHUB_OUTPUT"
+            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+
+    generate-docker-reports-komplexity:
+      runs-on: ubuntu-latest
+      container: sunbeamlabs/komplexity:latest
+      needs: [push-dockerhub]
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
+
+      steps:
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+    
+    generate-docker-reports-qc:
+      runs-on: ubuntu-latest
+      container: sunbeamlabs/qc:latest
+      needs: [push-dockerhub]
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
+
+      steps:
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+
+    generate-docker-reports-reports:
+      runs-on: ubuntu-latest
+      container: sunbeamlabs/reports:latest
+      needs: [push-dockerhub]
+
+      outputs:
+        package_versions: ${{ steps.report.outputs.package_versions }}
+
+      steps:
+        - name: Generate image report
+          id: report
+          run: |
+            echo "package_versions=$(cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
 
     udpate-release-notes:
         name: Update release notes
@@ -120,6 +160,9 @@ jobs:
         needs:
           - generate-docker-reports-sunbeam
           - generate-docker-reports-cutadapt
+          - generate-docker-reports-komplexity
+          - generate-docker-reports-qc
+          - generate-docker-reports-reports
         
         steps:
           - name: Add Image Reports to Release
@@ -127,7 +170,7 @@ jobs:
             with:
               token: ${{ secrets.GITHUB_TOKEN }}
               id: ${{ github.event.release.id }}
-              body: "### sunbeamlabs/sunbeam:latest\nSnakemake: ${{ needs.generate-docker-reports-sunbeam.outputs.snakemake_version }}\nPython: ${{ needs.generate-docker-reports-sunbeam.outputs.python_version }}\n### sunbeamlabs/cutadapt:latest\nCutadapt: ${{ needs.generate-docker-reports-cutadapt.outputs.cutadapt_version }}"
+              body: "### sunbeamlabs/sunbeam\n${{ needs.generate-docker-reports-sunbeam.outputs.package_versions }}\n### sunbeamlabs/cutadapt\n${{ needs.generate-docker-reports-cutadapt.outputs.package_versions }}\n### sunbeamlabs/komplexity\n${{ needs.generate-docker-reports-komplexity.outputs.package_versions }}\n### sunbeamlabs/qc\n${{ needs.generate-docker-reports-qc.outputs.package_versions }}\n### sunbeamlabs/reports\n${{ needs.generate-docker-reports-reports.outputs.package_versions }}"
               replacebody: false
         
     run-integration-tests:
