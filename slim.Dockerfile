@@ -2,6 +2,7 @@ FROM condaforge/mambaforge:latest
 
 # Setup
 WORKDIR /home/sunbeam
+ARG SUNBEAM_VER
 
 RUN mkdir -p etc/
 COPY etc/* etc/
@@ -26,7 +27,7 @@ RUN ./install.sh -e sunbeam -v
 
 ENV PATH="/opt/conda/envs/sunbeam/bin/:${PATH}"
 ENV SUNBEAM_DIR="/home/sunbeam"
-ENV SUNBEAM_VER="4.4.0"
+ENV SUNBEAM_VER ${SUNBEAM_VER}
 ENV SUNBEAM_MIN_MEM_MB="8000"
 ENV SUNBEAM_MIN_RUNTIME="60"
 
