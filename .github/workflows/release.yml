@@ -16,6 +16,7 @@ jobs:
 
         outputs:
           version-without-v: ${{ steps.get_version.outputs.version-without-v }}
+          version: ${{ steps.get_version.outputs.version }}
 
         steps:
           - name: Checkout
@@ -69,7 +70,7 @@ jobs:
             with:
               token: ${{ secrets.GITHUB_TOKEN }}
               id: ${{ github.event.release.id }}
-              body: "### Sunbeam Tarball\nDownload the Sunbeam tarball from the release page to install Sunbeam locally.\n[Download Sunbeam Tarball](https://github.com/sunbeam-labs/sunbeam/releases/${{ needs.check-version.outputs.version-without-v }}/download/sunbeam.tar.gz"
+              body: "### Sunbeam Tarball\nDownload the Sunbeam tarball from the release page to install Sunbeam locally.\n[Download Sunbeam Tarball](https://github.com/sunbeam-labs/sunbeam/releases/${{ needs.check-version.outputs.version }}/download/sunbeam.tar.gz"
               replacebody: false
               files: "sunbeam.tar.gz"
     
@@ -88,7 +89,7 @@ jobs:
           - name: Download and Extract
             shell: bash
             run: |
-              wget https://github.com/sunbeam-labs/sunbeam/releases/${{ needs.check-version.outputs.version-without-v }}/download/sunbeam.tar.gz
+              wget https://github.com/sunbeam-labs/sunbeam/releases/${{ needs.check-version.outputs.version }}/download/sunbeam.tar.gz
               mkdir sunbeam
               tar -zxf sunbeam.tar.gz -C sunbeam
               cd sunbeam && ./install.sh -e sunbeam
@@ -103,7 +104,7 @@ jobs:
     push-dockerhub:
         uses: ./.github/workflows/dockerhub.yml
         with:
-          version: ${{ needs.check-version.outputs.version-without-v }}
+          version: ${{ needs.check-version.outputs.version }}
         secrets: inherit
         needs:
           - run-tests
