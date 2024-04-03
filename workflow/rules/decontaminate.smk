@@ -29,7 +29,7 @@ rule build_host_index:
     container:
         get_docker_str("qc")
     shell:
-        "cd {Cfg[qc][host_fp]} && bwa index {input} 2>&1 | tee {log}"
+        "cd $(dirname {input}) && bwa index {input} 2>&1 | tee {log}"
 
 
 rule align_to_host:
