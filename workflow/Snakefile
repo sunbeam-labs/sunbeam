@@ -88,6 +88,7 @@ if Cfg["qc"]["host_fp"] == Cfg["all"]["root"]:
     HostGenomeFiles = []
 else:
     HostGenomeFiles = [f for f in Cfg["qc"]["host_fp"].glob("*.fasta")]
+    print(HostGenomeFiles)
     if not HostGenomeFiles:
         sys.stderr.write(
             "\n\nWARNING: No files detected in host genomes folder ({}). "
@@ -96,9 +97,19 @@ else:
                 Cfg["qc"]["host_fp"]
             )
         )
-HostGenomes = {
-    Path(g.name).stem: read_seq_ids(Cfg["qc"]["host_fp"] / g) for g in HostGenomeFiles
-}
+
+# Once this change has been implemented for a while we can remove the try/except
+# and just use an if/else, using the try/except for now to avoid migration pains
+# with old sunbeam configs being copied over
+try:
+    if Cfg["qc"]["host_list"]:
+        HostGenomes = Cfg["qc"]["host_list"]
+    else:
+        raise KeyError
+except KeyError:
+    HostGenomes = [Path(g.name).stem for g in HostGenomeFiles]
+    print(HostGenomes)
+
 sys.stderr.write("done.\n")
 
 

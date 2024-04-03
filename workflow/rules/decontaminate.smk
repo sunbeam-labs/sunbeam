@@ -24,9 +24,6 @@ rule build_host_index:
         LOG_FP / "build_host_index_{host}.log",
     benchmark:
         BENCHMARK_FP / "build_host_index_{host}.tsv"
-    params:
-        host="{host}",
-        index_fp=Cfg["qc"]["host_fp"],
     conda:
         "../envs/qc.yml"
     container:
@@ -84,7 +81,7 @@ rule aggregate_reads:
     input:
         expand(
             QC_FP / "decontam" / "intermediates" / "{host}" / "{{sample}}.ids",
-            host=HostGenomes.keys(),
+            host=HostGenomes,
         ),
     output:
         temp(QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids"),
@@ -102,7 +99,7 @@ rule filter_reads:
         reads=QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
         hostids=expand(
             QC_FP / "decontam" / "intermediates" / "{host}" / "{{sample}}.ids",
-            host=HostGenomes.keys(),
+            host=HostGenomes,
         ),
     output:
         reads=QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
