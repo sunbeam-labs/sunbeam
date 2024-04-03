@@ -35,8 +35,8 @@ def validate_paths(cfg: Dict[str, str], root: Path) -> Dict[str, Union[str, Path
     """
     new_cfg = dict()
     for k, v in cfg.items():
-        if k == "output_fp" and not v:
-            v = ""
+        if k == "output_fp" or k == "host_fp":
+            v = Path(v)
         elif k.endswith("_fp"):
             try:
                 v = makepath(v)
