@@ -5,8 +5,7 @@ on:
       types: [published]
 
     workflow_dispatch:
-      https://github.com/sunbeam-labs/sunbeam/releases/download/v4.5.2.dev5/sunbeam.tar.gz
-      https://github.com/sunbeam-labs/sunbeam/releases/v4.5.2.dev5/download/sunbeam.tar.gz
+      
 jobs:
     run-tests:
         uses: ./.github/workflows/tests.yml
