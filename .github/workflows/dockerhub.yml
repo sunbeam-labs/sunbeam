@@ -99,12 +99,9 @@ jobs:
 
           - name: Generate image report
             id: report
-            # Replace '\n' with '%0A' for embedding into release notes (for somer reason '\n' is not escaped)
             run: |
-              IP=$(docker run --rm sunbeamlabs/sunbeam:${{ inputs.version }} cat installed_packages.txt)
-              echo "package_versions=${IP//$'\n'/'%0A'}" >> "$GITHUB_OUTPUT"
-              IP=$(docker run --rm sunbeamlabs/sunbeam:${{ inputs.version }}-slim cat installed_packages.txt)
-              echo "package_versions_slim=${IP//$'\n'/'%0A'}" >> "$GITHUB_OUTPUT"
+              echo "package_versions=$(docker run --rm sunbeamlabs/sunbeam:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
+              echo "package_versions_slim=$(docker run --rm sunbeamlabs/sunbeam:${{ inputs.version }}-slim cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
 
     push-cutadapt-dockerhub:
       name: Push cutadapt env to Dockerhub
@@ -140,9 +137,7 @@ jobs:
         - name: Generate image report
           id: report
           run: |
-            IP=$(docker run --rm sunbeamlabs/cutadapt:${{ inputs.version }} cat installed_packages.txt)
-            echo $IP
-            echo "package_versions=${IP//$'\n'/'%0A'}" >> "$GITHUB_OUTPUT"
+            echo "package_versions=$(docker run --rm sunbeamlabs/cutadapt:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
 
     push-komplexity-dockerhub:
       name: Push komplexity env to Dockerhub
@@ -178,9 +173,7 @@ jobs:
         - name: Generate image report
           id: report
           run: |
-            IP=$(docker run --rm sunbeamlabs/komplexity:${{ inputs.version }} cat installed_packages.txt)
-            echo $IP
-            echo "package_versions=${IP//$'\n'/'%0A'}" >> "$GITHUB_OUTPUT"
+            echo "package_versions=$(docker run --rm sunbeamlabs/komplexity:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
 
     push-qc-dockerhub:
       name: Push qc env to Dockerhub
@@ -216,9 +209,7 @@ jobs:
         - name: Generate image report
           id: report
           run: |
-            IP=$(docker run --rm sunbeamlabs/qc:${{ inputs.version }} cat installed_packages.txt)
-            echo $IP
-            echo "package_versions=${IP//$'\n'/'%0A'}" >> "$GITHUB_OUTPUT"
+            echo "package_versions=$(docker run --rm sunbeamlabs/qc:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
 
     push-reports-dockerhub:
       name: Push reports env to Dockerhub
@@ -254,6 +245,4 @@ jobs:
         - name: Generate image report
           id: report
           run: |
-            IP=$(docker run --rm sunbeamlabs/reports:${{ inputs.version }} cat installed_packages.txt)
-            echo $IP
-            echo "package_versions=${IP//$'\n'/'%0A'}" >> "$GITHUB_OUTPUT"
+            echo "package_versions=$(docker run --rm sunbeamlabs/reports:${{ inputs.version }} cat installed_packages.txt)" >> "$GITHUB_OUTPUT"
