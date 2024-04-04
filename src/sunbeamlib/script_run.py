@@ -33,7 +33,7 @@ def main(argv=sys.argv):
         "-m",
         "--mamba",
         action="store_true",
-        help="Use mamba instead of conda to manage environments",
+        help="Use mamba instead of conda to create environments",
     )
     parser.add_argument(
         "--target_list",
@@ -57,6 +57,11 @@ def main(argv=sys.argv):
         "--docker_tag",
         default=__version__,
         help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version ($SUNBEAM_VER), a good alternative is 'latest' for the latest stable release",
+    )
+    parser.add_argument(
+        "--ignore_local_fs",
+        action="store_true",
+        help="Ignore local filesystem performing checks for input files",
     )
 
     # The remaining args (after --) are passed to Snakemake
