@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 __conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-__version_tag=$(if git describe --tags >/dev/null 2>&1 ; then git describe --tags; else echo v4.5.2.dev5; fi) # <--- Update this on each version release
+__version_tag=$(if git describe --tags >/dev/null 2>&1 ; then git describe --tags; else echo v4.5.2.dev6; fi) # <--- Update this on each version release
 __version_tag="${__version_tag:1}" # Remove the 'v' prefix
 
 read -r -d '' __usage <<-'EOF'
