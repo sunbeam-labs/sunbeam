@@ -5,7 +5,8 @@ on:
       types: [published]
 
     workflow_dispatch:
-
+      https://github.com/sunbeam-labs/sunbeam/releases/download/v4.5.2.dev5/sunbeam.tar.gz
+      https://github.com/sunbeam-labs/sunbeam/releases/v4.5.2.dev5/download/sunbeam.tar.gz
 jobs:
     run-tests:
         uses: ./.github/workflows/tests.yml
@@ -59,7 +60,7 @@ jobs:
           - name: Download and Extract
             shell: bash
             run: |
-              wget https://github.com/sunbeam-labs/sunbeam/releases/${{ needs.check-version.outputs.version }}/download/sunbeam.tar.gz
+              wget https://github.com/sunbeam-labs/sunbeam/releases/download/${{ needs.check-version.outputs.version }}/sunbeam.tar.gz
               mkdir sunbeam
               tar -zxf sunbeam.tar.gz -C sunbeam
               cd sunbeam && ./install.sh -e sunbeam
