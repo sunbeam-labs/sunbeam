@@ -1,5 +1,7 @@
 import gzip
+import linecache
 import os
+import tracemalloc
 import shutil
 import subprocess as sp
 import sys
@@ -8,6 +10,31 @@ from io import TextIOWrapper
 from pathlib import Path
 from sunbeamlib.parse import parse_fastq, write_fastq
 
+
+def display_top(snapshot, key_type='lineno', limit=3):
+    snapshot = snapshot.filter_traces((
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<unknown>"),
+    ))
+    top_stats = snapshot.statistics(key_type)
+
+    print("Top %s lines" % limit)
+    for index, stat in enumerate(top_stats[:limit], 1):
+        frame = stat.traceback[0]
+        # replace "/path/to/module/file.py" with "module/file.py"
+        filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+        print("#%s: %s:%s: %.1f KiB"
+              % (index, filename, frame.lineno, stat.size / 1024))
+        line = linecache.getline(frame.filename, frame.lineno).strip()
+        if line:
+            print('    %s' % line)
+
+    other = top_stats[limit:]
+    if other:
+        size = sum(stat.size for stat in other)
+        print("%s other: %.1f KiB" % (len(other), size / 1024))
+    total = sum(stat.size for stat in top_stats)
+    print("Total allocated size: %.1f KiB" % (total / 1024))
 
 def count_host_reads(fp: str, hostdict: dict, net_hostlist: set):
     hostname = os.path.basename(os.path.dirname(fp))
@@ -34,6 +61,7 @@ def write_log(f: TextIOWrapper, hostdict: OrderedDict, host: int, nonhost: int):
     )
 
 
+tracemalloc.start()
 with open(snakemake.log[0], "w") as l:
     hostdict = OrderedDict()
     done = False
@@ -44,7 +72,7 @@ with open(snakemake.log[0], "w") as l:
     host, nonhost = calculate_counts(snakemake.input.reads, net_hostlist)
 
     with open(snakemake.input.hostreads) as f:
-        if not f.readlines():
+        if not f.readline():
             s = f"WARNING: {snakemake.input.hostreads} is empty, skipping...\n"
             l.write(s)
             sys.stderr.write(s)
@@ -78,3 +106,6 @@ with open(snakemake.log[0], "w") as l:
         write_log(log, hostdict, host, nonhost)
 
     sys.stderr.write("filter_reads script finished\n")
+
+snapshot = tracemalloc.take_snapshot()
+display_top(snapshot, limit=20)
