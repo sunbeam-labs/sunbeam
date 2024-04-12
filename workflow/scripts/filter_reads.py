@@ -11,11 +11,13 @@ from pathlib import Path
 from sunbeamlib.parse import parse_fastq, write_fastq
 
 
-def display_top(snapshot, key_type='lineno', limit=3):
-    snapshot = snapshot.filter_traces((
-        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
-        tracemalloc.Filter(False, "<unknown>"),
-    ))
+def display_top(snapshot, key_type="lineno", limit=3):
+    snapshot = snapshot.filter_traces(
+        (
+            tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+            tracemalloc.Filter(False, "<unknown>"),
+        )
+    )
     top_stats = snapshot.statistics(key_type)
 
     print("Top %s lines" % limit)
@@ -23,11 +25,12 @@ def display_top(snapshot, key_type='lineno', limit=3):
         frame = stat.traceback[0]
         # replace "/path/to/module/file.py" with "module/file.py"
         filename = os.sep.join(frame.filename.split(os.sep)[-2:])
-        print("#%s: %s:%s: %.1f KiB"
-              % (index, filename, frame.lineno, stat.size / 1024))
+        print(
+            "#%s: %s:%s: %.1f KiB" % (index, filename, frame.lineno, stat.size / 1024)
+        )
         line = linecache.getline(frame.filename, frame.lineno).strip()
         if line:
-            print('    %s' % line)
+            print("    %s" % line)
 
     other = top_stats[limit:]
     if other:
@@ -36,13 +39,14 @@ def display_top(snapshot, key_type='lineno', limit=3):
     total = sum(stat.size for stat in top_stats)
     print("Total allocated size: %.1f KiB" % (total / 1024))
 
+
 def count_host_reads(fp: str, hostdict: dict) -> set:
     hostname = os.path.basename(os.path.dirname(fp))
     hostcts = int(sp.getoutput("cat {} | wc -l".format(fp)).strip())
     hostdict[hostname] = hostcts
 
     with open(fp) as f:
-        return set(l for l in f.readlines())
+        return set(l.strip() for l in f.readlines())
 
 
 def calculate_counts(fp: str, len_hostlist: int) -> tuple:
@@ -80,13 +84,12 @@ with open(snakemake.log[0], "w") as l:
     if not done:
         with gzip.open(snakemake.input.reads, "rt") as f_in, gzip.open(
             snakemake.output.reads, "wt"
-        ) as f_out, open(snakemake.input.hostreads) as f_ids:
-            ids = set(k.strip() for k in f_ids.readlines())
+        ) as f_out:
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
                 parsed_header = (
                     header_str.split(" ")[0].replace("/1", "").replace("/2", "")
                 )
-                if not parsed_header in ids:
+                if not parsed_header in net_hostlist:
                     write_fastq([header_str, seq_str, plus_str, quality_str], f_out)
 
         # Check that the output file is about the right size given the number of ids removed
