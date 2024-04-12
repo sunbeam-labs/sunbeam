@@ -36,22 +36,20 @@ def display_top(snapshot, key_type='lineno', limit=3):
     total = sum(stat.size for stat in top_stats)
     print("Total allocated size: %.1f KiB" % (total / 1024))
 
-def count_host_reads(fp: str, hostdict: dict, net_hostlist: set):
+def count_host_reads(fp: str, hostdict: dict) -> set:
     hostname = os.path.basename(os.path.dirname(fp))
     hostcts = int(sp.getoutput("cat {} | wc -l".format(fp)).strip())
     hostdict[hostname] = hostcts
 
     with open(fp) as f:
-        for l in f.readlines():
-            net_hostlist.add(l)  # Only adds unique ids
+        return set(l for l in f.readlines())
 
 
-def calculate_counts(fp: str, net_hostlist: set) -> tuple:
+def calculate_counts(fp: str, len_hostlist: int) -> tuple:
     original = int(str(sp.getoutput("zcat {} | wc -l".format(fp))).strip()) // 4
-    host = len(net_hostlist)
-    nonhost = int(original - host)
+    nonhost = int(original - len_hostlist)
 
-    return host, nonhost
+    return len_hostlist, nonhost
 
 
 def write_log(f: TextIOWrapper, hostdict: OrderedDict, host: int, nonhost: int):
@@ -67,9 +65,9 @@ with open(snakemake.log[0], "w") as l:
     done = False
     net_hostlist = set()
     for hostid in sorted(snakemake.input.hostids):
-        count_host_reads(hostid, hostdict, net_hostlist)
+        net_hostlist.update(count_host_reads(hostid, hostdict))
 
-    host, nonhost = calculate_counts(snakemake.input.reads, net_hostlist)
+    host, nonhost = calculate_counts(snakemake.input.reads, len(net_hostlist))
 
     with open(snakemake.input.hostreads) as f:
         if not f.readline():
@@ -83,7 +81,7 @@ with open(snakemake.log[0], "w") as l:
         with gzip.open(snakemake.input.reads, "rt") as f_in, gzip.open(
             snakemake.output.reads, "wt"
         ) as f_out, open(snakemake.input.hostreads) as f_ids:
-            ids = {k.strip(): 1 for k in f_ids.readlines()}
+            ids = set(k.strip() for k in f_ids.readlines())
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
                 parsed_header = (
                     header_str.split(" ")[0].replace("/1", "").replace("/2", "")
