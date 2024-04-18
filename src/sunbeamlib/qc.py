@@ -3,6 +3,7 @@ Supporting functions for QC rules.
 """
 
 import gzip
+import sys
 from pathlib import Path
 from sunbeamlib.parse import parse_fastq, write_fastq
 from typing import Set, TextIO
@@ -54,7 +55,7 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: Set[str], log: TextIO) -> None:
             log.write("IDs list empty, finished filtering\n")
 
 
-def remove_pair_id(id: str, log: TextIO) -> str:
+def remove_pair_id(id: str, log: TextIO = sys.stdout) -> str:
     """
     Removes the pair identifier from the given ID.
 
