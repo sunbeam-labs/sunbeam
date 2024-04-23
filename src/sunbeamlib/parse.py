@@ -48,7 +48,7 @@ def write_fasta(record: Tuple[str, str], f: TextIO) -> None:
 
 
 def parse_fastq(f: TextIO) -> Iterator[Tuple[str, str, str, str]]:
-    for g in grouper(f.readlines(), 4):
+    for g in grouper(f, 4):
         header_str = g[0][1:].strip()
         seq_str = g[1].strip()
         plus_str = g[2].strip()
@@ -58,11 +58,8 @@ def parse_fastq(f: TextIO) -> Iterator[Tuple[str, str, str, str]]:
 
 
 def write_fastq(record: Tuple[str, str, str, str], f: TextIO) -> None:
-    for i, l in enumerate(record):
-        if i == 0:
-            f.write(f"@{l}\n")
-        else:
-            f.write(f"{l}\n")
+    s = f"@{record[0]}\n{record[1]}\n{record[2]}\n{record[3]}\n"
+    f.write(s)
 
 
 def write_many_fastq(record_list: List[Tuple[str, str, str, str]], f: TextIO) -> None:
