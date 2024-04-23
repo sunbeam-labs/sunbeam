@@ -16,7 +16,7 @@ def filter_ids(fp_in: Path, fp_out: Path, ids: Set[str], log: TextIO) -> None:
     Args:
         fp_in (Path): Path to the input FASTQ file.
         fp_out (Path): Path to the output FASTQ file.
-        ids (List[str]): Set of IDs to filter.
+        ids (Set[str]): Set of IDs to filter.
         log (TextIO): TextIO object to write log messages.
 
     Returns:
