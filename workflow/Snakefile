@@ -130,11 +130,45 @@ MAPPING_FP = output_subdir(Cfg, "mapping")
 # ---- END DEPRECATED
 
 
-# ---- Targets rules
+# ---- Import rules
 include: "rules/targets.smk"
-# ---- Quality control rules
-include: "rules/qc.smk"
-include: "rules/decontaminate.smk"
+
+
+# Skip QC and/or decontam
+if os.environ.get("SUNBEAM_SKIP", "").lower() == "decontam":
+
+    rule skip_decontam:
+        input:
+            lambda wildcards: Samples[wildcards.sample][wildcards.rp],
+        output:
+            QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
+        log:
+            LOG_FP / "skip_decontam_{sample}_{rp}.log",
+        shell:
+            """
+            cp {input} {output}
+            """
+
+elif os.environ.get("SUNBEAM_SKIP", "").lower() == "qc":
+
+    rule skip_qc:
+        input:
+            lambda wildcards: Samples[wildcards.sample][wildcards.rp],
+        output:
+            QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
+        log:
+            LOG_FP / "skip_qc_{sample}_{rp}.log",
+        shell:
+            """
+            cp {input} {output}
+            """
+
+    include: "rules/decontaminate.smk"
+
+else:
+
+    include: "rules/qc.smk"
+    include: "rules/decontaminate.smk"
 
 
 for sbx_path, wildcards in sbxs:

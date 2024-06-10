@@ -54,6 +54,11 @@ def main(argv=sys.argv):
         help="List of extensions to exclude from run, use 'all' to exclude all extensions",
     )
     parser.add_argument(
+        "--skip",
+        default="",
+        help="Workflow to skip. Either 'qc' to skip the quality control steps or 'decontam' to skip everything in sunbeam core (QC and decontamination).",
+    )
+    parser.add_argument(
         "--docker_tag",
         default=__version__,
         help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version ($SUNBEAM_VER), a good alternative is 'latest' for the latest stable release",
@@ -89,6 +94,12 @@ def main(argv=sys.argv):
         os.environ["SUNBEAM_EXTS_INCLUDE"] = ", ".join(args.include)
     if args.exclude:
         os.environ["SUNBEAM_EXTS_EXCLUDE"] = ", ".join(args.exclude)
+
+    if args.skip not in ["", "qc", "decontam"]:
+        sys.stderr.write("Error: --skip must be either 'qc' or 'decontam'\n")
+        sys.exit(1)
+
+    os.environ["SUNBEAM_SKIP"] = args.skip
 
     os.environ["SUNBEAM_DOCKER_TAG"] = args.docker_tag
 
