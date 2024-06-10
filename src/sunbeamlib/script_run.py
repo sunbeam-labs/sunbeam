@@ -58,11 +58,6 @@ def main(argv=sys.argv):
         default=__version__,
         help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version ($SUNBEAM_VER), a good alternative is 'latest' for the latest stable release",
     )
-    parser.add_argument(
-        "--ignore_local_fs",
-        action="store_true",
-        help="Ignore local filesystem performing checks for input files",
-    )
 
     # The remaining args (after --) are passed to Snakemake
     args, remaining = parser.parse_known_args(argv)
@@ -85,7 +80,7 @@ def main(argv=sys.argv):
         )
 
     if args.include and args.exclude:
-        sys.stderr.write("Error: cannot pass both --include and --exclude\n")
+        sys.stderr.write("Error: cannot use both --include and --exclude\n")
         sys.exit(1)
 
     os.environ["SUNBEAM_EXTS_INCLUDE"] = ""
