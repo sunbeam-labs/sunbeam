@@ -37,5 +37,6 @@ EL Clarke, LJ Taylor, C Zhao *et al.* Sunbeam: an extensible pipeline for analyz
    extensions.rst
    examples.rst
    install.rst
+   dev.rst
    citation.rst
 
