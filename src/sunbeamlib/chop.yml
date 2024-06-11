@@ -1,0 +1,6 @@
+# Template for running on CHOP HPC
+
+qc:
+  host_fp: /mnt/isilon/microbiome/analysis/biodata/hosts
+sbx_kraken:
+  kraken_db_fp: '/mnt/isilon/microbiome/analysis/biodata/kraken2db/standard_20200204'
