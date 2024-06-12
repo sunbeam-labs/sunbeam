@@ -4,3 +4,7 @@ qc:
   host_fp: /mnt/isilon/microbiome/analysis/biodata/hosts
 sbx_kraken:
   kraken_db_fp: '/mnt/isilon/microbiome/analysis/biodata/kraken2db/standard_20200204'
+sbx_gene_clusters:
+  genes_fp: /mnt/isilon/microbiome/analysis/biodata/diamondIndexes/v2.1.6.160
+sbx_mapping:
+  genomes_fp: /mnt/isilon/microbiome/analysis/biodata/bwa_and_bowtie2/six_fungal_genomes
