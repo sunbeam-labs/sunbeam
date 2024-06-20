@@ -16,7 +16,7 @@ Sunbeam currently automates the following tasks:
 * Taxonomic assignment of reads to databases using [Kraken](https://github.com/DerrickWood/kraken) ([sbx_kraken](https://github.com/sunbeam-labs/sbx_kraken));
 * Assembly of reads into contigs using [Megahit](https://github.com/voutcn/megahit) ([sbx_assembly](https://github.com/sunbeam-labs/sbx_assembly));
 * Contig annotation using BLAST[n/p/x] and Diamond ([sbx_assembly](https://github.com/sunbeam-labs/sbx_assembly));
-* Mapping to reference genomes ([sbx_mapping](https://))
+* Mapping to reference genomes ([sbx_mapping](https://github.com/sunbeam-labs/sbx_mapping))
 * ORF prediction using [Prodigal](https://github.com/hyattpd/Prodigal) ([sbx_assembly](https://github.com/sunbeam-labs/sbx_assembly)).
 
 More extensions can be found at https://github.com/sunbeam-labs.
