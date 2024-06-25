@@ -41,7 +41,7 @@ def validate_paths(cfg: Dict[str, str], root: Path) -> Dict[str, Union[str, Path
             try:
                 v = makepath(v)
             except TypeError as e:
-                raise TypeError(f"Missing value for key: {k}")
+                sys.stderr.write(f"Warning: Missing value for key: {k}")
             if not v.is_absolute():
                 v = root / v
             if k != "output_fp":

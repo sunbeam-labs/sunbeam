@@ -46,7 +46,7 @@ Sunbeam Commands
     Executes the Sunbeam pipeline by calling Snakemake.
 
     .. code-block:: shell
-        sunbeam run [-h] [-m] [-s PATH] [--target_list [TARGETS, ...]] [--include [INCLUDES, ...]] [--exclude [EXCLUDE, ...]] [--docker_tag TAG] <snakemake options>
+        sunbeam run [-h] [-m] [-s PATH] [--target_list [TARGETS, ...]] [--include [INCLUDES, ...]] [--exclude [EXCLUDE, ...]] [--skip SKIP] [--docker_tag TAG] <snakemake options>
 
     .. tip::
         The ``--target_list`` option is deprecated. Pass the targets directly to ``sunbeam run`` instead.
@@ -58,6 +58,8 @@ Sunbeam Commands
        ``sunbeam run --profile /path/to/project/ all_decontam all_assembly all_annotation``
     3. The equivalent of 2, using the deprecated ``--target_list`` option:
        ``sunbeam run --profile /path/to/project/ --target_list all_decontam all_assembly all_annotation``
+    4. To run assembly on samples that have already been decontaminated:
+       ``sunbeam run --profile /path/to/project/ --skip decontam all_assembly``
 
     .. code-block:: shell
         -h/--help: Display help.
@@ -66,6 +68,7 @@ Sunbeam Commands
         --target_list: A list of targets to run successively. (DEPRECATED)
         --include: List of extensions to include in run.
         --exclude: List of extensions to exclude from run, use 'all' to exclude all extensions.
+        --skip: Either 'qc' to skip the quality control steps or 'decontam' to skip the quality control and decontamination.
         --docker_tag: Tag to use for internal environment docker images. Try 'latest' if the default tag doesn't work.
         <snakemake options>: You can pass further arguments to Snakemake, e.g: ``$ sunbeam run --cores 12``. See http://snakemake.readthedocs.io for more information.
 

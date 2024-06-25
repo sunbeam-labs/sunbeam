@@ -2,8 +2,8 @@
 
 ==================
 Software Structure
-
 ==================
+
 Overview
 ========
 Sunbeam is a snakemake pipeline with a python library acting as a wrapper (``sunbeamlib``). Calling ``sunbeam run [args] [options]`` is a call to this wrapper library which then invokes the necessary snakemake commands. The main Snakefile can be found in the ``workflow/`` directory and it makes use of rules from ``workflow/rules/`` and ``extensions/``, scripts from ``workflow/scripts/``, and environments from ``workflow/envs/``. Tests are run with pytest and live in the ``tests/`` directory. Documentation lives in ``docs/`` and is served by ReadTheDocs.

@@ -24,15 +24,14 @@ rule build_host_index:
         LOG_FP / "build_host_index_{host}.log",
     benchmark:
         BENCHMARK_FP / "build_host_index_{host}.tsv"
-    params:
-        host="{host}",
-        index_fp=Cfg["qc"]["host_fp"],
     conda:
         "../envs/qc.yml"
     container:
         get_docker_str("qc")
     shell:
-        "cd {Cfg[qc][host_fp]} && bwa index {input} 2>&1 | tee {log}"
+        """
+        bwa index {input} 2>&1 | tee {log}
+        """
 
 
 rule align_to_host:
@@ -84,7 +83,7 @@ rule aggregate_reads:
     input:
         expand(
             QC_FP / "decontam" / "intermediates" / "{host}" / "{{sample}}.ids",
-            host=HostGenomes.keys(),
+            host=HostGenomes,
         ),
     output:
         temp(QC_FP / "decontam" / "intermediates" / "{sample}_hostreads.ids"),
@@ -102,7 +101,7 @@ rule filter_reads:
         reads=QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
         hostids=expand(
             QC_FP / "decontam" / "intermediates" / "{host}" / "{{sample}}.ids",
-            host=HostGenomes.keys(),
+            host=HostGenomes,
         ),
     output:
         reads=QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
@@ -158,16 +157,13 @@ rule clean_decontam:
             rp=Pairs,
         ),
         QC_FP / ".qc_cleaned",
-    params:
-        cutadapt_fp=QC_FP / "01_cutadapt",
-        trimmomatic_fp=QC_FP / "02_trimmomatic",
-        komplexity_fp=QC_FP / "03_komplexity",
-        clean_qc_fp=QC_FP / "cleaned",
-        intermediates_fp=QC_FP / "decontam" / "intermediates",
     output:
         touch(QC_FP / ".decontam_cleaned"),
     shell:
         """
-        rm -r {params.clean_qc} || true
-        rm -r {params.intermediates} || true
+        cleaned_dir=$(dirname {input[0]})
+        qc_dir=$(dirname $cleaned_dir)
+
+        rm -r $qc_dir/cleaned || true
+        rm -r $qc_dir/decontam/intermediates || true
         """
