@@ -2,6 +2,7 @@
 #
 # Illumina quality control rules
 
+import os
 from sunbeamlib import get_docker_str
 
 
@@ -80,6 +81,11 @@ rule adapter_removal_paired:
 
 
 ruleorder: trimmomatic_paired > trimmomatic_unpaired
+
+
+# Check that the adapter template file exists
+if os.environ.get("SUNBEAM_NO_ADAPTER", None):
+    assert os.path.exists(Cfg["qc"]["adapter_template"])
 
 
 rule trimmomatic_unpaired:
