@@ -86,6 +86,8 @@ ruleorder: trimmomatic_paired > trimmomatic_unpaired
 # Check that the adapter template file exists
 if os.environ.get("SUNBEAM_NO_ADAPTER", None):
     assert os.path.exists(Cfg["qc"]["adapter_template"])
+    assert os.path.isfile(Cfg["qc"]["adapter_template"])
+    assert os.stat(Cfg["qc"]["adapter_template"]).st_size > 0
 
 
 rule trimmomatic_unpaired:
