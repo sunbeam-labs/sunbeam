@@ -35,6 +35,19 @@ Variables defined in the main Snakefile can be accessed throughout the workflow.
 - ``BENCHMARK_FP``: Path - The Path to the project's benchmarking output directory.
 - ``LOG_FP``: Path - The Path to the project's log output directory.
 
+Environment Variables
+---------------------
+
+- ``SUNBEAM_DIR``: str - The path to the Sunbeam installation directory.
+- ``SUNBEAM_VER``: str - The version of Sunbeam being run.
+- ``SUNBEAM_EXTS_INCLUDE``: str - If set, will include the given extension in the workflow (and exclude the rest). This is useful for testing individual extensions.
+- ``SUNBEAM_EXTS_EXCLUDE``: str - If set, will exclude the given extension from the workflow. This is useful for when namespaces between extensions collide (same rule name multiple times).
+- ``SUNBEAM_SKIP``: str - If set, will skip either 'qc' or 'decontam'.
+- ``SUNBEAM_DOCKER_TAG``: str - If set, will use the given tag for the Docker image instead of the default.
+- ``SUNBEAM_MIN_MEM_MB``: int - If set, will override the default minimum memory value.
+- ``SUNBEAM_MIN_RUNTIME``: int - If set, will override the default minimum runtime value.
+- ``SUNBEAM_NO_ADAPTER``: bool - If set, will not check that the adapter template file exists.
+
 tests
 =====
 
