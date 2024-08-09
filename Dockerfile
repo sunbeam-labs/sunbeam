@@ -2,6 +2,7 @@ FROM condaforge/mambaforge:latest
 
 # Setup
 WORKDIR /home/sunbeam
+ARG SUNBEAM_VER
 
 RUN mkdir -p etc/
 COPY etc/* etc/
@@ -21,12 +22,12 @@ COPY environment.yml install.sh MANIFEST.in pyproject.toml pytest.ini README.md 
 # Install sunbeam
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y git
+    apt-get install -y git vim
 RUN ./install.sh -e sunbeam -v
 
 ENV PATH="/opt/conda/envs/sunbeam/bin/:${PATH}"
 ENV SUNBEAM_DIR="/home/sunbeam"
-ENV SUNBEAM_VER="4.4.0"
+ENV SUNBEAM_VER ${SUNBEAM_VER}
 ENV SUNBEAM_MIN_MEM_MB="8000"
 ENV SUNBEAM_MIN_RUNTIME="60"
 
@@ -38,7 +39,8 @@ RUN rm -r projects
 
 # "Activate" the environment
 SHELL ["conda", "run", "-n", "sunbeam", "/bin/bash", "-c"]
-#RUN bash /opt/conda/envs/sunbeam/etc/conda/activate.d/env_vars.sh
+
+RUN echo "Python: $(python --version), Snakemake: $(snakemake --version), Conda: $(conda --version)" > installed_packages.txt
 
 # Run
 CMD "bash"

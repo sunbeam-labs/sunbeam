@@ -31,7 +31,7 @@ workflow/envs/
 -----
 This directory contains ``.yml`` files defining environments that will be managed by snakemake as it runs. Anywhere that a rule is defined with ``conda: /path/to/ENV_NAME.yml``, when snakemake reaches that rule, that environment will be created if it doesn't exist already and then activated while running the rule. These environments are created in ``sunbeam/.snakemake/`` by default.
 
-The accompanying files named something like ``ENV_NAME.ARCH.pin.txt`` are generated with ``snakedeploy``. They list all the packages and exact versions in a given environment (for the architecture they were generated on, e.g. linux-64) so that snakemake can first try to use that exact environment and only if it fails, try to solve the ``.yml`` file for itself.
+There may be accompanying files named something like ``ENV_NAME.ARCH.pin.txt`` which are generated with ``snakedeploy``. They list all the packages and exact versions in a given environment (for the architecture they were generated on, e.g. linux-64) so that snakemake can first try to use that exact environment and only if it fails, try to solve the ``.yml`` file for itself.
 
 extensions/
 -----------

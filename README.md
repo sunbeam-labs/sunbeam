@@ -4,6 +4,7 @@
 
 [![Tests](https://github.com/sunbeam-labs/sunbeam/actions/workflows/pr.yml/badge.svg)](https://github.com/sunbeam-labs/sunbeam/actions/workflows/pr.yml)
 [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=stable)](https://sunbeam.readthedocs.io/en/stable/?badge=stable)
+[![Release](https://img.shields.io/github/release/sunbeam-labs/sunbeam.svg?style=flat)](https://github.com/sunbeam-labs/sunbeam/releases/latest)
 [![DockerHub](https://img.shields.io/docker/pulls/sunbeamlabs/sunbeam)](https://hub.docker.com/repository/docker/sunbeamlabs/sunbeam/)
 [![DOI:10.1186/s40168-019-0658-x](https://img.shields.io/badge/Published%20in-Microbiome-1abc9c.svg)](https://doi.org/10.1186/s40168-019-0658-x)
 
@@ -15,7 +16,7 @@ Sunbeam currently automates the following tasks:
 * Taxonomic assignment of reads to databases using [Kraken](https://github.com/DerrickWood/kraken) ([sbx_kraken](https://github.com/sunbeam-labs/sbx_kraken));
 * Assembly of reads into contigs using [Megahit](https://github.com/voutcn/megahit) ([sbx_assembly](https://github.com/sunbeam-labs/sbx_assembly));
 * Contig annotation using BLAST[n/p/x] and Diamond ([sbx_assembly](https://github.com/sunbeam-labs/sbx_assembly));
-* Mapping to reference genomes ([sbx_mapping](https://))
+* Mapping to reference genomes ([sbx_mapping](https://github.com/sunbeam-labs/sbx_mapping))
 * ORF prediction using [Prodigal](https://github.com/hyattpd/Prodigal) ([sbx_assembly](https://github.com/sunbeam-labs/sbx_assembly)).
 
 More extensions can be found at https://github.com/sunbeam-labs.

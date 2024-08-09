@@ -25,3 +25,8 @@ def init(output_dir):
             shutil.copytree(output_dir, "output_sunbeamlib/")
         except FileExistsError as e:
             pass
+
+
+def test_makepath_on_none():
+    assert makepath(None) == Path("")
+    assert makepath("test") == Path("test")
