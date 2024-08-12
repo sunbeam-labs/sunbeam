@@ -51,15 +51,9 @@ MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 # Check for major version compatibility
 pkg_major, cfg_major = check_compatibility(config)
-if pkg_major > cfg_major:
+if pkg_major != cfg_major:
     raise SystemExit(
-        "\nThis config file was created with an older version of Sunbeam"
-        " and may not be compatible. Create a new config file using"
-        "`sunbeam init` or update this one using `sunbeam config update -i /path/to/sunbeam_config.yml`\n"
-    )
-elif pkg_major < cfg_major:
-    raise SystemExit(
-        "\nThis config file was created with an older version of Sunbeam"
+        "\nThis config file was created with a different version of Sunbeam"
         " and may not be compatible. Create a new config file using"
         "`sunbeam init` or update this one using `sunbeam config update -i /path/to/sunbeam_config.yml`\n"
     )
@@ -88,7 +82,6 @@ if Cfg["qc"]["host_fp"] == Cfg["all"]["root"]:
     HostGenomeFiles = []
 else:
     HostGenomeFiles = [f for f in Cfg["qc"]["host_fp"].glob("*.fasta")]
-    print(HostGenomeFiles)
     if not HostGenomeFiles:
         sys.stderr.write(
             "\n\nWARNING: No files detected in host genomes folder ({}). "
