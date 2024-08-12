@@ -33,7 +33,7 @@ def main(argv=sys.argv):
         "-m",
         "--mamba",
         action="store_true",
-        help="Use mamba instead of conda to manage environments",
+        help="Use mamba instead of conda to create environments",
     )
     parser.add_argument(
         "--target_list",
@@ -52,6 +52,11 @@ def main(argv=sys.argv):
         nargs="+",
         default=[],
         help="List of extensions to exclude from run, use 'all' to exclude all extensions",
+    )
+    parser.add_argument(
+        "--skip",
+        default="",
+        help="Workflow to skip. Either 'qc' to skip the quality control steps or 'decontam' to skip everything in sunbeam core (QC and decontamination).",
     )
     parser.add_argument(
         "--docker_tag",
@@ -80,7 +85,7 @@ def main(argv=sys.argv):
         )
 
     if args.include and args.exclude:
-        sys.stderr.write("Error: cannot pass both --include and --exclude\n")
+        sys.stderr.write("Error: cannot use both --include and --exclude\n")
         sys.exit(1)
 
     os.environ["SUNBEAM_EXTS_INCLUDE"] = ""
@@ -89,6 +94,12 @@ def main(argv=sys.argv):
         os.environ["SUNBEAM_EXTS_INCLUDE"] = ", ".join(args.include)
     if args.exclude:
         os.environ["SUNBEAM_EXTS_EXCLUDE"] = ", ".join(args.exclude)
+
+    if args.skip not in ["", "qc", "decontam"]:
+        sys.stderr.write("Error: --skip must be either 'qc' or 'decontam'\n")
+        sys.exit(1)
+
+    os.environ["SUNBEAM_SKIP"] = args.skip
 
     os.environ["SUNBEAM_DOCKER_TAG"] = args.docker_tag
 

@@ -43,6 +43,7 @@ qc:
   pct_id: 0.5
   frac: 0.6
   host_fp: ""
+  host_list: []
 
 # Taxonomic classifications
 classify:

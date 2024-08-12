@@ -51,15 +51,9 @@ MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 # Check for major version compatibility
 pkg_major, cfg_major = check_compatibility(config)
-if pkg_major > cfg_major:
+if pkg_major != cfg_major:
     raise SystemExit(
-        "\nThis config file was created with an older version of Sunbeam"
-        " and may not be compatible. Create a new config file using"
-        "`sunbeam init` or update this one using `sunbeam config update -i /path/to/sunbeam_config.yml`\n"
-    )
-elif pkg_major < cfg_major:
-    raise SystemExit(
-        "\nThis config file was created with an older version of Sunbeam"
+        "\nThis config file was created with a different version of Sunbeam"
         " and may not be compatible. Create a new config file using"
         "`sunbeam init` or update this one using `sunbeam config update -i /path/to/sunbeam_config.yml`\n"
     )
@@ -96,9 +90,19 @@ else:
                 Cfg["qc"]["host_fp"]
             )
         )
-HostGenomes = {
-    Path(g.name).stem: read_seq_ids(Cfg["qc"]["host_fp"] / g) for g in HostGenomeFiles
-}
+
+# Once this change has been implemented for a while we can remove the try/except
+# and just use an if/else, using the try/except for now to avoid migration pains
+# with old sunbeam configs being copied over
+try:
+    if Cfg["qc"]["host_list"]:
+        HostGenomes = Cfg["qc"]["host_list"]
+    else:
+        raise KeyError
+except KeyError:
+    HostGenomes = [Path(g.name).stem for g in HostGenomeFiles]
+    print(HostGenomes)
+
 sys.stderr.write("done.\n")
 
 
@@ -110,20 +114,54 @@ sys.stderr.write("done.\n")
 QC_FP = output_subdir(Cfg, "qc")
 BENCHMARK_FP = output_subdir(Cfg, "benchmarks")
 LOG_FP = output_subdir(Cfg, "logs")
-# ---- DEPRECATED
+# ---- BEGIN DEPRECATED
 # These paths will be moved to their respective extensions in a future version
 ASSEMBLY_FP = output_subdir(Cfg, "assembly")
 ANNOTATION_FP = output_subdir(Cfg, "annotation")
 CLASSIFY_FP = output_subdir(Cfg, "classify")
 MAPPING_FP = output_subdir(Cfg, "mapping")
-# ---- DEPRECATED
+# ---- END DEPRECATED
 
 
-# ---- Targets rules
+# ---- Import rules
 include: "rules/targets.smk"
-# ---- Quality control rules
-include: "rules/qc.smk"
-include: "rules/decontaminate.smk"
+
+
+# Skip QC and/or decontam
+if os.environ.get("SUNBEAM_SKIP", "").lower() == "decontam":
+
+    rule skip_decontam:
+        input:
+            lambda wildcards: Samples[wildcards.sample][wildcards.rp],
+        output:
+            QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
+        log:
+            LOG_FP / "skip_decontam_{sample}_{rp}.log",
+        shell:
+            """
+            cp {input} {output}
+            """
+
+elif os.environ.get("SUNBEAM_SKIP", "").lower() == "qc":
+
+    rule skip_qc:
+        input:
+            lambda wildcards: Samples[wildcards.sample][wildcards.rp],
+        output:
+            QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
+        log:
+            LOG_FP / "skip_qc_{sample}_{rp}.log",
+        shell:
+            """
+            cp {input} {output}
+            """
+
+    include: "rules/decontaminate.smk"
+
+else:
+
+    include: "rules/qc.smk"
+    include: "rules/decontaminate.smk"
 
 
 for sbx_path, wildcards in sbxs:

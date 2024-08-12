@@ -37,7 +37,7 @@ def test_version():
     assert __version__ != "0.0.0"
 
 
-def test_load_sample_list(init):
+def test_load_sample_list(init, capsys):
     output_dir = init
     samples_fp = output_dir / "samples"
     samples_fp.mkdir()
@@ -50,7 +50,10 @@ def test_load_sample_list(init):
 
     try:
         load_sample_list(sample_list_fp)
-        assert False
+        assert (
+            capsys.readouterr().err
+            == f"WARNING: File {sample1.resolve()} does not exist locally\nWARNING: File {sample2.resolve()} does not exist locally\n"
+        )
     except ValueError as e:
         pass
 
@@ -59,7 +62,10 @@ def test_load_sample_list(init):
 
     try:
         load_sample_list(sample_list_fp)
-        assert False
+        assert (
+            capsys.readouterr().err
+            == f"WARNING: File {sample2.resolve()} does not exist locally\n"
+        )
     except ValueError as e:
         pass
 
@@ -96,7 +102,7 @@ def test_guess_format_string_single_end():
     assert ret == "{sample}.fastq.gz"
 
 
-def test_verify_path(init):
+def test_verify_path(init, capsys):
     output_dir = init
 
     try:
@@ -105,11 +111,11 @@ def test_verify_path(init):
     except ValueError as e:
         pass
 
-    try:
-        _verify_path("thisdoesnotexist")
-        assert False
-    except ValueError as e:
-        pass
+    _verify_path("thisdoesnotexist")
+    assert (
+        capsys.readouterr().err
+        == "WARNING: File thisdoesnotexist does not exist locally\n"
+    )
 
     with open(output_dir / "test", "w") as f:
         f.write(" ")

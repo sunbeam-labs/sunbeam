@@ -37,13 +37,12 @@ rule adapter_removal_unpaired:
     input:
         QC_FP / "00_samples" / "{sample}_1.fastq.gz",
     output:
-        QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
+        r=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
+        ngz=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
     log:
         LOG_FP / "adapter_removal_unpaired_{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
-    params:
-        str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
     threads: 4
@@ -62,13 +61,12 @@ rule adapter_removal_paired:
     output:
         r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
         r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
+        ngz1=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
+        ngz2=temp(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
     log:
         LOG_FP / "adapter_removal_paired_{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
-    params:
-        r1=str(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
-        r2=str(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 10),
     threads: 4
@@ -177,8 +175,6 @@ rule fastqc:
         LOG_FP / "fastqc_{sample}.log",
     benchmark:
         BENCHMARK_FP / "fastqc_{sample}.tsv"
-    params:
-        outdir=QC_FP / "reports",
     resources:
         runtime=lambda wc: max(MIN_RUNTIME, 120),
     conda:
@@ -186,7 +182,12 @@ rule fastqc:
     container:
         get_docker_str("qc")
     shell:
-        "fastqc -o {params.outdir} {input.reads} -extract 2>&1 | tee {log}"
+        """
+        sample_dir=$(dirname {output[0]})
+        outdir=$(dirname $sample_dir)
+
+        fastqc -o $outdir {input.reads} -extract 2>&1 | tee {log}
+        """
 
 
 rule fastqc_report:
@@ -270,15 +271,14 @@ rule clean_qc:
             sample=Samples.keys(),
             rp=Pairs,
         ),
-    params:
-        cutadapt_fp=QC_FP / "01_cutadapt",
-        trimmomatic_fp=QC_FP / "02_trimmomatic",
-        komplexity_fp=QC_FP / "03_komplexity",
     output:
         touch(QC_FP / ".qc_cleaned"),
     shell:
         """
-        rm -r {params.cutadapt_fp} || true
-        rm -r {params.trimmomatic_fp} || true
-        rm -r {params.komplexity_fp} || true
+        cleaned_dir=$(dirname {input[0]})
+        qc_dir=$(dirname $cleaned_dir)
+
+        rm -r $qc_dir/01_cutadapt || true
+        rm -r $qc_dir/02_trimmomatic || true
+        rm -r $qc_dir/03_komplexity || true
         """

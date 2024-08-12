@@ -159,6 +159,19 @@ Then you submit the job:
 
     sbatch run_sunbeam.sh
 
+Skipping the QC and Decontamination
+===================================
+
+This time you're coming at sunbeam with a data set that you have already run QC on and removed host reads from. You want to run the assembly pipeline on this data. Your data is paired end and lives in a directory called ``/data``. Run:
+
+.. code-block:: bash
+
+    sunbeam extend https://github.com/sunbeam-labs/sbx_assembly
+    sunbeam init --data_fp /data/ /projects/my_project/
+    sunbeam run --profile /projects/my_project --skip decontam all_assembly
+
+Once this run completes, you will have a directory called ``/projects/my_project/sunbeam_output/`` that contains all of the output from the run. Look in ``/projects/my_project/sunbeam_output/assembly/contigs/`` for the assembled contigs.
+
 Running on AWS Batch with AWS S3 Data
 ======================================
 
