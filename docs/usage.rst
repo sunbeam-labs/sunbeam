@@ -284,12 +284,17 @@ Running
 To run Sunbeam, make sure you've activated the sunbeam environment. Then run:
 
 .. code-block:: shell
+
    sunbeam run --profile path/to/project/
    
 There are many options that you can use to determine which outputs you want. By default, if nothing is specified, this runs the entire pipeline. However, each section is broken up into subsections that can be called individually, and will only execute the steps necessary to get their outputs. These are specified after the command above and consist of the following:
 
 * ``all_qc``: basic quality control on all reads
 * ``all_decontam``: quality control and host read removal on all samples
+* ``all_assembly``: assemble contigs on all samples
+* ``all_mapping``: map all samples to target genomes
+* ``all_classify``: taxonomic classification on all samples
+* ``all_annontate``: annotate contigs on all samples
 
 To use one of these options, simply run it like so:
 
