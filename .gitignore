@@ -1,5 +1,16 @@
 # Custom
-
+*.fasta.amb
+*.fasta.ann
+*.fasta.bwt
+*.fasta.pac
+*.fasta.sa
+extensions/*/
+.conda/
+*.condarc
+.java/
+.snakemake/
+projects/
+*.pem
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
