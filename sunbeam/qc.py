@@ -5,7 +5,7 @@ Supporting functions for QC rules.
 import gzip
 import sys
 from pathlib import Path
-from sunbeamlib.parse import parse_fastq, write_fastq
+from sunbeam.parse import parse_fastq, write_fastq
 from typing import Set, TextIO
 
 

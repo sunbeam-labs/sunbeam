@@ -3,11 +3,13 @@ import sys
 import argparse
 import subprocess
 from pathlib import Path
+from sunbeam import __version__
 
-from sunbeamlib import __version__
 
+def main(argv: list[str] = sys.argv):
+    """CLI entry point for running Sunbeam.
+    """
 
-def main(argv=sys.argv):
     epilog_str = (
         "You can pass further arguments to Snakemake after --, e.g:\n"
         "    $ sunbeam run -- --cores 12\n"
@@ -116,7 +118,7 @@ def main(argv=sys.argv):
         + remaining
         + args.target_list
     )
-    sys.stderr.write("Running: " + " ".join(snakemake_args))
+    sys.stderr.write("Running: " + " ".join(snakemake_args) + "\n")
 
     cmd = subprocess.run(snakemake_args)
 

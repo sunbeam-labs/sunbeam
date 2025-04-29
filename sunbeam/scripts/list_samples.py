@@ -2,10 +2,8 @@ import sys
 from pathlib import Path
 import argparse
 import csv
-
 from snakemake.utils import listfiles
-
-from sunbeamlib import guess_format_string, SampleFormatError, MissingMatePairError
+from sunbeam import guess_format_string, SampleFormatError, MissingMatePairError
 
 
 def main(argv=sys.argv):

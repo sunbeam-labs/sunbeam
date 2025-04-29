@@ -4,8 +4,7 @@ import yaml
 from pathlib import Path
 from pkg_resources import resource_stream
 from typing import Dict, TextIO, Tuple, Union
-
-from sunbeamlib import __version__, Version
+from sunbeam import __version__, Version
 
 
 def makepath(path: str) -> Path:

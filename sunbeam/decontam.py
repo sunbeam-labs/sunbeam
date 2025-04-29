@@ -1,6 +1,6 @@
 from typing import Dict, Iterator, Tuple, Union
 
-from sunbeamlib.parse import parse_sam
+from sunbeam.parse import parse_sam
 
 
 def get_mapped_reads(fp: str, min_pct_id: float, min_len_frac: float) -> Iterator[str]:

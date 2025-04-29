@@ -1,12 +1,11 @@
 import argparse
 import sys
-
-import sunbeamlib
-from sunbeamlib.script_run import main as Run
-from sunbeamlib.script_init import main as Init
-from sunbeamlib.script_config import main as Config
-from sunbeamlib.script_list_samples import main as ListSamples
-from sunbeamlib.script_extend import main as Extend
+from sunbeam import __version__
+from sunbeam.scripts.config import main as Config
+from sunbeam.scripts.extend import main as Extend
+from sunbeam.scripts.init import main as Init
+from sunbeam.scripts.list_samples import main as ListSamples
+from sunbeam.scripts.run import main as Run
 
 
 def main():
@@ -18,7 +17,7 @@ def main():
         "  config       \tModify or update config files.\n"
         "  list_samples \tMake a list of samples from a directory.\n"
         "  extend       \tAdd an extension.\n"
-    ).format(version=sunbeamlib.__version__)
+    ).format(version=__version__)
 
     parser = argparse.ArgumentParser(
         prog="sunbeam",
@@ -34,7 +33,7 @@ def main():
         "-v",
         "--version",
         action="version",
-        version=sunbeamlib.__version__,
+        version=__version__,
     )
 
     args, remaining = parser.parse_known_args()

@@ -31,7 +31,7 @@ class Version:
         return f"{self.major}.{self.minor}.{self.patch}"
 
 
-__version__ = str(Version(os.environ.get("SUNBEAM_VER", "0.0.0")))
+__version__ = "4.7.0"
 __author__ = "Erik Clarke"
 __license__ = "GPL2+"
 

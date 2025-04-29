@@ -4,14 +4,13 @@ import sys
 import argparse
 import yaml
 from pathlib import Path
-
-from sunbeamlib.script_list_samples import (
+from sunbeam.scripts.list_samples import (
     build_sample_list,
     MissingMatePairError,
     SampleFormatError,
     check_existing,
 )
-from sunbeamlib import config
+from sunbeam import config
 
 
 def main(argv=sys.argv):

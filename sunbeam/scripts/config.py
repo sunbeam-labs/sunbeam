@@ -2,7 +2,7 @@ import sys
 import yaml
 import argparse
 
-from sunbeamlib import config
+from sunbeam import config
 
 
 def main(argv):
