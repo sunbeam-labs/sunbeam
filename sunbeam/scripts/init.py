@@ -13,12 +13,10 @@ def main(argv=sys.argv):
 
     project_fp = Path(args.project_fp)
     if project_fp.exists() and not args.force:
-        raise SystemExit(
-            "Error: project folder already exists. Use -f to overwrite."
-        )
+        raise SystemExit("Error: project folder already exists. Use -f to overwrite.")
     if args.force:
         shutil.rmtree(project_fp, ignore_errors=True)
-    
+
     project_fp.mkdir(parents=True, exist_ok=True)
 
     profile_fp = CONFIGS_DIR / f"{args.profile}_profile.yaml"

@@ -48,9 +48,10 @@ with open(snakemake.log[0], "w") as log:
             sys.exit(e.returncode)
         log.write(cutadapt_output.decode())
 
-        with open(snakemake.output.ngz) as f_in, gzip.open(
-            snakemake.output.r, "wt"
-        ) as f_out:
+        with (
+            open(snakemake.output.ngz) as f_in,
+            gzip.open(snakemake.output.r, "wt") as f_out,
+        ):
             f_out.writelines(f_in.readlines())
     else:
         log.write("Adapters not found, skipping adapter removal...")

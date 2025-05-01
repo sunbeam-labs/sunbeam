@@ -63,12 +63,14 @@ def test_config_from_file(tmp_path):
 
 
 def test_config_to_file(tmp_path):
-    sc = SunbeamConfig({
-        "all": {
-            "root": "/path/to/root",
-            "version": __version__,
+    sc = SunbeamConfig(
+        {
+            "all": {
+                "root": "/path/to/root",
+                "version": __version__,
+            }
         }
-    })
+    )
 
     config_fp = tmp_path / "config.yml"
     sc.to_file(config_fp)
@@ -82,12 +84,14 @@ def test_fill_missing(test_extension):
     root_fp = Path("root") / "root"
     ext_dir = test_extension
 
-    sc = SunbeamConfig({
-        "all": {
-            "root": str(root_fp),
-            "version": __version__,
+    sc = SunbeamConfig(
+        {
+            "all": {
+                "root": str(root_fp),
+                "version": __version__,
+            }
         }
-    })
+    )
 
     assert "sbx_test_extension" not in sc.config
 
@@ -100,15 +104,17 @@ def test_fill_missing_doesnt_overwrite(test_extension):
     root_fp = Path("root") / "root"
     ext_dir = test_extension
 
-    sc = SunbeamConfig({
-        "all": {
-            "root": str(root_fp),
-            "version": __version__,
-        },
-        "sbx_test_extension": {
-            "bloop": "not_blorp",
+    sc = SunbeamConfig(
+        {
+            "all": {
+                "root": str(root_fp),
+                "version": __version__,
+            },
+            "sbx_test_extension": {
+                "bloop": "not_blorp",
+            },
         }
-    })
+    )
 
     assert sc.config["sbx_test_extension"]["bloop"] == "not_blorp"
 

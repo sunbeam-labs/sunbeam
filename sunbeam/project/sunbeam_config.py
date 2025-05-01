@@ -4,24 +4,25 @@ from sunbeam import __version__, EXTENSIONS_DIR
 from typing import Dict, Union
 
 
-class SunbeamConfig():
+class SunbeamConfig:
     """
     Sunbeam configuration file
-    
+
     Defining samples:
       Run 'sunbeam list_samples <data_dir>' to create a list of samples and
       associated fastq.gz files. Samples must be in gzipped fastq format.
-    
+
     Paths:
       Paths are resolved through the following rules:
         1. If the path is absolute, the path is parsed as-is
         2. If the path is not absolute, the path at 'root' is appended to it
         3. If the path is not 'output_fp', the path is checked to ensure it exists
-    
+
     Suffixes:
       Each subsection contains a 'suffix' key that defines the folder under
        'output_fp' where the results of that section are put.
     """
+
     def __init__(self, config: Dict[str, Union[str, Dict]] = {}):
         self.config = config
 
@@ -30,9 +31,11 @@ class SunbeamConfig():
         with open(config_fp) as f:
             config = yaml.safe_load(f)
         return cls(config)
-    
+
     @classmethod
-    def from_template(cls, template_fp: Path, root_fp: Path, extensions_dir: Path = EXTENSIONS_DIR) -> "SunbeamConfig":
+    def from_template(
+        cls, template_fp: Path, root_fp: Path, extensions_dir: Path = EXTENSIONS_DIR
+    ) -> "SunbeamConfig":
         with open(template_fp) as f:
             config = dict(yaml.safe_load(f))
 
@@ -49,12 +52,11 @@ class SunbeamConfig():
                         config = {**config, **ext_config}
 
         return cls(config)
-    
+
     def to_file(self, config_fp: Path):
         with open(config_fp, "w") as f:
             yaml.safe_dump(self.config, f)
 
-    
     def fill_missing(self, extensions_dir: Path = EXTENSIONS_DIR):
         """
         Fill in missing extension config values with defaults
@@ -74,7 +76,6 @@ class SunbeamConfig():
                                     if sub_key not in self.config[key]:
                                         self.config[key][sub_key] = sub_value
 
-    
     @staticmethod
     def get_extensions(extensions_dir: Path = EXTENSIONS_DIR) -> dict[str, Path]:
         """
@@ -86,15 +87,15 @@ class SunbeamConfig():
                 extensions[ext_dir.name] = ext_dir
 
         return extensions
-    
 
     @staticmethod
     def get_extension_rules(extension_fp: Path) -> list[Path]:
         # Find all .smk and .rules files in the extension directory using glob
-        return list(extension_fp.glob("**/*.smk")) + list(extension_fp.glob("**/*.rules"))
-    
+        return list(extension_fp.glob("**/*.smk")) + list(
+            extension_fp.glob("**/*.rules")
+        )
 
-    def resolved_paths(self) -> dict[str, Path|str]:
+    def resolved_paths(self) -> dict[str, Path | str]:
         """
         Resolve all paths in the config file (any field ending in "_fp")
         Relative paths are resolved relative to the 'root' key

@@ -7,7 +7,9 @@ __author__ = "Erik Clarke"
 __license__ = "GPL2+"
 
 
-EXTENSIONS_DIR = Path(os.environ.get("SUNBEAM_EXTENSIONS", Path(__file__).parent.resolve() / "extensions"))
+EXTENSIONS_DIR = Path(
+    os.environ.get("SUNBEAM_EXTENSIONS", Path(__file__).parent.resolve() / "extensions")
+)
 WORKFLOW_DIR = Path(__file__).parent.resolve() / "workflow"
 CONFIGS_DIR = Path(__file__).parent.resolve() / "configs"
 

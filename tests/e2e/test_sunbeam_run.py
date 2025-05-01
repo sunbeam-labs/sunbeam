@@ -7,7 +7,7 @@ from sunbeam.scripts.run import main as Run
 
 def test_sunbeam_run(tmp_path, DATA_DIR):
     project_dir = tmp_path / "test"
-    
+
     Init(
         [
             str(project_dir),
@@ -16,12 +16,16 @@ def test_sunbeam_run(tmp_path, DATA_DIR):
         ]
     )
 
-    Run(
-        [
-            "--profile",
-            str(project_dir),
-        ]
-    )
+    with pytest.raises(SystemExit) as excinfo:
+        Run(
+            [
+                "--profile",
+                str(project_dir),
+                "--exclude",
+                "all",
+            ]
+        )
+    assert excinfo.value.code == 0
 
     sunbeam_output = project_dir / "sunbeam_output"
     assert sunbeam_output.exists()

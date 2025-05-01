@@ -53,9 +53,10 @@ with open(snakemake.log[0], "w") as l:
 
     # Perform filtering if host reads file is not empty
     if not done:
-        with gzip.open(snakemake.input.reads, "rt") as f_in, gzip.open(
-            snakemake.output.reads, "wt"
-        ) as f_out:
+        with (
+            gzip.open(snakemake.input.reads, "rt") as f_in,
+            gzip.open(snakemake.output.reads, "wt") as f_out,
+        ):
             for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
                 parsed_header = (
                     header_str.split(" ")[0].replace("/1", "").replace("/2", "")

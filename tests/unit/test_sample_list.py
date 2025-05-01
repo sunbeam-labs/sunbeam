@@ -31,7 +31,10 @@ def test_bad_sample_names(tmp_path):
     sl = SampleList()
     output_fp = tmp_path / "sample_list.csv"
     sl.samples["BAD SAMPLE NAME"] = {"r1": "test_r1.fastq.gz", "r2": "test_r2.fastq.gz"}
-    sl.samples["bad_sample/name"] = {"r1": "test2_r1.fastq.gz", "r2": "test2_r2.fastq.gz"}
+    sl.samples["bad_sample/name"] = {
+        "r1": "test2_r1.fastq.gz",
+        "r2": "test2_r2.fastq.gz",
+    }
     sl.to_file(output_fp)
 
     with pytest.raises(ValueError):
@@ -43,7 +46,7 @@ def test_duplicate_samples(tmp_path):
     output_fp = tmp_path / "sample_list.csv"
     sl.samples["LONG"] = {"r1": "test_r1.fastq.gz", "r2": "test_r2.fastq.gz"}
     sl.to_file(output_fp)
-    
+
     with open(output_fp, "a") as f:
         f.write("LONG,test1_r1.fastq.gz,test1_r2.fastq.gz\n")
 

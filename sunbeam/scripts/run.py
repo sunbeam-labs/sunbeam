@@ -7,8 +7,7 @@ from sunbeam import __version__
 
 
 def main(argv: list[str] = sys.argv):
-    """CLI entry point for running Sunbeam.
-    """
+    """CLI entry point for running Sunbeam."""
 
     epilog_str = (
         "You can pass further arguments to Snakemake after --, e.g:\n"
@@ -99,20 +98,17 @@ def main(argv: list[str] = sys.argv):
         sys.exit(1)
     configfile = Path(profile) / "sunbeam_config.yml"
 
-    snakemake_args = (
-        [
-            "snakemake",
-            "--snakefile",
-            str(snakefile),
-            "--conda-prefix",
-            str(conda_prefix),
-            "--conda-frontend",
-            conda_cmd,
-            "--configfile",
-            str(configfile),
-        ]
-        + remaining
-    )
+    snakemake_args = [
+        "snakemake",
+        "--snakefile",
+        str(snakefile),
+        "--conda-prefix",
+        str(conda_prefix),
+        "--conda-frontend",
+        conda_cmd,
+        "--configfile",
+        str(configfile),
+    ] + remaining
     sys.stderr.write("Running: " + " ".join(snakemake_args) + "\n")
 
     cmd = subprocess.run(snakemake_args)

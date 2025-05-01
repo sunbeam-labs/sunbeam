@@ -108,25 +108,20 @@ else:
 for sbx_name, sbx_fp in sbxs.items():
     if os.getenv("SUNBEAM_EXTS_INCLUDE", ""):
         if not sbx_name in os.environ["SUNBEAM_EXTS_INCLUDE"].split(", "):
-            sys.stderr.write(
-                f"Excluding extension {sbx_name} in folder {sbx_fp}\n"
-            )
+            sys.stderr.write(f"Excluding extension {sbx_name} in folder {sbx_fp}\n")
             continue
     if os.getenv("SUNBEAM_EXTS_EXCLUDE", ""):
         if (
             sbx_name in os.environ["SUNBEAM_EXTS_EXCLUDE"].split(", ")
             or os.environ["SUNBEAM_EXTS_EXCLUDE"] == "all"
         ):
-            sys.stderr.write(
-                f"Excluding extension {sbx_name} in folder {sbx_fp}\n"
-            )
+            sys.stderr.write(f"Excluding extension {sbx_name} in folder {sbx_fp}\n")
             continue
 
-    sys.stderr.write(
-        f"Including extension {sbx_name} in folder {sbx_fp}\n"
-    )
+    sys.stderr.write(f"Including extension {sbx_name} in folder {sbx_fp}\n")
 
     for rule_fp in SunbeamConfig.get_extension_rules(sbx_fp):
+
         include: rule_fp
 
 

@@ -4,8 +4,10 @@ import string
 from pathlib import Path
 
 
-class SampleList():
-    def __init__(self, fp: Path = None, paired_end: bool = True, format_str: str = None):
+class SampleList:
+    def __init__(
+        self, fp: Path = None, paired_end: bool = True, format_str: str = None
+    ):
         self.paired_end = paired_end
         self.samples = {}
 
@@ -18,7 +20,6 @@ class SampleList():
         if self.samples:
             self.check()
 
-    
     def check(self):
         """
         Check the sample list for duplicates, missing values, and invalid values.
@@ -34,9 +35,9 @@ class SampleList():
 
             if "r1" not in data or (self.paired_end and "r2" not in data):
                 raise ValueError(f"Missing read files for sample: {sample}")
-            
+
             # Custom function for checking file existence (handle local and remote data sources)
-            
+
     def load_from_file(self, fp: Path) -> dict[str, dict[str, str]]:
         """
         Load a sample list from a file.
@@ -51,23 +52,32 @@ class SampleList():
 
         return samples
 
-
-    def load_from_dir(self, fp: Path, format_str: str = None) -> dict[str, dict[str, str]]:
+    def load_from_dir(
+        self, fp: Path, format_str: str = None
+    ) -> dict[str, dict[str, str]]:
         """
         Load a sample list from a directory.
         """
         samples = {}
-        fnames = [f for f in fp.iterdir() if f.is_file() and f.name.endswith(".fastq.gz")]
+        fnames = [
+            f for f in fp.iterdir() if f.is_file() and f.name.endswith(".fastq.gz")
+        ]
         if len(fnames) == 0:
             raise ValueError("No gzipped FASTQ files found in the directory.")
-        
-        pattern = self.format_string_to_regex(format_str) if format_str else self.guess_format_string(fnames)
+
+        pattern = (
+            self.format_string_to_regex(format_str)
+            if format_str
+            else self.guess_format_string(fnames)
+        )
         print(f"Guessed format string: {pattern}")
         for f in fnames:
             match = re.match(pattern, f.name)
             if not match:
-                raise ValueError(f"Filename {f.name} does not match format string {pattern}")
-            
+                raise ValueError(
+                    f"Filename {f.name} does not match format string {pattern}"
+                )
+
             sample = match.group("sample")
             if sample not in samples:
                 samples[sample] = {"r1": None, "r2": None}
@@ -81,13 +91,14 @@ class SampleList():
                 samples[sample]["r1"] = f
 
         return samples
-    
 
     def guess_format_string(self, fnames: list[Path]) -> re.Pattern:
         patterns = [
             re.compile(r"(?P<sample>.+)_R(?P<rp>[12])(_[A-Za-z0-9]+)*\.fastq\.gz"),
             re.compile(r"(?P<sample>.+)_(?P<rp>[12])(_[A-Za-z0-9]+)*\.fastq\.gz"),
-            re.compile(r"(?P<sample>.+)_S\d+_L\d+_R(?P<rp>[12])_001\.fastq\.gz"),  # Illumina-style
+            re.compile(
+                r"(?P<sample>.+)_S\d+_L\d+_R(?P<rp>[12])_001\.fastq\.gz"
+            ),  # Illumina-style
             re.compile(r"(?P<sample>.+)_R(?P<rp>[12])_.*\.fastq\.gz"),
             re.compile(r"(?P<sample>.+)_(?P<rp>[12])_.*\.fastq\.gz"),
             re.compile(r"(?P<rp>[12])_(?P<sample>.+)\.fastq\.gz"),
@@ -104,7 +115,6 @@ class SampleList():
                     return pattern
 
         raise ValueError(f"Could not guess format string from filenames: {fnames}")
-    
 
     @staticmethod
     def format_string_to_regex(format_str: str) -> re.Pattern:
@@ -114,7 +124,9 @@ class SampleList():
         regex = ""
         formatter = string.Formatter()
 
-        for literal_text, field_name, format_spec, conversion in formatter.parse(format_str):
+        for literal_text, field_name, format_spec, conversion in formatter.parse(
+            format_str
+        ):
             regex += re.escape(literal_text)
             if field_name == "sample":
                 regex += r"(?P<sample>.+?)"
@@ -124,8 +136,6 @@ class SampleList():
                 regex += rf"(?P<{field_name}>.+?)"
 
         return re.compile(regex)
-
-    
 
     def to_file(self, fp: Path):
         """
@@ -139,7 +149,6 @@ class SampleList():
                     row["r2"] = data["r2"]
                 writer.writerow(row)
 
-    
     def generate_subset(self, func: callable) -> "SampleList":
         """
         Generate a subset of the sample list based on a function. The function takes three args:
@@ -150,7 +159,7 @@ class SampleList():
             if func(sample, data["r1"], data.get("r2")):
                 subset.samples[sample] = data
         return subset
-    
+
     def get_samples(self):
         """
         Getting samples in a format that is backwards compatible
@@ -163,5 +172,5 @@ class SampleList():
                 samples[sample]["1"] = samples[sample].pop("r1")
             if "r2" in samples[sample]:
                 samples[sample]["2"] = samples[sample].pop("r2")
-                
+
         return samples
