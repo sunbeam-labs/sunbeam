@@ -13,21 +13,7 @@ def DATA_DIR() -> Path:
 
 
 @pytest.fixture(autouse=True)
-def set_extension_dir(tmp_path, monkeypatch):
-    ext_dir = tmp_path / "extensions"
-    ext_dir.mkdir(parents=True, exist_ok=True)
-    monkeypatch.setenv("SUNBEAM_EXTENSIONS", str(ext_dir))
-
-    yield ext_dir
-
-    shutil.rmtree(ext_dir)
-
-
-@pytest.fixture(autouse=True)
 def set_extension_dir(monkeypatch, tmp_path):
-    """
-    Set the extension directory to a temporary path for testing.
-    """
     ext_dir = tmp_path / "extensions"
     ext_dir.mkdir(parents=True, exist_ok=True)
     monkeypatch.setenv("SUNBEAM_EXTENSIONS", str(ext_dir))
