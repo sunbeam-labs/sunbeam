@@ -21,11 +21,8 @@ def get_docker_str(repo: str, user: str = "sunbeamlabs") -> str:
 
 
 def get_ext_path(ext_name: str) -> Path:
-    try:
-        ext_path = Path(os.environ["SUNBEAM_DIR"]) / "extensions" / ext_name
-    except KeyError:
-        raise ValueError("SUNBEAM_DIR not set in environment.")
+    ext_path = EXTENSIONS_DIR() / ext_name
 
     if ext_path.exists():
         return ext_path
-    raise ValueError(f"Extension {ext_name} not found in {os.environ['SUNBEAM_DIR']}.")
+    raise ValueError(f"Extension {ext_name} not found in {EXTENSIONS_DIR()}.")
