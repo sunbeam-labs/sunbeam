@@ -83,10 +83,13 @@ class SunbeamConfig:
                                         self.config[key][sub_key] = sub_value
 
     @staticmethod
-    def get_extensions(extensions_dir: Path) -> dict[str, Path]:
+    def get_extensions(extensions_dir: Path = None) -> dict[str, Path]:
         """
         Get a list of all extensions in the extensions directory
         """
+        if not extensions_dir:
+            extensions_dir = EXTENSIONS_DIR()
+
         extensions = {}
         for ext_dir in extensions_dir.iterdir():
             if ext_dir.is_dir() and ext_dir.name.startswith("sbx"):
