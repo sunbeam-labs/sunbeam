@@ -28,6 +28,9 @@ class SunbeamConfig:
 
     @classmethod
     def from_file(cls, config_fp: Path) -> "SunbeamConfig":
+        """
+        Create a SunbeamConfig object from a file
+        """
         with open(config_fp) as f:
             config = yaml.safe_load(f)
         return cls(config)
@@ -36,6 +39,9 @@ class SunbeamConfig:
     def from_template(
         cls, template_fp: Path, root_fp: Path, extensions_dir: Path = None
     ) -> "SunbeamConfig":
+        """
+        Create a SunbeamConfig object from a template file
+        """
         if not extensions_dir:
             extensions_dir = EXTENSIONS_DIR()
 
@@ -57,6 +63,9 @@ class SunbeamConfig:
         return cls(config)
 
     def to_file(self, config_fp: Path):
+        """
+        Write the config to a file
+        """
         with open(config_fp, "w") as f:
             yaml.safe_dump(self.config, f)
 
@@ -99,10 +108,20 @@ class SunbeamConfig:
 
     @staticmethod
     def get_extension_rules(extension_fp: Path) -> list[Path]:
-        # Find all .smk and .rules files in the extension directory using glob
+        """
+        Find all .smk and .rules files in the extension directory using glob
+        """
         return list(extension_fp.glob("**/*.smk")) + list(
             extension_fp.glob("**/*.rules")
         )
+
+    @staticmethod
+    def output_subdir(cfg: dict[str, dict[str, str]], section: str) -> Path:
+        """
+        Get the output subdirectory for a given section
+        Weird that it's a static method and doesn't make use of self but it's done for backwards compatibility
+        """
+        return cfg["all"]["output_fp"] / cfg[section]["suffix"]
 
     def resolved_paths(self) -> dict[str, Path | str]:
         """

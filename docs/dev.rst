@@ -21,8 +21,8 @@ The ``bfx/`` directory contains bioinformatics utilties, used in the pipeline fo
 
 .. automodule:: sunbeam.bfx
     :members:
-
-    :autofunction:: sunbeam.bfx.decontam.get_mapped_reads
+    :imported-members:
+    :undoc-members:
 
 configs
 -------
@@ -48,6 +48,11 @@ scripts
 -------
 
 The ``scripts/`` directory contains scripts for running the pipeline and managing the workflow.
+
+.. automodule:: sunbeam.scripts
+    :members:
+    :imported-members:
+    :undoc-members:
 
 workflow
 --------
