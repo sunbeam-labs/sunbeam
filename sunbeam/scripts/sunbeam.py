@@ -23,15 +23,10 @@ def main():
         parser.print_help()
         sys.stderr.write("Unrecognized command.\n")
 
+
 def main_parser():
     usage_str = "%(prog)s [-h/--help,-v/--version] <subcommand>"
-    description_str = (
-        "subcommands:\n"
-        "  init         \tCreate a new config file for a project using local or SRA data.\n"
-        "  run          \tExecute the pipeline.\n"
-        "  config       \tModify or update config files.\n"
-        "  extend       \tAdd an extension.\n"
-    ).format(version=__version__)
+    description_str = "Sunbeam subcommands: init, run, config, extend"
 
     parser = argparse.ArgumentParser(
         prog="sunbeam",
@@ -48,6 +43,12 @@ def main_parser():
         "--version",
         action="version",
         version=__version__,
+    )
+    parser.add_argument(
+        "-h",
+        "--help",
+        action="help",
+        help="Show this help message and exit.",
     )
 
     return parser

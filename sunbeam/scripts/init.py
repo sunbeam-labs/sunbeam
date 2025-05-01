@@ -9,7 +9,8 @@ from sunbeam.project.sunbeam_profile import SunbeamProfile
 
 
 def main(argv=sys.argv):
-    args = parse_args(argv)
+    parser = main_parser()
+    args = parser.parse_args(argv)
 
     project_fp = Path(args.project_fp)
     if project_fp.exists() and not args.force:
@@ -35,7 +36,7 @@ def main(argv=sys.argv):
         sample_list.to_file(project_fp / "samples.csv")
 
 
-def parse_args(argv):
+def main_parser():
     description_str = (
         "Initialize a new Sunbeam project in a given directory, creating "
         "a new config file and (optionally) a sample list."
@@ -90,8 +91,4 @@ def parse_args(argv):
         help="name of the profile template to use (e.g. default, slurm) (default: default)",
     )
 
-    # argparse doesn't support complete argument groups that are mutually
-    # exclusive (need to do subparsers/subcommands) but this seems good enough:
-    # https://stackoverflow.com/a/27675614
-    args = parser.parse_args(argv)
-    return args
+    return parser

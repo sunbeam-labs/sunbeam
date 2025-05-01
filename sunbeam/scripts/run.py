@@ -8,51 +8,7 @@ from sunbeam import __version__
 
 def main(argv: list[str] = sys.argv):
     """CLI entry point for running Sunbeam."""
-
-    epilog_str = (
-        "You can pass further arguments to Snakemake after --, e.g:\n"
-        "    $ sunbeam run -- --cores 12\n"
-        "See http://snakemake.readthedocs.io for more information.\n"
-        " "
-    )
-
-    parser = argparse.ArgumentParser(
-        "sunbeam run",
-        usage="%(prog)s [options] -- <snakemake options>",
-        description="Executes the Sunbeam pipeline by calling Snakemake.",
-        epilog=epilog_str,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument(
-        "-m",
-        "--mamba",
-        action="store_true",
-        help="Use mamba instead of conda to create environments",
-    )
-    parser.add_argument(
-        "--include",
-        nargs="+",
-        default=[],
-        help="List of extensions to include in run",
-    )
-    parser.add_argument(
-        "--exclude",
-        nargs="+",
-        default=[],
-        help="List of extensions to exclude from run, use 'all' to exclude all extensions",
-    )
-    parser.add_argument(
-        "--skip",
-        default="",
-        help="Workflow to skip. Either 'qc' to skip the quality control steps or 'decontam' to skip everything in sunbeam core (QC and decontamination).",
-    )
-    parser.add_argument(
-        "--docker_tag",
-        default=__version__,
-        help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version ($SUNBEAM_VER), a good alternative is 'latest' for the latest stable release",
-    )
-
-    # The remaining args are passed to Snakemake
+    parser = main_parser()
     args, remaining = parser.parse_known_args(argv)
 
     snakefile = Path(__file__).parent.parent / "workflow" / "Snakefile"
@@ -114,3 +70,50 @@ def main(argv: list[str] = sys.argv):
     cmd = subprocess.run(snakemake_args)
 
     sys.exit(cmd.returncode)
+
+
+def main_parser():
+    epilog_str = (
+        "You can pass further arguments to Snakemake after --, e.g:\n"
+        "    $ sunbeam run -- --cores 12\n"
+        "See http://snakemake.readthedocs.io for more information.\n"
+        " "
+    )
+
+    parser = argparse.ArgumentParser(
+        "sunbeam run",
+        usage="%(prog)s [options] -- <snakemake options>",
+        description="Executes the Sunbeam pipeline by calling Snakemake.",
+        epilog=epilog_str,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "-m",
+        "--mamba",
+        action="store_true",
+        help="Use mamba instead of conda to create environments",
+    )
+    parser.add_argument(
+        "--include",
+        nargs="+",
+        default=[],
+        help="List of extensions to include in run",
+    )
+    parser.add_argument(
+        "--exclude",
+        nargs="+",
+        default=[],
+        help="List of extensions to exclude from run, use 'all' to exclude all extensions",
+    )
+    parser.add_argument(
+        "--skip",
+        default="",
+        help="Workflow to skip. Either 'qc' to skip the quality control steps or 'decontam' to skip everything in sunbeam core (QC and decontamination).",
+    )
+    parser.add_argument(
+        "--docker_tag",
+        default=__version__,
+        help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version, a good alternative is 'latest' for the latest stable release",
+    )
+
+    return parser
