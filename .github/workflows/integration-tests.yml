@@ -60,6 +60,8 @@ jobs:
             - name: Check output
               shell: bash
               run: |
+                ls -l .snakemake/
+                ls -l .snakemake/slurm_logs/
                 ls -l .snakemake/slurm_logs/ | grep "rule_test"
     
     test-apptainer:
@@ -81,5 +83,6 @@ jobs:
             - name: Run Sunbeam
               shell: bash
               run: |
+                export APPTAINER_NO_NAMESPACE=yes
                 sunbeam init --data_fp tests/data/reads/ --profile apptainer test/
                 sunbeam run --profile test/ --docker_tag latest

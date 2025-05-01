@@ -41,6 +41,8 @@ The ``project/`` directory contains project management utilities, used for initi
 
 .. automodule:: sunbeam.project
     :members:
+    :imported-members:
+    :undoc-members:
 
 scripts
 -------
