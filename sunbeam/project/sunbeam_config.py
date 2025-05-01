@@ -115,14 +115,6 @@ class SunbeamConfig:
             extension_fp.glob("**/*.rules")
         )
 
-    @staticmethod
-    def output_subdir(cfg: dict[str, dict[str, str]], section: str) -> Path:
-        """
-        Get the output subdirectory for a given section
-        Weird that it's a static method and doesn't make use of self but it's done for backwards compatibility
-        """
-        return cfg["all"]["output_fp"] / cfg[section]["suffix"]
-
     def resolved_paths(self) -> dict[str, Path | str]:
         """
         Resolve all paths in the config file (any field ending in "_fp")
@@ -147,3 +139,10 @@ class SunbeamConfig:
 
         resolved["all"]["root"] = root_fp
         return resolved
+
+
+def output_subdir(cfg: dict[str, dict[str, str]], section: str) -> Path:
+    """
+    Get the output subdirectory for a given section
+    """
+    return cfg["all"]["output_fp"] / cfg[section]["suffix"]
