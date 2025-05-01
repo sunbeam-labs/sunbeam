@@ -8,7 +8,6 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from sunbeam import __version__, EXTENSIONS_DIR
 from sunbeam.project import SampleList, SunbeamConfig, output_subdir
 from sunbeam.project.post import compile_benchmarks
 

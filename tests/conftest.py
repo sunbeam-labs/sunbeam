@@ -8,8 +8,30 @@ from pathlib import Path
 
 
 @pytest.fixture(autouse=True)
-def DATA_DIR():
+def DATA_DIR() -> Path:
     return Path(__file__).parent / "data"
+
+
+@pytest.fixture(autouse=True)
+def set_extension_dir(tmp_path, monkeypatch):
+    ext_dir = tmp_path / "extensions"
+    ext_dir.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setenv("SUNBEAM_EXTENSIONS", str(ext_dir))
+
+    yield ext_dir
+
+    shutil.rmtree(ext_dir)
+
+
+@pytest.fixture()
+def set_extension_dir(monkeypatch, DATA_DIR):
+    """
+    Set the extension directory to a temporary path for testing.
+    """
+    ext_dir = DATA_DIR / "extensions"
+    monkeypatch.setenv("SUNBEAM_EXTENSIONS_DIR", str(ext_dir))
+    yield ext_dir
+    shutil.rmtree(ext_dir)
 
 
 @pytest.fixture

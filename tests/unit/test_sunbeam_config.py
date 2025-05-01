@@ -29,10 +29,13 @@ def test_empty_config():
     assert sc.config == {}
 
 
-def test_config_from_template():
+def test_config_from_template(tmp_path):
     template_fp = CONFIGS_DIR / "default_config.yml"
     root_fp = Path("root") / "root"
-    sc = SunbeamConfig.from_template(template_fp, root_fp)
+    ext_dir = tmp_path / "extensions"
+    ext_dir.mkdir(parents=True, exist_ok=True)
+
+    sc = SunbeamConfig.from_template(template_fp, root_fp, ext_dir)
     assert sc.config["all"]["root"] == str(root_fp)
     assert sc.config["all"]["version"] == __version__
 

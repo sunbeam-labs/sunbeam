@@ -34,7 +34,7 @@ class SunbeamConfig:
 
     @classmethod
     def from_template(
-        cls, template_fp: Path, root_fp: Path, extensions_dir: Path = EXTENSIONS_DIR
+        cls, template_fp: Path, root_fp: Path, extensions_dir: Path = EXTENSIONS_DIR()
     ) -> "SunbeamConfig":
         with open(template_fp) as f:
             config = dict(yaml.safe_load(f))
@@ -57,7 +57,7 @@ class SunbeamConfig:
         with open(config_fp, "w") as f:
             yaml.safe_dump(self.config, f)
 
-    def fill_missing(self, extensions_dir: Path = EXTENSIONS_DIR):
+    def fill_missing(self, extensions_dir: Path = EXTENSIONS_DIR()):
         """
         Fill in missing extension config values with defaults
         """
@@ -77,7 +77,7 @@ class SunbeamConfig:
                                         self.config[key][sub_key] = sub_value
 
     @staticmethod
-    def get_extensions(extensions_dir: Path = EXTENSIONS_DIR) -> dict[str, Path]:
+    def get_extensions(extensions_dir: Path = EXTENSIONS_DIR()) -> dict[str, Path]:
         """
         Get a list of all extensions in the extensions directory
         """
