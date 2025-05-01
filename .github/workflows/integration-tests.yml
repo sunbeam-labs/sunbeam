@@ -49,19 +49,17 @@ jobs:
               run: |
                 python -m pip install --upgrade pip
                 pip install .[dev]
+                pip install snakemake-executor-plugin-slurm
             
             - name: Run Sunbeam
               shell: bash
               run: |
-                cd $GITHUB_WORKSPACE
-                pip install snakemake-executor-plugin-slurm
                 sunbeam init --data_fp tests/data/reads/ --profile slurm test/
                 sunbeam run --default-resources slurm_account=runner --profile test/ test
 
             - name: Check output
               shell: bash
               run: |
-                cd $GITHUB_WORKSPACE
                 ls -l .snakemake/slurm_logs/ | grep "rule_test"
     
     test-apptainer:

@@ -34,8 +34,11 @@ class SunbeamConfig:
 
     @classmethod
     def from_template(
-        cls, template_fp: Path, root_fp: Path, extensions_dir: Path = EXTENSIONS_DIR()
+        cls, template_fp: Path, root_fp: Path, extensions_dir: Path = None
     ) -> "SunbeamConfig":
+        if not extensions_dir:
+            extensions_dir = EXTENSIONS_DIR()
+
         with open(template_fp) as f:
             config = dict(yaml.safe_load(f))
 
@@ -57,10 +60,13 @@ class SunbeamConfig:
         with open(config_fp, "w") as f:
             yaml.safe_dump(self.config, f)
 
-    def fill_missing(self, extensions_dir: Path = EXTENSIONS_DIR()):
+    def fill_missing(self, extensions_dir: Path = None):
         """
         Fill in missing extension config values with defaults
         """
+        if not extensions_dir:
+            extensions_dir = EXTENSIONS_DIR()
+
         for ext_name, ext_dir in self.get_extensions(extensions_dir).items():
             config_fp = ext_dir / "config.yml"
             if config_fp.exists():
@@ -77,14 +83,11 @@ class SunbeamConfig:
                                         self.config[key][sub_key] = sub_value
 
     @staticmethod
-    def get_extensions(extensions_dir: Path = EXTENSIONS_DIR()) -> dict[str, Path]:
+    def get_extensions(extensions_dir: Path) -> dict[str, Path]:
         """
         Get a list of all extensions in the extensions directory
         """
         extensions = {}
-        import os
-        print(os.environ.get("SUNBEAM_EXTENSIONS"))
-        print(f"Searching for extensions in {extensions_dir}")
         for ext_dir in extensions_dir.iterdir():
             if ext_dir.is_dir() and ext_dir.name.startswith("sbx"):
                 extensions[ext_dir.name] = ext_dir

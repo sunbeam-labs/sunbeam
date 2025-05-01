@@ -55,6 +55,7 @@ include = ["sunbeam*"]
 "sunbeam" = [
   "configs/*.yml",
   "configs/*.yaml",
+  "extensions/.gitkeep",
   "workflow/Snakefile",
   "workflow/rules/*.smk",
   "workflow/scripts/*.py",
