@@ -54,14 +54,9 @@ jobs:
               shell: bash
               run: |
                 cd $GITHUB_WORKSPACE
-                source activate sunbeam
-                mkdir projects/
-    
                 pip install snakemake-executor-plugin-slurm
-    
-                sunbeam init --data_fp tests/data/reads/ --profile slurm projects/test/
-    
-                sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
+                sunbeam init --data_fp tests/data/reads/ --profile slurm test/
+                sunbeam run --default-resources slurm_account=runner --profile test/ test
 
             - name: Check output
               shell: bash
@@ -75,7 +70,6 @@ jobs:
     
         steps:
             - uses: actions/checkout@v4
-            - uses: s-weigand/setup-conda@v1.2.1
             - uses: eWaterCycle/setup-apptainer@v2
               with:
                 apptainer-version: 1.1.2
@@ -83,16 +77,11 @@ jobs:
             - name: Install Sunbeam
               shell: bash
               run: |
-                cd $GITHUB_WORKSPACE
-                bash install.sh -e sunbeam -v
+                python -m pip install --upgrade pip
+                pip install .[dev]
     
             - name: Run Sunbeam
               shell: bash
               run: |
-                cd $GITHUB_WORKSPACE
-                source activate sunbeam
-                mkdir projects/
-    
-                sunbeam init --data_fp tests/data/reads/ --profile apptainer projects/test/
-    
-                sunbeam run --profile projects/test/ --docker_tag latest
+                sunbeam init --data_fp tests/data/reads/ --profile apptainer test/
+                sunbeam run --profile test/ --docker_tag latest

@@ -82,6 +82,9 @@ class SunbeamConfig:
         Get a list of all extensions in the extensions directory
         """
         extensions = {}
+        import os
+        print(os.environ.get("SUNBEAM_EXTENSIONS"))
+        print(f"Searching for extensions in {extensions_dir}")
         for ext_dir in extensions_dir.iterdir():
             if ext_dir.is_dir() and ext_dir.name.startswith("sbx"):
                 extensions[ext_dir.name] = ext_dir
