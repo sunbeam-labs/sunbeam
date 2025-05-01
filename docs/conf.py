@@ -61,7 +61,7 @@ from sunbeam import __version__
 # built documents.
 #
 # The short X.Y version.
-version = __version__.split('.')[0]
+version = __version__.split(".")[0]
 
 # The full version, including alpha/beta/rc tags.
 release = __version__
