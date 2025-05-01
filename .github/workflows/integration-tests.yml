@@ -63,19 +63,20 @@ jobs:
     
         steps:
             - uses: actions/checkout@v4
-            - uses: eWaterCycle/setup-apptainer@v2
-              with:
-                apptainer-version: 1.1.2
+            #- uses: eWaterCycle/setup-apptainer@v2
+            #  with:
+            #    apptainer-version: 1.1.2
     
             - name: Install Sunbeam
               shell: bash
               run: |
                 python -m pip install --upgrade pip
                 pip install .[dev]
+                sudo apt-get update && sudo apt-get install -y apptainer
     
             - name: Run Sunbeam
               shell: bash
               run: |
-                export APPTAINER_NO_NAMESPACE=yes
+                export APPTAINER_NO_NAMESPACE=1
                 sunbeam init --data_fp tests/data/reads/ --profile apptainer test/
                 sunbeam run --profile test/ --docker_tag latest

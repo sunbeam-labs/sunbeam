@@ -11,8 +11,9 @@ sunbeam (Python lib)
 
 Sunbeam is a Python package designed to help facilitate reproducible bioinformatics workflows. The core of the package is located in the ``sunbeam/`` directory. This is where the main code for Sunbeam lives, and it is organized into subdirectories based on functionality.
 
-.. autofunction:: sunbeam.get_docker_str
-.. autofunction:: sunbeam.get_ext_path
+.. automodule:: sunbeam
+    :members:
+    :special-members:
 
 bfx
 ---
