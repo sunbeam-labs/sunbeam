@@ -3,7 +3,7 @@
 # Illumina quality control rules
 
 import os
-from sunbeamlib import get_docker_str
+from sunbeam import get_docker_str
 
 
 localrules:

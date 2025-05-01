@@ -1,4 +1,4 @@
-from sunbeamlib import get_docker_str
+from sunbeam import get_docker_str
 
 
 localrules:

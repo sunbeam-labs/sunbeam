@@ -31,6 +31,7 @@ dependencies = [
   "snakemake==9.3.3",
   "more-itertools==10.7.0",
   "pyyaml==6.0.2",
+  "pandas==2.2.3",
 ]
 [project.optional-dependencies]
 dev = [
@@ -51,17 +52,20 @@ test = [
 sunbeam = "sunbeam.scripts.sunbeam:main"
 
 [tool.setuptools]
-package-data = {
-  "sunbeam" = [
-    "configs/*.yml",
-    "configs/*.yaml",
-    "workflow/Snakefile",
-    "workflow/rules/*.smk",
-    "workflow/scripts/*.py",
-    "workflow/envs/*.yml",
-    "workflow/envs/*.Dockerfile",
-  ]
-}
+packages = [
+  "sunbeam",
+]
+
+[tool.setuptools.package-data]
+"sunbeam" = [
+  "configs/*.yml",
+  "configs/*.yaml",
+  "workflow/Snakefile",
+  "workflow/rules/*.smk",
+  "workflow/scripts/*.py",
+  "workflow/envs/*.yml",
+  "workflow/envs/*.Dockerfile",
+]
 
 [build-system]
 requires = ["setuptools>=61.0.0", "wheel"]

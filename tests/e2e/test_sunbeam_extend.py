@@ -7,7 +7,7 @@ from pathlib import Path
 
 test_dir = Path(__file__).parent.parent.resolve()
 sys.path.append(test_dir)
-from config_fixture import output_dir, config
+from tests.conftest import output_dir, config
 
 
 @pytest.fixture

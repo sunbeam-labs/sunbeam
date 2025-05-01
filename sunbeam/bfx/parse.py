@@ -1,7 +1,6 @@
 from itertools import groupby
 from more_itertools import grouper
-from pathlib import Path
-from typing import Dict, Iterator, List, TextIO, Tuple, Union
+from typing import Dict, Iterator, TextIO, Tuple, Union
 
 
 BLAST6_DEFAULTS = [
@@ -34,14 +33,6 @@ def parse_fasta(f: TextIO) -> Iterator[Tuple[str, str]]:
         yield (header_str, seq_str)
 
 
-def read_seq_ids(fasta_fp: Union[str, Path]) -> List[Tuple[str, str]]:
-    """
-    Return the sequence identifiers for a given fasta filepath.
-    """
-    with open(str(fasta_fp)) as f:
-        return list(parse_fasta(f))
-
-
 def write_fasta(record: Tuple[str, str], f: TextIO) -> None:
     f.write(f">{record[0]}\n")
     f.write(f"{record[1]}\n")
@@ -60,14 +51,6 @@ def parse_fastq(f: TextIO) -> Iterator[Tuple[str, str, str, str]]:
 def write_fastq(record: Tuple[str, str, str, str], f: TextIO) -> None:
     s = f"@{record[0]}\n{record[1]}\n{record[2]}\n{record[3]}\n"
     f.write(s)
-
-
-def write_many_fastq(record_list: List[Tuple[str, str, str, str]], f: TextIO) -> None:
-    record_list = [
-        [f"@{r[0]}\n", f"{r[1]}\n", f"{r[2]}\n", f"{r[3]}\n"] for r in record_list
-    ]
-    record_list = [item for sublist in record_list for item in sublist]
-    f.writelines(record_list)
 
 
 def parse_sam(

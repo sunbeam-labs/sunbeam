@@ -4,75 +4,28 @@
 # Author: Erik Clarke <ecl@mail.med.upenn.edu>
 # Created: 2016-04-28
 #
-import configparser
 import os
-import re
 import shutil
 import sys
-import yaml
+from pathlib import Path
+from sunbeam import __version__, EXTENSIONS_DIR
+from sunbeam.project import SampleList, SunbeamConfig, output_subdir
+from sunbeam.project.post import compile_benchmarks
 
-from pprint import pprint
-from pathlib import Path, PurePath
-
-from snakemake.utils import update_config, listfiles
-from snakemake.exceptions import WorkflowError
-
-from sunbeamlib import load_sample_list, __version__
-from sunbeamlib.config import *
-from sunbeamlib.parse import read_seq_ids
-from sunbeamlib.post import *
-from sunbeamlib.reports import *
-
-
-# Disallow slashes in our sample names during Snakemake's wildcard evaluation.
-# Slashes should always be interpreted as directory separators.
-wildcard_constraints:
-    sample="[^/]+",
-
-
-# Load config file
-if not config:
-    raise SystemExit(
-        "Config not found, are you sure your profile contains a path to an "
-        "existing configfile?"
-    )
-
-sunbeam_dir = ""
-try:
-    sunbeam_dir = os.environ["SUNBEAM_DIR"]
-except KeyError:
-    raise SystemExit(
-        "$SUNBEAM_DIR environment variable not defined. Are you sure you're "
-        "running this from the Sunbeam conda env?"
-    )
 
 MIN_MEM_MB = int(os.getenv("SUNBEAM_MIN_MEM_MB", 8000))
 MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
-# Check for major version compatibility
-pkg_major, cfg_major = check_compatibility(config)
-if pkg_major != cfg_major:
-    raise SystemExit(
-        "\nThis config file was created with a different version of Sunbeam"
-        " and may not be compatible. Create a new config file using"
-        "`sunbeam init` or update this one using `sunbeam config update -i /path/to/sunbeam_config.yml`\n"
-    )
-
-# Setting up config files
-Cfg = check_config(config)
+sc = SunbeamConfig(config)
+print(sc.resolved_paths())
+Cfg = sc.resolved_paths()
 
 # Load extensions
-sbxs = list(listfiles(sunbeam_dir + "/extensions/{sbx_folder}/{sbx}.rules")) + list(
-    listfiles(sunbeam_dir + "/extensions/{sbx_folder}/{sbx}.smk")
-)
-for sbx in sbxs:
-    sys.stderr.write("Found extension {sbx} in folder {sbx_folder}\n".format(**sbx[1]))
+sbxs = SunbeamConfig.get_extensions()
 
 # Setting up samples and read pairs
-Samples = load_sample_list(
-    Cfg["all"]["samplelist_fp"],
-    Cfg["all"]["paired_end"],
-)
+sl = SampleList(Path(Cfg["all"]["root"]) / "samples.csv")
+Samples = sl.get_samples()
 Pairs = ["1", "2"] if Cfg["all"]["paired_end"] else ["1"]
 
 
@@ -105,22 +58,10 @@ except KeyError:
 
 sys.stderr.write("done.\n")
 
-
-# ---- Change your workdir to output_fp
-# workdir: str(Cfg["all"]["output_fp"])
-
-
-# ---- Set up output paths for the various steps
+# ---- Set up output paths
 QC_FP = output_subdir(Cfg, "qc")
 BENCHMARK_FP = output_subdir(Cfg, "benchmarks")
 LOG_FP = output_subdir(Cfg, "logs")
-# ---- BEGIN DEPRECATED
-# These paths will be moved to their respective extensions in a future version
-ASSEMBLY_FP = output_subdir(Cfg, "assembly")
-ANNOTATION_FP = output_subdir(Cfg, "annotation")
-CLASSIFY_FP = output_subdir(Cfg, "classify")
-MAPPING_FP = output_subdir(Cfg, "mapping")
-# ---- END DEPRECATED
 
 
 # ---- Import rules
@@ -164,28 +105,29 @@ else:
     include: "rules/decontaminate.smk"
 
 
-for sbx_path, wildcards in sbxs:
+for sbx_name, sbx_fp in sbxs.items():
     if os.getenv("SUNBEAM_EXTS_INCLUDE", ""):
-        if not wildcards[0] in os.environ["SUNBEAM_EXTS_INCLUDE"].split(", "):
+        if not sbx_name in os.environ["SUNBEAM_EXTS_INCLUDE"].split(", "):
             sys.stderr.write(
-                "Excluding extension {sbx} in folder {sbx_folder}\n".format(**wildcards)
+                f"Excluding extension {sbx_name} in folder {sbx_fp}\n"
             )
             continue
     if os.getenv("SUNBEAM_EXTS_EXCLUDE", ""):
         if (
-            wildcards[0] in os.environ["SUNBEAM_EXTS_EXCLUDE"].split(", ")
+            sbx_name in os.environ["SUNBEAM_EXTS_EXCLUDE"].split(", ")
             or os.environ["SUNBEAM_EXTS_EXCLUDE"] == "all"
         ):
             sys.stderr.write(
-                "Excluding extension {sbx} in folder {sbx_folder}\n".format(**wildcards)
+                f"Excluding extension {sbx_name} in folder {sbx_fp}\n"
             )
             continue
 
     sys.stderr.write(
-        "Including extension {sbx} in folder {sbx_folder}\n".format(**wildcards)
+        f"Including extension {sbx_name} in folder {sbx_fp}\n"
     )
 
-    include: sbx_path
+    for rule_fp in SunbeamConfig.get_extension_rules(sbx_fp):
+        include: rule_fp
 
 
 # ---- Rule all: run all targets

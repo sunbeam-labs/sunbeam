@@ -6,7 +6,7 @@ import sys
 from collections import OrderedDict
 from io import TextIOWrapper
 from pathlib import Path
-from sunbeamlib.parse import parse_fastq, write_fastq
+from sunbeam.bfx.parse import parse_fastq, write_fastq
 
 
 def count_host_reads(fp: str, hostdict: dict) -> set:

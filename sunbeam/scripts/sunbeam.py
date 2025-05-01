@@ -4,7 +4,6 @@ from sunbeam import __version__
 from sunbeam.scripts.config import main as Config
 from sunbeam.scripts.extend import main as Extend
 from sunbeam.scripts.init import main as Init
-from sunbeam.scripts.list_samples import main as ListSamples
 from sunbeam.scripts.run import main as Run
 
 
@@ -15,7 +14,6 @@ def main():
         "  init         \tCreate a new config file for a project using local or SRA data.\n"
         "  run          \tExecute the pipeline.\n"
         "  config       \tModify or update config files.\n"
-        "  list_samples \tMake a list of samples from a directory.\n"
         "  extend       \tAdd an extension.\n"
     ).format(version=__version__)
 
@@ -44,8 +42,6 @@ def main():
         Init(remaining)
     elif args.command == "config":
         Config(remaining)
-    elif args.command == "list_samples":
-        ListSamples(remaining)
     elif args.command == "extend":
         Extend(remaining)
     else:

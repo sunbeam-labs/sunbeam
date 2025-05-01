@@ -1,4 +1,4 @@
-from sunbeamlib.decontam import get_mapped_reads
+from sunbeam.bfx.decontam import get_mapped_reads
 
 with open(snakemake.output.ids, "w") as out:
     last = None

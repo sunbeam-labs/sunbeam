@@ -1,4 +1,4 @@
-from sunbeamlib.qc import filter_ids, remove_pair_id
+from sunbeam.bfx.qc import filter_ids, remove_pair_id
 
 with open(snakemake.log[0], "w") as log:
     with open(snakemake.input.ids) as f:

@@ -2,8 +2,6 @@ import sys
 import yaml
 import argparse
 
-from sunbeam import config
-
 
 def main(argv):
     # Two subcommands: update and modify config files

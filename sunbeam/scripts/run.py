@@ -24,24 +24,11 @@ def main(argv: list[str] = sys.argv):
         epilog=epilog_str,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-
-    parser.add_argument(
-        "-s",
-        "--sunbeam_dir",
-        default=os.getenv("SUNBEAM_DIR", os.getcwd()),
-        help="Path to Sunbeam installation",
-    )
     parser.add_argument(
         "-m",
         "--mamba",
         action="store_true",
         help="Use mamba instead of conda to create environments",
-    )
-    parser.add_argument(
-        "--target_list",
-        nargs="+",
-        default=[],
-        help="List of sunbeam targets (DEPRECATED)",
     )
     parser.add_argument(
         "--include",
@@ -66,25 +53,19 @@ def main(argv: list[str] = sys.argv):
         help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version ($SUNBEAM_VER), a good alternative is 'latest' for the latest stable release",
     )
 
-    # The remaining args (after --) are passed to Snakemake
+    # The remaining args are passed to Snakemake
     args, remaining = parser.parse_known_args(argv)
 
-    snakefile = Path(args.sunbeam_dir) / "workflow" / "Snakefile"
+    snakefile = Path(__file__).parent.parent / "workflow" / "Snakefile"
     if not snakefile.exists():
         sys.stderr.write(
-            f"Error: could not find a Snakefile in directory '{str(Path(args.sunbeam_dir) / 'workflow')}'\n"
+            f"Error: could not find a Snakefile in directory '{snakefile}'\n"
         )
         sys.exit(1)
 
-    conda_prefix = Path(args.sunbeam_dir) / ".snakemake"
+    conda_prefix = Path(__file__).parent.parent.parent / ".snakemake"
 
     conda_cmd = "conda" if not args.mamba else "mamba"
-
-    if args.target_list:
-        sys.stderr.write(
-            "Warning: passing targets to '--target_list' is deprecated. "
-            "Please use 'sunbeam run <opts> target1 target2 target3' instead.\n"
-        )
 
     if args.include and args.exclude:
         sys.stderr.write("Error: cannot use both --include and --exclude\n")
@@ -105,6 +86,19 @@ def main(argv: list[str] = sys.argv):
 
     os.environ["SUNBEAM_DOCKER_TAG"] = args.docker_tag
 
+    # Extract the profile arg from the remaining args
+    profile_parse = argparse.ArgumentParser(add_help=False)
+    profile_parse.add_argument("--profile")
+    profile_args, _ = profile_parse.parse_known_args(remaining)
+    profile = profile_args.profile
+
+    if not profile:
+        sys.stderr.write(
+            "Error: --profile is required. Please specify a profile to use.\n"
+        )
+        sys.exit(1)
+    configfile = Path(profile) / "sunbeam_config.yml"
+
     snakemake_args = (
         [
             "snakemake",
@@ -114,9 +108,10 @@ def main(argv: list[str] = sys.argv):
             str(conda_prefix),
             "--conda-frontend",
             conda_cmd,
+            "--configfile",
+            str(configfile),
         ]
         + remaining
-        + args.target_list
     )
     sys.stderr.write("Running: " + " ".join(snakemake_args) + "\n")
 

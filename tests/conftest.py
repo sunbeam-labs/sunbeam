@@ -7,6 +7,11 @@ import yaml
 from pathlib import Path
 
 
+@pytest.fixture(autouse=True)
+def DATA_DIR():
+    return Path(__file__).parent / "data"
+
+
 @pytest.fixture
 def config():
     tests_dir = Path(__file__).parent.resolve()

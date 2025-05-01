@@ -1,9 +1,9 @@
 import pandas
-from sunbeamlib import reports
+from sunbeam.bfx.reports import summarize_qual_decontam
 
 paired_end = snakemake.config["all"]["paired_end"]
 summary_list = [
-    reports.summarize_qual_decontam(q, d, k, paired_end)
+    summarize_qual_decontam(q, d, k, paired_end)
     for q, d, k in zip(
         snakemake.input.trim_files,
         snakemake.input.decontam_files,
