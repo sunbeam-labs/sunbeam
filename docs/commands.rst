@@ -5,8 +5,12 @@ Sunbeam Commands
 ================
 
 .. argparse::
-        :ref: sunbeam.scripts.Sunbeam
+        :ref: sunbeam.scripts.sunbeam.main_parser
         :prog: sunbeam
+
+
+THIS IS A LINE
+==============
 
 .. code-block:: shell
 

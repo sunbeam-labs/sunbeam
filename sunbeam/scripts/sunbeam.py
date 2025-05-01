@@ -8,6 +8,22 @@ from sunbeam.scripts.run import main as Run
 
 
 def main():
+    parser = main_parser()
+    args, remaining = parser.parse_known_args()
+
+    if args.command == "run":
+        Run(remaining)
+    elif args.command == "init":
+        Init(remaining)
+    elif args.command == "config":
+        Config(remaining)
+    elif args.command == "extend":
+        Extend(remaining)
+    else:
+        parser.print_help()
+        sys.stderr.write("Unrecognized command.\n")
+
+def main_parser():
     usage_str = "%(prog)s [-h/--help,-v/--version] <subcommand>"
     description_str = (
         "subcommands:\n"
@@ -33,19 +49,5 @@ def main():
         action="version",
         version=__version__,
     )
-
-    args, remaining = parser.parse_known_args()
-
-    if args.command == "run":
-        Run(remaining)
-    elif args.command == "init":
-        Init(remaining)
-    elif args.command == "config":
-        Config(remaining)
-    elif args.command == "extend":
-        Extend(remaining)
-    else:
-        parser.print_help()
-        sys.stderr.write("Unrecognized command.\n")
 
     return parser
