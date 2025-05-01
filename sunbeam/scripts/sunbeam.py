@@ -47,3 +47,5 @@ def main():
     else:
         parser.print_help()
         sys.stderr.write("Unrecognized command.\n")
+
+    return parser

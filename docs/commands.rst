@@ -13,6 +13,10 @@ Sunbeam Commands
         -h/--help: Display help.
         -v/--version: Display version.
 
+    .. argparse::
+        :ref: sunbeam.scripts.Sunbeam
+        :prog: sunbeam
+
     init
     ====
     Initialize a new Sunbeam project in a given directory, creating a new config file and (optionally) a sample list.
