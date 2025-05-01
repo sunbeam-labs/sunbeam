@@ -4,18 +4,18 @@
 Sunbeam Commands
 ================
 
+.. argparse::
+        :ref: sunbeam.scripts.Sunbeam
+        :prog: sunbeam
+
 .. code-block:: shell
 
     
         sunbeam [-h | -v] <subcommand>
 
-    .. code-block:: shell
-        -h/--help: Display help.
-        -v/--version: Display version.
-
-    .. argparse::
-        :ref: sunbeam.scripts.Sunbeam
-        :prog: sunbeam
+.. code-block:: shell
+    -h/--help: Display help.
+    -v/--version: Display version.
 
     init
     ====
