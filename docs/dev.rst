@@ -22,6 +22,8 @@ The ``bfx/`` directory contains bioinformatics utilties, used in the pipeline fo
 .. automodule:: sunbeam.bfx
     :members:
 
+    :autofunction:: sunbeam.bfx.decontam.get_mapped_reads
+
 configs
 -------
 
@@ -36,6 +38,9 @@ project
 -------
 
 The ``project/`` directory contains project management utilities, used for initializing and managing Sunbeam projects.
+
+.. automodule:: sunbeam.project
+    :members:
 
 scripts
 -------
