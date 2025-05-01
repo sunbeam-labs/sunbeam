@@ -1,5 +1,5 @@
 import pytest
-from sunbeam import CONFIGS_DIR
+from sunbeam import CONFIGS_DIR, EXTENSIONS_DIR
 from sunbeam.project import SampleList, SunbeamConfig, SunbeamProfile
 from sunbeam.scripts.init import main as Init
 from sunbeam.scripts.run import main as Run
