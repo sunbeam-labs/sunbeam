@@ -3,6 +3,9 @@ from sunbeam.bfx.parse import parse_sam
 
 
 def get_mapped_reads(fp: str, min_pct_id: float, min_len_frac: float) -> Iterator[str]:
+    """
+    Takes a SAM file and returns an iterator of read names that are mapped
+    """
     with open(fp, "r") as sam_file:
         for read in parse_sam(sam_file):
             if (
