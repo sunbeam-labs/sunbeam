@@ -4,10 +4,10 @@
 Dev
 ===
 
-Getting involved with developing Sunbeam can be a little daunting at first. This doc will try to break down the constituent parts from a developer's perspective. For starters, check out the structure_ doc to get a sense of how the code is organized.
+Getting involved with developing Sunbeam can be a little daunting at first. This doc will try to break down the constituent parts from a developer's perspective.
 
-sunbeam (Python lib)
-====================
+sunbeam (Python package)
+========================
 
 Sunbeam is a Python package designed to help facilitate reproducible bioinformatics workflows. The core of the package is located in the ``sunbeam/`` directory. This is where the main code for Sunbeam lives, and it is organized into subdirectories based on functionality.
 
@@ -97,17 +97,36 @@ Environment Variables
 - ``SUNBEAM_MIN_RUNTIME``: int - If set, will override the default minimum runtime value.
 - ``SUNBEAM_NO_ADAPTER``: bool - If set, will not check that the adapter template file exists.
 
-tests
-=====
+Contributing
+============
 
-All tests are located in the ``tests/`` directory. The tests are run with pytest, and the tests are organized into subdirectories based on the module they are testing.
+Sunbeam is an open-source project, and we welcome contributions from the community. If you would like to contribute to Sunbeam, please follow these steps:
 
-.github
-=======
+1. Fork the repository on GitHub.
+2. Create a new branch for your changes.
+3. Make your changes and test them locally.
+4. Commit your changes and push them to your fork.
+5. Create a pull request against the main branch of the Sunbeam repository (tagging any relevant issues).
+6. Update the documentation if necessary.
+7. Wait for feedback from the maintainers and make any necessary changes.
+8. Once your changes are approved, they will be merged into the main branch and included in the next release!
 
-The ``.github/`` directory contains the configuration for GitHub Actions, which are used to run the tests on every push to the repository and manage releases. The configuration is in ``.github/workflows/``.
+Testing locally
+---------------
 
-docs
-====
+To lint and test Sunbeam locally, you can use the following commands:
+
+.. code-block:: shell
+    black .
+    snakefmt sunbeam/workflow/Snakefile sunbeam/workflow/rules/*.smk
+    pytest tests/
+
+Automated tests
+---------------
+
+Tests will be run automatically on every push to the repository. The tests are run using GitHub Actions and are defined in the ``.github/workflows/`` directory. They test across multiple Python version and environment managers for more thorough coverage. You can see the results in the PR on GitHub.
+
+Updating docs
+-------------
 
 The ``docs/`` directory contains the documentation for Sunbeam. The documentation is written in reStructuredText and is built with Sphinx.

@@ -4,12 +4,12 @@
 Sunbeam Commands
 ================
 
+Sunbeam
+=======
+
 .. argparse::
     :ref: sunbeam.scripts.sunbeam.main_parser
     :prog: sunbeam
-    :markdown:
-    Sunbeam
-    =======
 
 
 .. argparse::
