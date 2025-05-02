@@ -131,6 +131,9 @@ To use this, make a folder containing all the target sequences in FASTA format. 
 Running the Pipeline
 ********************
 
+.. tip::
+   If you installed Sunbeam using Pip, you will need to have either Conda or Apptainer/Singularity installed to run the pipeline, depending on your choice of dependency manager (conda is the default).
+
 After you've finished editing your config file, you're ready to run Sunbeam:
 
 .. code-block:: bash

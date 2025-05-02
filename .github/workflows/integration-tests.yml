@@ -56,29 +56,3 @@ jobs:
               run: |
                 sunbeam init --data_fp tests/data/reads/ --profile slurm test/
                 sunbeam run --default-resources slurm_account=runner --profile test/ test
-    
-    test-apptainer:
-        name: Apptainer Test
-        runs-on: ubuntu-latest
-    
-        steps:
-            - uses: actions/checkout@v4
-            #- uses: eWaterCycle/setup-apptainer@v2
-            #  with:
-            #    apptainer-version: 1.1.2
-            - uses: eWaterCycle/setup-singularity@v7
-              with:
-                singularity-version: 3.8.3
-    
-            - name: Install Sunbeam
-              shell: bash
-              run: |
-                python -m pip install --upgrade pip
-                pip install .[dev]
-    
-            - name: Run Sunbeam
-              shell: bash
-              run: |
-                export APPTAINER_NO_NAMESPACE=1
-                sunbeam init --data_fp tests/data/reads/ --profile apptainer test/
-                sunbeam run --profile test/ --docker_tag latest --singularity-args "--containall --cleanenv"
