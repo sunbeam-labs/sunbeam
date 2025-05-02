@@ -8,7 +8,6 @@ all:
 
 # Quality control
 qc:
-  suffix: qc
   # Trimmomatic
   leading: 3
   trailing: 3
@@ -27,28 +26,5 @@ qc:
   host_fp: ""
   host_list: []
 
-# Taxonomic classifications
-classify:
-  suffix: classify
-
-# Contig assembly
-assembly:
-  suffix: assembly
-
-# Contig annotation
-annotation:
-  suffix: annotation
-
 blastdbs:
   root_fp: ''
-
-mapping:
-  suffix: mapping
-
-# Per-rule computational resource usage data
-benchmarks:
-  suffix: benchmarks
-
-# Logs
-logs:
-  suffix: logs

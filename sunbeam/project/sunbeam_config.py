@@ -146,4 +146,4 @@ def output_subdir(cfg: dict[str, dict[str, str]], section: str) -> Path:
     Get the output subdirectory for a given section.
     Here mostly for backwards compatibility.
     """
-    return cfg["all"]["output_fp"] / cfg[section]["suffix"]
+    return cfg["all"]["output_fp"] / section
