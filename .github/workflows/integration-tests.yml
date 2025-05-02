@@ -81,4 +81,4 @@ jobs:
               run: |
                 export APPTAINER_NO_NAMESPACE=1
                 sunbeam init --data_fp tests/data/reads/ --profile apptainer test/
-                sunbeam run --profile test/ --docker_tag latest
+                sunbeam run --profile test/ --docker_tag latest --singularity-args "--containall --cleanenv"
