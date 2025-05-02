@@ -45,7 +45,6 @@ Extend
 Config
 ------
 
-... argparse::
+.. argparse::
     :ref: sunbeam.scripts.config.main_parser
     :prog: sunbeam config
-

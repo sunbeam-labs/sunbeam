@@ -17,3 +17,6 @@ This is a known issue with singularity. It's not actually running out of space, 
 **A rule keeps failing with an error like "perl: error while loading shared libraries: libcrypt.so.1: cannot open shared object file: No such file or directory". What's going on?**
 
 This is unfortunately a common issue with conda where shared libraries are either not installed or not properly loaded for packages that depend on them. There can be many causes and many fixes. You can start by searching the exact error message and seeing if there are any suggestions for how to solve it. Often it will involve installing the missing library with conda or installing the missing library with the system package manager. For example, the solution to the example error for me running sunbeam on a standard Amazon machine image (AMI) was to install the library using ``sudo yum install libxcrypt-compat`` in the snakemake-managed conda environment.
+
+.. tip::
+    If you can't find the answer to your problem here, try searching the `issue tracker <https://github.com/sunbeam-labs/sunbeam/issues>`_ on GitHub or posting a new issue.

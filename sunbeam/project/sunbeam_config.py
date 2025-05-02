@@ -91,6 +91,14 @@ class SunbeamConfig:
                                     if sub_key not in self.config[key]:
                                         self.config[key][sub_key] = sub_value
 
+    def modify(self, change_str: str):
+        """
+        Modify the config file with the specified changes
+        change_str should be a string in the format "root_key: {sub_key: value}"
+        """
+        changes = yaml.safe_load(change_str)
+        self.config.update(changes)
+
     @staticmethod
     def get_extensions(extensions_dir: Path = None) -> dict[str, Path]:
         """

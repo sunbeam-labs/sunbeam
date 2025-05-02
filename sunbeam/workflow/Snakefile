@@ -61,6 +61,11 @@ sys.stderr.write("done.\n")
 QC_FP = output_subdir(Cfg, "qc")
 BENCHMARK_FP = output_subdir(Cfg, "benchmarks")
 LOG_FP = output_subdir(Cfg, "logs")
+ASSEMBLY_FP = output_subdir(Cfg, "assembly")
+ANNOTATION_FP = output_subdir(Cfg, "annotation")
+CLASSIFY_FP = output_subdir(Cfg, "classify")
+MAPPING_FP = output_subdir(Cfg, "mapping")
+VIRUS_FP = output_subdir(Cfg, "virus")
 
 
 # ---- Import rules

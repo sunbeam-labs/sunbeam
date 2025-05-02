@@ -85,6 +85,11 @@ Variables defined in the main Snakefile can be accessed throughout the workflow.
 - ``QC_FP``: Path - The Path to the project's quality control output directory.
 - ``BENCHMARK_FP``: Path - The Path to the project's benchmarking output directory.
 - ``LOG_FP``: Path - The Path to the project's log output directory.
+- ``ASSEMBLY_FP``: Path - The Path to the project's assembly output directory.
+- ``ANNOTATION_FP``: Path - The Path to the project's annotation output directory.
+- ``CLASSIFY_FP``: Path - The Path to the project's classification output directory.
+- ``MAPPING_FP``: Path - The Path to the project's mapping output directory.
+- ``VIRUS_FP``: Path - The Path to the project's virus output directory.
 
 Environment Variables
 ---------------------

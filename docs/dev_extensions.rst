@@ -6,213 +6,196 @@ Developing Sunbeam Extensions
 
 Sunbeam extensions allow you to add new features to the pipeline. You might use an extension to carry out a new type of analysis, or to produce a report from Sunbeam output files. Extensions can be re-distributed and installed by other researchers to facilitate reproducible analysis.
 
-A Sunbeam extension consists of a directory that contains a *rules* file. The *rules* file must have a name that ends with the file extension ".smk". The name of the extension is derived from the name of this file. It is customary for the name of the extension to start with "sbx_", which is shorthand for "Sunbeam extension."  Technically, only the *rules* file is needed for a Sunbeam extension. In practice, almost all extensions include other files to facilitate the installation of software dependencies, to specify parameters in the configuration file, and to give instructions to users.
+This page will go deep into the weeds on how to develop extensions for Sunbeam. If you're looking for how to install/run them, check out :ref:`extensions`. Make sure you've read the :ref:`dev` page first so that you have a good grounding in the internals of Sunbeam. And the more you're familiar with Snakemake and Python, the better (both have great documentation).
 
-In Sunbeam version 3.0 and higher, extensions can be installed using the ``sunbeam extend`` command, followed by the GitHub URL of the extension you're installing. For example, to install an extension to run metagenome assembly, you would run::
+Starting a new extension
+========================
 
-    sunbeam extend https://github.com/sunbeam-labs/sbx_assembly/
+A Sunbeam extension consists of a directory that contains a rules file. The rules file must have a name that ends with the file extension ".smk". It is customary for the name of the extension to start with "sbx_", which is shorthand for "Sunbeam extension."  Technically, only the rules file is needed for a Sunbeam extension. In practice, almost all extensions include other files to facilitate the installation of software dependencies, to specify parameters in the configuration file, and to give instructions to users.
 
-Sunbeam extensions are installed by placing the extension directory in the ``extensions/`` subdirectory of the Sunbeam software.  Once the extension is in place, Sunbeam will find the *rules* file and incorporate the new functionality into the Sunbeam workflow.
+Using ``sbx_template``
+----------------------
 
-Using sbx_template
-==================
-
-We've created a GitHub template for creating new Sunbeam extensions easily. To use the template, go to the `sbx_template <https://github.com/sunbeam-labs/sbx_template>`_ and click the Use this template button in the top right. Once you've created the new repository, wait a minute for the CI to update all the names and links, then clone the repository to your computer. You can then edit the files in the repository to create your extension.
+We've created a GitHub template for creating new Sunbeam extensions easily. To use the template, go to the `sbx_template <https://github.com/sunbeam-labs/sbx_template>`_ repo and click the Use this template button in the top right. Once you've created the new repository, wait a minute for the CI to update all the names and links, then clone the repository to your computer. You can then edit the files in the repository to create your extension.
 
 Writing the rules file
-======================
+----------------------
 
 The rules file contains the code for one or more rules in Snakemake format. These rules describe how to take files produced by Sunbeam and do something more with them.  When Sunbeam is run, the Snakemake workflow management system determines how to put the rules together in the right order to produce the desired result.
 
-Example: MetaSPAdes assembler
------------------------------
+Example: An extension for AwesomeTool
+-------------------------------------
 
-We'll use the `sbx_metaspades_example <https://github.com/sunbeam-labs/sbx_metaspades_example>`_ extension to illustrate the basics. This extension runs the MetaSPAdes assembly program on each pair of host-filtered FASTQ files, producing a folder with contigs for each sample.
+Say we have a tool we want to include in Sunbeam called AwesomeTool, that provides strain level taxonomic classification of every read and then provides a human-readable report of how interesting each one is in descending order of interest. (unfortunately, AwesomeTool doesn't exist outside of this example). AwesomeTool has a command line interface (CLI) that takes gzipped fastq files and a database file as input, and produces a gzipped output file. The command looks like:
 
-The rules file contains two rules: one describes how to run the MetaSPAdes program, and the other gives the full set of output folders we expect to make. Here is the rule that runs the program::
+.. code-block:: shell
+    AwesomeTool -i {input} -d {database} -o {output}
 
-    rule run_metaspades:
+We'll start our development effort by updating the rules file (this assumes you're using ``sbx_template``; if not, follow along with those files in mind). We want to remove the dummy rules from the template ``sbx_awesome_tool.smk`` and replace them with our own:
+
+.. code-block:: python
+    AWESOME_FP = CLASSIFY_FP / 'awesome'
+
+    rule all_awesome_tool:
         input:
-            r1 = QC_FP/'decontam'/'{sample}_1.fastq.gz',
-            r2 = QC_FP/'decontam'/'{sample}_2.fastq.gz'
+            expand(AWESOME_FP / "{sample}.awesome", sample=Samples.keys())
+
+    rule run_awesome_tool:
+        input:
+            r1 = QC_FP / "decontam" / "{sample}_1.fastq.gz",
+            r2 = QC_FP / "decontam" / "{sample}_2.fastq.gz",
+            db = Cfg['all']['awesome_db']
         output:
-            ASSEMBLY_FP/'metaspades'/'{sample}'
+            AWESOME_FP / "{sample}.awesome"
         conda:
-            "metaspades_example_env.yaml"
+            "awesome_env.yaml"
         shell:
-            "metaspades.py -1 {input.r1} -2 {input.r2} -o {output}"
+            """
+            AwesomeTool -i {input.r1} -d {input.db} -o {output}
+            """
 
-The first line indicates a new rule named ``run_metaspades``. The ``input`` and ``output`` sections contain patterns for file paths that will be used by the command and produced after the command is run. The ``conda`` section specifies which environment the command should be run in (i.e. it specifies which software will be necessary to run the command). The command itself is given in the ``shell`` section.  Files from the input and output sections are indicated in curly braces inside the command.  In the case of multiple inputs, you can assign them individual names, like ``r1`` and ``r2``, then refer to these names inside the command.
-
-In this example, the input and output filepaths are given as Python code. This is typical for rules in Sunbeam, because we are using info from the user's configuration to determine the full filepath.  Let's take ``QC_FP/'decontam'/'{sample}_1.fastq.gz'`` and see how it's put together.  ``QC_FP`` is a Python variable, which gives the absolute path to the directory containing quality control results in Sunbeam.  This value is a special ``Path`` object in Python, which means that we can add subdirectories using the division symbol ``/``. Here, ``decontam`` is the name of a subdirectory inside the main quality control directory. The last part, ``{sample}_1.fastq.gz`` looks like the name of a gzipped FASTQ file, but has something going on inside those curly braces.
-
-The ``{sample}`` bit inside the input and output sections is the most important part of this rule.  It's called a *wildcard*, and indicates that for any sample, we expect to see certain files before and after the command is run.  If a sample is named ``Abc``, Snakemake will look for the files ``Abc_1.fastq.gz`` and ``Abc_2.fastq.gz`` before running the command.  If these files don't exist, that's an error.  Likewise, Snakemake will check for the subdirectory ``metaspades/Abc`` after the command is run; if it's not there, Snakemake will stop and report the discrepancy. Wildcards allow you to write one rule that runs on all the samples.
-
-We have a standard format for files that can be used as input to your extension.  Here are all the patterns you can use:
-
-+-----------------------+----------------------------------------------------------------+
-| Sequence data files   | Target                                                         |
-+=======================+================================================================+
-| Quality-controlled,   | QC_FP/'cleaned'/'{sample}_{rp}.fastq.gz'                       |
-| non-decontaminated    | QC_FP/'cleaned'/'{sample}_1.fastq.gz'                          |
-| sequences             | QC_FP/'cleaned'/'{sample}_2.fastq.gz'                          |
-+-----------------------+----------------------------------------------------------------+
-| Quality-controlled,   | QC_FP/'decontam'/'{sample}_{rp}.fastq.gz'                      |
-| decontaminated        | QC_FP/'decontam'/'{sample}_1.fastq.gz'                         |
-| sequences             | QC_FP/'decontam'/'{sample}_2.fastq.gz'                         |
-+-----------------------+----------------------------------------------------------------+
-
-+-----------------------+-----------------------------------------------+
-| Summary tables        | Target                                        |
-+=======================+===============================================+
-| Attrition from        | QC_FP/'reports'/'preprocess_summary.tsv'      |
-| decontamination and   |                                               |
-| quality control       |                                               |
-+-----------------------+-----------------------------------------------+
-| Sequence              | QC_FP/'reports'/'fastqc_quality.tsv'          |
-| quality scores        |                                               |
-+-----------------------+-----------------------------------------------+
-
-Very often, you will use one of these patterns directly for input to a rule.  For output from a rule, you'll often use a pattern from the tables above and modify it to suit your command.
-
-Our example extension has one more rule, representing the final set of files that should be produced after the extension is run.  This rule has no output and no command; only input.  After Python evaluates the code, the input to this rule is the full list of directories created by MetaSPAdes for every sample::
-
-    rule all_metaspades:
-        input:
-            expand(ASSEMBLY_FP/'metaspades'/'{sample}',
-                   sample=Samples.keys())
-
-This rule is critical for the ``{sample}`` pattern to work inside the Snakemake workflow management system.  To determine the names of the samples, Snakemake *works backwards*, starting with the files you *would like to produce* at the end of the workflow.  Snakemake does not work forward; you can't give it a list of samples or assume that it will match against input files already present.  This may seem strange, but this way of working allows Snakemake to assemble a workflow containing only the steps that are needed to make a particular set of output files.
-
-Fortunately, there is a basic pattern employed to write rules like this.  Here, we take the output pattern from our other rule; this gives the pattern for the files we'd like to have at the end.  Then, we use a function called ``expand`` to generate the full list of files.  The ``expand`` function expects to get a list of all possible values for every wildcard in the filename.  Sunbeam provides two variables for this purpose: ``Samples.keys()`` gives the full list of sample names, and ``Pairs`` gives the values used for the forward and reverse reads in the file.  Here, we give ``sample=Samples.keys()`` as an additional argument to ``expand()``, and the function produces a list of all the outputs we expect.
-
-When the user runs the extension, they specify the rule name, ``all_metaspades``.  Using the full list of output directories, Snakemake figures out what sample files it needs to use, figures out what commands to run, runs the commands in parallel if possible, and lets you know if there were any problems.
-
-Example: a reproducible report
-------------------------------
-
-As another example, we'll look at an extension that takes standard output from Sunbeam and produces a report.  The extension `sbx_shallowshotgun_pilot <https://github.com/junglee0713/sbx_shallowshotgun_pilot>`_ enables researchers to re-run the analysis for a small methods comaprison.
-
-To make a report from Sunbeam output files, the extension needs only one rule.::
-    rule make_shallowshotgun_report:
-            input:
-                    kraken = CLASSIFY_FP/'kraken'/'all_samples.tsv',
-                    preprocess = QC_FP/'preprocess_summary.tsv',
-                    quality = QC_FP/'fastqc_quality.tsv',
-                    sampleinfo = sunbeam_dir + '/extensions/sbx_shallowshotgun_pilot/data/sampleinfo.tsv'
-            output:
-                    Cfg['all']['output_fp']/'reports/ShallowShotgun_Pilot_Report.html'
-            script:
-                    'shallowshotgun_pilot_report.Rmd'
-
-Here, the output is a single file path, and the path does not contain any wildcards like ``{sample}``.  Therefore, Snakemake can work backwards from the output file and figure out everything it needs; we can use this rule as our final target when running Sunbeam.
-
-The basic structure of the rule and most of the inputs should be familiar from the previous example.  One of the inputs, ``sampleinfo``, does not come from Sunbeam, but is distributed with the extension.  We know the filepath inside the extension is ``data/sampleinfo.tsv``, but we need to specify the entire path for Snakemake to find the file.  To do this, we use the variable ``sunbeam_dir``, which points to the Sunbeam installation directory.  The extension must be located inside the ``extensions/`` subdirectory to run.  From here, we know how to get to our file.  Because the value of ``sunbeam_dir`` is an ordinary string, we use the ``+`` symbol to add on the ``extensions/`` subdirectory, the directory name for the extension, and the path to the file inside the extension directory.  This example shows how to refer to files inside the Sunbeam installation directory.
-
-In the output section, we need to specify a file path for the final report.  Here, we use the configuration parameter ``Cfg['all']['output_fp']`` to get the base directory for output from Sunbeam.  The value of this configuration parameter is a ``Path`` object, so we use the ``/`` symbol to add the rest of the filepath.  Just as a note, Snakemake will create the ``reports/`` subdirectory if needed, so you don't have to worry about directories being present ahead of time to accommodate your output files.
-
-At the bottom of the rule, we write ``script`` instead of ``shell``, because we'd like Snakemake to run a script instead of a shell command.  Here, we give the name of a script in `R Markdown <https://rmarkdown.rstudio.com/>`_ format.  The file path of the script is given *relative to the rules file*, which is a little bit different from all the other file paths in the rules file, but convenient.
-
-Inside the script, we need to access the input files given in the rule.  Here is the part of the script that accesses the input file paths and saves them as ordinary variables in R::
-    sample_fp <- file.path(snakemake@input[["sampleinfo"]])
-    preprocess_fp <- file.path(snakemake@input[["preprocess"]])
-    quality_fp <- file.path(snakemake@input[["quality"]])
-    kraken_fp <- file.path(snakemake@input[["kraken"]])
-
-The `R Markdown tutorial <https://rmarkdown.rstudio.com/lesson-1.html>`_ and `book <https://bookdown.org/yihui/rmarkdown/>`_ are the best sources of information on the report format, whereas the `R for data science book <https://r4ds.had.co.nz/>`_ provides a good introduction to the R programming languageas you might use it in the report.
-
-Variables provided by Sunbeam
------------------------------
-
-Here is a table of all the Python variables provided by Sunbeam for use in your extensions:
-+-------------------+-------------+-----------------------------------------------+
-| Variable name     | Type        | Description                                   |
-+-------------------+-------------+-----------------------------------------------+
-| ``QC_FP``         | Path        | Output directory for quality control files.   |
-+-------------------+-------------+-----------------------------------------------+
-| ``ASSEMBLY_FP``   | Path        | Output directory for assembly files. (DEPRECATED)|
-+-------------------+-------------+-----------------------------------------------+
-| ``ANNOTATION_FP`` | Path        | Output directory for gene annotation files. (DEPRECATED)|
-+-------------------+-------------+-----------------------------------------------+
-|| ``CLASSIFY_FP``  || Path       || Output directory for taxonomic               |
-||                  ||            || classification files. (DEPRECATED)           |
-+-------------------+-------------+-----------------------------------------------+
-| ``BENCHMARK_FP``  | Path        | Output directory for benchmark files.         |
-+-------------------+-------------+-----------------------------------------------+
-| ``LOG_FP``        | Path        | Output directory for logs.                    |
-+-------------------+-------------+-----------------------------------------------+
-|| ``Samples``      || Dictionary ||                                              |
-||                  ||            || with keys "1" and "2", values are the        |
-||                  ||            || the gzipped FASTQ files at the start of the  |
-||                  ||            || workflow. For unpaired reads the value for   |
-||                  ||            || "2" is the empty string.                     |
-+-------------------+-------------+-----------------------------------------------+
-|| ``Pairs``        || List       || For paired reads, ["1", "2"]. For unpaired   |
-||                  ||            || reads, ["1"].                                |
-+-------------------+-------------+-----------------------------------------------+
-|| ``Cfg``          || Dictionary || Parameters found in the configuration file.  |
-||                  ||            || For any parameter ending in "_fp", the value |
-||                  ||            || is converted to a Path object. The most      |
-||                  ||            || commonly used parameter is                   |
-||                  ||            || base output directory.                       |
-||                  ||            ||                                              |
-+-------------------+-------------+-----------------------------------------------+
-| ``sunbeam_dir``   | String      | File path where Sunbeam is installed.         |
-+-------------------+-------------+-----------------------------------------------+
-..tip::
-        Deprecated filepaths will be moved from the main pipeline to the extensions where they are used in a future release.
-
-Further reading
----------------
-
-We're only scratching the surface of what you can do with rules in Snakemake.  The `official Snakemake documentation <https://snakemake.readthedocs.io/en/stable/index.html>`_ gives excellent instructions with more examples.
-
-Software dependencies
-=====================
-
-If your extension requires additional software to be installed, there are a couple ways to manage these dependencies. The preferred method is to create an environment file named ``sbx_ext_name.yaml`` that looks something like this:
+This gives us our target (``all_awesome_tool``) and the rule that runs the program (``run_awesome_tool``). The target rule is a list of all the output files we expect to produce. The runner rule describes how to run the program, including the input files, output files, and command to run. You might notice that there are a few things here we will need to define to supplement these rules. For starters, we need to define the ``awesome_db`` option in the config. To do this, we will modify the ``config.yml`` file:
 
 .. code-block:: yaml
-    name: metaspades_example
+    sbx_awesome_tool:
+        awesome_db: /path/to/awesome_db
+
+We also need to specify the environment that AwesomeTool is installed in. To do this, we will modify ``envs/sbx_awesome_tool_env.yml``:
+
+.. code-block:: yaml
+    name: awesome_env
     channels:
         - bioconda
-        - other-channels
+        - conda-forge
     dependencies:
-        - spades
-        - other-packages
+        - awesome_tool
 
-You then attach this environment to any rules that require any of the listed dependencies with ``conda``.
-NOTE: If this method is used with sunbeam version <3.0, the ``--use-conda`` flag has to be included in the ``sunbeam run`` command (i.e. ``sunbeam run all_metaspades --use-conda --configfile /path/to/config``).
-Alternatively, you can provide the names of `Conda packages <https://conda.io/docs/>`_ inside a file named ``requirements.txt``.  This file contains the package names, one per line.  To install Conda packages in this file, users of your extension will run the ``conda install`` command with this file as an additonal argument (while the sunbeam environment is active)::
-        conda install --file requirements.txt
+And with that, we have a working extension! You can run it with the command:
 
-Configuration
-=============
+.. code-block:: shell
+    sunbeam run --profile /path/to/project/ all_awesome_tool
 
-Your extension can include its own section in the configuration file. To take advantage of this, you would write an example configuration file named ``config.yml``. This file should contain only one additional configuration section, specifying parameters for your extension.  For example, the `sbx_coassembly <https://github.com/sunbeam-labs/sbx_coassembly>`_ extension includes two parameters: the number of threads to use, and the path to a file with groups of samples to co-assemble.
+We can go check out our output files in ``/path/to/project/sunbeam_output/classify/awesome``.
 
-.. code-block:: yaml
-    sbx_coassembly:
-        threads: 4
-        group_file: ''
-        
-As of version 3.0, config options from extensions are automatically included in config files made using ``sunbeam init`` and ``sunbeam config update``. This functionality depends on the extension's configuration file being named ``config.yml``.
-In version <3.0, users can copy this example section to the end of their configuration file, using ``cat``::
-    cat config.yml >> /path/to/user/sunbeam_config.yml
-In your *rules* file, you can access parameters in the configuration like this: ``Cfg['sbx_coassembly']['group_file']``.
+Example: A reproducible report
+------------------------------
 
-The README file
-===============
+After running ``sbx_awesome_tool`` a while, you might realize you're compiling the same standard report over and over again. To address this, we can create a new rule that produces a summary report on the results of AwesomeTool on each sample. To do this, we will add a new rule to our rules file and adjust our target rule:
 
-We recommend that you include a README file in your extension.  The contents of the file should be in Markdown format, and the file should be named ``README.md``.  Here's what you should cover in the README file:
-1. A short summary of what your extension does
-2. Any relevant citations
-3. Instructions to install
-4. Instructions to configure
-5. Instructions to run
-A good example to follow is the `sbx_coassembly <https://github.com/sunbeam-labs/sbx_coassembly>`_ extension.
+.. code-block:: python
+    rule all_awesome_tool:
+        input:
+            AWESOME_FP / "awesome_report.tsv",
 
-Publishing at sunbeam-labs.org
-==============================
+    ...
 
-You are welcome to add your Sunbeam extensions to the organization at `sunbeam-labs <https://github.com/sunbeam-labs>`_.  To submit your extension, please go to the `sunbeam Issues page <https://github.com/sunbeam-labs/sunbeam/issues>`_ and open and issue with the GitHub URL of your extension.
+    rule make_awesome_report:
+        input:
+            awesome = expand(AWESOME_FP / "{sample}.awesome", sample=Samples.keys())
+        output:
+            report = AWESOME_FP / "awesome_report.tsv"
+        script:
+            "scripts/awesome_report.R"
+
+We choose R because we're familiar with it (but you should choose what you're familiar with). The ``script`` command points to a file ``scripts/awesome_report.R`` that we now have to make:
+
+.. code-block:: r
+    awesome_files <- snakemake@input$awesome
+    awesome_report <- snakemake@output$report
+
+    # Load the awesome files and make a report
+    awesome_data <- lapply(awesome_files, read.table, header=TRUE)
+    awesome_report_data <- do.call(rbind, awesome_data)
+    awesome_report_data <- awesome_report_data[order(awesome_report_data$interest, decreasing=TRUE), ]
+    awesome_report_data <- awesome_report_data[1:10, ]
+
+    # Write the report
+    write.table(awesome_report_data, awesome_report, sep="\t", row.names=FALSE, col.names=TRUE)
+
+Note how the snakemake rule variables are accessed through the injected ``snakemake`` object. Access patterns differ accross languages but this is the general idea. After running the pipeline, we can check out our report in ``/path/to/project/sunbeam_output/classify/awesome/awesome_report.html``.
+
+Example: Complicated use case
+-----------------------------
+
+AwesomeTool is great, but now we realize the standard CLI doesn't offer enough flexibility for what we want to do. We'll have to make a custom script to run it, importing some of the internals from the AwesomeTool package. To do this, we will need to modify our runner rule:
+
+.. code-block:: python
+    rule run_awesome_tool:
+        input:
+            r1 = QC_FP / "decontam" / "{sample}_1.fastq.gz",
+            r2 = QC_FP / "decontam" / "{sample}_2.fastq.gz",
+            db = Cfg['all']['awesome_db']
+        output:
+            AWESOME_FP / "{sample}.awesome"
+        conda:
+            "awesome_env.yaml"
+        script:
+            "scripts/run_awesome_tool.py"
+
+And now we make the script:
+
+.. code-block:: python
+    import awesome_tool
+
+    def run_awesome_tool(r1, r2, db):
+        data = awesome_tool.load_data(r1, r2)
+        results = awesome_tool.run_analysis(data, db)
+        awesome_tool.save_results(results, snakemake.output[0])
+
+    run_awesome_tool(snakemake.input.r1, snakemake.input.r2, snakemake.input.db)
+
+Testing the extension
+---------------------
+
+Testing is a tricky thing with Snakemake. Because it is a workflow language, most of the code we write is just putting pieces together. So if we took the orthodox functional programming approach, we would test that the pipeline compiles (i.e. that we can run a dryrun without errors) and then claim that it will work because we can trust all the pieces to be tested themselves. So often we will *start* our testing with a dryrun:
+
+.. code-block:: python
+    import pytest
+    import subprocess as sp
+    from pathlib import Path
+
+    @pytest.fixture
+    def project(tmp_path):
+        project_fp = tmp_path / "project"
+        reads_fp = Path(".tests/data/reads").resolve()
+        db_fp = Path(".tests/data/db").resolve()
+
+        sp.check_output(["sunbeam", "init", "--data_fp", str(reads_fp), str(project_fp)])
+        sp.check_output(["sunbeam", "config", "--modify", "sbx_awesome_tool: {awesome_db: " + str(db_fp) + "}"])
+
+        return project_fp
+
+    def test_dryrun(project):
+        # Run a dryrun of the pipeline
+        sp.check_output(["sunbeam", "run", "--profile", str(project), "--directory", str(project.parent), "--dryrun", "all_awesome_tool"])
+
+.. tip::
+    Adding the ``--directory`` flag pointing to a temp directory is a good idea for running these tests in a non-CI environment. This will prevent a bunch of snakemake garbage from being left behind in your working directory and make the tests more reliable.
+
+This is nice, but in practice, we dont' really trust the components of our pipeline enough to stop here. If we have the ability to create a small enough test case to run the whole extension, that is an ideal case for testing everything easily. For example, here we can take our small set of synthetic reads in ``.tests/data/reads`` and a small dummy database we created with AwesomeTool's awesome database building utiltity in ``.tests/data/db``. We can then run the pipeline on these small files and check that the output is what we expect. This is a bit of a pain to set up, but it is worth it in the end. We can do this by adding this to our test file:
+
+.. code-block:: python
+    def test_run(project):
+        sp.check_output(["sunbeam", "run", "--profile", str(project), "--directory", str(project.parent), "all_awesome_tool"])
+
+        report_fp = project / "sunbeam_output" / "classify" / "awesome" / "awesome_report.tsv"
+
+        assert report_fp.exists()
+        assert report_fp.stat().st_size > 0
+        with open(report_fp) as f:
+            header = f.readline()
+            first_line = f.readline()
+            interest_index = header.split("\t").index("interest")
+            assert float(first_line.split("\t")[interest_index]) > 0.5
+
+If you don't have the ability to run all the rules of your extension in a CI environment (some tools just won't work on that small a dataset), you'll have to get more creative. You can test individual rules, explore Snakemake's unit testing framework, or test script logic directly.
+
+.. tip::
+    If you have enough custom logic that it needs testing, consider moving it to an extension library. This will allow you to test the logic separately from Snakemake's machinations. For instance, make a Python function for filtering reads if they have less than 20 A's. We would start by writing the function in the extension library, then calling it from the Snakemake script file (passing the snakemake input, output, etc objects), then testing the function.
+
+The extension comes with a ``.github`` directory that defines CI workflows for automatically running tests.
+
+Releasing the extension
+-----------------------
+
+Releases for Sunbeam extensions are pretty mellow. We don't have a proper repository or enforced release structure. You could never release your extension and it would still work fine. But if you want to maintain good versioning practices and developer hygiene, you can use GitHub's release system and update the version number in ``VERSION``.
