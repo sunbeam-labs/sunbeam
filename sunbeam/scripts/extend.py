@@ -17,7 +17,6 @@ def main(argv=sys.argv):
 
     git_clone_args = ["git", "clone", gh_url, str(EXTENSIONS_DIR() / ext_name)]
     cmd = subprocess.run(git_clone_args)
-    sys.exit(cmd.returncode)
 
 
 def main_parser():

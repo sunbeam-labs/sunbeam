@@ -6,6 +6,8 @@ def main(argv):
     parser = main_parser()
     args = parser.parse_args(argv)
 
+    if not args.config_file:
+        raise SystemExit("No config file specified. Use -h for help.")
     if args.update and args.modify:
         raise SystemExit(
             "Incompatible arguments: --update and --modify cannot be used together."
@@ -31,6 +33,11 @@ def main_parser():
         usage="%(prog)s [options]",
         description="Update or modify a Sunbeam config file",
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "config_file",
+        type=str,
+        help="Path to the Sunbeam config file to update or modify",
     )
     parser.add_argument(
         "-u",
