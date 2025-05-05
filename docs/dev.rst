@@ -1,8 +1,8 @@
 .. _dev:
 
-===
-Dev
-===
+==================
+Developing Sunbeam
+==================
 
 Getting involved with developing Sunbeam can be a little daunting at first. This doc will try to break down the constituent parts from a developer's perspective.
 

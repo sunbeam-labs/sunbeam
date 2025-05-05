@@ -1,0 +1,26 @@
+name: Publish Release
+
+on:
+    release:
+      types: [published]
+
+jobs:
+    run-tests:
+        uses: ./.github/workflows/tests.yml
+        secrets: inherit
+
+    run-integration-tests:
+        uses: ./.github/workflows/integration-tests.yml
+        secrets: inherit
+
+    run-build:
+        uses: ./.github/workflows/build.yml
+        secrets: inherit
+        needs:
+            - run-tests
+            - run-integration-tests
+
+    release:
+      uses: ./.github/workflows/release.yml
+      secrets: inherit
+      needs: run-build
