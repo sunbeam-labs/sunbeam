@@ -1,5 +1,5 @@
 [project]
-name = "sunbeam"
+name = "sunbeamlib"
 dynamic = ["version"]
 description = "A snakemake utility for metagenomic sequencing analysis"
 readme = "README.md"
@@ -47,9 +47,8 @@ dev = [
 [project.scripts]
 sunbeam = "sunbeam.scripts.sunbeam:main"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["sunbeam*"]
+[tool.setuptools.package-dir]
+sunbeam = "sunbeam"
 
 [tool.setuptools.package-data]
 "sunbeam" = [

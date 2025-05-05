@@ -26,6 +26,8 @@ def main(argv=sys.argv):
 
     config_fp = args.template if args.template else CONFIGS_DIR / "default_config.yml"
     config = SunbeamConfig.from_template(config_fp, project_fp)
+    if args.single_end:
+        config.config["all"]["paired_end"] = False
     config.to_file(project_fp / "sunbeam_config.yml")
 
     data_fp = args.data_fp
