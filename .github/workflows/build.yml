@@ -1,18 +1,11 @@
 name: Build
 
 on:
-    push:
-      branches:
-        - main
-
-    release:
-      types: [published]
-
     workflow_call:
 
 jobs:
     pypi-build:
-      name: Build distribution 📦
+      name: Build PyPi distribution 🐍
       runs-on: ubuntu-latest
 
       steps:
@@ -38,7 +31,7 @@ jobs:
           path: dist/
 
     docker-build:
-      name: Build Docker image
+      name: Build and test Docker images 🐳
       runs-on: ubuntu-latest
     
       steps:
@@ -69,7 +62,7 @@ jobs:
             docker run --rm -v ${{ github.workspace }}/tests:/tests sunbeamlabs/sunbeam:test-slim pytest /tests
 
     docker-build-worker-images:
-        name: Build worker images
+        name: Build worker images 🐳
         runs-on: ubuntu-latest
 
         steps:
