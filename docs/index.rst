@@ -8,7 +8,7 @@ Welcome to Sunbeam
    :align: left
 
 
-Sunbeam is a pipeline written in `snakemake <http://snakemake.readthedocs.io>`_ that simplifies and automates many of the steps in metagenomic sequencing analysis. Sunbeam requires a reasonably modern GNU/Linux computer with bash, Python 3.7+, internet access (to retrieve dependencies), and at least 4Gb of RAM. RAM and disk space requirements may increase depending on the databases and tasks you choose to run, and the size of your data. For more information, check out the `Sunbeam paper in Microbiome <https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-019-0658-x>`_.
+Sunbeam is a pipeline written in `snakemake <http://snakemake.readthedocs.io>`_ that simplifies and automates many of the steps in metagenomic sequencing analysis. Sunbeam requires a reasonably modern GNU/Linux computer with Python 3.11+, internet access (to retrieve dependencies), and at least 4Gb of RAM. RAM and disk space requirements may increase depending on the databases and tasks you choose to run, and the size of your data. For more information, check out the `Sunbeam paper in Microbiome <https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-019-0658-x>`_.
 
 Sunbeam currently automates the following tasks:
 
@@ -31,12 +31,10 @@ EL Clarke, LJ Taylor, C Zhao *et al.* Sunbeam: an extensible pipeline for analyz
    :caption: Contents:
 
    quickstart.rst
-   usage.rst
-   commands.rst
-   structure.rst
    extensions.rst
+   commands.rst
    examples.rst
-   install.rst
+   faqs.rst
    dev.rst
+   dev_extensions.rst
    citation.rst
-

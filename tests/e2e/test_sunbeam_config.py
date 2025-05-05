@@ -1,69 +1,52 @@
-import os
-import pytest
-import shutil
-import subprocess as sp
-import sys
-import yaml
-from pathlib import Path
-
-test_dir = Path(__file__).parent.parent.resolve()
-sys.path.append(test_dir)
-from config_fixture import output_dir, config
+from sunbeam import CONFIGS_DIR, EXTENSIONS_DIR
+from sunbeam.project import SunbeamConfig
+from sunbeam.scripts import Config
 
 
-@pytest.fixture
-def init(output_dir):
-    output_dir = output_dir / "sunbeam_config"
+def test_sunbeam_config_update(tmp_path):
+    project_fp = tmp_path / "test"
+    project_fp.mkdir(parents=True, exist_ok=True)
+    config_fp = project_fp / "sunbeam_config.yml"
 
-    sp.check_output(
+    sc = SunbeamConfig.from_template(CONFIGS_DIR / "default_config.yml", project_fp)
+    sc.to_file(config_fp)
+
+    ext_fp = EXTENSIONS_DIR() / "sbx_test"
+    ext_fp.mkdir(parents=True, exist_ok=True)
+    with open(ext_fp / "config.yml", "w") as f:
+        f.write(
+            """
+            sbx_test:
+                test: "test"
+            """
+        )
+
+    Config(
         [
-            "sunbeam",
-            "init",
-            "--data_fp",
-            f"{test_dir / 'data' / 'reads'}",
-            output_dir,
+            str(config_fp),
+            "--update",
         ]
     )
 
-    yield output_dir
-
-    if os.environ.get("CI", False):
-        try:
-            shutil.copytree(output_dir, "output_sunbeam_config/")
-        except FileExistsError as e:
-            pass
+    sc = SunbeamConfig.from_file(config_fp)
+    assert sc.config["sbx_test"]["test"] == "test"
 
 
-@pytest.fixture
-def config_modify(init):
-    output_dir = init
-    hosts_fp = test_dir / "data" / "hosts"
-    config_str = f"qc: {{host_fp: {hosts_fp}}}"
+def test_sunbeam_config_modify(tmp_path):
+    project_fp = tmp_path / "test"
+    project_fp.mkdir(parents=True, exist_ok=True)
+    config_fp = project_fp / "sunbeam_config.yml"
 
-    sp.check_output(
+    sc = SunbeamConfig.from_template(CONFIGS_DIR / "default_config.yml", project_fp)
+    sc.to_file(config_fp)
+
+    Config(
         [
-            "sunbeam",
-            "config",
-            "modify",
-            "-i",
-            "-s",
-            f"{config_str}",
-            f"{output_dir / 'sunbeam_config.yml'}",
+            str(config_fp),
+            "--modify",
+            "sbx_test: {test: 'modified'}",
         ]
     )
 
-    yield output_dir, hosts_fp
-
-
-def test_config_modify(config_modify):
-    output_dir, hosts_fp = config_modify
-
-    with open(output_dir / "sunbeam_config.yml") as f:
-        config_dict = yaml.safe_load(f)
-
-    assert config_dict["qc"]["host_fp"] == str(hosts_fp)
-
-
-@pytest.fixture
-def config_update(init):
-    output_dir = init
+    sc = SunbeamConfig.from_file(config_fp)
+    assert sc.config["sbx_test"]["test"] == "modified"

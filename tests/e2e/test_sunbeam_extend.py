@@ -1,31 +1,16 @@
-import os
-import pytest
-import shutil
-import subprocess as sp
-import sys
-from pathlib import Path
-
-test_dir = Path(__file__).parent.parent.resolve()
-sys.path.append(test_dir)
-from config_fixture import output_dir, config
+from sunbeam import EXTENSIONS_DIR
+from sunbeam.scripts.extend import main as Extend
 
 
-@pytest.fixture
-def extend_template():
-    sp.check_output(
-        [
-            "sunbeam",
-            "extend",
-            "https://github.com/sunbeam-labs/sbx_template.git",
-        ]
-    )
+def test_sunbeam_extend():
+    Extend(["sbx_template"])
 
-    yield Path(os.environ.get("SUNBEAM_DIR")) / "extensions" / "sbx_template"
-
-    shutil.rmtree(Path(os.environ.get("SUNBEAM_DIR")) / "extensions" / "sbx_template")
+    ext_path = EXTENSIONS_DIR() / "sbx_template"
+    assert ext_path.exists()
 
 
-def test_sunbeam_extend(extend_template):
-    template_fp = extend_template
+def test_sunbeam_extend_with_github_url():
+    Extend(["https://github.com/sunbeam-labs/sbx_template.git"])
 
-    assert template_fp.exists()
+    ext_path = EXTENSIONS_DIR() / "sbx_template"
+    assert ext_path.exists()

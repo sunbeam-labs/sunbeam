@@ -1,0 +1,64 @@
+# Default options for running sunbeam on slurm
+rerun-incomplete: True
+rerun-triggers: "mtime"
+latency-wait: 90
+keep-going: True
+notemp: True
+printshellcmds: True
+nolock: True
+verbose: True
+
+# Environment
+software-deployment-method: "conda"
+
+# Cluster configuration
+executor: "slurm"
+jobs: 10
+cores: 24
+
+# Default resource configuration
+default-resources:
+  - slurm_account="hpcusers" # EDIT THIS TO MATCH YOUR CLUSTER'S ACCOUNT NAME
+  - slurm_partition="defq" # EDIT THIS TO MATCH YOUR CLUSTER'S PARTITION NAME
+  - mem_mb=8000
+  - runtime=240
+  - disk_mb=1000
+# set-threads: map rule names to threads
+set-threads:
+  - diamond_reads=8
+  - gene_hits=8
+  - kraken2_classify_report=8
+  - megahit_paired=4
+  - megahit_unpaired=4
+  - run_blastn=4
+  - run_diamond_blastp=4
+  - run_diamond_blastx=4
+  - align_to_genome=4
+# set-resources: map rule names to resources in general
+set-resources:
+  - fq_2_fa:mem_mb=8000
+  - fq_2_fa:runtime=60
+  - build_gene_clusters_diamond_db:mem_mb=32000
+  - build_gene_clusters_diamond_db:runtime=30
+  - diamond_reads:mem_mb=32000
+  - diamond_reads:runtime=1440
+  - gene_hits:mem_mb=32000
+  - gene_hits:runtime=1440
+  - demultiplex:mem_mb=10000
+  - demultiplex:runtime=720
+  - megahit_paired:mem_mb=20000
+  - megahit_paired:runtime=720
+  - kraken2_classify_report:mem_mb=48000
+  - kraken2_classify_report:runtime=2880
+  - kraken2_biom:mem_mb=4000
+  - kraken2_biom:runtime=240
+  - classic_k2_biom:mem_mb=4000
+  - classic_k2_biom:runtime=240
+  - run_blastn:mem_mb=16000
+  - run_blastn:runtime=720
+  - run_diamond_blastp:mem_mb=16000
+  - run_diamond_blastp:runtime=720
+  - run_diamond_blastx:mem_mb=24000
+  - run_diamond_blastx:runtime=720
+  - prodigal:mem_mb=16000
+  - prodigal:runtime=720

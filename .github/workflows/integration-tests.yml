@@ -9,6 +9,26 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
+    test:
+      runs-on: ubuntu-latest
+
+      steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[dev]
+
+      - name: Run tests
+        run: |
+          pytest tests/e2e/
+
     test-slurm:
         name: Slurm Test
         runs-on: ubuntu-latest
@@ -23,58 +43,16 @@ jobs:
     
         steps:
             - uses: actions/checkout@v4
-            - uses: s-weigand/setup-conda@v1.2.1
             - uses: koesterlab/setup-slurm-action@v1
     
             - name: Install Sunbeam
-              shell: bash
               run: |
-                cd $GITHUB_WORKSPACE
-                bash install.sh -e sunbeam -v
+                python -m pip install --upgrade pip
+                pip install .[dev]
+                pip install snakemake-executor-plugin-slurm
             
             - name: Run Sunbeam
               shell: bash
               run: |
-                cd $GITHUB_WORKSPACE
-                source activate sunbeam
-                mkdir projects/
-    
-                pip install snakemake-executor-plugin-slurm
-    
-                sunbeam init --data_fp tests/data/reads/ --profile slurm projects/test/
-    
-                sunbeam run --default-resources slurm_account=runner --profile projects/test/ test
-
-            - name: Check output
-              shell: bash
-              run: |
-                cd $GITHUB_WORKSPACE
-                ls -l .snakemake/slurm_logs/ | grep "rule_test"
-    
-    test-apptainer:
-        name: Apptainer Test
-        runs-on: ubuntu-latest
-    
-        steps:
-            - uses: actions/checkout@v4
-            - uses: s-weigand/setup-conda@v1.2.1
-            - uses: eWaterCycle/setup-apptainer@v2
-              with:
-                apptainer-version: 1.1.2
-    
-            - name: Install Sunbeam
-              shell: bash
-              run: |
-                cd $GITHUB_WORKSPACE
-                bash install.sh -e sunbeam -v
-    
-            - name: Run Sunbeam
-              shell: bash
-              run: |
-                cd $GITHUB_WORKSPACE
-                source activate sunbeam
-                mkdir projects/
-    
-                sunbeam init --data_fp tests/data/reads/ --profile apptainer projects/test/
-    
-                sunbeam run --profile projects/test/ --docker_tag latest
+                sunbeam init --data_fp tests/data/reads/ --profile slurm test/
+                sunbeam run --default-resources slurm_account=runner --profile test/ test

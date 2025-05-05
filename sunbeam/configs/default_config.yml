@@ -1,0 +1,30 @@
+# General options
+all:
+  root: "{PROJECT_FP}"
+  output_fp: "sunbeam_output"
+  samplelist_fp: "samples.csv"
+  paired_end: true
+  version: "{SB_VERSION}"
+
+# Quality control
+qc:
+  # Trimmomatic
+  leading: 3
+  trailing: 3
+  slidingwindow: [4,15]
+  minlen: 36
+  adapter_template: "$CONDA_PREFIX/share/trimmomatic/adapters/NexteraPE-PE.fa"
+  # Cutadapt
+  fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
+  rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
+  cutadapt_opts: "--discard-trimmed"
+  # Komplexity
+  kz_threshold: 0.55
+  # Decontam
+  pct_id: 0.5
+  frac: 0.6
+  host_fp: ""
+  host_list: []
+
+blastdbs:
+  root_fp: ''

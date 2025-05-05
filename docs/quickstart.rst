@@ -7,102 +7,118 @@ Quickstart Guide
 Installation
 ************
 
-There are multiple installation methods available. We do not currently support non-Linux environments but Sunbeam has been run successfully on macOS and on Windows when using WSL.
+Sunbeam is a Python package that can be installed in a variety of ways.
+
+.. tip::
+   The core of Sunbeam is written in Snakemake which means it might not behave well if you're trying to integrate it into a larger pipeline. Instead consider making a Sunbeam extension for what you need.
 
 .. tabs::
 
-   .. tab:: tar
+   .. tab:: pip
 
-      On a Linux machine, download the tarball for the sunbeam version you want (``sunbeamX.X.X``) then unpack and install it.
+      From the PyPi repository (Python 3.11+ required):
 
       .. code-block:: shell
 
-         wget https://github.com/sunbeam-labs/sunbeam/releases/latest/download/sunbeam.tar.gz
-         mkdir sunbeam4.0.0
-         tar -zxf sunbeam.tar.gz -C sunbeam4.0.0
-         cd sunbeam4.0.0 && ./install.sh
+         python -m venv --python=python3.13 sunbeam_env/
+         source sunbeam_env/bin/activate
+         pip install sunbeam
+
+         sunbeam -h
+
+   .. tab:: conda
+
+      From the BioConda channel:
+
+      .. code-block:: shell
+
+         conda create -n sunbeam_env python=3.13
+         conda activate sunbeam_env
+         conda install -c bioconda sunbeam
+
+         sunbeam -h
 
    .. tab:: git
 
-      On a Linux machine, download a copy of Sunbeam from our GitHub repository, and install.
+      Clone and install directly from GitHub:
 
       .. code-block:: shell
 
-         git clone --branch v4.0.0 https://github.com/sunbeam-labs/sunbeam.git
+         git clone https://github.com/sunbeam-labs/sunbeam.git
          cd sunbeam
-         ./install.sh
+         python -m venv --python=python3.13 sunbeam_env/
+         source sunbeam_env/bin/activate
+         pip install -e .[dev]
+
+         sunbeam -h
 
       .. tip::
 
-         If you're planning on doing development work on sunbeam, use SSH or HTTPS with a PAT.
+         If you're planning on doing development work on sunbeam, include the ``[dev]`` to indicate you want the extra requirements installed.
    
    .. tab:: docker
 
-      On a Linux machine, you can use the Sunbeam Docker image. You'll need to have `Docker <https://docs.docker.com/get-docker/>`_ installed and running.
+      Pull and run the Sunbeam Docker image. You'll need to have `Docker <https://docs.docker.com/get-docker/>`_ installed and running (or an alternative like Singularity or Apptainer).
 
       .. code-block:: shell
 
          docker pull sunbeamlabs/sunbeam:latest
-         docker run -v /local/path/to/data/:/mnt/data/ -v /local/path/to/outputs/:/mnt/projects/ -it sunbeamlabs/sunbeam:latest /bin/bash
 
-         ### WITHIN THE CONTAINER ###
-         pytest tests/  # To verify the installation
-         exit
-
-      This will drop you into a shell inside the Sunbeam Docker container. You can then run Sunbeam as you would on a normal machine.
+         docker run --rm sunbeamlabs/sunbeam:latest sunbeam -h
 
       .. tip::
-
-         If you're not already familiar with Docker, you may want to read up on it or use a different installation method.
-
-This installs Sunbeam and all its dependencies, including the `Conda <https://conda.io/miniconda.html>`_ environment manager, if required. It will finish by printing instructions to continue that should look like:
-
-.. code-block:: shell
-
-   conda activate ENV_NAME
-   pytest tests/
-
-This runs some tests to make sure everything was installed correctly.
-
-.. tip::
-
-   If you've never installed Conda before, you'll need to add it to your shell's path. If you're running Bash (the most common terminal shell), the installation script should print the necessary command.
-
-If the tests fail, check out our troubleshooting section or file an issue on our `GitHub <https://github.com/sunbeam-labs/sunbeam/issues>`_ page.
+         The ``--rm`` flag removes the container it creates to run the command after it's done. This way you don't end up with a pile of dead containers on your machine. There are multiple sunbeam images available including the default which comes with prebuilt conda environments and the ``slim`` version which is smaller but requires you to build the conda environments yourself. See the `Docker Hub <https://hub.docker.com/r/sunbeamlabs/sunbeam>`_ for more information.
 
 .. tip::
 
    Refer to the examples page for lots of walkthroughs of common Sunbeam use cases.
 
-Setup
-*****
+Project Initialization
+**********************
 
-Let's say your sequencing reads live in a folder called ``/sequencing/project/reads``, with one or two files per sample (for single- and paired-end sequencing, respectively). These files *must* be in gzipped FASTQ format.
+Let's say your sequencing reads live in a folder called ``/sequencing/project/reads``, with one or two files per sample (for single- and paired-end sequencing, respectively). These files *must* be in gzipped FASTQ format (.fastq.gz).
 
 Let's create a new Sunbeam project (we'll call it ``my_project``):
+
+.. tip::
+   These commands pick up where the installation instructions left off. If you're in a virtual environment, you should still be in it. If you're using Docker, you should have already run the container and be inside it.
 
 .. tabs::
 
    .. tab:: Standard (Conda, local)
+      Using Conda to manage worker environments and keeping all compute local:
 
       .. code-block:: shell
 
-         source activate ENV_NAME
          sunbeam init my_project --data_fp /sequencing/project/reads
    
    .. tab:: Slurm
+      Using Conda to manage worker environments and submitting jobs to a Slurm cluster:
 
       .. code-block:: shell
 
-         source activate ENV_NAME
+         pip install snakemake-executor-plugin-slurm
          sunbeam init my_project --data_fp /sequencing/project/reads --profile slurm
 
    .. tab:: Apptainer/Singularity
+      Using Apptainer/Singularity to manage worker environments and keeping all compute local:
 
       .. code-block:: shell
 
-         source activate ENV_NAME
          sunbeam init my_project --data_fp /sequencing/project/reads --profile apptainer
+
+   .. tab:: Docker
+      Using the Sunbeam Docker image to run the pipeline and keeping all compute local:
+
+      .. code-block:: shell
+
+         docker run --rm -v /local/path/to/data/:/data/ -v /local/path/to/outputs/:/projects/ sunbeamlabs/sunbeam:latest sunbeam init --data_fp /data/reads/ /projects/my_project
+
+      .. tip::
+         The ``-v`` flag mounts a local directory to the container. This way you can access your data and outputs from inside the container. The first ``/local/path/to/data/`` is where your data is stored on your local machine, and the second ``/local/path/to/outputs/`` is where you want the output to be saved. The ``/data/`` and ``/projects/`` are the paths inside the container that correspond to those directories.
+
+.. tip::
+   Snakemake has a number of different options for environment managers, compute services, and storage backends. See docs on executor and storage plugins for more information. And remember that you have to install the relavent plugin before you can run it.
 
 Sunbeam will create a new folder called ``my_project`` and put three files there:
 
@@ -119,21 +135,44 @@ Contaminant filtering
 
 Sunbeam can align your reads to an arbitrary number of contaminant sequences or host genomes and remove reads that map above a given threshold.
 
-To use this, make a folder containing all the target sequences in FASTA format. The filenames should end in "fasta" to be recognized by Sunbeam. In your ``sunbeam_config.yml`` file, edit the ``host_fp:`` line in the ``qc`` section to point to this folder.
+To use this, make a folder containing all the target sequences in FASTA format. The filenames should end in ``.fasta`` to be recognized by Sunbeam. In your ``sunbeam_config.yml`` file, edit the ``host_fp:`` line in the ``qc`` section to point to this folder.
 
-Running
-*******
+Running the Pipeline
+********************
+
+.. tip::
+   If you installed Sunbeam using Pip, you will need to have either Conda or Apptainer/Singularity installed to run the pipeline, depending on your choice of dependency manager (conda is the default).
 
 After you've finished editing your config file, you're ready to run Sunbeam:
 
-.. code-block:: bash
+.. tabs::
 
-   sunbeam run --profile my_project/
+   .. tab:: Most cases
+      In most cases (Standard, Slurm, Apptainer/Singularity from the Init instructions), you can run the pipeline with:
+
+      .. code-block:: bash
+
+         sunbeam run --profile my_project/
+
+   .. tab:: Docker
+      If you're running Sunbeam from the Docker image, you need to be sure to mount the project directory and any database directories you want to use. Also make sure paths in your config are correct for the container, NOT your local machine.
+
+      .. code-block:: bash
+
+         docker run --rm -v /local/path/to/outputs/:/projects/ -v /local/path/to/blast_db/:/blast_db/ sunbeamlabs/sunbeam:latest sunbeam run --profile /projects/my_project/
+
+      .. tip::
+         If you're using the ``slim`` image, you will want to consider where your conda environments are stored. You could mount a local directory specifically for storing these and then point to it with ``sunbeam run --conda-prefix /conda_envs/ ...``. Or you could run ``docker run --name sunbeam ...`` without the ``--rm`` and persist the same container across runs. Or just resolve the environments on every run, which is slow and network intensive but maybe you have your reasons.
 
 By default, this will do a lot, including trimming and quality-controlling your
-reads and removing contaminant, host, and low-complexity sequences. Each of these steps can also be run independently by adding arguments after the ``sunbeam run`` command. See :ref:`running` for more info.
+reads and removing contaminant, host, and low-complexity sequences.
 
-Viewing results
+Viewing Results
 ***************
 
-The output is stored by default under ``my_project/sunbeam_output``. For more information on the output files and all of Sunbeam's different parts, see our full :ref:`usage`!
+The output is stored under ``my_project/sunbeam_output``. QCed and decontaminated reads are in ``my_project/sunbeam_output/qc/decontam/``.
+
+Extending the Pipeline
+**********************
+
+See the :ref:`extensions` page for instructions on how to add extensions to your Sunbeam project.

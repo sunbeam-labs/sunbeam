@@ -1,83 +1,101 @@
-import os
-import pytest
-import shutil
-import subprocess as sp
-import sys
-from pathlib import Path
-
-test_dir = Path(__file__).parent.parent.resolve()
-sys.path.append(test_dir)
-from config_fixture import output_dir, config
+from sunbeam.project.sample_list import SampleList
+from sunbeam.project.sunbeam_config import SunbeamConfig
+from sunbeam.scripts.init import main
 
 
-@pytest.fixture
-def init(output_dir):
-    output_dir = output_dir / "sunbeam_init"
+def test_sunbeam_init(tmp_path):
+    project_dir = tmp_path / "test"
 
-    sp.check_output(
+    main(
         [
-            "sunbeam",
-            "init",
-            "--data_fp",
-            f"{test_dir / 'data' / 'reads'}",
-            output_dir,
+            str(project_dir),
         ]
     )
 
-    yield output_dir
-
-    if os.environ.get("CI", False):
-        try:
-            shutil.copytree(output_dir, "output_sunbeam_init/")
-        except FileExistsError as e:
-            pass
+    assert (project_dir / "sunbeam_config.yml").exists()
+    assert (project_dir / "config.yaml").exists()
 
 
-def test_init(init):
-    output_dir = init
+def test_sunbeam_init_with_data(tmp_path, DATA_DIR):
+    project_dir = tmp_path / "test"
 
-    config_fp = output_dir / "sunbeam_config.yml"
-    profile_fp = output_dir / "config.yaml"
-    samples_fp = output_dir / "samples.csv"
-
-    assert config_fp.exists()
-    assert profile_fp.exists()
-    assert samples_fp.exists()
-
-
-@pytest.fixture
-def init_single_end(output_dir):
-    output_dir = output_dir / "sunbeam_init_single_end"
-
-    sp.check_output(
+    main(
         [
-            "sunbeam",
-            "init",
+            str(project_dir),
             "--data_fp",
-            f"{test_dir / 'data' / 'reads'}",
+            str(DATA_DIR / "reads"),
+        ]
+    )
+
+    assert (project_dir / "sunbeam_config.yml").exists()
+    assert (project_dir / "config.yaml").exists()
+    assert (project_dir / "samples.csv").exists()
+
+    sl = SampleList(project_dir / "samples.csv")
+    assert sl.paired_end
+    assert len(sl.samples) == 2
+
+
+def test_sunbeam_init_with_single_end(tmp_path, DATA_DIR):
+    project_dir = tmp_path / "test"
+
+    main(
+        [
+            str(project_dir),
+            "--data_fp",
+            str(DATA_DIR / "single_end_reads"),
             "--single_end",
+        ]
+    )
+
+    assert (project_dir / "sunbeam_config.yml").exists()
+    assert (project_dir / "config.yaml").exists()
+    assert (project_dir / "samples.csv").exists()
+
+    sl = SampleList(project_dir / "samples.csv", paired_end=False)
+    assert len(sl.samples) == 2
+
+
+def test_sunbeam_init_with_format(tmp_path, DATA_DIR):
+    project_dir = tmp_path / "test"
+
+    main(
+        [
+            str(project_dir),
+            "--data_fp",
+            str(DATA_DIR / "reads"),
             "--format",
             "{sample}_R{rp}.fastq.gz",
-            output_dir,
         ]
     )
 
-    yield output_dir
+    assert (project_dir / "sunbeam_config.yml").exists()
+    assert (project_dir / "config.yaml").exists()
+    assert (project_dir / "samples.csv").exists()
 
-    if os.environ.get("CI", False):
-        try:
-            shutil.copytree(output_dir, "output_sunbeam_init_single_end/")
-        except FileExistsError as e:
-            pass
+    sl = SampleList(project_dir / "samples.csv")
+    assert len(sl.samples) == 2
 
 
-def test_init_single_end(init_single_end):
-    output_dir = init_single_end
+def test_sunbeam_init_with_template(tmp_path):
+    project_dir = tmp_path / "test"
+    template_fp = tmp_path / "template_config.yml"
+    with open(template_fp, "w") as f:
+        f.write(
+            """
+            all:
+                root: "{PROJECT_FP}"
+                version: 0.1
+            """
+        )
 
-    config_fp = output_dir / "sunbeam_config.yml"
-    profile_fp = output_dir / "config.yaml"
-    samples_fp = output_dir / "samples.csv"
+    main(
+        [
+            str(project_dir),
+            "--template",
+            str(template_fp),
+        ]
+    )
 
-    assert config_fp.exists()
-    assert profile_fp.exists()
-    assert samples_fp.exists()
+    sc = SunbeamConfig.from_file(project_dir / "sunbeam_config.yml")
+    assert sc.config["all"]["root"] == str(project_dir)
