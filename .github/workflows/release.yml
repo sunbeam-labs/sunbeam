@@ -64,3 +64,57 @@ jobs:
             push: true
             tags: sunbeamlabs/sunbeam:${{ github.ref_name }}-slim
             labels: ${{ steps.meta.outputs.labels }}
+
+        - name: Extract cutadapt Docker metadata
+          id: meta-cutadapt
+          uses: docker/metadata-action@v5
+          with:
+            images: sunbeamlabs/cutadapt
+            tags: |
+              sunbeamlabs/cutadapt:${{ github.ref_name }}
+              sunbeamlabs/cutadapt:latest
+
+        - name: Build and push cutadapt image
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: sunbeam/workflow/envs/cutadapt.Dockerfile
+            push: true
+            tags: ${{ steps.meta-cutadapt.outputs.tags }}
+            labels: ${{ steps.meta-cutadapt.outputs.labels }}
+
+        - name: Extract komplexity Docker metadata
+          id: meta-komplexity
+          uses: docker/metadata-action@v5
+          with:
+            images: sunbeamlabs/komplexity
+            tags: |
+              sunbeamlabs/komplexity:${{ github.ref_name }}
+              sunbeamlabs/komplexity:latest
+
+        - name: Build and push komplexity image
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: sunbeam/workflow/envs/komplexity.Dockerfile
+            push: true
+            tags: ${{ steps.meta-komplexity.outputs.tags }}
+            labels: ${{ steps.meta-komplexity.outputs.labels }}
+
+        - name: Extract QC Docker metadata
+          id: meta-qc
+          uses: docker/metadata-action@v5
+          with:
+            images: sunbeamlabs/qc
+            tags: |
+              sunbeamlabs/qc:${{ github.ref_name }}
+              sunbeamlabs/qc:latest
+
+        - name: Build and push QC image
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: sunbeam/workflow/envs/qc.Dockerfile
+            push: true
+            tags: ${{ steps.meta-qc.outputs.tags }}
+            labels: ${{ steps.meta-qc.outputs.labels }}
