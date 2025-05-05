@@ -97,7 +97,7 @@ jobs:
             name: python-package-distributions
             path: dist/
         - name: Publish distribution 📦 to PyPI
-          uses: pypa/gh-action-pypi-publish@release/v1
+          uses: pypa/gh-action-pypi-publish@v1
 
     push-dockerhub:
         uses: ./.github/workflows/dockerhub.yml
