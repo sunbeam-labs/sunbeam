@@ -3,7 +3,7 @@ FROM condaforge/mambaforge:latest
 # Setup
 WORKDIR /home/qc_env
 
-COPY workflow/envs/qc.yml ./
+COPY sunbeam/workflow/envs/qc.yml ./
 
 # Install environment
 RUN mamba env create --file qc.yml --name qc

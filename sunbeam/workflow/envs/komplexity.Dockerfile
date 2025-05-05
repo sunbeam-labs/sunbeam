@@ -1,4 +1,5 @@
-FROM rust:slim
+# Pin to version because komplexity is 7 years old and doesn't work with latest Rust
+FROM rust:1.80.1-slim
 
 # Setup
 WORKDIR /home/komplexity_env

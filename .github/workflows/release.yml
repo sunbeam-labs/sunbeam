@@ -1,91 +1,13 @@
 name: Release
 
 on:
-    release:
-      types: [published]
-
-    workflow_dispatch:
+    workflow_call:
       
 jobs:
-    check-version:
-      runs-on: ubuntu-latest
-      outputs:
-        version: ${{ steps.get_version.outputs.version }}
-
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: '3.x'
-
-        - name: Install Library
-          run: |
-              python -m pip install .
-
-        - id: get_version
-          uses: battila7/get-version-action@v2
-
-        - name: Check version
-          run: |
-            LIBRARY_VERSION=$(sunbeam --version)
-            GITHUB_VERSION=${{ steps.get_version.outputs.version-without-v }}
-            if [[ $LIBRARY_VERSION == $GITHUB_VERSION ]]; then
-              echo "Versions match, continuing..."
-            else
-              echo "Versions don't match, exiting..."
-              echo "Library version: $LIBRARY_VERSION"
-              echo "GitHub version: $GITHUB_VERSION"
-              exit 1
-            fi
-
-    run-tests:
-      uses: ./.github/workflows/tests.yml
-      secrets: inherit
-      needs:
-        - check-version
-
-    run-integration-tests:
-      uses: ./.github/workflows/integration-tests.yml
-      secrets: inherit
-      needs:
-        - check-version
-        - run-tests
-
-    pypi-build:
-      name: Build distribution 📦
-      runs-on: ubuntu-latest
-      needs: run-integration-tests
-
-      steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-      - name: Install pypa/build
-        run: >-
-          python3 -m
-          pip install
-          build
-          --user
-      - name: Build a binary wheel and a source tarball
-        run: python3 -m build
-      - name: Store the distribution packages
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-package-distributions
-          path: dist/
-
     publish-to-pypi:
       name: >-
         Publish Python 🐍 distribution 📦 to PyPI
       if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
-      needs: pypi-build
       runs-on: ubuntu-latest
       environment:
         name: pypi
@@ -102,9 +24,97 @@ jobs:
         - name: Publish distribution 📦 to PyPI
           uses: pypa/gh-action-pypi-publish@release/v1
 
-    push-dockerhub:
-        uses: ./.github/workflows/dockerhub.yml
-        secrets: inherit
-        needs: [check-version, run-integration-tests]
-        with:
-          version: ${{ needs.check-version.outputs.version }}
+    publish-to-dockerhub:
+      name: >-
+        Publish Docker 🐳 image 📦 to Docker Hub
+      if: startsWith(github.ref, 'refs/tags/')  # only publish to Docker Hub on tag pushes
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Log in to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+        - name: Extract Docker metadata
+          id: meta
+          uses: docker/metadata-action@v5
+          with:
+            images: sunbeamlabs/sunbeam
+
+        - name: Build and push full image
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: ./Dockerfile
+            push: true
+            tags: |
+              sunbeamlabs/sunbeam:latest
+              sunbeamlabs/sunbeam:${{ github.ref_name }}
+            labels: ${{ steps.meta.outputs.labels }}
+
+        - name: Build and push slim image
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: ./slim.Dockerfile
+            push: true
+            tags: sunbeamlabs/sunbeam:${{ github.ref_name }}-slim
+            labels: ${{ steps.meta.outputs.labels }}
+
+        - name: Extract cutadapt Docker metadata
+          id: meta-cutadapt
+          uses: docker/metadata-action@v5
+          with:
+            images: sunbeamlabs/cutadapt
+            tags: |
+              sunbeamlabs/cutadapt:${{ github.ref_name }}
+              sunbeamlabs/cutadapt:latest
+
+        - name: Build and push cutadapt image
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: sunbeam/workflow/envs/cutadapt.Dockerfile
+            push: true
+            tags: ${{ steps.meta-cutadapt.outputs.tags }}
+            labels: ${{ steps.meta-cutadapt.outputs.labels }}
+
+        - name: Extract komplexity Docker metadata
+          id: meta-komplexity
+          uses: docker/metadata-action@v5
+          with:
+            images: sunbeamlabs/komplexity
+            tags: |
+              sunbeamlabs/komplexity:${{ github.ref_name }}
+              sunbeamlabs/komplexity:latest
+
+        - name: Build and push komplexity image
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: sunbeam/workflow/envs/komplexity.Dockerfile
+            push: true
+            tags: ${{ steps.meta-komplexity.outputs.tags }}
+            labels: ${{ steps.meta-komplexity.outputs.labels }}
+
+        - name: Extract QC Docker metadata
+          id: meta-qc
+          uses: docker/metadata-action@v5
+          with:
+            images: sunbeamlabs/qc
+            tags: |
+              sunbeamlabs/qc:${{ github.ref_name }}
+              sunbeamlabs/qc:latest
+
+        - name: Build and push QC image
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: sunbeam/workflow/envs/qc.Dockerfile
+            push: true
+            tags: ${{ steps.meta-qc.outputs.tags }}
+            labels: ${{ steps.meta-qc.outputs.labels }}
