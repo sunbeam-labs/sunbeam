@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 
-__version__ = "5.0.0.b"
+__version__ = "5.0.0.c"
 __author__ = "Erik Clarke"
 __license__ = "GPL2+"
 

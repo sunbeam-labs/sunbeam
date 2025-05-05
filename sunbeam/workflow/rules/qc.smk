@@ -204,10 +204,6 @@ rule fastqc_report:
         LOG_FP / "fastqc_report.log",
     benchmark:
         BENCHMARK_FP / "fastqc_report.tsv"
-    conda:
-        "../envs/reports.yml"
-    container:
-        get_docker_str("reports")
     script:
         "../scripts/fastqc_report.py"
 
@@ -247,10 +243,6 @@ rule remove_low_complexity:
     resources:
         mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.size_mb),
         runtime=lambda wc: max(MIN_RUNTIME, 120),
-    conda:
-        "../envs/reports.yml"
-    container:
-        get_docker_str("reports")
     script:
         "../scripts/remove_low_complexity.py"
 

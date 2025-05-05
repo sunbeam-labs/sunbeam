@@ -5,15 +5,15 @@ WORKDIR /home/sunbeam
 # Install Sunbeam
 COPY pyproject.toml .
 COPY sunbeam/ sunbeam/
-RUN pip install .
+RUN pip install .[dev]
 
 # Pre-create conda environments (caches them in image)
-COPY tests/data/reads/ reads/
 RUN mkdir -p projects && \
-    sunbeam init --data_fp reads projects/init && \
+    sunbeam init --data_fp tests/data/reads projects/init && \
     sunbeam run --profile projects/init --conda-create-envs-only --mamba && \
-    rm -r projects reads
+    rm -rf projects/
 
+# Set labels
 LABEL org.opencontainers.image.title="Sunbeam" \
       org.opencontainers.image.source="https://github.com/sunbeam-labs/sunbeam"
 

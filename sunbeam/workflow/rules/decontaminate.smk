@@ -141,10 +141,6 @@ rule preprocess_report:
         LOG_FP / "preprocess_report.log",
     benchmark:
         BENCHMARK_FP / "preprocess_report.tsv"
-    conda:
-        "../envs/reports.yml"
-    container:
-        get_docker_str("reports")
     script:
         "../scripts/preprocess_report.py"
 
