@@ -123,7 +123,7 @@ jobs:
           uses: docker/build-push-action@v5
           with:
             context: .
-            file: workflow/envs/komplexity.Dockerfile
+            file: sunbeam/workflow/envs/komplexity.Dockerfile
             push: true
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
@@ -151,7 +151,7 @@ jobs:
           uses: docker/build-push-action@v5
           with:
             context: .
-            file: workflow/envs/qc.Dockerfile
+            file: sunbeam/workflow/envs/qc.Dockerfile
             push: true
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
