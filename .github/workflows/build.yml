@@ -38,7 +38,7 @@ jobs:
         - uses: actions/checkout@v4
 
         - name: Build test image
-          uses: docker/build-push-action@v5
+          uses: docker/build-push-action@v6
           with:
             context: .
             file: ./Dockerfile
@@ -50,7 +50,7 @@ jobs:
             docker run --rm -v ${{ github.workspace }}/tests:/tests sunbeamlabs/sunbeam:test pytest /tests
 
         - name: Build slim test image
-          uses: docker/build-push-action@v5
+          uses: docker/build-push-action@v6
           with:
             context: .
             file: ./slim.Dockerfile
@@ -69,7 +69,7 @@ jobs:
           - uses: actions/checkout@v4
 
           - name: Build cutadapt image
-            uses: docker/build-push-action@v5
+            uses: docker/build-push-action@v6
             with:
               context: .
               file: sunbeam/workflow/envs/cutadapt.Dockerfile
@@ -77,7 +77,7 @@ jobs:
               tags: sunbeamlabs/cutadapt:test
 
           - name: Build komplexity image
-            uses: docker/build-push-action@v5
+            uses: docker/build-push-action@v6
             with:
               context: .
               file: sunbeam/workflow/envs/komplexity.Dockerfile
@@ -85,7 +85,7 @@ jobs:
               tags: sunbeamlabs/komplexity:test
 
           - name: Build QC image
-            uses: docker/build-push-action@v5
+            uses: docker/build-push-action@v6
             with:
               context: .
               file: sunbeam/workflow/envs/qc.Dockerfile

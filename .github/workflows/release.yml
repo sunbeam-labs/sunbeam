@@ -46,7 +46,7 @@ jobs:
             images: sunbeamlabs/sunbeam
 
         - name: Build and push full image
-          uses: docker/build-push-action@v5
+          uses: docker/build-push-action@v6
           with:
             context: .
             file: ./Dockerfile
@@ -57,7 +57,7 @@ jobs:
             labels: ${{ steps.meta.outputs.labels }}
 
         - name: Build and push slim image
-          uses: docker/build-push-action@v5
+          uses: docker/build-push-action@v6
           with:
             context: .
             file: ./slim.Dockerfile
@@ -75,7 +75,7 @@ jobs:
               sunbeamlabs/cutadapt:latest
 
         - name: Build and push cutadapt image
-          uses: docker/build-push-action@v5
+          uses: docker/build-push-action@v6
           with:
             context: .
             file: sunbeam/workflow/envs/cutadapt.Dockerfile
@@ -93,7 +93,7 @@ jobs:
               sunbeamlabs/komplexity:latest
 
         - name: Build and push komplexity image
-          uses: docker/build-push-action@v5
+          uses: docker/build-push-action@v6
           with:
             context: .
             file: sunbeam/workflow/envs/komplexity.Dockerfile
@@ -111,7 +111,7 @@ jobs:
               sunbeamlabs/qc:latest
 
         - name: Build and push QC image
-          uses: docker/build-push-action@v5
+          uses: docker/build-push-action@v6
           with:
             context: .
             file: sunbeam/workflow/envs/qc.Dockerfile
