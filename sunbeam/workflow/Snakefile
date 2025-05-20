@@ -8,6 +8,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
+from snakemake.io import IOFile, Log
 from sunbeam.project import SampleList, SunbeamConfig, output_subdir
 from sunbeam.project.post import compile_benchmarks
 
@@ -16,7 +17,6 @@ MIN_MEM_MB = int(os.getenv("SUNBEAM_MIN_MEM_MB", 8000))
 MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 sc = SunbeamConfig(config)
-print(sc.resolved_paths())
 Cfg = sc.resolved_paths()
 
 # Load extensions
@@ -129,6 +129,29 @@ for sbx_name, sbx_fp in sbxs.items():
         include: rule_fp
 
 
+# ---- Add standard features to rules
+for rule_obj in workflow.rules:
+    # Determine wildcard string
+    wildcards_str = ""
+    if rule_obj.wildcard_names:
+        wildcards_str = "_".join(f"{{{w}}}" for w in rule_obj.wildcard_names)
+
+    # Add sunbeam log file
+    log_name = f"{rule_obj.name}_{wildcards_str}.log" if wildcards_str else f"{rule_obj.name}.log"
+    rule_obj.log.update({"main": str(LOG_FP / log_name)})
+
+    # Add benchmarks
+    wildcards_str = "_".join(f"{{{w}}}" for w in rule_obj.wildcard_names)
+    benchmark_name = f"{rule_obj.name}_{wildcards_str}.tsv" if wildcards_str else f"{rule_obj.name}.tsv"
+
+    try:
+        rule_obj.benchmark = str(BENCHMARK_FP / benchmark_name)
+    except AssertionError:
+        print(f"Skipping benchmark assignment for rule '{rule_obj.name}' (unsupported)")
+
+    print(rule_obj.benchmark)
+
+
 # ---- Rule all: run all targets
 rule all:
     input:
@@ -155,6 +178,7 @@ rule samples:
 
 localrules:
     all,
+    test,
     samples,
 
 
