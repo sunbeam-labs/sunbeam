@@ -16,7 +16,6 @@ MIN_MEM_MB = int(os.getenv("SUNBEAM_MIN_MEM_MB", 8000))
 MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 sc = SunbeamConfig(config)
-print(sc.resolved_paths())
 Cfg = sc.resolved_paths()
 
 # Load extensions
@@ -53,7 +52,6 @@ try:
         raise KeyError
 except KeyError:
     HostGenomes = [Path(g.name).stem for g in HostGenomeFiles]
-    print(HostGenomes)
 
 sys.stderr.write("done.\n")
 
