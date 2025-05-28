@@ -124,3 +124,37 @@ def test_fill_missing_doesnt_overwrite(test_extension):
     sc.fill_missing(ext_dir.parent)
 
     assert sc.config["sbx_test_extension"]["bloop"] == "not_blorp"
+
+
+def test_modify(tmp_path):
+    config = {
+        "all": {
+            "root": "/path/to/root",
+            "version": __version__,
+        },
+        "sbx_test_extension": {
+            "bloop": "blorp",
+        },
+    }
+    sc = SunbeamConfig(config)
+
+    sc.modify("sbx_test_extension: {bloop: 'new_value'}")
+    assert sc.config["sbx_test_extension"]["bloop"] == "new_value"
+
+
+def test_modify_one_of_many(tmp_path):
+    config = {
+        "all": {
+            "root": "/path/to/root",
+            "version": __version__,
+        },
+        "sbx_test_extension": {
+            "bloop": "blorp",
+            "blap": "blip",
+        },
+    }
+    sc = SunbeamConfig(config)
+
+    sc.modify("sbx_test_extension: {bloop: 'new_value'}")
+    assert sc.config["sbx_test_extension"]["bloop"] == "new_value"
+    assert sc.config["sbx_test_extension"]["blap"] == "blip"
