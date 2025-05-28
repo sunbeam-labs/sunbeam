@@ -97,7 +97,15 @@ class SunbeamConfig:
         change_str should be a string in the format "root_key: {sub_key: value}"
         """
         changes = yaml.safe_load(change_str)
-        self.config.update(changes)
+        for k, v in changes.items():
+            if k not in self.config:
+                self.config[k] = v
+            else:
+                if isinstance(v, dict):
+                    for sub_k, sub_v in v.items():
+                        self.config[k][sub_k] = sub_v
+                else:
+                    self.config[k] = v
 
     @staticmethod
     def get_extensions(extensions_dir: Path = None) -> dict[str, Path]:
