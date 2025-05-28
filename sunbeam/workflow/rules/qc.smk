@@ -30,145 +30,60 @@ rule sample_intake:
         "../scripts/sample_intake.py"
 
 
-ruleorder: adapter_removal_paired > adapter_removal_unpaired
-
-
-rule adapter_removal_unpaired:
-    input:
-        QC_FP / "00_samples" / "{sample}_1.fastq.gz",
-    output:
-        r=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
-        ngz=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
-    log:
-        LOG_FP / "adapter_removal_unpaired_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
-    resources:
-        runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
-    threads: 4
-    conda:
-        "../envs/cutadapt.yml"
-    container:
-        get_docker_str("cutadapt")
-    script:
-        "../scripts/adapter_removal_unpaired.py"
-
-
-rule adapter_removal_paired:
+rule fastp:
+    """Run fastp on the input files."""
     input:
         r1=QC_FP / "00_samples" / "{sample}_1.fastq.gz",
         r2=QC_FP / "00_samples" / "{sample}_2.fastq.gz",
     output:
-        r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
-        r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
-        ngz1=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
-        ngz2=temp(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
-    log:
-        LOG_FP / "adapter_removal_paired_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
-    resources:
-        runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 10),
-    threads: 4
-    conda:
-        "../envs/cutadapt.yml"
-    container:
-        get_docker_str("cutadapt")
-    script:
-        "../scripts/adapter_removal_paired.py"
-
-
-ruleorder: trimmomatic_paired > trimmomatic_unpaired
-
-
-# Check that the adapter template file exists
-if os.environ.get("SUNBEAM_NO_ADAPTER", None):
-    assert os.path.exists(Cfg["qc"]["adapter_template"])
-    assert os.path.isfile(Cfg["qc"]["adapter_template"])
-    assert os.stat(Cfg["qc"]["adapter_template"]).st_size > 0
-
-
-rule trimmomatic_unpaired:
-    input:
-        QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
-    output:
-        QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
-    log:
-        LOG_FP / "trimmomatic_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "trimmomatic_unpaired_{sample}.tsv"
+        r1=QC_FP / "01_fastp" / "{sample}_1.fastq.gz",
+        r2=QC_FP / "01_fastp" / "{sample}_2.fastq.gz",
+        ur1=QC_FP / "01_fastp" / "{sample}_unpaired_1.fastq.gz",
+        ur2=QC_FP / "01_fastp" / "{sample}_unpaired_2.fastq.gz",
+        json=QC_FP / "01_fastp" / "{sample}.json",
+        html=QC_FP / "01_fastp" / "{sample}.html",
     params:
+        adapter_template=Cfg["qc"]["adapter_template"],
+        leading=Cfg["qc"]["leading"],
+        trailing=Cfg["qc"]["trailing"],
         sw_start=Cfg["qc"]["slidingwindow"][0],
         sw_end=Cfg["qc"]["slidingwindow"][1],
-    resources:
-        mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 1000) * MIN_MEM_MB),
-        runtime=lambda wc: max(MIN_RUNTIME, 240),
-    threads: 4
-    conda:
-        "../envs/qc.yml"
-    container:
-        get_docker_str("qc")
-    shell:
-        """
-        trimmomatic \
-        SE -threads {threads} -phred33 \
-        {input} {output} \
-        ILLUMINACLIP:{Cfg[qc][adapter_template]}:2:30:10:8:true \
-        LEADING:{Cfg[qc][leading]} \
-        TRAILING:{Cfg[qc][trailing]} \
-        SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
-        MINLEN:{Cfg[qc][minlen]} \
-        2>&1 | tee {log}
-        """
-
-
-rule trimmomatic_paired:
-    input:
-        r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
-        r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
-    output:
-        pair_r1=QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
-        pair_r2=QC_FP / "02_trimmomatic" / "{sample}_2.fastq.gz",
-        unpair_r1=temp(
-            QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_1_unpaired.fastq.gz"
-        ),
-        unpair_r2=temp(
-            QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_2_unpaired.fastq.gz"
-        ),
+        minlen=Cfg["qc"]["minlen"],
     log:
-        LOG_FP / "trimmomatic_{sample}.log",
+        LOG_FP / "fastp_{sample}_{rp}.log",
     benchmark:
-        BENCHMARK_FP / "trimmomatic_paired_{sample}.tsv"
-    params:
-        sw_start=Cfg["qc"]["slidingwindow"][0],
-        sw_end=Cfg["qc"]["slidingwindow"][1],
+        BENCHMARK_FP / "fastp_{sample}_{rp}.tsv"
     resources:
-        mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 2000) * MIN_MEM_MB),
-        runtime=lambda wc: max(MIN_RUNTIME, 240),
+        mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.size_mb),
+        runtime=lambda wc: max(MIN_RUNTIME, 120),
     threads: 4
     conda:
-        "../envs/qc.yml"
+        "../envs/fastp.yml"
     container:
-        get_docker_str("qc")
+        get_docker_str("fastp")
     shell:
         """
-        trimmomatic \
-        PE -threads {threads} -phred33 \
-        {input.r1} {input.r2} \
-        {output.pair_r1} {output.unpair_r1} \
-        {output.pair_r2} {output.unpair_r2} \
-        ILLUMINACLIP:{Cfg[qc][adapter_template]}:2:30:10:8:true \
-        LEADING:{Cfg[qc][leading]} \
-        TRAILING:{Cfg[qc][trailing]} \
-        SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
-        MINLEN:{Cfg[qc][minlen]} \
-        2>&1 | tee {log}
+        fastp \
+            -i {input.r1} \
+            -I {input.r2} \
+            -o {output.r1} \
+            -O {output.r2} \
+            --unpaired1 {output.ur1} \
+            --unpaired2 {output.ur2} \
+            --adapter_fasta {params.adapter_template} \
+            --thread {threads} \
+            --cut_front --cut_front_window_size {params.leading} \
+            --cut_tail --cut_tail_window_size {params.trailing} \
+            --cut_right --cut_right_window_size {params.sw_start} \
+            --cut_mean_quality {params.sw_end} \
+            --length_required {params.minlen} \
+            --json {output.json} --html {output.html} 2>&1 | tee {log}
         """
 
 
 rule fastqc:
     input:
-        reads=expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
+        reads=expand(QC_FP / "01_fastp" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
         expand(QC_FP / "reports" / "{{sample}}_{rp}_fastqc/fastqc_data.txt", rp=Pairs),
     log:
@@ -210,7 +125,7 @@ rule fastqc_report:
 
 rule find_low_complexity:
     input:
-        expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
+        expand(QC_FP / "01_fastp" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
         QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
     log:
@@ -232,7 +147,7 @@ rule find_low_complexity:
 
 rule remove_low_complexity:
     input:
-        reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
+        reads=QC_FP / "01_fastp" / "{sample}_{rp}.fastq.gz",
         ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
     output:
         QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",

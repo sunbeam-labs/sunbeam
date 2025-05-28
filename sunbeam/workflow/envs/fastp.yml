@@ -2,5 +2,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - cutadapt
-name: cutadapt
+  - fastp
+name: fastp
