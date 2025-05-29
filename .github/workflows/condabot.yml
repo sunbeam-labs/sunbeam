@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
         with:
             fetch-depth: 0
-      - uses: sunbeam-labs/condabot@main
+      - uses: sunbeam-labs/condabot@v1
         with:
             env-path: "sunbeam/workflow/envs/"
             test-path: "tests/"
