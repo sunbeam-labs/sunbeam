@@ -1,6 +1,3 @@
-from sunbeam import get_docker_str
-
-
 localrules:
     all_decontam,
     aggregate_reads,
