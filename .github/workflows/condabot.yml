@@ -15,6 +15,6 @@ jobs:
             fetch-depth: 0
       - uses: sunbeam-labs/condabot@main
         with:
-            env-path: "workflow/envs/"
+            env-path: "sunbeam/workflow/envs/"
             test-path: "tests/"
             sunbeam-version: "update/conda-lock"
