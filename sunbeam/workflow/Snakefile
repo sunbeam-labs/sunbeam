@@ -8,7 +8,13 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from sunbeam import __version__, EXTENSIONS_DIR, get_docker_str, get_ext_path, get_ext_version
+from sunbeam import (
+    __version__,
+    EXTENSIONS_DIR,
+    get_docker_str,
+    get_ext_path,
+    get_ext_version,
+)
 from sunbeam.project import SampleList, SunbeamConfig, output_subdir
 from sunbeam.project.post import compile_benchmarks
 
