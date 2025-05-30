@@ -26,3 +26,15 @@ def get_ext_path(ext_name: str) -> Path:
     if ext_path.exists():
         return ext_path
     raise ValueError(f"Extension {ext_name} not found in {EXTENSIONS_DIR()}.")
+
+
+def get_ext_version(ext_name: str) -> str:
+    ext_path = get_ext_path(ext_name)
+    version_file = ext_path / "VERSION"
+
+    if version_file.exists():
+        with open(version_file, "r") as f:
+            return f.read().strip()
+    else:
+        print("Version file not found for extension:", ext_name)
+        return "0.0.0"
