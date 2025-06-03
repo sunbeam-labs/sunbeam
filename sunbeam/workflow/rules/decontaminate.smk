@@ -110,10 +110,6 @@ rule filter_reads:
     resources:
         mem_mb=lambda wc: max(MIN_MEM_MB, 24000),
         runtime=lambda wc: max(MIN_RUNTIME, 240),
-    conda:
-        "../envs/qc.yml"
-    container:
-        get_docker_str("qc")
     script:
         "../scripts/filter_reads.py"
 

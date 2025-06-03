@@ -8,6 +8,7 @@ Sunbeam
 =======
 
 .. argparse::
+
     :ref: sunbeam.scripts.sunbeam.main_parser
     :prog: sunbeam
 
@@ -25,6 +26,7 @@ Usage examples
     ``sunbeam run --profile /path/to/project/ --skip decontam all_assembly``
 
 .. argparse::
+
     :ref: sunbeam.scripts.run.main_parser
     :prog: sunbeam run
 
@@ -32,6 +34,7 @@ Init
 ----
 
 .. argparse::
+
     :ref: sunbeam.scripts.init.main_parser
     :prog: sunbeam init
 
@@ -39,6 +42,7 @@ Extend
 ------
 
 .. argparse::
+
     :ref: sunbeam.scripts.extend.main_parser
     :prog: sunbeam extend
 
@@ -46,5 +50,6 @@ Config
 ------
 
 .. argparse::
+    
     :ref: sunbeam.scripts.config.main_parser
     :prog: sunbeam config
