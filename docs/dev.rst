@@ -135,3 +135,13 @@ Updating docs
 -------------
 
 The ``docs/`` directory contains the documentation for Sunbeam. The documentation is written in reStructuredText and is built with Sphinx.
+
+Misc
+====
+
+Random tips and tricks that I don't have a good home for. Hopefully these might save you a headache or two.
+
+Importing ``sunbeam`` in scripts
+--------------------------------
+
+Parts of the ``sunbeam`` package are meant to be imported into Snakemake and scripts. Things like ``parse_fastq()`` should be pretty general use functions for DIY scripts. HOWEVER, you should not import ``sunbeam`` into a rule that uses the ``conda`` keyword. Under certain configurations like having ``sunbeam`` installed in a venv and running the rule in a conda env, the ``sunbeam`` module won't be available. Split up any logic that needs ``sunbeam`` logic and other dependencies into separate rules.

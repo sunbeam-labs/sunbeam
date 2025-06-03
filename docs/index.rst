@@ -3,6 +3,7 @@ Welcome to Sunbeam
 ==================
 
 .. image:: images/sunbeam_logo.gif
+
    :width: 120px
    :height: 120px
    :align: left
@@ -26,6 +27,7 @@ If you use Sunbeam in your research, please cite:
 EL Clarke, LJ Taylor, C Zhao *et al.* Sunbeam: an extensible pipeline for analyzing metagenomic sequencing experiments. *Microbiome* 7:46 (2019)
 
 .. toctree::
+   
    :hidden:
    :maxdepth: 2
    :caption: Contents:
