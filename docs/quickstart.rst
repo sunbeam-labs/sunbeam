@@ -127,7 +127,7 @@ Let's create a new Sunbeam project (we'll call it ``my_project``):
 
 .. tip::
 
-   Snakemake has a number of different options for environment managers, compute services, and storage backends. See docs on executor and storage plugins for more information. And remember that you have to install the relavent plugin before you can run it.
+   Snakemake has a number of different options for environment managers, compute services, and storage backends. See docs on executor and storage plugins for more information. And remember that you have to install the relevant plugin before you can run it.
 
 Sunbeam will create a new folder called ``my_project`` and put three files there:
 
