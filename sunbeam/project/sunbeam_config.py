@@ -1,3 +1,4 @@
+import os
 import yaml
 from pathlib import Path
 from sunbeam import __version__, EXTENSIONS_DIR
@@ -144,7 +145,12 @@ class SunbeamConfig:
                 resolved[key] = {}
                 for sub_key, sub_value in value.items():
                     if sub_key.endswith("_fp"):
-                        if not Path(sub_value).is_absolute():
+                        if not sub_value:
+                            print(
+                                f"Warning: {key}.{sub_key} is empty, setting to os.devnull"
+                            )
+                            resolved[key][sub_key] = Path(os.devnull)
+                        elif not Path(sub_value).is_absolute():
                             resolved[key][sub_key] = root_fp / sub_value
                         else:
                             resolved[key][sub_key] = Path(sub_value).resolve()
