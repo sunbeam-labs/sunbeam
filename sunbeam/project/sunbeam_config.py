@@ -145,8 +145,8 @@ class SunbeamConfig:
                 for sub_key, sub_value in value.items():
                     if sub_key.endswith("_fp"):
                         if not sub_value:
-                            print(f"Warning: {key}.{sub_key} is empty, setting to /dev/null")
-                            resolved[key][sub_key] = Path("/dev/null")
+                            print(f"Warning: {key}.{sub_key} is empty, setting to os.devnull")
+                            resolved[key][sub_key] = Path(os.devnull)
                         elif not Path(sub_value).is_absolute():
                             resolved[key][sub_key] = root_fp / sub_value
                         else:
