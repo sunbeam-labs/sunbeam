@@ -165,7 +165,8 @@ def test_empty_fp(tmp_path):
     config_fp = tmp_path / "config.yml"
 
     with open(config_fp, "w") as f:
-        f.write("""
+        f.write(
+            """
             all:
                 root: /path/to/root
                 version: 1.0.0
@@ -173,7 +174,8 @@ def test_empty_fp(tmp_path):
                 bloop_fp: /path/to/bloop_fp
                 blap_fp: ""
                 blip_fp: 
-        """)
+        """
+        )
 
     sc = SunbeamConfig.from_file(config_fp)
 
