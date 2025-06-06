@@ -20,7 +20,7 @@ This is unfortunately a common issue with conda where shared libraries are eithe
 
 **I'm trying to run an extension but none of the rules are running.**
 
-There are a number of reasons why this might be happening. First, make sure you've included the correct target for your extension in your command. You can check the extension's main ``.smk`` file to see that name. Also, if you are using list-based input flags like ``sunbeam run --profile /path/to/project/ all_test_extension --include sbx_test_extension``, note that it WILL NOT WORK like this: ``sunbeam run --profile /path/to/project/ --include sbx_test_extension all_test_extension``. Argparse will interpret the target as another extension to include instead of as the target. Another thing to check is if there are any mapping files or database directories that need to be included in ``/path/to/project/sunbeam_config.yml``. Some extensions are built such that each ruleset will only run once per mapping or once per database.
+There are a number of reasons why this might be happening. First, make sure you've included the correct target for your extension in your command. You can check the extension's main ``.smk`` file to see that name. Another thing to check is if there are any mapping files or database directories that need to be included in ``/path/to/project/sunbeam_config.yml``. Some extensions are built such that each ruleset will only run once per mapping or once per database.
 
 .. tip::
     
