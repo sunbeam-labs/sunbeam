@@ -1,11 +1,6 @@
 # -*- mode: Snakemake -*-
 #
 # Illumina quality control rules
-
-import os
-from sunbeam import get_docker_str
-
-
 localrules:
     all_qc,
     sample_intake,

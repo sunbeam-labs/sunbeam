@@ -1,0 +1,20 @@
+name: Condabot
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+jobs:
+  run-condabot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+      - uses: sunbeam-labs/condabot@v1
+        with:
+            env-path: "sunbeam/workflow/envs/"
+            test-path: "tests/"
+            sunbeam-version: "update/conda-lock"

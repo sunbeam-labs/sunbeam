@@ -26,16 +26,16 @@ classifiers = [
 ]
 
 dependencies = [
-  "snakemake==9.3.4",
+  "snakemake==9.5.1",
   "more-itertools==10.7.0",
   "pyyaml==6.0.2",
-  "pandas==2.2.3",
+  "pandas==2.3.0",
 ]
 [project.optional-dependencies]
 dev = [
   "black==24.10.0",
   "snakefmt==0.11.0",
-  "pytest==8.3.5",
+  "pytest==8.4.0",
 ]
 
 [project.urls]

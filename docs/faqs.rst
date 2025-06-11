@@ -18,5 +18,10 @@ This is a known issue with singularity. It's not actually running out of space, 
 
 This is unfortunately a common issue with conda where shared libraries are either not installed or not properly loaded for packages that depend on them. There can be many causes and many fixes. You can start by searching the exact error message and seeing if there are any suggestions for how to solve it. Often it will involve installing the missing library with conda or installing the missing library with the system package manager. For example, the solution to the example error for me running sunbeam on a standard Amazon machine image (AMI) was to install the library using ``sudo yum install libxcrypt-compat`` in the snakemake-managed conda environment.
 
+**I'm trying to run an extension but none of the rules are running.**
+
+There are a number of reasons why this might be happening. First, make sure you've included the correct target for your extension in your command. You can check the extension's main ``.smk`` file to see that name. Another thing to check is if there are any mapping files or database directories that need to be included in ``/path/to/project/sunbeam_config.yml``. Some extensions are built such that each ruleset will only run once per mapping or once per database.
+
 .. tip::
+    
     If you can't find the answer to your problem here, try searching the `issue tracker <https://github.com/sunbeam-labs/sunbeam/issues>`_ on GitHub or posting a new issue.

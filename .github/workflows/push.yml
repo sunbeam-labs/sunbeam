@@ -1,6 +1,9 @@
-name: Push to Main
+name: Push/PR to Main
 
 on:
+    pull_request:
+      branches:
+        - main
     push:
       branches:
         - main

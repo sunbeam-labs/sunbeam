@@ -2,7 +2,7 @@
 
 # Sunbeam: a robust, extensible metagenomic sequencing pipeline 
 
-[![Tests](https://github.com/sunbeam-labs/sunbeam/actions/workflows/pr.yml/badge.svg)](https://github.com/sunbeam-labs/sunbeam/actions/workflows/pr.yml)
+[![Tests](https://github.com/sunbeam-labs/sunbeam/actions/workflows/tests.yml/badge.svg)](https://github.com/sunbeam-labs/sunbeam/actions/workflows/tests.yml)
 [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=stable)](https://sunbeam.readthedocs.io/en/stable/?badge=stable)
 [![PyPI](https://badge.fury.io/py/sunbeamlib.svg)](https://pypi.org/project/sunbeamlib/)
 [![Bioconda](https://anaconda.org/bioconda/sunbeamlib/badges/downloads.svg)](https://anaconda.org/bioconda/sunbeamlib/)

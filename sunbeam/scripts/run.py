@@ -99,19 +99,20 @@ def main_parser():
         "-m",
         "--mamba",
         action="store_true",
-        help="Use mamba instead of conda to create environments",
+        help="Use mamba instead of conda to create environments.",
     )
     parser.add_argument(
         "--include",
-        nargs="+",
+        action="append",
         default=[],
-        help="List of extensions to include in run",
+        help="Extension to include in run. Use multiple times for multiple extensions. Will exclude everything else.",
     )
+
     parser.add_argument(
         "--exclude",
-        nargs="+",
+        action="append",
         default=[],
-        help="List of extensions to exclude from run, use 'all' to exclude all extensions",
+        help="Extension to exclude from run. Use multiple times for multiple extensions. Use 'all' to exclude all extensions. Will include everything else.",
     )
     parser.add_argument(
         "--skip",

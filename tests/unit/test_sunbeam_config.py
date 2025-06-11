@@ -1,3 +1,4 @@
+import os
 import pytest
 import yaml
 from pathlib import Path
@@ -124,3 +125,66 @@ def test_fill_missing_doesnt_overwrite(test_extension):
     sc.fill_missing(ext_dir.parent)
 
     assert sc.config["sbx_test_extension"]["bloop"] == "not_blorp"
+
+
+def test_modify():
+    config = {
+        "all": {
+            "root": "/path/to/root",
+            "version": __version__,
+        },
+        "sbx_test_extension": {
+            "bloop": "blorp",
+        },
+    }
+    sc = SunbeamConfig(config)
+
+    sc.modify("sbx_test_extension: {bloop: 'new_value'}")
+    assert sc.config["sbx_test_extension"]["bloop"] == "new_value"
+
+
+def test_modify_one_of_many():
+    config = {
+        "all": {
+            "root": "/path/to/root",
+            "version": __version__,
+        },
+        "sbx_test_extension": {
+            "bloop": "blorp",
+            "blap": "blip",
+        },
+    }
+    sc = SunbeamConfig(config)
+
+    sc.modify("sbx_test_extension: {bloop: 'new_value'}")
+    assert sc.config["sbx_test_extension"]["bloop"] == "new_value"
+    assert sc.config["sbx_test_extension"]["blap"] == "blip"
+
+
+def test_empty_fp(tmp_path):
+    config_fp = tmp_path / "config.yml"
+
+    with open(config_fp, "w") as f:
+        f.write(
+            """
+            all:
+                root: /path/to/root
+                version: 1.0.0
+            sbx_test_extension:
+                bloop_fp: /path/to/bloop_fp
+                blap_fp: ""
+                blip_fp: 
+        """
+        )
+
+    sc = SunbeamConfig.from_file(config_fp)
+
+    assert sc.config["sbx_test_extension"]["bloop_fp"] == "/path/to/bloop_fp"
+    assert sc.config["sbx_test_extension"]["blap_fp"] == ""
+    assert sc.config["sbx_test_extension"]["blip_fp"] == None
+
+    res = sc.resolved_paths()
+
+    assert res["sbx_test_extension"]["bloop_fp"] == Path("/path/to/bloop_fp")
+    assert res["sbx_test_extension"]["blap_fp"] == Path(os.devnull)
+    assert res["sbx_test_extension"]["blip_fp"] == Path(os.devnull)

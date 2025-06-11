@@ -1,3 +1,4 @@
+import os
 import yaml
 from pathlib import Path
 from sunbeam import __version__, EXTENSIONS_DIR
@@ -97,7 +98,15 @@ class SunbeamConfig:
         change_str should be a string in the format "root_key: {sub_key: value}"
         """
         changes = yaml.safe_load(change_str)
-        self.config.update(changes)
+        for k, v in changes.items():
+            if k not in self.config:
+                self.config[k] = v
+            else:
+                if isinstance(v, dict):
+                    for sub_k, sub_v in v.items():
+                        self.config[k][sub_k] = sub_v
+                else:
+                    self.config[k] = v
 
     @staticmethod
     def get_extensions(extensions_dir: Path = None) -> dict[str, Path]:
@@ -136,7 +145,12 @@ class SunbeamConfig:
                 resolved[key] = {}
                 for sub_key, sub_value in value.items():
                     if sub_key.endswith("_fp"):
-                        if not Path(sub_value).is_absolute():
+                        if not sub_value:
+                            print(
+                                f"Warning: {key}.{sub_key} is empty, setting to os.devnull"
+                            )
+                            resolved[key][sub_key] = Path(os.devnull)
+                        elif not Path(sub_value).is_absolute():
                             resolved[key][sub_key] = root_fp / sub_value
                         else:
                             resolved[key][sub_key] = Path(sub_value).resolve()
