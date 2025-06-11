@@ -106,13 +106,10 @@ def test_sunbeam_run_with_target_after_exclude(tmp_path, DATA_DIR, capsys):
                 "clean_qc",
                 "-n",
                 "--quiet",
-                "--log_file",
-                str(log_fp),
             ]
         )
     assert excinfo.value.code == 0
 
-    with open(log_fp, "r") as log_file:
-        log_content = log_file.read()
-        assert "clean_qc" in log_content, log_content
-        assert "filter_reads" not in log_content, log_content
+    captured = capsys.readouterr()
+    assert "clean_qc" in captured.err
+    assert "filter_reads" not in captured.err
