@@ -2,6 +2,15 @@ import logging
 from pathlib import Path
 
 
+class ConditionalLevelFormatter(logging.Formatter):
+    def format(self, record):
+        # For WARNING and above, include "LEVELNAME: message"
+        if record.levelno >= logging.WARNING:
+            return f"{record.levelname}: {record.getMessage()}"
+        # For lower levels like INFO, just return the message
+        return record.getMessage()
+
+
 def get_sunbeam_logger() -> logging.Logger:
     """Basic logger for general library output."""
     logger = logging.getLogger("sunbeam")
@@ -10,20 +19,10 @@ def get_sunbeam_logger() -> logging.Logger:
     if not logger.handlers:
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
-        formatter = logging.Formatter("%(levelname)s: %(message)s")
-        ch.setFormatter(formatter)
+        ch.setFormatter(ConditionalLevelFormatter())
         logger.addHandler(ch)
 
     return logger
-
-
-class ConditionalLevelFormatter(logging.Formatter):
-    def format(self, record):
-        # For WARNING and above, include "LEVELNAME: message"
-        if record.levelno >= logging.WARNING:
-            return f"{record.levelname}: {record.getMessage()}"
-        # For lower levels like INFO, just return the message
-        return record.getMessage()
 
 
 def get_pipeline_logger(log_file: Path = None) -> logging.Logger:

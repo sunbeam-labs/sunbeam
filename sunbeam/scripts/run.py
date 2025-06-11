@@ -59,12 +59,12 @@ def main(argv: list[str] = sys.argv):
         str(snakefile),
         "--profile",
         str(profile),
+        "--configfile",
+        str(configfile),
         "--conda-prefix",
         str(conda_prefix),
         "--conda-frontend",
         conda_cmd,
-        "--configfile",
-        str(configfile),
     ] + remaining
     logger.info("Running: " + " ".join(snakemake_args))
 
