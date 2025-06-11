@@ -3,6 +3,9 @@ import datetime
 import os
 from pathlib import Path
 from snakemake.common import Rules
+from sunbeam.logging import get_sunbeam_logger
+
+logger = get_sunbeam_logger()
 from typing import Dict
 
 
@@ -15,10 +18,10 @@ def compile_benchmarks(
     try:
         benchmarks = os.listdir(benchmark_fp)
     except FileNotFoundError as e:
-        print("No benchmark files found")
+        logger.debug("No benchmark files found")
         return None
     if not benchmarks:
-        print("No benchmark files found")
+        logger.debug("No benchmark files found")
         return None
     headers = ["rule"]
     with open(os.path.join(benchmark_fp, benchmarks[0]), "r") as f:

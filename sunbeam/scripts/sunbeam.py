@@ -1,6 +1,6 @@
 import argparse
-import sys
 from sunbeam import __version__
+from sunbeam.logging import get_sunbeam_logger
 from sunbeam.scripts.config import main as Config
 from sunbeam.scripts.extend import main as Extend
 from sunbeam.scripts.init import main as Init
@@ -21,7 +21,8 @@ def main():
         Extend(remaining)
     else:
         parser.print_help()
-        sys.stderr.write("Unrecognized command.\n")
+        logger = get_sunbeam_logger()
+        logger.error("Unrecognized command.\n")
 
 
 def main_parser():

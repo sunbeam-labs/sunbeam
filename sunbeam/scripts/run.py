@@ -1,9 +1,11 @@
+import argparse
+import datetime
 import os
 import sys
-import argparse
-import subprocess
 from pathlib import Path
+from snakemake.cli import main as snakemake_main
 from sunbeam import __version__
+from sunbeam.logging import get_pipeline_logger
 
 
 def main(argv: list[str] = sys.argv):
@@ -11,11 +13,20 @@ def main(argv: list[str] = sys.argv):
     parser = main_parser()
     args, remaining = parser.parse_known_args(argv)
 
+    profile = Path(args.profile).resolve()
+
+    log_file = args.log_file
+    if not log_file:
+        log_file = (
+            profile
+            / f"sunbeam_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+        )
+
+    logger = get_pipeline_logger(log_file)
+
     snakefile = Path(__file__).parent.parent / "workflow" / "Snakefile"
     if not snakefile.exists():
-        sys.stderr.write(
-            f"Error: could not find a Snakefile in directory '{snakefile}'\n"
-        )
+        logger.error(f"Could not find a Snakefile in directory '{snakefile}'\n")
         sys.exit(1)
 
     conda_prefix = Path(__file__).parent.parent.parent / ".snakemake"
@@ -23,7 +34,7 @@ def main(argv: list[str] = sys.argv):
     conda_cmd = "conda" if not args.mamba else "mamba"
 
     if args.include and args.exclude:
-        sys.stderr.write("Error: cannot use both --include and --exclude\n")
+        logger.error("Cannot use both --include and --exclude\n")
         sys.exit(1)
 
     os.environ["SUNBEAM_EXTS_INCLUDE"] = ""
@@ -34,30 +45,20 @@ def main(argv: list[str] = sys.argv):
         os.environ["SUNBEAM_EXTS_EXCLUDE"] = ", ".join(args.exclude)
 
     if args.skip not in ["", "qc", "decontam"]:
-        sys.stderr.write("Error: --skip must be either 'qc' or 'decontam'\n")
+        logger.error("The value of --skip must be either 'qc' or 'decontam'\n")
         sys.exit(1)
 
     os.environ["SUNBEAM_SKIP"] = args.skip
 
     os.environ["SUNBEAM_DOCKER_TAG"] = args.docker_tag
 
-    # Extract the profile arg from the remaining args
-    profile_parse = argparse.ArgumentParser(add_help=False)
-    profile_parse.add_argument("--profile")
-    profile_args, _ = profile_parse.parse_known_args(remaining)
-    profile = profile_args.profile
-
-    if not profile:
-        sys.stderr.write(
-            "Error: --profile is required. Please specify a profile to use.\n"
-        )
-        sys.exit(1)
     configfile = Path(profile) / "sunbeam_config.yml"
 
     snakemake_args = [
-        "snakemake",
         "--snakefile",
         str(snakefile),
+        "--profile",
+        str(profile),
         "--conda-prefix",
         str(conda_prefix),
         "--conda-frontend",
@@ -65,11 +66,13 @@ def main(argv: list[str] = sys.argv):
         "--configfile",
         str(configfile),
     ] + remaining
-    sys.stderr.write("Running: " + " ".join(snakemake_args) + "\n")
+    logger.info("Running: " + " ".join(snakemake_args))
 
-    cmd = subprocess.run(snakemake_args)
-
-    sys.exit(cmd.returncode)
+    try:
+        snakemake_main(snakemake_args)
+    except Exception as e:
+        logger.error(f"An error occurred while running Sunbeam: {e}")
+        sys.exit(1)
 
 
 def main_parser():
@@ -86,6 +89,11 @@ def main_parser():
         description="Executes the Sunbeam pipeline by calling Snakemake.",
         epilog=epilog_str,
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--profile",
+        required=True,
+        help="The Snakemake profile to use for running the pipeline. This should be a directory containing a 'config.yaml' file.",
     )
     parser.add_argument(
         "-m",
@@ -114,6 +122,11 @@ def main_parser():
         "--docker_tag",
         default=__version__,
         help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version, a good alternative is 'latest' for the latest stable release",
+    )
+    parser.add_argument(
+        "--log_file",
+        default=None,
+        help="Path to a file where the pipeline log will be written. If not specified, logs will be written to `sunbeam_<current_datetime>.log` under the project directory.",
     )
 
     return parser

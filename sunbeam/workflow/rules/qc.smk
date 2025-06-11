@@ -63,6 +63,10 @@ rule adapter_removal_paired:
         r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
         ngz1=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
         ngz2=temp(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
+    log:
+        LOG_FP / "adapter_removal_paired_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 10),
     threads: 4
