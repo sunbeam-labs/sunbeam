@@ -27,7 +27,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/e2e/
+          pytest -vvv -l tests/e2e/
 
     test-slurm:
         name: Slurm Test
