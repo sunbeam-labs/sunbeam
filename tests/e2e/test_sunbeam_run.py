@@ -113,3 +113,27 @@ def test_sunbeam_run_with_target_after_exclude(tmp_path, DATA_DIR, capsys):
 
     assert "clean_qc" in captured.err
     assert "filter_reads" not in captured.err
+
+
+def test_sunbeam_run_ai_option(tmp_path, monkeypatch):
+    project_dir = tmp_path / "empty"
+    project_dir.mkdir()
+
+    called = {"flag": False}
+
+    def fake_analyze(log):
+        called["flag"] = True
+
+    monkeypatch.setattr("sunbeam.scripts.run.analyze_failure", fake_analyze)
+
+    with pytest.raises(SystemExit):
+        Run(
+            [
+                "--profile",
+                str(project_dir),
+                "--ai",
+                "-n",
+            ]
+        )
+
+    assert called["flag"]

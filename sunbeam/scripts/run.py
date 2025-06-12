@@ -6,6 +6,42 @@ from pathlib import Path
 from sunbeam import __version__
 
 
+def analyze_failure(log: str) -> None:
+    """Use OpenAI to analyze failure logs."""
+    try:
+        import openai
+    except Exception:
+        sys.stderr.write(
+            "AI analysis requested, but the 'openai' package is not installed.\n"
+        )
+        return
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        sys.stderr.write("OPENAI_API_KEY not set; skipping AI analysis.\n")
+        return
+
+    try:
+        openai.api_key = api_key
+        resp = openai.ChatCompletion.create(
+            model="gpt-4.1-nano",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You diagnose errors from Sunbeam pipeline runs.",
+                },
+                {
+                    "role": "user",
+                    "content": f"Sunbeam run failed with the following output:\n{log}\n",
+                },
+            ],
+            max_tokens=150,
+        )
+        sys.stderr.write("AI diagnosis:\n" + resp.choices[0].message.content + "\n")
+    except Exception as exc:  # pragma: no cover - network errors are non-deterministic
+        sys.stderr.write(f"AI analysis failed: {exc}\n")
+
+
 def main(argv: list[str] = sys.argv):
     """CLI entry point for running Sunbeam."""
     parser = main_parser()
@@ -67,7 +103,13 @@ def main(argv: list[str] = sys.argv):
     ] + remaining
     sys.stderr.write("Running: " + " ".join(snakemake_args) + "\n")
 
-    cmd = subprocess.run(snakemake_args)
+    cmd = subprocess.run(snakemake_args, capture_output=True, text=True)
+    if cmd.stdout:
+        sys.stdout.write(cmd.stdout)
+    if cmd.stderr:
+        sys.stderr.write(cmd.stderr)
+    if cmd.returncode != 0 and args.ai:
+        analyze_failure(cmd.stdout + "\n" + cmd.stderr)
 
     sys.exit(cmd.returncode)
 
@@ -115,6 +157,11 @@ def main_parser():
         "--docker_tag",
         default=__version__,
         help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version, a good alternative is 'latest' for the latest stable release",
+    )
+    parser.add_argument(
+        "--ai",
+        action="store_true",
+        help="Use OpenAI to diagnose failures after the run",
     )
 
     return parser
