@@ -1,6 +1,5 @@
 import pytest
-from sunbeam import CONFIGS_DIR, EXTENSIONS_DIR
-from sunbeam.project import SampleList, SunbeamConfig, SunbeamProfile
+import subprocess as sp
 from sunbeam.scripts.init import main as Init
 from sunbeam.scripts.run import main as Run
 
@@ -95,21 +94,22 @@ def test_sunbeam_run_with_target_after_exclude(tmp_path, DATA_DIR, capsys):
         ]
     )
 
-    log_fp = project_dir / "sunbeam.log"
-    with pytest.raises(SystemExit) as excinfo:
-        Run(
-            [
-                "--profile",
-                str(project_dir),
-                "--exclude",
-                "all",
-                "clean_qc",
-                "-n",
-                "--quiet",
-            ]
-        )
-    assert excinfo.value.code == 0
+    ret = sp.run(
+        [
+            "sunbeam",
+            "run",
+            "--profile",
+            str(project_dir),
+            "--exclude",
+            "all",
+            "clean_qc",
+            "-n",
+            "--quiet",
+        ],
+        check=True,
+        capture_output=True,
+    )
 
-    captured = capsys.readouterr()
-    assert "clean_qc" in captured.err
-    assert "filter_reads" not in captured.err
+    assert ret.returncode == 0
+    assert "clean_qc" in ret.stderr.decode("utf-8")
+    assert "filter_reads" not in ret.stderr.decode("utf-8")
