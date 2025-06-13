@@ -31,7 +31,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest tests/unit/
+        pytest -vvv -l tests/unit/
 
   
   lint:
