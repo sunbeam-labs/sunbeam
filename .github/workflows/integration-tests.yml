@@ -55,4 +55,4 @@ jobs:
               shell: bash
               run: |
                 sunbeam init --data_fp tests/data/reads/ --profile slurm test/
-                sunbeam run --default-resources slurm_account=runner --profile test/ test
+                sunbeam run --default-resources slurm_account=runner --profile test/ -- test
