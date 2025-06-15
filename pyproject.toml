@@ -37,6 +37,10 @@ dev = [
   "snakefmt==0.11.0",
   "pytest==8.4.0",
 ]
+ai = [
+  "langchain-openai>=0.3.23",
+  "langchain-community>=0.3.25",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/sunbeam-labs/sunbeam"
@@ -46,6 +50,7 @@ dev = [
 
 [project.scripts]
 sunbeam = "sunbeam.scripts.sunbeam:main"
+sunbeam-ai = "sunbeam.scripts.ai:main"
 
 [tool.setuptools.package-dir]
 sunbeam = "sunbeam"
