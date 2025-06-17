@@ -1,12 +1,14 @@
 import argparse
+import contextlib
 import datetime
+import io
 import logging
 import os
 import sys
 from pathlib import Path
 from snakemake.cli import main as snakemake_main
 from sunbeam import __version__
-from sunbeam.logging import get_pipeline_logger
+from sunbeam.logging import get_pipeline_logger, StreamToLogger
 
 
 def analyze_run(log: str, logger: logging.Logger) -> None:
@@ -31,11 +33,11 @@ def analyze_run(log: str, logger: logging.Logger) -> None:
             messages=[
                 {
                     "role": "system",
-                    "content": "You diagnose errors from Sunbeam pipeline runs.",
+                    "content": "You diagnose errors from Sunbeam pipeline runs. If there are problems, suggest possible causes and solutions. You should always include a link to the Sunbeam documentation (https://sunbeam.readthedocs.io/en/stable/) and the GitHub issues page (https://github.com/sunbeam-labs/sunbeam/issues).",
                 },
                 {
                     "role": "user",
-                    "content": f"Sunbeam run failed with the following output:\n{log}\n",
+                    "content": f"Sunbeam ran with the following output:\n{log}\n",
                 },
             ],
             max_tokens=150,
@@ -110,8 +112,15 @@ def main(argv: list[str] = sys.argv):
     logger.info("Running: " + " ".join(snakemake_args))
 
     try:
-        snakemake_main(snakemake_args)
+        stderr_buffer = io.StringIO()
+
+        with contextlib.redirect_stderr(stderr_buffer):
+            snakemake_main(snakemake_args)
+
+        logger.info("Snakemake run completed successfully.\n")
     finally:
+        logger.info(stderr_buffer.getvalue())
+
         if args.ai:
             with open(log_file, "r") as f:
                 analyze_run(f.read(), logger)
