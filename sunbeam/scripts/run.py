@@ -9,8 +9,8 @@ from sunbeam import __version__
 def analyze_failure(log: str) -> None:
     """Use OpenAI to analyze failure logs."""
     try:
-        import openai
-        resp = openai.chat.completions.create(
+        from openai import OpenAI
+    except ImportError:  # pragma: no cover - this is a soft dependency
         sys.stderr.write(
             "AI analysis requested, but the 'openai' package is not installed.\n"
         )
@@ -22,8 +22,8 @@ def analyze_failure(log: str) -> None:
         return
 
     try:
-        openai.api_key = api_key
-        resp = openai.ChatCompletion.create(
+        client = OpenAI(api_key=api_key)
+        resp = client.chat.completions.create(
             model="gpt-4.1-nano",
             messages=[
                 {
