@@ -143,6 +143,9 @@ for sbx_name, sbx_fp in sbxs.items():
 
 
 # ---- Add standard features to rules
+### NOT FUNCTIONAL ###
+# This is here for future reference but as-is does not do anything
+# Effectful lines are commented out to avoid errors/unintended behavior
 for rule_obj in workflow.rules:
     # Determine wildcard string
     wildcards_str = ""
@@ -151,25 +154,20 @@ for rule_obj in workflow.rules:
 
     # Add sunbeam log file
     log_name = (
-        f"{rule_obj.name}_{wildcards_str}.log"
-        if wildcards_str
-        else f"{rule_obj.name}.log"
+        f"{rule_obj.name}_{wildcards_str}.log" if wildcards_str else f"{rule_obj.name}.log"
     )
     # rule_obj.log.update({"main": str(LOG_FP / log_name)})
 
     # Add benchmarks
     wildcards_str = "_".join(f"{{{w}}}" for w in rule_obj.wildcard_names)
     benchmark_name = (
-        f"{rule_obj.name}_{wildcards_str}.tsv"
-        if wildcards_str
-        else f"{rule_obj.name}.tsv"
+        f"{rule_obj.name}_{wildcards_str}.tsv" if wildcards_str else f"{rule_obj.name}.tsv"
     )
 
     # try:
     # rule_obj.benchmark = str(BENCHMARK_FP / benchmark_name)
     # except AssertionError:
     # logger.warning(f"Skipping benchmark assignment for rule '{rule_obj.name}' (unsupported)")
-
     # logger.debug(rule_obj.benchmark)
 
 

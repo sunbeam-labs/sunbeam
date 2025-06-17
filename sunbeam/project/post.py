@@ -3,9 +3,7 @@ import datetime
 import os
 from pathlib import Path
 from snakemake.common import Rules
-from sunbeam.logging import get_sunbeam_logger
-
-logger = get_sunbeam_logger()
+from sunbeam import logger
 from typing import Dict
 
 

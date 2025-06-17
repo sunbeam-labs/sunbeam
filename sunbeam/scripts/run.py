@@ -22,6 +22,10 @@ def main(argv: list[str] = sys.argv):
             / f"sunbeam_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
         )
 
+    # From here on everything is considered part of the "pipeline"
+    # This means all logs are handled by the pipeline logger (or pipeline extension loggers)
+    # You could argue it would make more sense to start this at the actual snakemake call
+    # but this way we can log some relevant setup information that might be useful on post-mortem analysis
     logger = get_pipeline_logger(log_file)
 
     snakefile = Path(__file__).parent.parent / "workflow" / "Snakefile"

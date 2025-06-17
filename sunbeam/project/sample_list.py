@@ -2,9 +2,7 @@ import csv
 import re
 import string
 from pathlib import Path
-from sunbeam.logging import get_sunbeam_logger
-
-logger = get_sunbeam_logger()
+from sunbeam import logger
 
 
 class SampleList:
