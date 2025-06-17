@@ -59,7 +59,6 @@ try:
         raise KeyError
 except KeyError:
     HostGenomes = [Path(g.name).stem for g in HostGenomeFiles]
-    print(HostGenomes)
 
 sys.stderr.write("done.\n")
 
