@@ -134,7 +134,9 @@ def test_sunbeam_run_ai_option(tmp_path, monkeypatch):
             ]
         )
 
-    fake_openai.ChatCompletion = types.SimpleNamespace(create=dummy_create)
+    fake_openai.chat = types.SimpleNamespace(
+        completions=types.SimpleNamespace(create=dummy_create)
+    )
 
     monkeypatch.setitem(sys.modules, "openai", fake_openai)
     monkeypatch.setenv("OPENAI_API_KEY", "token")
