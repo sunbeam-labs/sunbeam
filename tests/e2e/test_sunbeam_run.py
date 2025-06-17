@@ -1,3 +1,4 @@
+import sys
 import pytest
 from sunbeam import CONFIGS_DIR, EXTENSIONS_DIR
 from sunbeam.project import SampleList, SunbeamConfig, SunbeamProfile
@@ -121,10 +122,22 @@ def test_sunbeam_run_ai_option(tmp_path, monkeypatch):
 
     called = {"flag": False}
 
-    def fake_analyze(log):
-        called["flag"] = True
+    import types
 
-    monkeypatch.setattr("sunbeam.scripts.run.analyze_failure", fake_analyze)
+    fake_openai = types.SimpleNamespace()
+
+    def dummy_create(**kwargs):
+        called["flag"] = True
+        return types.SimpleNamespace(
+            choices=[
+                types.SimpleNamespace(message=types.SimpleNamespace(content="analysis"))
+            ]
+        )
+
+    fake_openai.ChatCompletion = types.SimpleNamespace(create=dummy_create)
+
+    monkeypatch.setitem(sys.modules, "openai", fake_openai)
+    monkeypatch.setenv("OPENAI_API_KEY", "token")
 
     with pytest.raises(SystemExit):
         Run(
