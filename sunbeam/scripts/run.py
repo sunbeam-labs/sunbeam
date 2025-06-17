@@ -10,7 +10,7 @@ def analyze_failure(log: str) -> None:
     """Use OpenAI to analyze failure logs."""
     try:
         import openai
-    except Exception:
+    except ImportError:
         sys.stderr.write(
             "AI analysis requested, but the 'openai' package is not installed.\n"
         )
