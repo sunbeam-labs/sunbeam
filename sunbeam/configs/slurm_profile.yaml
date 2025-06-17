@@ -14,7 +14,7 @@ software-deployment-method: "conda"
 # Cluster configuration
 executor: "slurm"
 jobs: 10
-cores: 24
+cores: all
 
 # Default resource configuration
 default-resources:

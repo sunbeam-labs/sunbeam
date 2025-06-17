@@ -33,10 +33,9 @@ Sunbeam is a Python package that can be installed in a variety of ways.
 
       .. code-block:: shell
 
-         conda create -n sunbeam_env python=3.13
-         conda activate sunbeam_env
-         conda install -c bioconda sunbeamlib
+         conda create --name sunbeam_env -c conda-forge -c bioconda sunbeamlib
 
+         conda activate sunbeam_env
          sunbeam -h
 
    .. tab:: git

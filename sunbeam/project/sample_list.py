@@ -2,6 +2,7 @@ import csv
 import re
 import string
 from pathlib import Path
+from sunbeam import logger
 
 
 class SampleList:
@@ -70,7 +71,7 @@ class SampleList:
             if format_str
             else self.guess_format_string(fnames)
         )
-        print(f"Guessed format string: {pattern}")
+        logger.info(f"Guessed format string: {pattern}")
         for f in fnames:
             match = re.match(pattern, f.name)
             if not match:

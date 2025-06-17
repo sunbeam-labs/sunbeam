@@ -27,7 +27,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/e2e/
+          pytest -vvv -l tests/e2e/
 
     test-slurm:
         name: Slurm Test
@@ -55,4 +55,5 @@ jobs:
               shell: bash
               run: |
                 sunbeam init --data_fp tests/data/reads/ --profile slurm test/
-                sunbeam run --default-resources slurm_account=runner --profile test/ test
+                cat test/config.yaml
+                sunbeam run test --default-resources slurm_account=runner --profile test/

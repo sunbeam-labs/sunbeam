@@ -1,24 +1,27 @@
+import argparse
+import datetime
+import logging
 import os
 import sys
-import argparse
-import subprocess
 from pathlib import Path
+from snakemake.cli import main as snakemake_main
 from sunbeam import __version__
+from sunbeam.logging import get_pipeline_logger
 
 
-def analyze_failure(log: str) -> None:
+def analyze_run(log: str, logger: logging.Logger) -> None:
     """Use OpenAI to analyze failure logs."""
     try:
         from openai import OpenAI
     except ImportError:  # pragma: no cover - this is a soft dependency
-        sys.stderr.write(
+        logger.error(
             "AI analysis requested, but the 'openai' package is not installed.\n"
         )
         return
 
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        sys.stderr.write("OPENAI_API_KEY not set; skipping AI analysis.\n")
+        logger.error("OPENAI_API_KEY not set; skipping AI analysis.\n")
         return
 
     try:
@@ -37,9 +40,9 @@ def analyze_failure(log: str) -> None:
             ],
             max_tokens=150,
         )
-        sys.stderr.write("AI diagnosis:\n" + resp.choices[0].message.content + "\n")
+        logger.info("AI diagnosis:\n" + resp.choices[0].message.content + "\n")
     except Exception as exc:  # pragma: no cover - network errors are non-deterministic
-        sys.stderr.write(f"AI analysis failed: {exc}\n")
+        logger.error(f"AI analysis failed: {exc}\n")
 
 
 def main(argv: list[str] = sys.argv):
@@ -47,11 +50,24 @@ def main(argv: list[str] = sys.argv):
     parser = main_parser()
     args, remaining = parser.parse_known_args(argv)
 
+    profile = Path(args.profile).resolve()
+
+    log_file = args.log_file
+    if not log_file:
+        log_file = (
+            profile
+            / f"sunbeam_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+        )
+
+    # From here on everything is considered part of the "pipeline"
+    # This means all logs are handled by the pipeline logger (or pipeline extension loggers)
+    # You could argue it would make more sense to start this at the actual snakemake call
+    # but this way we can log some relevant setup information that might be useful on post-mortem analysis
+    logger = get_pipeline_logger(log_file)
+
     snakefile = Path(__file__).parent.parent / "workflow" / "Snakefile"
     if not snakefile.exists():
-        sys.stderr.write(
-            f"Error: could not find a Snakefile in directory '{snakefile}'\n"
-        )
+        logger.error(f"Could not find a Snakefile in directory '{snakefile}'\n")
         sys.exit(1)
 
     conda_prefix = Path(__file__).parent.parent.parent / ".snakemake"
@@ -59,7 +75,7 @@ def main(argv: list[str] = sys.argv):
     conda_cmd = "conda" if not args.mamba else "mamba"
 
     if args.include and args.exclude:
-        sys.stderr.write("Error: cannot use both --include and --exclude\n")
+        logger.error("Cannot use both --include and --exclude\n")
         sys.exit(1)
 
     os.environ["SUNBEAM_EXTS_INCLUDE"] = ""
@@ -70,48 +86,37 @@ def main(argv: list[str] = sys.argv):
         os.environ["SUNBEAM_EXTS_EXCLUDE"] = ", ".join(args.exclude)
 
     if args.skip not in ["", "qc", "decontam"]:
-        sys.stderr.write("Error: --skip must be either 'qc' or 'decontam'\n")
+        logger.error("The value of --skip must be either 'qc' or 'decontam'\n")
         sys.exit(1)
 
     os.environ["SUNBEAM_SKIP"] = args.skip
 
     os.environ["SUNBEAM_DOCKER_TAG"] = args.docker_tag
 
-    # Extract the profile arg from the remaining args
-    profile_parse = argparse.ArgumentParser(add_help=False)
-    profile_parse.add_argument("--profile")
-    profile_args, _ = profile_parse.parse_known_args(remaining)
-    profile = profile_args.profile
-
-    if not profile:
-        sys.stderr.write(
-            "Error: --profile is required. Please specify a profile to use.\n"
-        )
-        sys.exit(1)
     configfile = Path(profile) / "sunbeam_config.yml"
 
     snakemake_args = [
-        "snakemake",
         "--snakefile",
         str(snakefile),
+        "--profile",
+        str(profile),
+        "--configfile",
+        str(configfile),
         "--conda-prefix",
         str(conda_prefix),
         "--conda-frontend",
         conda_cmd,
-        "--configfile",
-        str(configfile),
     ] + remaining
-    sys.stderr.write("Running: " + " ".join(snakemake_args) + "\n")
+    logger.info("Running: " + " ".join(snakemake_args))
 
-    cmd = subprocess.run(snakemake_args, capture_output=True, text=True)
-    if cmd.stdout:
-        sys.stdout.write(cmd.stdout)
-    if cmd.stderr:
-        sys.stderr.write(cmd.stderr)
-    if cmd.returncode != 0 and args.ai:
-        analyze_failure(cmd.stdout + "\n" + cmd.stderr)
+    try:
+        snakemake_main(snakemake_args)
+    finally:
+        if args.ai:
+            with open(log_file, "r") as f:
+                analyze_run(f.read(), logger)
 
-    sys.exit(cmd.returncode)
+        logger.info("Sunbeam run completed.")
 
 
 def main_parser():
@@ -128,6 +133,11 @@ def main_parser():
         description="Executes the Sunbeam pipeline by calling Snakemake.",
         epilog=epilog_str,
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--profile",
+        required=True,
+        help="The Snakemake profile to use for running the pipeline. This should be a directory containing a 'config.yaml' file.",
     )
     parser.add_argument(
         "-m",
@@ -162,6 +172,11 @@ def main_parser():
         "--ai",
         action="store_true",
         help="Use OpenAI to diagnose failures after the run",
+    )
+    parser.add_argument(
+        "--log_file",
+        default=None,
+        help="Path to a file where the pipeline log will be written. If not specified, logs will be written to `sunbeam_<current_datetime>.log` under the project directory.",
     )
 
     return parser
