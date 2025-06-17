@@ -113,7 +113,7 @@ rule trimmomatic_unpaired:
         TRAILING:{Cfg[qc][trailing]} \
         SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
         MINLEN:{Cfg[qc][minlen]} \
-        2>&1 | tee {log}
+        > {log} 2>&1
         """
 
 
@@ -157,7 +157,7 @@ rule trimmomatic_paired:
         TRAILING:{Cfg[qc][trailing]} \
         SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
         MINLEN:{Cfg[qc][minlen]} \
-        2>&1 | tee {log}
+        > {log} 2>&1
         """
 
 
@@ -181,7 +181,7 @@ rule fastqc:
         sample_dir=$(dirname {output[0]})
         outdir=$(dirname $sample_dir)
 
-        fastqc -o $outdir {input.reads} -extract 2>&1 | tee {log}
+        fastqc -o $outdir {input.reads} -extract > {log} 2>&1
         """
 
 
@@ -218,10 +218,12 @@ rule find_low_complexity:
         get_docker_str("komplexity")
     shell:
         """
-        for rp in {input}; do
-          gzip -dc $rp | kz | \
-          awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> {output}
-        done
+        (
+            for rp in {input}; do
+            gzip -dc $rp | kz | \
+            awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> {output}
+            done
+        ) > {log} 2>&1
         """
 
 

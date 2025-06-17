@@ -169,6 +169,7 @@ for rule_obj in workflow.rules:
     # except AssertionError:
     # logger.warning(f"Skipping benchmark assignment for rule '{rule_obj.name}' (unsupported)")
     # logger.debug(rule_obj.benchmark)
+### END NOT FUNCTIONAL ###
 
 
 # ---- Rule all: run all targets

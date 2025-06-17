@@ -27,7 +27,7 @@ rule build_host_index:
         get_docker_str("qc")
     shell:
         """
-        bwa index {input} 2>&1 | tee {log}
+        bwa index {input} > {log} 2>&1
         """
 
 
@@ -55,8 +55,7 @@ rule align_to_host:
         get_docker_str("qc")
     shell:
         """
-        bwa mem -M -t {threads} {input.host} \
-        {input.reads} -o {output} 2>&1 | tee {log}
+        bwa mem -M -t {threads} {input.host} {input.reads} -o {output} > {log} 2>&1
         """
 
 

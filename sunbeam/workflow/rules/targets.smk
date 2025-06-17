@@ -10,7 +10,7 @@ TARGET_FASTQC = [
         sample=Samples.keys(),
         rp=Pairs,
     ),
-    str(QC_FP / "reports" / "fastqc_quality.tsv"),
+    QC_FP / "reports" / "fastqc_quality.tsv",
 ]
 
 
@@ -28,7 +28,7 @@ TARGET_DECONTAM = [
     expand(
         QC_FP / "decontam" / "{sample}_{rp}.fastq.gz", sample=Samples.keys(), rp=Pairs
     ),
-    str(QC_FP / "reports" / "preprocess_summary.tsv"),
+    QC_FP / "reports" / "preprocess_summary.tsv",
 ]
 
 
