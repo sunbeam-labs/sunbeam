@@ -1,7 +1,7 @@
 import sys
 import argparse
 import subprocess
-from sunbeam import EXTENSIONS_DIR
+from sunbeam import EXTENSIONS_DIR, logger
 
 
 def main(argv=sys.argv):
@@ -11,9 +11,15 @@ def main(argv=sys.argv):
     if args.github_url.startswith("http"):
         gh_url = args.github_url
         ext_name = gh_url.split("/")[-1].replace(".git", "")
+        logger.info(
+            f"GitHub URL provided. Cloning from the specified URL: {gh_url}. Parsed extension name: {ext_name}"
+        )
     else:
         ext_name = args.github_url
         gh_url = "https://github.com/sunbeam-labs/" + ext_name + ".git"
+        logger.info(
+            f"Extension name provided. Constructed GitHub URL: {gh_url}. Using extension name: {ext_name}"
+        )
 
     git_clone_args = ["git", "clone", gh_url, str(EXTENSIONS_DIR() / ext_name)]
     cmd = subprocess.run(git_clone_args)

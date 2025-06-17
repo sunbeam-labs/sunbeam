@@ -1,13 +1,9 @@
-#
-# Sunbeam: an iridescent HTS pipeline
-#
-# Author: Erik Clarke <ecl@mail.med.upenn.edu>
-# Created: 2016-04-28
-#
+import logging
 import os
 import shutil
 import sys
 from pathlib import Path
+from snakemake.io import IOFile, Log
 from sunbeam import (
     __version__,
     EXTENSIONS_DIR,
@@ -15,18 +11,27 @@ from sunbeam import (
     get_ext_path,
     get_ext_version,
 )
+from sunbeam.logging import get_pipeline_logger, get_extension_logger
 from sunbeam.project import SampleList, SunbeamConfig, output_subdir
 from sunbeam.project.post import compile_benchmarks
 
+
+logger = get_pipeline_logger()
 
 MIN_MEM_MB = int(os.getenv("SUNBEAM_MIN_MEM_MB", 8000))
 MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 sc = SunbeamConfig(config)
 Cfg = sc.resolved_paths()
+logger.debug(f"Sunbeam configuration: {Cfg}")
 
 # Load extensions
 sbxs = SunbeamConfig.get_extensions()
+
+# Setup extension loggers
+ext_loggers = {}
+for sbx_name, sbx_fp in sbxs.items():
+    ext_loggers[sbx_name] = get_extension_logger(sbx_name)
 
 # Setting up samples and read pairs
 sl = SampleList(Path(Cfg["all"]["root"]) / "samples.csv")
@@ -35,18 +40,16 @@ Pairs = ["1", "2"] if Cfg["all"]["paired_end"] else ["1"]
 
 
 # Collect host (contaminant) genomes
-sys.stderr.write("Collecting host/contaminant genomes... ")
+logger.info("Collecting host/contaminant genomes...")
 if Cfg["qc"]["host_fp"] == Cfg["all"]["root"]:
     HostGenomeFiles = []
 else:
     HostGenomeFiles = [f for f in Cfg["qc"]["host_fp"].glob("*.fasta")]
     if not HostGenomeFiles:
-        sys.stderr.write(
-            "\n\nWARNING: No files detected in host genomes folder ({}). "
+        logger.warning(
+            "No files detected in host genomes folder ({}). "
             "If this is not intentional, make sure all files end in "
-            ".fasta and the folder is specified correctly.\n\n".format(
-                Cfg["qc"]["host_fp"]
-            )
+            ".fasta and the folder is specified correctly.".format(Cfg["qc"]["host_fp"])
         )
 
 # Once this change has been implemented for a while we can remove the try/except
@@ -59,9 +62,9 @@ try:
         raise KeyError
 except KeyError:
     HostGenomes = [Path(g.name).stem for g in HostGenomeFiles]
-    print(HostGenomes)
+    logger.info(f"Host genomes collected: {HostGenomes}")
 
-sys.stderr.write("done.\n")
+logger.info("done.")
 
 # ---- Set up output paths
 QC_FP = output_subdir(Cfg, "qc")
@@ -80,6 +83,9 @@ include: "rules/targets.smk"
 
 # Skip QC and/or decontam
 if os.environ.get("SUNBEAM_SKIP", "").lower() == "decontam":
+    logger.info(
+        "Skipping QC and decontamination steps as per SUNBEAM_SKIP environment variable."
+    )
 
     rule skip_decontam:
         input:
@@ -94,6 +100,7 @@ if os.environ.get("SUNBEAM_SKIP", "").lower() == "decontam":
             """
 
 elif os.environ.get("SUNBEAM_SKIP", "").lower() == "qc":
+    logger.info("Skipping QC steps as per SUNBEAM_SKIP environment variable.")
 
     rule skip_qc:
         input:
@@ -118,21 +125,51 @@ else:
 for sbx_name, sbx_fp in sbxs.items():
     if os.getenv("SUNBEAM_EXTS_INCLUDE", ""):
         if not sbx_name in os.environ["SUNBEAM_EXTS_INCLUDE"].split(", "):
-            sys.stderr.write(f"Excluding extension {sbx_name} in folder {sbx_fp}\n")
+            ext_loggers[sbx_name].info(f"Excluding {sbx_name}")
             continue
     if os.getenv("SUNBEAM_EXTS_EXCLUDE", ""):
         if (
             sbx_name in os.environ["SUNBEAM_EXTS_EXCLUDE"].split(", ")
             or os.environ["SUNBEAM_EXTS_EXCLUDE"] == "all"
         ):
-            sys.stderr.write(f"Excluding extension {sbx_name} in folder {sbx_fp}\n")
+            ext_loggers[sbx_name].info(f"Excluding {sbx_name}")
             continue
 
-    sys.stderr.write(f"Including extension {sbx_name} in folder {sbx_fp}\n")
+    ext_loggers[sbx_name].debug(f"Including {sbx_name}")
 
     for rule_fp in SunbeamConfig.get_extension_rules(sbx_fp):
 
         include: rule_fp
+
+
+# ---- Add standard features to rules
+### NOT FUNCTIONAL ###
+# This is here for future reference but as-is does not do anything
+# Effectful lines are commented out to avoid errors/unintended behavior
+for rule_obj in workflow.rules:
+    # Determine wildcard string
+    wildcards_str = ""
+    if rule_obj.wildcard_names:
+        wildcards_str = "_".join(f"{{{w}}}" for w in rule_obj.wildcard_names)
+
+    # Add sunbeam log file
+    log_name = (
+        f"{rule_obj.name}_{wildcards_str}.log" if wildcards_str else f"{rule_obj.name}.log"
+    )
+    # rule_obj.log.update({"main": str(LOG_FP / log_name)})
+
+    # Add benchmarks
+    wildcards_str = "_".join(f"{{{w}}}" for w in rule_obj.wildcard_names)
+    benchmark_name = (
+        f"{rule_obj.name}_{wildcards_str}.tsv" if wildcards_str else f"{rule_obj.name}.tsv"
+    )
+
+    # try:
+    # rule_obj.benchmark = str(BENCHMARK_FP / benchmark_name)
+    # except AssertionError:
+    # logger.warning(f"Skipping benchmark assignment for rule '{rule_obj.name}' (unsupported)")
+    # logger.debug(rule_obj.benchmark)
+### END NOT FUNCTIONAL ###
 
 
 # ---- Rule all: run all targets
@@ -149,34 +186,35 @@ rule test:
             rp=Pairs,
         ),
     run:
-        print([x for x in input.samples])
+        logger.info([x for x in input.samples])
 
 
 rule samples:
     message:
         "Samples to be processed:"
     run:
-        [print(sample) for sample in sorted(list(Samples.keys()))]
+        [logger.info(sample) for sample in sorted(list(Samples.keys()))]
 
 
 localrules:
     all,
+    test,
     samples,
 
 
 onstart:
     try:
         shutil.rmtree(BENCHMARK_FP)
-        print("Cleared benchmarks directory.")
+        logger.info("Cleared benchmarks directory.")
     except FileNotFoundError as e:
         None
 
 
 onsuccess:
-    print("Sunbeam finished!")
+    logger.info("Sunbeam finished!")
     compile_benchmarks(BENCHMARK_FP, Cfg, rules)
 
 
 onerror:
-    print("Sunbeam failed with error.")
+    logger.error("Sunbeam failed with error.")
     compile_benchmarks(BENCHMARK_FP, Cfg, rules)
