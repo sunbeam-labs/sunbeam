@@ -33,16 +33,20 @@ def analyze_run(log: str, logger: logging.Logger) -> None:
             messages=[
                 {
                     "role": "system",
-                    "content": "You diagnose errors from Sunbeam pipeline runs. If there are problems, suggest possible causes and solutions. You should always include a link to the Sunbeam documentation (https://sunbeam.readthedocs.io/en/stable/) and the GitHub issues page (https://github.com/sunbeam-labs/sunbeam/issues).",
+                    "content": "You diagnose errors from Sunbeam pipeline runs. If there are problems, suggest possible causes and solutions. Keep the answer short and sweet. If there are relevant file paths for debugging (like log files), mention them.",
                 },
                 {
                     "role": "user",
                     "content": f"Sunbeam ran with the following output:\n{log}\n",
                 },
             ],
-            max_tokens=150,
+            max_tokens=1500,
         )
-        logger.info("AI diagnosis:\n" + resp.choices[0].message.content + "\n")
+        logger.info(
+            "AI diagnosis:\n"
+            + resp.choices[0].message.content
+            + "\nCheck out the Sunbeam documentation (https://sunbeam.readthedocs.io/en/stable/) and the GitHub issues page (https://github.com/sunbeam-labs/sunbeam/issues) for more information or to open a new issue.\n"
+        )
     except Exception as exc:  # pragma: no cover - network errors are non-deterministic
         logger.error(f"AI analysis failed: {exc}\n")
 
@@ -112,15 +116,11 @@ def main(argv: list[str] = sys.argv):
     logger.info("Running: " + " ".join(snakemake_args))
 
     try:
-        stderr_buffer = io.StringIO()
+        stream_logger = StreamToLogger(logger, level=logging.INFO)
 
-        with contextlib.redirect_stderr(stderr_buffer):
+        with contextlib.redirect_stderr(stream_logger):
             snakemake_main(snakemake_args)
-
-        logger.info("Snakemake run completed successfully.\n")
     finally:
-        logger.info(stderr_buffer.getvalue())
-
         if args.ai:
             with open(log_file, "r") as f:
                 analyze_run(f.read(), logger)
