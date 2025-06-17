@@ -43,7 +43,7 @@ def analyze_run(log: str, logger: logging.Logger) -> None:
             max_tokens=1500,
         )
         logger.info(
-            "AI diagnosis:\n"
+            "\n\nAI diagnosis:\n"
             + resp.choices[0].message.content
             + "\nCheck out the Sunbeam documentation (https://sunbeam.readthedocs.io/en/stable/) and the GitHub issues page (https://github.com/sunbeam-labs/sunbeam/issues) for more information or to open a new issue.\n"
         )
@@ -124,8 +124,6 @@ def main(argv: list[str] = sys.argv):
         if args.ai:
             with open(log_file, "r") as f:
                 analyze_run(f.read(), logger)
-
-        logger.info("Sunbeam run completed.")
 
 
 def main_parser():
