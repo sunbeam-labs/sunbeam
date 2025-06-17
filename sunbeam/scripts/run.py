@@ -75,7 +75,7 @@ def main(argv: list[str] = sys.argv):
     try:
         snakemake_main(snakemake_args)
     except Exception as e:
-        logger.error(f"An error occurred while running Sunbeam: {e}")
+        logger.exception("An error occurred while running Sunbeam")
         sys.exit(1)
 
 
