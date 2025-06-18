@@ -117,9 +117,8 @@ def test_sunbeam_run_with_target_after_exclude(tmp_path, DATA_DIR, capsys):
     assert "filter_reads" not in ret.stderr.decode("utf-8")
 
 
-def test_sunbeam_run_ai_option(tmp_path, monkeypatch):
-    project_dir = tmp_path / "empty"
-    project_dir.mkdir()
+def test_sunbeam_run_ai_option(tmp_path, monkeypatch, DATA_DIR):
+    project_dir = tmp_path / "test"
 
     called = {"flag": False}
 
@@ -141,6 +140,14 @@ def test_sunbeam_run_ai_option(tmp_path, monkeypatch):
 
     monkeypatch.setitem(sys.modules, "openai", fake_openai)
     monkeypatch.setenv("OPENAI_API_KEY", "token")
+
+    Init(
+        [
+            str(project_dir),
+            "--data_fp",
+            str(DATA_DIR / "reads"),
+        ]
+    )
 
     with pytest.raises(SystemExit):
         Run(
