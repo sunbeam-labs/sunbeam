@@ -125,6 +125,8 @@ def main(argv: list[str] = sys.argv):
         with contextlib.redirect_stderr(stream_logger):
             snakemake_main(snakemake_args)
     finally:
+        print(log_file)
+        print(log_file.exists())
         with open(log_file, "r") as f:
             analyze_run(f.read(), logger, args.ai)
 
