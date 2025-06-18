@@ -15,7 +15,7 @@ def analyze_run(log: str, logger: logging.Logger, ai: bool) -> None:
     # We could do some rule-based analysis here but I'd rather lean into the AI features and see how far they can take us
     if ai:
         try:
-            from openai import OpenAI
+            import openai
         except ImportError:  # pragma: no cover - this is a soft dependency
             logger.error(
                 "AI analysis requested, but the 'openai' package is not installed. Try `pip install -e sunbeamlib[ai]`.\n"
@@ -28,7 +28,7 @@ def analyze_run(log: str, logger: logging.Logger, ai: bool) -> None:
             return
 
         try:
-            client = OpenAI(api_key=api_key)
+            client = openai.OpenAI(api_key=api_key)
             resp = client.chat.completions.create(
                 model="gpt-4.1-nano",
                 messages=[

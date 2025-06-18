@@ -1,6 +1,7 @@
-import sys
 import pytest
 import subprocess as sp
+import sys
+import types
 from sunbeam.scripts.init import main as Init
 from sunbeam.scripts.run import main as Run
 
@@ -122,10 +123,6 @@ def test_sunbeam_run_ai_option(tmp_path, monkeypatch):
 
     called = {"flag": False}
 
-    import types
-
-    fake_openai = types.SimpleNamespace()
-
     def dummy_create(**kwargs):
         called["flag"] = True
         return types.SimpleNamespace(
@@ -134,8 +131,12 @@ def test_sunbeam_run_ai_option(tmp_path, monkeypatch):
             ]
         )
 
-    fake_openai.chat = types.SimpleNamespace(
-        completions=types.SimpleNamespace(create=dummy_create)
+    fake_openai = types.SimpleNamespace()
+
+    fake_openai.OpenAI = lambda *args, **kwargs: types.SimpleNamespace(
+        chat=types.SimpleNamespace(
+            completions=types.SimpleNamespace(create=dummy_create)
+        )
     )
 
     monkeypatch.setitem(sys.modules, "openai", fake_openai)
