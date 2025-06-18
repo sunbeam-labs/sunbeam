@@ -74,6 +74,7 @@ def main(argv: list[str] = sys.argv):
     # but this way we can log some relevant setup information that might be useful on post-mortem analysis
     logger = get_pipeline_logger(log_file)
     logger.debug("Sunbeam pipeline logger initialized.")
+    print(log_file.exists())
 
     snakefile = Path(__file__).parent.parent / "workflow" / "Snakefile"
     if not snakefile.exists():
