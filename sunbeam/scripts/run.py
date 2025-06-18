@@ -18,7 +18,7 @@ def analyze_run(log: str, logger: logging.Logger, ai: bool) -> None:
             from openai import OpenAI
         except ImportError:  # pragma: no cover - this is a soft dependency
             logger.error(
-                "AI analysis requested, but the 'openai' package is not installed.\n"
+                "AI analysis requested, but the 'openai' package is not installed. Try `pip install -e sunbeamlib[ai]`.\n"
             )
             return
 
@@ -126,6 +126,8 @@ def main(argv: list[str] = sys.argv):
         with contextlib.redirect_stderr(stream_logger):
             snakemake_main(snakemake_args)
     finally:
+        # Show all files in log_file directory
+        print(list(log_file.parent.glob("*")))
         print(log_file)
         print(log_file.exists())
         with open(log_file, "r") as f:
