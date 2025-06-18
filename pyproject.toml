@@ -37,6 +37,9 @@ dev = [
   "snakefmt==0.11.0",
   "pytest==8.4.0",
 ]
+ai = [
+  "openai==1.88.0",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/sunbeam-labs/sunbeam"
