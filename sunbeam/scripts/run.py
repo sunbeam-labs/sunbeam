@@ -1,11 +1,57 @@
 import argparse
+import contextlib
 import datetime
+import logging
 import os
 import sys
 from pathlib import Path
 from snakemake.cli import main as snakemake_main
 from sunbeam import __version__
-from sunbeam.logging import get_pipeline_logger
+from sunbeam.logging import get_pipeline_logger, StreamToLogger
+
+
+def analyze_run(log: str, logger: logging.Logger, ai: bool) -> None:
+    """Analyze the run log and provide insights or suggestions."""
+    # We could do some rule-based analysis here but I'd rather lean into the AI features and see how far they can take us
+    if ai:
+        try:
+            import openai
+        except ImportError:  # pragma: no cover - this is a soft dependency
+            logger.error(
+                "AI analysis requested, but the 'openai' package is not installed. Try `pip install -e sunbeamlib[ai]`.\n"
+            )
+            return
+
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            logger.error("OPENAI_API_KEY not set; skipping AI analysis.\n")
+            return
+
+        try:
+            client = openai.OpenAI(api_key=api_key)
+            resp = client.chat.completions.create(
+                model="gpt-4.1-nano",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You diagnose errors from Sunbeam pipeline runs. If there are problems, suggest possible causes and solutions. Keep the answer short and sweet. If there are relevant file paths for debugging (like log files), mention them.",
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Sunbeam ran with the following output:\n{log}\n",
+                    },
+                ],
+                max_tokens=1500,
+            )
+            logger.info(
+                "\n\nAI diagnosis:\n"
+                + resp.choices[0].message.content
+                + "\nCheck out the Sunbeam documentation (https://sunbeam.readthedocs.io/en/stable/) and the GitHub issues page (https://github.com/sunbeam-labs/sunbeam/issues) for more information or to open a new issue.\n"
+            )
+        except (
+            Exception
+        ) as exc:  # pragma: no cover - network errors are non-deterministic
+            logger.error(f"AI analysis failed: {exc}\n")
 
 
 def main(argv: list[str] = sys.argv):
@@ -27,6 +73,8 @@ def main(argv: list[str] = sys.argv):
     # You could argue it would make more sense to start this at the actual snakemake call
     # but this way we can log some relevant setup information that might be useful on post-mortem analysis
     logger = get_pipeline_logger(log_file)
+    logger.debug("Sunbeam pipeline logger initialized.")
+    print(log_file.exists())
 
     snakefile = Path(__file__).parent.parent / "workflow" / "Snakefile"
     if not snakefile.exists():
@@ -73,10 +121,17 @@ def main(argv: list[str] = sys.argv):
     logger.info("Running: " + " ".join(snakemake_args))
 
     try:
-        snakemake_main(snakemake_args)
-    except Exception as e:
-        logger.exception("An error occurred while running Sunbeam")
-        sys.exit(1)
+        stream_logger = StreamToLogger(logger, level=logging.INFO)
+
+        with contextlib.redirect_stderr(stream_logger):
+            snakemake_main(snakemake_args)
+    finally:
+        # Show all files in log_file directory
+        print(list(log_file.parent.glob("*")))
+        print(log_file)
+        print(log_file.exists())
+        with open(log_file, "r") as f:
+            analyze_run(f.read(), logger, args.ai)
 
 
 def main_parser():
@@ -127,6 +182,11 @@ def main_parser():
         "--docker_tag",
         default=__version__,
         help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version, a good alternative is 'latest' for the latest stable release",
+    )
+    parser.add_argument(
+        "--ai",
+        action="store_true",
+        help="Use OpenAI to diagnose failures after the run",
     )
     parser.add_argument(
         "--log_file",
