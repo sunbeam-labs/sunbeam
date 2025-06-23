@@ -26,7 +26,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "snakemake==9.5.1",
+  "snakemake==9.6.1",
   "more-itertools==10.7.0",
   "pyyaml==6.0.2",
   "pandas==2.3.0",
@@ -35,7 +35,7 @@ dependencies = [
 dev = [
   "black==24.10.0",
   "snakefmt==0.11.0",
-  "pytest==8.4.0",
+  "pytest==8.4.1",
 ]
 ai = [
   "openai==1.88.0",
