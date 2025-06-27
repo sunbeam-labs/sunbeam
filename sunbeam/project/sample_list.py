@@ -11,11 +11,14 @@ class SampleList:
     ):
         self.paired_end = paired_end
         self.samples = {}
+        logger.debug(f"Initializing SampleList with fp={fp}, paired_end={paired_end}")
 
         if fp:
             if fp.is_dir():
+                logger.debug(f"Loading samples from directory {fp}")
                 self.samples = self.load_from_dir(fp, format_str)
             elif fp.is_file():
+                logger.debug(f"Loading samples from file {fp}")
                 self.samples = self.load_from_file(fp)
 
         if self.samples:
@@ -43,6 +46,7 @@ class SampleList:
         """
         Load a sample list from a file.
         """
+        logger.debug(f"Loading sample list from file {fp}")
         samples = {}
         with open(fp, "r") as f:
             reader = csv.DictReader(f, delimiter=",", fieldnames=["sample", "r1", "r2"])
@@ -50,6 +54,8 @@ class SampleList:
                 samples[row["sample"]] = {"r1": row["r1"]}
                 if self.paired_end:
                     samples[row["sample"]]["r2"] = row["r2"]
+
+        logger.debug(f"Loaded {len(samples)} samples from file")
 
         return samples
 
@@ -59,6 +65,7 @@ class SampleList:
         """
         Load a sample list from a directory.
         """
+        logger.debug(f"Loading sample list from directory {fp}")
         samples = {}
         fnames = [
             f for f in fp.iterdir() if f.is_file() and f.name.endswith(".fastq.gz")
@@ -91,9 +98,11 @@ class SampleList:
             else:
                 samples[sample]["r1"] = f
 
+        logger.debug(f"Loaded {len(samples)} samples from directory")
         return samples
 
     def guess_format_string(self, fnames: list[Path]) -> re.Pattern:
+        logger.debug(f"Guessing format string from {len(fnames)} files")
         patterns = [
             re.compile(r"(?P<sample>.+)_R(?P<rp>[12])(_[A-Za-z0-9]+)*\.fastq\.gz"),
             re.compile(r"(?P<sample>.+)_(?P<rp>[12])(_[A-Za-z0-9]+)*\.fastq\.gz"),
@@ -109,12 +118,15 @@ class SampleList:
         if not self.paired_end:
             pattern = re.compile(r"(?P<sample>.+)\.fastq\.gz")
             if all(pattern.match(f.name) for f in fnames):
+                logger.debug(f"Guessed pattern: {pattern.pattern}")
                 return pattern
         else:
             for pattern in patterns:
                 if all(pattern.match(f.name) for f in fnames):
+                    logger.debug(f"Guessed pattern: {pattern.pattern}")
                     return pattern
 
+        logger.debug("Failed to guess format string")
         raise ValueError(f"Could not guess format string from filenames: {fnames}")
 
     @staticmethod
@@ -124,6 +136,7 @@ class SampleList:
         """
         regex = ""
         formatter = string.Formatter()
+        logger.debug(f"Converting format string '{format_str}' to regex")
 
         for literal_text, field_name, format_spec, conversion in formatter.parse(
             format_str
@@ -136,12 +149,15 @@ class SampleList:
             elif field_name:  # fallback
                 regex += rf"(?P<{field_name}>.+?)"
 
-        return re.compile(regex)
+        compiled = re.compile(regex)
+        logger.debug(f"Compiled regex: {compiled.pattern}")
+        return compiled
 
     def to_file(self, fp: Path):
         """
         Write the sample list to a file.
         """
+        logger.debug(f"Writing sample list to {fp}")
         with open(fp, "w") as f:
             writer = csv.DictWriter(f, delimiter=",", fieldnames=["sample", "r1", "r2"])
             for sample, data in self.samples.items():
@@ -155,10 +171,12 @@ class SampleList:
         Generate a subset of the sample list based on a function. The function takes three args:
         sample_name, r1, and r2, and should return True if the sample should be included in the subset.
         """
+        logger.debug("Generating subset of samples")
         subset = SampleList()
         for sample, data in self.samples.items():
             if func(sample, data["r1"], data.get("r2")):
                 subset.samples[sample] = data
+        logger.debug(f"Subset contains {len(subset.samples)} samples")
         return subset
 
     def get_samples(self):
@@ -166,6 +184,7 @@ class SampleList:
         Getting samples in a format that is backwards compatible
         Convert "r1" and "r2" to "1" and "2", make sure all fields are strings
         """
+        logger.debug("Converting samples to legacy format")
         samples = {}
         for sample, data in self.samples.items():
             samples[sample] = {k: str(v) for k, v in data.items()}
@@ -173,5 +192,7 @@ class SampleList:
                 samples[sample]["1"] = samples[sample].pop("r1")
             if "r2" in samples[sample]:
                 samples[sample]["2"] = samples[sample].pop("r2")
+
+        logger.debug(f"Converted {len(samples)} samples")
 
         return samples

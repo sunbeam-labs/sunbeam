@@ -26,14 +26,17 @@ class SunbeamConfig:
 
     def __init__(self, config: Dict[str, Union[str, Dict]] = {}):
         self.config = config
+        logger.debug(f"Initialized SunbeamConfig with keys: {list(self.config.keys())}")
 
     @classmethod
     def from_file(cls, config_fp: Path) -> "SunbeamConfig":
         """
         Create a SunbeamConfig object from a file
         """
+        logger.debug(f"Loading config from file: {config_fp}")
         with open(config_fp) as f:
             config = yaml.safe_load(f)
+        logger.debug(f"Loaded config keys: {list(config.keys())}")
         return cls(config)
 
     @classmethod
@@ -43,6 +46,7 @@ class SunbeamConfig:
         """
         Create a SunbeamConfig object from a template file
         """
+        logger.debug(f"Creating config from template {template_fp} with root {root_fp}")
         if not extensions_dir:
             extensions_dir = EXTENSIONS_DIR()
 
@@ -56,17 +60,20 @@ class SunbeamConfig:
         for ext_name, ext_dir in cls.get_extensions(extensions_dir).items():
             config_fp = ext_dir / "config.yml"
             if config_fp.exists():
+                logger.debug(f"Loading extension config from {config_fp}")
                 with open(config_fp) as f:
                     ext_config = yaml.safe_load(f)
                     if ext_config:
                         config = {**config, **ext_config}
 
+        logger.debug("Config from template loaded")
         return cls(config)
 
     def to_file(self, config_fp: Path):
         """
         Write the config to a file
         """
+        logger.debug(f"Writing config to {config_fp}")
         with open(config_fp, "w") as f:
             yaml.safe_dump(self.config, f)
 
@@ -74,12 +81,16 @@ class SunbeamConfig:
         """
         Fill in missing extension config values with defaults
         """
+        logger.debug(
+            f"Filling missing config values using extensions dir: {extensions_dir}"
+        )
         if not extensions_dir:
             extensions_dir = EXTENSIONS_DIR()
 
         for ext_name, ext_dir in self.get_extensions(extensions_dir).items():
             config_fp = ext_dir / "config.yml"
             if config_fp.exists():
+                logger.debug(f"Checking defaults in {config_fp}")
                 with open(config_fp) as f:
                     ext_config = yaml.safe_load(f)
                     if ext_config:
@@ -97,6 +108,7 @@ class SunbeamConfig:
         Modify the config file with the specified changes
         change_str should be a string in the format "root_key: {sub_key: value}"
         """
+        logger.debug(f"Applying config modification: {change_str}")
         changes = yaml.safe_load(change_str)
         for k, v in changes.items():
             if k not in self.config:
@@ -115,11 +127,13 @@ class SunbeamConfig:
         """
         if not extensions_dir:
             extensions_dir = EXTENSIONS_DIR()
+        logger.debug(f"Scanning for extensions in {extensions_dir}")
 
         extensions = {}
         for ext_dir in extensions_dir.iterdir():
             if ext_dir.is_dir() and ext_dir.name.startswith("sbx"):
                 extensions[ext_dir.name] = ext_dir
+                logger.debug(f"Found extension: {ext_dir.name}")
 
         return extensions
 
@@ -128,6 +142,7 @@ class SunbeamConfig:
         """
         Find all .smk and .rules files in the extension directory using glob
         """
+        logger.debug(f"Searching for rule files in {extension_fp}")
         return list(extension_fp.glob("**/*.smk")) + list(
             extension_fp.glob("**/*.rules")
         )
@@ -137,7 +152,9 @@ class SunbeamConfig:
         Resolve all paths in the config file (any field ending in "_fp")
         Relative paths are resolved relative to the 'root' key
         """
+        logger.debug("Resolving configuration paths")
         root_fp = Path(self.config["all"]["root"]).resolve()
+        logger.debug(f"Root path resolved to {root_fp}")
 
         resolved = {}
         for key, value in self.config.items():
@@ -152,14 +169,21 @@ class SunbeamConfig:
                             resolved[key][sub_key] = Path(os.devnull)
                         elif not Path(sub_value).is_absolute():
                             resolved[key][sub_key] = root_fp / sub_value
+                            logger.debug(
+                                f"Resolved {key}.{sub_key} to {resolved[key][sub_key]}"
+                            )
                         else:
                             resolved[key][sub_key] = Path(sub_value).resolve()
+                            logger.debug(
+                                f"Resolved {key}.{sub_key} to {resolved[key][sub_key]}"
+                            )
                     else:
                         resolved[key][sub_key] = sub_value
             else:
                 resolved[key] = value
 
         resolved["all"]["root"] = root_fp
+        logger.debug("All paths resolved")
         return resolved
 
 
@@ -168,4 +192,6 @@ def output_subdir(cfg: dict[str, dict[str, str]], section: str) -> Path:
     Get the output subdirectory for a given section.
     Here mostly for backwards compatibility.
     """
-    return cfg["all"]["output_fp"] / section
+    subdir = cfg["all"]["output_fp"] / section
+    logger.debug(f"Output subdir for {section}: {subdir}")
+    return subdir
