@@ -17,7 +17,7 @@ def get_mapped_reads(fp: str, min_pct_id: float, min_len_frac: float) -> Iterato
 
 
 def _get_pct_identity(
-    read: Dict[str, Union[int, float, str, Tuple[int, str]]]
+    read: Dict[str, Union[int, float, str, Tuple[int, str]]],
 ) -> float:
     edit_dist = read.get("NM", 0)
     pct_mm = float(edit_dist) / len(read["SEQ"])

@@ -2,6 +2,26 @@ import logging
 from pathlib import Path
 
 
+class StreamToLogger:
+    def __init__(self, logger, level=logging.INFO):
+        self.logger = logger
+        self.level = level
+        self.buffer = ""
+
+    def write(self, message):
+        if message != "\n":
+            self.buffer += message
+            if "\n" in self.buffer:
+                for line in self.buffer.splitlines():
+                    self.logger.log(self.level, line.strip())
+                self.buffer = ""
+
+    def flush(self):
+        if self.buffer:
+            self.logger.log(self.level, self.buffer.strip())
+            self.buffer = ""
+
+
 class ConditionalLevelFormatter(logging.Formatter):
     def format(self, record):
         # For WARNING and above, include "LEVELNAME: message"
