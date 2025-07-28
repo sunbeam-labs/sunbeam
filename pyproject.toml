@@ -26,7 +26,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "snakemake==9.7.1",
+  "snakemake==9.8.2",
   "more-itertools==10.7.0",
   "pyyaml==6.0.2",
   "pandas==2.3.0",
