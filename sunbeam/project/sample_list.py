@@ -68,7 +68,9 @@ class SampleList:
         logger.debug(f"Loading sample list from directory {fp}")
         samples = {}
         fnames = [
-            f for f in fp.iterdir() if f.is_file() and f.name.endswith(".fastq.gz")
+            f.resolve()
+            for f in fp.iterdir()
+            if f.is_file() and f.name.endswith(".fastq.gz")
         ]
         if len(fnames) == 0:
             raise ValueError("No gzipped FASTQ files found in the directory.")
@@ -161,9 +163,18 @@ class SampleList:
         with open(fp, "w") as f:
             writer = csv.DictWriter(f, delimiter=",", fieldnames=["sample", "r1", "r2"])
             for sample, data in self.samples.items():
-                row = {"sample": sample, "r1": data["r1"]}
+                r1 = Path(data["r1"])
+                if not r1.is_absolute():
+                    r1 = r1.resolve()
+                row = {
+                    "sample": sample,
+                    "r1": str(r1),
+                }
                 if self.paired_end:
-                    row["r2"] = data["r2"]
+                    r2 = Path(data["r2"])
+                    if not r2.is_absolute():
+                        r2 = r2.resolve()
+                    row["r2"] = str(r2)
                 writer.writerow(row)
 
     def generate_subset(self, func: callable) -> "SampleList":

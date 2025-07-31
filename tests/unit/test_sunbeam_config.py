@@ -2,7 +2,7 @@ import os
 import pytest
 import yaml
 from pathlib import Path
-from sunbeam import __version__, CONFIGS_DIR, EXTENSIONS_DIR
+from sunbeam import __version__, CONFIGS_DIR
 from sunbeam.project.sunbeam_config import SunbeamConfig
 
 
@@ -37,7 +37,7 @@ def test_config_from_template(tmp_path):
     ext_dir.mkdir(parents=True, exist_ok=True)
 
     sc = SunbeamConfig.from_template(template_fp, root_fp, ext_dir)
-    assert sc.config["all"]["root"] == str(root_fp)
+    assert sc.config["all"]["root"] == str(root_fp.resolve())
     assert sc.config["all"]["version"] == __version__
 
 
@@ -181,7 +181,7 @@ def test_empty_fp(tmp_path):
 
     assert sc.config["sbx_test_extension"]["bloop_fp"] == "/path/to/bloop_fp"
     assert sc.config["sbx_test_extension"]["blap_fp"] == ""
-    assert sc.config["sbx_test_extension"]["blip_fp"] == None
+    assert sc.config["sbx_test_extension"]["blip_fp"] is None
 
     res = sc.resolved_paths()
 

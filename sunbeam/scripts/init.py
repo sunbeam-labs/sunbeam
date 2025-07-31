@@ -32,7 +32,7 @@ def main(argv=sys.argv):
 
     data_fp = args.data_fp
     if data_fp:
-        data_fp = Path(data_fp)
+        data_fp = Path(data_fp).resolve()
         paired_end = not args.single_end
         sample_list = SampleList(data_fp, paired_end, args.format)
         sample_list.to_file(project_fp / "samples.csv")

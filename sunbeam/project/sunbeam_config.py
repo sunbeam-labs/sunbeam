@@ -36,6 +36,11 @@ class SunbeamConfig:
         logger.debug(f"Loading config from file: {config_fp}")
         with open(config_fp) as f:
             config = yaml.safe_load(f)
+
+        if "all" in config and "root" in config["all"]:
+            root = Path(config["all"]["root"]).resolve()
+            config["all"]["root"] = str(root)
+
         logger.debug(f"Loaded config keys: {list(config.keys())}")
         return cls(config)
 
@@ -53,7 +58,7 @@ class SunbeamConfig:
         with open(template_fp) as f:
             config = dict(yaml.safe_load(f))
 
-        config["all"]["root"] = str(root_fp)
+        config["all"]["root"] = str(Path(root_fp).resolve())
         config["all"]["version"] = __version__
 
         # Iterate over extension dirs to find config files
@@ -153,7 +158,7 @@ class SunbeamConfig:
         Relative paths are resolved relative to the 'root' key
         """
         logger.debug("Resolving configuration paths")
-        root_fp = Path(self.config["all"]["root"]).resolve()
+        root_fp = Path(self.config["all"]["root"])
         logger.debug(f"Root path resolved to {root_fp}")
 
         resolved = {}
