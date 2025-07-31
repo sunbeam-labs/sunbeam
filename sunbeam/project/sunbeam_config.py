@@ -158,7 +158,7 @@ class SunbeamConfig:
         Relative paths are resolved relative to the 'root' key
         """
         logger.debug("Resolving configuration paths")
-        root_fp = Path(self.config["all"]["root"]).resolve()
+        root_fp = Path(self.config["all"]["root"])
         logger.debug(f"Root path resolved to {root_fp}")
 
         resolved = {}
