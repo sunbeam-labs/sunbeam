@@ -25,7 +25,13 @@ rule sample_intake:
         "../scripts/sample_intake.py"
 
 
-ruleorder: adapter_removal_paired > adapter_removal_unpaired
+if Cfg["all"]["paired_end"]:
+
+    ruleorder: adapter_removal_paired > adapter_removal_unpaired
+
+else:
+
+    ruleorder: adapter_removal_unpaired > adapter_removal_paired
 
 
 rule adapter_removal_unpaired:
@@ -73,7 +79,13 @@ rule adapter_removal_paired:
         "../scripts/adapter_removal_paired.py"
 
 
-ruleorder: trimmomatic_paired > trimmomatic_unpaired
+if Cfg["all"]["paired_end"]:
+
+    ruleorder: trimmomatic_paired > trimmomatic_unpaired
+
+else:
+
+    ruleorder: trimmomatic_unpaired > trimmomatic_paired
 
 
 # Check that the adapter template file exists
