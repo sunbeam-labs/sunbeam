@@ -34,10 +34,10 @@ for sbx_name, sbx_fp in sbxs.items():
     ext_loggers[sbx_name] = get_extension_logger(sbx_name)
 
 # Setting up samples and read pairs
-if Path(Cfg["all"]["samples_fp"]).is_absolute():
-    samples_fp = Path(Cfg["all"]["samples_fp"])
+if Path(Cfg["all"]["samplelist_fp"]).is_absolute():
+    samples_fp = Path(Cfg["all"]["samplelist_fp"])
 else:
-    samples_fp = Path(Cfg["all"]["root"]) / Cfg["all"]["samples_fp"]
+    samples_fp = Path(Cfg["all"]["root"]) / Cfg["all"]["samplelist_fp"]
 sl = SampleList(samples_fp, Cfg["all"]["paired_end"])
 Samples = sl.get_samples()
 Pairs = ["1", "2"] if Cfg["all"]["paired_end"] else ["1"]
