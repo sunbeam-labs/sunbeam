@@ -34,10 +34,16 @@ for sbx_name, sbx_fp in sbxs.items():
     ext_loggers[sbx_name] = get_extension_logger(sbx_name)
 
 # Setting up samples and read pairs
-if Path(Cfg["all"]["samples_fp"]).is_absolute():
-    samples_fp = Path(Cfg["all"]["samples_fp"])
-else:
-    samples_fp = Path(Cfg["all"]["root"]) / Cfg["all"]["samples_fp"]
+# ``samplelist_fp`` is the canonical config key for the sample list, but older
+# configurations may still use ``samples_fp``.  Use whichever is present and
+# raise a helpful error if neither is found.
+sample_key = "samplelist_fp" if "samplelist_fp" in Cfg["all"] else "samples_fp"
+if sample_key not in Cfg["all"]:
+    raise KeyError("No sample list found; expected 'all.samplelist_fp' in the config")
+
+# ``SunbeamConfig.resolved_paths`` has already resolved paths ending in ``_fp`` to
+# absolute ``Path`` objects, so we can use the value directly.
+samples_fp = Path(Cfg["all"][sample_key])
 sl = SampleList(samples_fp, Cfg["all"]["paired_end"])
 Samples = sl.get_samples()
 Pairs = ["1", "2"] if Cfg["all"]["paired_end"] else ["1"]
