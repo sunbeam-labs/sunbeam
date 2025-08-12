@@ -1,11 +1,11 @@
 import argparse
-import datetime
 import os
 import sys
 from pathlib import Path
 from snakemake.cli import main as snakemake_main
 from sunbeam import __version__
 from sunbeam.logging import get_pipeline_logger
+from sunbeam.project import SunbeamConfig
 
 
 def main(argv: list[str] = sys.argv):
@@ -14,19 +14,17 @@ def main(argv: list[str] = sys.argv):
     args, remaining = parser.parse_known_args(argv)
 
     profile = Path(args.profile).resolve()
+    configfile = Path(profile) / "sunbeam_config.yml"
 
-    log_file = args.log_file
-    if not log_file:
-        log_file = (
-            profile
-            / f"sunbeam_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
-        )
+    sc = SunbeamConfig.from_file(configfile)
+    Cfg = sc.resolved_paths()
+    log_fp = Cfg["all"]["log_fp"]
 
     # From here on everything is considered part of the "pipeline"
     # This means all logs are handled by the pipeline logger (or pipeline extension loggers)
     # You could argue it would make more sense to start this at the actual snakemake call
     # but this way we can log some relevant setup information that might be useful on post-mortem analysis
-    logger = get_pipeline_logger(log_file)
+    logger = get_pipeline_logger(log_fp)
 
     snakefile = Path(__file__).parent.parent / "workflow" / "Snakefile"
     if not snakefile.exists():
@@ -55,8 +53,6 @@ def main(argv: list[str] = sys.argv):
     os.environ["SUNBEAM_SKIP"] = args.skip
 
     os.environ["SUNBEAM_DOCKER_TAG"] = args.docker_tag
-
-    configfile = Path(profile) / "sunbeam_config.yml"
 
     snakemake_args = [
         "--snakefile",
@@ -128,10 +124,4 @@ def main_parser():
         default=__version__,
         help="The tag to use when pulling docker images for the core pipeline environments, defaults to sunbeam's current version, a good alternative is 'latest' for the latest stable release",
     )
-    parser.add_argument(
-        "--log_file",
-        default=None,
-        help="Path to a file where the pipeline log will be written. If not specified, logs will be written to `sunbeam_<current_datetime>.log` under the project directory.",
-    )
-
     return parser
