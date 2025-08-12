@@ -15,14 +15,12 @@ from sunbeam.logging import get_pipeline_logger, get_extension_logger
 from sunbeam.project import SampleList, SunbeamConfig, output_subdir
 from sunbeam.project.post import compile_benchmarks
 
-
-logger = get_pipeline_logger()
-
 MIN_MEM_MB = int(os.getenv("SUNBEAM_MIN_MEM_MB", 8000))
 MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 sc = SunbeamConfig(config)
 Cfg = sc.resolved_paths()
+logger = get_pipeline_logger(Cfg["all"]["log_fp"])
 logger.debug(f"Sunbeam configuration: {Cfg}")
 
 # Load extensions
