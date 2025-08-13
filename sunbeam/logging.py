@@ -25,7 +25,7 @@ def get_sunbeam_logger() -> logging.Logger:
     return logger
 
 
-def get_pipeline_logger(log_file: Path = None) -> logging.Logger:
+def get_pipeline_logger(log_fp: Path = None) -> logging.Logger:
     """Sets up logging for the main pipeline entry point."""
     logger = logging.getLogger("sunbeam.pipeline")
     logger.setLevel(logging.DEBUG)
@@ -38,11 +38,11 @@ def get_pipeline_logger(log_file: Path = None) -> logging.Logger:
         ch.setFormatter(ConditionalLevelFormatter())
 
         # File handler
-        if log_file is None:
+        if log_fp is None:
             raise ValueError(
-                "log_file is None but the logger hasn't been initialized with a file handler yet"
+                "log_fp is None but the logger hasn't been initialized with a file handler yet"
             )
-        fh = logging.FileHandler(log_file, mode="w")
+        fh = logging.FileHandler(log_fp, mode="w")
         fh.setLevel(logging.DEBUG)
         fh.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s: %(message)s"))
 

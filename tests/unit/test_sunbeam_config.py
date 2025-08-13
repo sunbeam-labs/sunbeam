@@ -39,6 +39,7 @@ def test_config_from_template(tmp_path):
     sc = SunbeamConfig.from_template(template_fp, root_fp, ext_dir)
     assert sc.config["all"]["root"] == str(root_fp.resolve())
     assert sc.config["all"]["version"] == __version__
+    assert sc.config["all"]["log_fp"] == "sunbeam.log"
 
 
 def test_config_with_extension(test_extension):
@@ -57,6 +58,7 @@ def test_config_from_file(tmp_path):
     all:
         root: /path/to/root
         version: 1.0.0
+        log_fp: sunbeam.log
     """
     config_fp = tmp_path / "config.yml"
     with open(config_fp, "w") as f:
@@ -64,6 +66,9 @@ def test_config_from_file(tmp_path):
 
     sc = SunbeamConfig.from_file(config_fp)
     assert sc.config["all"]["root"] == "/path/to/root"
+    assert sc.config["all"]["log_fp"] == "sunbeam.log"
+    res = sc.resolved_paths()
+    assert res["all"]["log_fp"] == Path("/path/to/root") / "sunbeam.log"
 
 
 def test_config_to_file(tmp_path):

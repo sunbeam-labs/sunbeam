@@ -5,6 +5,7 @@ all:
   samplelist_fp: "samples.csv"
   paired_end: true
   version: "{SB_VERSION}"
+  log_fp: "sunbeam.log"
 
 # Quality control
 qc:
