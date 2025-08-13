@@ -62,8 +62,15 @@ sunbeam = "sunbeam"
   "workflow/envs/*.Dockerfile",
 ]
 
+[tool.versioneer]
+VCS = "git"
+versionfile_source = "sunbeam/_version.py"
+style = "pep440"
+versionfile_build = "sunbeam/_version.py"
+tag_prefix = "v"
+
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
+requires = ["setuptools>=61.0.0", "wheel", "versioneer[toml]"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]

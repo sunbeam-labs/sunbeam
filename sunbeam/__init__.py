@@ -3,7 +3,6 @@ from pathlib import Path
 from sunbeam.logging import get_sunbeam_logger
 
 
-__version__ = "5.1.2"
 __author__ = "Erik Clarke"
 __license__ = "GPL2+"
 logger = get_sunbeam_logger()
@@ -40,3 +39,8 @@ def get_ext_version(ext_name: str) -> str:
     else:
         print("Version file not found for extension:", ext_name)
         return "0.0.0"
+
+
+from . import _version
+
+__version__ = _version.get_versions()["version"]
