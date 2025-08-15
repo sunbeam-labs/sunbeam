@@ -163,7 +163,7 @@ rule _test_script:
     output:
         QC_FP / ".test_script",
     script:
-        "scripts/_test_script.py",
+        "scripts/_test_script.py"
 
 
 rule test:
