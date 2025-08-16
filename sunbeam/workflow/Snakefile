@@ -162,6 +162,8 @@ rule _test_shell:
 rule _test_script:
     output:
         QC_FP / ".test_script",
+    log:
+        QC_FP / ".test_script.log",
     script:
         "scripts/_test_script.py"
 

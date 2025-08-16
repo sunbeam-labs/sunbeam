@@ -1,8 +1,11 @@
-from sunbeam.logging import get_pipeline_logger, get_extension_logger
-from sunbeam.project import SampleList, SunbeamConfig, output_subdir
+l = snakemake.log[0]
+with open(l, "w") as log:
+    log.write("HERE\n")
 
+    from sunbeam.logging import get_pipeline_logger, get_extension_logger
+    from sunbeam.project import SampleList, SunbeamConfig, output_subdir
 
-logger = get_pipeline_logger()
-logger.info("This works!")
+    logger = get_pipeline_logger()
+    logger.info("This works!")
 
-SampleList()
+    SampleList()
