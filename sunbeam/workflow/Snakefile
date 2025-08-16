@@ -20,7 +20,7 @@ MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 sc = SunbeamConfig(config)
 Cfg = sc.resolved_paths()
-logger = get_pipeline_logger(Cfg["all"]["log_fp"])
+logger = get_pipeline_logger()
 logger.debug(f"Sunbeam configuration: {Cfg}")
 
 # Load extensions

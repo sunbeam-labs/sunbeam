@@ -1,4 +1,9 @@
+from pathlib import Path
+
+
 l = snakemake.log[0]
+o = Path(snakemake.output[0])
+
 with open(l, "w") as log:
     log.write("HERE\n")
 
@@ -9,3 +14,5 @@ with open(l, "w") as log:
     logger.info("This works!")
 
     SampleList()
+
+    o.write_text("This is a test output file.\n")
