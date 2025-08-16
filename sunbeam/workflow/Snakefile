@@ -20,7 +20,7 @@ MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 sc = SunbeamConfig(config)
 Cfg = sc.resolved_paths()
-logger = get_pipeline_logger(Cfg["all"]["log_fp"])
+logger = get_pipeline_logger()
 logger.debug(f"Sunbeam configuration: {Cfg}")
 
 # Load extensions
@@ -144,40 +144,28 @@ for sbx_name, sbx_fp in sbxs.items():
         include: rule_fp
 
 
-# ---- Add standard features to rules
-### NOT FUNCTIONAL ###
-# This is here for future reference but as-is does not do anything
-# Effectful lines are commented out to avoid errors/unintended behavior
-for rule_obj in workflow.rules:
-    # Determine wildcard string
-    wildcards_str = ""
-    if rule_obj.wildcard_names:
-        wildcards_str = "_".join(f"{{{w}}}" for w in rule_obj.wildcard_names)
-
-    # Add sunbeam log file
-    log_name = (
-        f"{rule_obj.name}_{wildcards_str}.log" if wildcards_str else f"{rule_obj.name}.log"
-    )
-    # rule_obj.log.update({"main": str(LOG_FP / log_name)})
-
-    # Add benchmarks
-    wildcards_str = "_".join(f"{{{w}}}" for w in rule_obj.wildcard_names)
-    benchmark_name = (
-        f"{rule_obj.name}_{wildcards_str}.tsv" if wildcards_str else f"{rule_obj.name}.tsv"
-    )
-
-    # try:
-    # rule_obj.benchmark = str(BENCHMARK_FP / benchmark_name)
-    # except AssertionError:
-    # logger.warning(f"Skipping benchmark assignment for rule '{rule_obj.name}' (unsupported)")
-    # logger.debug(rule_obj.benchmark)
-### END NOT FUNCTIONAL ###
-
-
 # ---- Rule all: run all targets
 rule all:
     input:
         TARGET_ALL,
+
+
+rule _test_shell:
+    output:
+        QC_FP / ".test_shell",
+    shell:
+        """
+        echo "Test shell rule executed successfully." > {output}
+        """
+
+
+rule _test_script:
+    output:
+        QC_FP / ".test_script",
+    log:
+        QC_FP / ".test_script.log",
+    script:
+        "scripts/_test_script.py"
 
 
 rule test:
@@ -187,6 +175,8 @@ rule test:
             sample=Samples.keys(),
             rp=Pairs,
         ),
+        test_shell=QC_FP / ".test_shell",
+        test_script=QC_FP / ".test_script",
     run:
         logger.info([x for x in input.samples])
 
