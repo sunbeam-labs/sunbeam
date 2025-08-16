@@ -56,4 +56,4 @@ jobs:
               run: |
                 sunbeam init --data_fp tests/data/reads/ --profile slurm test/
                 cat test/config.yaml
-                sunbeam run test --default-resources slurm_account=runner --profile test/
+                sunbeam run test --default-resources slurm_account=runner --profile test/ --show-failed-logs
