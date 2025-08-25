@@ -33,7 +33,9 @@ The ``configs/`` directory contains sample configuration files for the pipeline.
 extensions
 ----------
 
-This is the default location for extensions, although it can be configured by setting ``$SUNBEAM_EXTENSIONS``.
+The source tree contains an ``extensions/`` directory with example extensions.
+At runtime Sunbeam loads extensions from the directory specified by
+``$SUNBEAM_EXTENSIONS``, which defaults to ``~/.sunbeam/extensions``.
 
 project
 -------
