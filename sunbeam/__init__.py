@@ -17,6 +17,8 @@ def EXTENSIONS_DIR() -> Path:
     ext_dir = Path(os.environ.get("SUNBEAM_EXTENSIONS", default_dir))
     ext_dir.mkdir(parents=True, exist_ok=True)
     return ext_dir
+
+
 WORKFLOW_DIR = Path(__file__).parent.resolve() / "workflow"
 CONFIGS_DIR = Path(__file__).parent.resolve() / "configs"
 
