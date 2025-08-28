@@ -8,9 +8,17 @@ __license__ = "GPL2+"
 logger = get_sunbeam_logger()
 
 
-EXTENSIONS_DIR = lambda: Path(
-    os.environ.get("SUNBEAM_EXTENSIONS", Path(__file__).parent.resolve() / "extensions")
-)
+# Directory where extensions are stored. This defaults to ``~/.sunbeam/extensions``
+# but can be overridden by setting the ``SUNBEAM_EXTENSIONS`` environment
+# variable.  The directory is created if it does not already exist so that
+# subsequent operations (such as cloning an extension) do not fail.
+def EXTENSIONS_DIR() -> Path:
+    default_dir = Path.home() / ".sunbeam" / "extensions"
+    ext_dir = Path(os.environ.get("SUNBEAM_EXTENSIONS", default_dir))
+    ext_dir.mkdir(parents=True, exist_ok=True)
+    return ext_dir
+
+
 WORKFLOW_DIR = Path(__file__).parent.resolve() / "workflow"
 CONFIGS_DIR = Path(__file__).parent.resolve() / "configs"
 

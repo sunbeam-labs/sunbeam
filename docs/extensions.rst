@@ -8,7 +8,10 @@ Sunbeam is designed to be extensible. You can install and run extensions from ou
 
 .. tip::
 
-    Extensions live in the ``extensions/`` directory under the Sunbeam root installation. You can also set the environment variable ``$SUNBEAM_EXTENSIONS`` to point to a different directory if you want to keep your extensions separate from the core Sunbeam installation.
+    By default Sunbeam looks for extensions in ``~/.sunbeam/extensions``. Set the
+    environment variable ``$SUNBEAM_EXTENSIONS`` to point to a different
+    directory if you want to keep your extensions separate from the core Sunbeam
+    installation.
 
 This is now going to pick up where :ref:`quickstart` left off and show how to install and run ``sbx_kraken`` for taxonomic classification of your QCed and decontaminated reads.
 
