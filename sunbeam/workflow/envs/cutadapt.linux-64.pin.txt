@@ -39,7 +39,7 @@ https://conda.anaconda.org/conda-forge/noarch/setuptools-80.9.0-pyhff2d567_0.con
 https://conda.anaconda.org/conda-forge/noarch/wheel-0.45.1-pyhd8ed1ab_1.conda#75cb7132eb58d97896e173ef12ac9986
 https://conda.anaconda.org/conda-forge/linux-64/cffi-1.17.1-py312h06ac9bb_0.conda#a861504bbea4161a9170b85d4d2be840
 https://conda.anaconda.org/conda-forge/noarch/pip-25.2-pyh8b19718_0.conda#dfce4b2af4bfe90cdcaf56ca0b28ddf5
-https://conda.anaconda.org/conda-forge/linux-64/zstandard-0.23.0-py312h66e93f0_2.conda#630db208bc7bbb96725ce9832c7423bb
+https://conda.anaconda.org/conda-forge/linux-64/zstandard-0.23.0-py312h4c3975b_3.conda#7a2c6e25a4fabf9fab62ee1977beabe5
 https://conda.anaconda.org/conda-forge/noarch/xopen-2.0.2-pyh707e725_2.conda#afacb06c53d3e8dfb8462023436a25bb
 https://conda.anaconda.org/bioconda/linux-64/dnaio-1.2.2-py312hf67a6ed_0.tar.bz2#fe9505722563ed4f26aa055c99e4bf2e
 https://conda.anaconda.org/bioconda/linux-64/cutadapt-5.1-py312h0fa9677_0.tar.bz2#4f33d43d9fd39f6436dce03f942732d2
