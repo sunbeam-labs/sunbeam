@@ -3,6 +3,7 @@ from sunbeam import __version__
 from sunbeam import logger
 from sunbeam.scripts.config import main as Config
 from sunbeam.scripts.extend import main as Extend
+from sunbeam.scripts.generate import main as Generate
 from sunbeam.scripts.init import main as Init
 from sunbeam.scripts.run import main as Run
 
@@ -19,6 +20,8 @@ def main():
         Config(remaining)
     elif args.command == "extend":
         Extend(remaining)
+    elif args.command == "generate":
+        Generate(remaining)
     else:
         parser.print_help()
         logger.error("Unrecognized command.\n")
@@ -26,7 +29,7 @@ def main():
 
 def main_parser():
     usage_str = "%(prog)s [-h/--help,-v/--version] <subcommand>"
-    description_str = "Sunbeam subcommands: init, run, config, extend"
+    description_str = "Sunbeam subcommands: init, run, config, extend, generate"
 
     parser = argparse.ArgumentParser(
         prog="sunbeam",
