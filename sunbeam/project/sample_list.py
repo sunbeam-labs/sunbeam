@@ -37,8 +37,10 @@ class SampleList:
             if re.search(r"[ /,]", sample):
                 raise ValueError(f"Invalid characters in sample name: {sample}")
 
-            if "r1" not in data or (self.paired_end and "r2" not in data):
-                raise ValueError(f"Missing read files for sample: {sample}")
+            if "r1" not in data or data.get("r1") is None:
+                raise ValueError(f"Missing r1 file for sample: {sample}")
+            if self.paired_end and ("r2" not in data or data.get("r2") is None):
+                raise ValueError(f"Missing r2 file for sample: {sample}")
 
             # Custom function for checking file existence (handle local and remote data sources)
 
@@ -92,13 +94,15 @@ class SampleList:
             if sample not in samples:
                 samples[sample] = {"r1": None, "r2": None}
 
-            if "rp" in match.groupdict():
-                if match.group("rp") == "1":
-                    samples[sample]["r1"] = f
-                else:
-                    samples[sample]["r2"] = f
-            else:
+            rp = match.groupdict().get("rp")
+            if rp == "1" or rp is None:
+                if samples[sample]["r1"] is not None:
+                    raise ValueError(f"Multiple R1 files found for sample: {sample}")
                 samples[sample]["r1"] = f
+            elif rp == "2":
+                if samples[sample]["r2"] is not None:
+                    raise ValueError(f"Multiple R2 files found for sample: {sample}")
+                samples[sample]["r2"] = f
 
         logger.debug(f"Loaded {len(samples)} samples from directory")
         return samples

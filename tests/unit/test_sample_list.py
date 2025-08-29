@@ -27,6 +27,22 @@ def test_to_file(tmp_path, DATA_DIR):
     assert lines[1].strip().startswith("LONG") or lines[1].strip().startswith("SHORT")
 
 
+def test_missing_pairs(DATA_DIR):
+    with pytest.raises(ValueError, match="Missing r2"):
+        SampleList(DATA_DIR / "single_end_reads")
+
+
+def test_extra_files(tmp_path, DATA_DIR):
+    src = DATA_DIR / "reads"
+    for fp in src.iterdir():
+        (tmp_path / fp.name).write_bytes(fp.read_bytes())
+    extra = src / "LONG_R1.fastq.gz"
+    (tmp_path / "LONG_R1_copy.fastq.gz").write_bytes(extra.read_bytes())
+
+    with pytest.raises(ValueError, match="Multiple R1"):
+        SampleList(tmp_path)
+
+
 def test_bad_sample_names(tmp_path):
     sl = SampleList()
     output_fp = tmp_path / "sample_list.csv"
