@@ -53,11 +53,12 @@ def _default_model_name() -> str:
     return "gpt-4o-mini"
 
 
-def _simple_rules_validator(text: str) -> None:
-    """Basic safety/structure checks for generated rules.
+def _snakemake_rules_validator(text: str) -> None:
+    """Validate generated rules via Snakemake.
 
-    Raises ValueError if any quick structural checks fail. This is not
-    a full parser; it enforces minimal sanity before writing to disk.
+    Performs quick sanity checks and then writes the rules to a temporary
+    file that is parsed by Snakemake in dry-run mode.  A ``ValueError`` is
+    raised if Snakemake reports any issues.
     """
 
     if not text.strip():
@@ -70,6 +71,28 @@ def _simple_rules_validator(text: str) -> None:
         raise ValueError("No `rule` blocks detected in generated content.")
     if any(k in lowered for k in ["<todo>", "[fill", "<fill", "tbd"]):
         raise ValueError("Placeholder text found; refusing to write incomplete rules.")
+
+    # Use snakemake to ensure the generated rules are syntactically valid.
+    import subprocess
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        snakefile = Path(tmpdir) / "generated.smk"
+        snakefile.write_text(text)
+        cmd = ["snakemake", "-s", str(snakefile), "-n", "--quiet"]
+        try:
+            subprocess.run(
+                cmd,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+        except subprocess.CalledProcessError as exc:  # pragma: no cover - error path
+            msg = exc.stderr.strip() or exc.stdout.strip()
+            raise ValueError(
+                "Snakemake failed to validate generated rules: " + msg
+            ) from exc
 
 
 def create_rules_from_prompt(
@@ -135,7 +158,7 @@ def create_rules_from_prompt(
         (resp.content or "").strip() if hasattr(resp, "content") else str(resp).strip()
     )
 
-    _simple_rules_validator(rules_text)
+    _snakemake_rules_validator(rules_text)
 
     written_path: Optional[Path] = None
     if write_to:
