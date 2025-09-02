@@ -3,6 +3,7 @@ import re
 import string
 from pathlib import Path
 from sunbeam import logger
+from typing import Literal
 
 
 class SampleList:
@@ -194,7 +195,7 @@ class SampleList:
         logger.debug(f"Subset contains {len(subset.samples)} samples")
         return subset
 
-    def get_samples(self):
+    def get_samples(self) -> dict[str, dict[Literal["1", "2"], str]]:
         """
         Getting samples in a format that is backwards compatible
         Convert "r1" and "r2" to "1" and "2", make sure all fields are strings
