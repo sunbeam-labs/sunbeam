@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from sunbeam.ai import CONDA_ENV_GEN_SYSTEM_PROMPT, RULE_GEN_SYSTEM_PROMPT
 from typing import Optional, Sequence
 
 
@@ -11,11 +12,13 @@ class RuleCreationResult:
 
     Attributes:
         rules_text: The generated Snakemake rules in `.smk` syntax.
+        env_texts: Mapping of conda environment names to their YAML contents.
         written_to: Path where rules were saved (if any).
         model_name: The underlying LLM identifier, if available.
     """
 
     rules_text: str
+    env_texts: dict[str, str]
     written_to: Optional[Path] = None
     model_name: Optional[str] = None
 
@@ -35,52 +38,10 @@ def _require_ai_dependencies() -> None:
         )
 
 
-def _build_system_prompt() -> str:
-    return (
-        "You are an expert Snakemake engineer.\n"
-        "Generate valid Snakemake `.smk` rules only.\n"
-        "Constraints:\n"
-        "- Output ONLY rules and required Python blocks for Snakemake.\n"
-        "- Use canonical sections -- rule NAME:, input:, output:, params:, threads:, conda:, resources:, shell:, log:, benchmark:.\n"
-        "- Do not include prose, markdown, or triple backticks. However, each rule should include a docstring with the rule's purpose and any additional context.\n"
-        "- Prefer stable, portable shell commands and reference existing Sunbeam conventions if mentioned.\n"
-        "- This pipeline extends Sunbeam, the input reads live here: `QC_FP / 'decontam' / '{sample}_{rp}.fastq.gz'`. Default to paired end if there's ambiguity.\n"
-        "Some common Sunbeam conventions:\n"
-        "- Other extensions may use similar rules and rule names; avoid collisions by prefixing each rule name with the extension name (e.g., `myext_rule_name`).\n"
-        "- Use `log: LOG_FP / 'rule_name_{sample}.log'` to capture standard out/err for each sample. Expand over wildcards as necessary to match the output. In the shell command, try to include everything in a subshell and redirect everything that doesn't go into outputs to the log file.\n"
-        "- Use `benchmark: BENCHMARK_FP / 'rule_name_{sample}.tsv'` to capture resource usage for each sample.\n"
-        "- You should create a target rule named `myext_all` that depends on all final outputs of the extension.\n"
-        "Some important Sunbeam variables available in rules:\n"
-        "`Cfg` is a configuration dictionary holding the content of `sunbeam_config.yml`. You will probably not use this nor make your own config. If there are obvious configurable parameters for a rule, define them in code at the top of the file.\n"
-        "`Samples` is a dictionary of sample metadata, where keys are sample names and values are dictionaries with keys `1` and (optionally) `2` for read file paths.\n"
-        "`Pairs` is a list. If the run is paired end, it is ['1', '2']. If single end, it is ['1'].\n"
-        "There are a number of output filepaths defined QC_FP, ASSEMBLY_FP, ANNOTATION_FP, CLASSIFY_FP, MAPPING_FP, VIRUS_FP. All outputs should live in one of these directories. If none of these fit the theme of the new extension, define your own at the top of the file with `SOMETHING_FP = output_subdir(Cfg, 'something')`.\n"
-    )
-
-
 def _default_model_name() -> str:
     # Keep generic to avoid hard coupling to a specific vendor.
     # Users can override with their preferred model string.
     return "gpt-4o-mini"
-
-
-def _simple_rules_validator(text: str) -> None:
-    """Basic safety/structure checks for generated rules.
-
-    Raises ValueError if any quick structural checks fail. This is not
-    a full parser; it enforces minimal sanity before writing to disk.
-    """
-
-    if not text.strip():
-        raise ValueError("No content generated for rules.")
-
-    lowered = text.lower()
-    if "```" in text:
-        raise ValueError("Output contains markdown fences; expected raw `.smk` rules.")
-    if "rule " not in lowered:
-        raise ValueError("No `rule` blocks detected in generated content.")
-    if any(k in lowered for k in ["<todo>", "[fill", "<fill", "tbd"]):
-        raise ValueError("Placeholder text found; refusing to write incomplete rules.")
 
 
 def create_rules_from_prompt(
@@ -115,7 +76,7 @@ def create_rules_from_prompt(
     from langchain_openai import ChatOpenAI
     from langchain_core.messages import SystemMessage, HumanMessage
 
-    system = _build_system_prompt()
+    system = RULE_GEN_SYSTEM_PROMPT
 
     # Assemble context payloads.
     context_blobs: list[str] = []
@@ -125,7 +86,7 @@ def create_rules_from_prompt(
                 blob = Path(p).read_text()
             except Exception:
                 continue
-            context_blobs.append(f"FILE: {Path(p).name}\n{blob}")
+            context_blobs.append(f"CONTEXT FILE {Path(p).name}:\n{blob}")
 
     context_text = ("\n\n".join(context_blobs)).strip()
     user_content = (
@@ -135,6 +96,7 @@ def create_rules_from_prompt(
     model_name = model or _default_model_name()
     llm = ChatOpenAI(model=model_name, api_key=api_key)
 
+    # Run rule generation
     resp = llm.invoke(
         [
             SystemMessage(content=system),
@@ -146,17 +108,75 @@ def create_rules_from_prompt(
         (resp.content or "").strip() if hasattr(resp, "content") else str(resp).strip()
     )
 
-    _simple_rules_validator(rules_text)
+    # Run envs generation
+    envs = get_envs_from_rules(rules_text)
+    env_texts = {}
+
+    for env_name, rule in envs.items():
+        context = f"Generate a conda environment YAML file for the following Snakemake rule:\n\n{rule}"
+        resp = llm.invoke(
+            [
+                SystemMessage(content=CONDA_ENV_GEN_SYSTEM_PROMPT),
+                HumanMessage(content=context),
+            ]
+        )
+
+        env_texts[env_name] = resp.content if hasattr(resp, "content") else str(resp)
 
     written_path: Optional[Path] = None
     if write_to:
+        # Make ext dir
         out_path = Path(write_to)
         out_path.parent.mkdir(parents=True, exist_ok=True)
+        # Write rules
         out_path.write_text(rules_text)
+        # Write envs
+        envs_path = out_path.parent / "envs"
+        envs_path.mkdir(exist_ok=True)
+        for env_name, env_text in env_texts.items():
+            (envs_path / f"{env_name}.yaml").write_text(env_text)
         written_path = out_path
 
     return RuleCreationResult(
         rules_text=rules_text,
+        env_texts=env_texts,
         written_to=written_path,
         model_name=model_name,
     )
+
+
+def get_envs_from_rules(
+    rules_text: str,
+) -> dict[str, str]:
+    """Return rules with conda environments that need generation."""
+
+    rules = []
+    current_rule = []
+
+    for line in rules_text.splitlines(keepends=True):
+        if line.strip().startswith("rule:"):
+            # If we're already collecting a rule, save it
+            if current_rule:
+                rules.append("".join(current_rule).rstrip("\n"))
+                current_rule = []
+        current_rule.append(line)
+
+    # Save the last rule (if any)
+    if current_rule:
+        rules.append("".join(current_rule).rstrip("\n"))
+
+    rules = [r for r in rules if "conda:" in r]
+
+    # Extract env names
+    envs = {}
+    for rule in rules:
+        for line in rule.splitlines():
+            if line.strip().startswith("conda:"):
+                parts = line.split(":", 1)
+                if len(parts) == 2:
+                    env_name = parts[1].strip().strip('"').strip("'").strip(".yaml")
+                    envs[env_name] = rule
+                else:
+                    print("Warning: Malformed conda line:", line)
+
+    return envs
