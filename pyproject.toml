@@ -26,21 +26,21 @@ classifiers = [
 ]
 
 dependencies = [
-  "snakemake==9.9.0",
-  "more-itertools==10.7.0",
-  "pyyaml==6.0.2",
-  "pandas==2.3.2",
+  "snakemake~=9.11",
+  "more-itertools~=10.8",
+  "pyyaml~=6.0",
+  "pandas~=2.3",
 ]
 [project.optional-dependencies]
 dev = [
-  "black==24.10.0",
-  "snakefmt==0.11.0",
-  "pytest==8.4.1",
+  "black~=24.10",
+  "snakefmt~=0.11",
+  "pytest~=8.4",
 ]
 ai = [
-  "langchain>=0.2.0,<1.0.0",
-  "langgraph>=0.2.0,<1.0.0",
-  "langchain-openai>=0.2.0,<1.0.0",
+  "langchain~=0.2",
+  "langgraph~=0.2",
+  "langchain-openai~=0.2",
 ]
 
 [project.urls]
