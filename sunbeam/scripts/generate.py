@@ -21,7 +21,17 @@ def main(argv=sys.argv):
         raise SystemExit(f"Extension directory {ext_dir} already exists")
 
     rules_path = ext_dir / f"sbx_{ruleset_name}.smk"
-    result = create_rules_from_prompt(prompt, write_to=rules_path)
+
+    # Default context files to include
+    context_files = [
+        Path(__file__).parent.parent / "workflow" / "Snakefile",
+        Path(__file__).parent.parent / "workflow" / "rules" / "qc.smk",
+        Path(__file__).parent.parent / "workflow" / "rules" / "decontam.smk",
+    ]
+
+    result = create_rules_from_prompt(
+        ruleset_name, prompt, context_files=context_files, write_to=rules_path
+    )
 
     logger.info(f"Created extension scaffold at {ext_dir}")
 
