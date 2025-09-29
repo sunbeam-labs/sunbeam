@@ -123,10 +123,6 @@ rule preprocess_report:
             QC_FP / "log" / "decontam" / "{sample}_1.txt",
             sample=sorted(Samples.keys()),
         ),
-        komplexity_files=expand(
-            QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
-            sample=sorted(Samples.keys()),
-        ),
     output:
         QC_FP / "reports" / "preprocess_summary.tsv",
     log:

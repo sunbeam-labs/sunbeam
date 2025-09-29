@@ -215,43 +215,32 @@ rule fastqc_report:
         "../scripts/fastqc_report.py"
 
 
-rule find_low_complexity:
-    input:
-        expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
-    output:
-        QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
-    log:
-        LOG_FP / "find_low_complexity_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "find_low_complexity_{sample}.tsv"
-    conda:
-        "../envs/komplexity.yml"
-    container:
-        get_docker_str("komplexity")
-    shell:
-        """
-        (
-            for rp in {input}; do
-            gzip -dc $rp | kz | \
-            awk '{{ if ($4<{Cfg[qc][kz_threshold]}) print $1 }}' >> {output}
-            done
-        ) > {log} 2>&1
-        """
-
-
 rule remove_low_complexity:
     input:
-        reads=QC_FP / "02_trimmomatic" / "{sample}_{rp}.fastq.gz",
-        ids=QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
+        reads=expand(
+            QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz",
+            rp=Pairs,
+        ),
     output:
-        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
+        reads=expand(
+            QC_FP / "03_komplexity" / "{{sample}}_{rp}.fastq.gz",
+            rp=Pairs,
+        ),
+        counter=QC_FP / "03_komplexity" / "{sample}_count.txt",
+    params:
+        kmer_size=Cfg["qc"]["kmer_size"],
+        min_kscore=Cfg["qc"]["kz_threshold"],
     log:
-        LOG_FP / "remove_low_complexity_{sample}_{rp}.log",
+        LOG_FP / "remove_low_complexity_{sample}.log",
     benchmark:
-        BENCHMARK_FP / "remove_low_complexity_{sample}_{rp}.tsv"
+        BENCHMARK_FP / "remove_low_complexity_{sample}.tsv"
     resources:
         mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.size_mb),
         runtime=lambda wc: max(MIN_RUNTIME, 120),
+    conda:
+        "../envs/qc.yml"
+    container:
+        get_docker_str("qc")
     script:
         "../scripts/remove_low_complexity.py"
 

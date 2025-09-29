@@ -6,4 +6,6 @@ dependencies:
   - fastqc
   - trimmomatic
   - python =3.12.0
+  - pip:
+    - heyfastq
 name: qc
