@@ -25,108 +25,31 @@ rule sample_intake:
         "../scripts/sample_intake.py"
 
 
-if Cfg["all"]["paired_end"]:
-
-    ruleorder: adapter_removal_paired > adapter_removal_unpaired
-
-else:
-
-    ruleorder: adapter_removal_unpaired > adapter_removal_paired
-
-
-rule adapter_removal_unpaired:
+rule adapter_removal:
     input:
-        QC_FP / "00_samples" / "{sample}_1.fastq.gz",
+        reads=expand(QC_FP / "00_samples" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
-        r=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
-        ngz=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
+        reads=expand(QC_FP / "01_adapters" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
+        fail=QC_FP / "01_adapters" / "{sample}_adapter_removal_failed.fastq.gz",
+        json=QC_FP / "reports" / "01_{sample}_adapter_removal.json",
     log:
-        LOG_FP / "adapter_removal_unpaired_{sample}.log",
+        LOG_FP / "adapter_removal_{sample}.log",
     benchmark:
-        BENCHMARK_FP / "adapter_removal_unpaired_{sample}.tsv"
+        BENCHMARK_FP / "adapter_removal_{sample}.tsv"
+    params:
+        adapter=Cfg["qc"]["adapter_template"],
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
-    threads: 4
-    conda:
-        "../envs/cutadapt.yml"
-    container:
-        get_docker_str("cutadapt")
-    script:
-        "../scripts/adapter_removal_unpaired.py"
-
-
-rule adapter_removal_paired:
-    input:
-        r1=QC_FP / "00_samples" / "{sample}_1.fastq.gz",
-        r2=QC_FP / "00_samples" / "{sample}_2.fastq.gz",
-    output:
-        r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
-        r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
-        ngz1=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
-        ngz2=temp(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
-    log:
-        LOG_FP / "adapter_removal_paired_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "adapter_removal_paired_{sample}.tsv"
-    resources:
-        runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 10),
-    threads: 4
-    conda:
-        "../envs/cutadapt.yml"
-    container:
-        get_docker_str("cutadapt")
-    script:
-        "../scripts/adapter_removal_paired.py"
-
-
-if Cfg["all"]["paired_end"]:
-
-    ruleorder: trimmomatic_paired > trimmomatic_unpaired
-
-else:
-
-    ruleorder: trimmomatic_unpaired > trimmomatic_paired
-
-
-# Check that the adapter template file exists
-if os.environ.get("SUNBEAM_NO_ADAPTER", None):
-    assert os.path.exists(Cfg["qc"]["adapter_template"])
-    assert os.path.isfile(Cfg["qc"]["adapter_template"])
-    assert os.stat(Cfg["qc"]["adapter_template"]).st_size > 0
-
-
-rule trimmomatic_unpaired:
-    input:
-        QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
-    output:
-        QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
-    log:
-        LOG_FP / "trimmomatic_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "trimmomatic_unpaired_{sample}.tsv"
-    params:
-        sw_start=Cfg["qc"]["slidingwindow"][0],
-        sw_end=Cfg["qc"]["slidingwindow"][1],
-    resources:
-        mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 1000) * MIN_MEM_MB),
-        runtime=lambda wc: max(MIN_RUNTIME, 240),
     threads: 4
     conda:
         "../envs/qc.yml"
     container:
         get_docker_str("qc")
-    shell:
-        """
-        trimmomatic \
-        SE -threads {threads} -phred33 \
-        {input} {output} \
-        ILLUMINACLIP:{Cfg[qc][adapter_template]}:2:30:10:8:true \
-        LEADING:{Cfg[qc][leading]} \
-        TRAILING:{Cfg[qc][trailing]} \
-        SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
-        MINLEN:{Cfg[qc][minlen]} \
-        > {log} 2>&1
-        """
+    script:
+        "../scripts/adapter_removal.py"
+
+
+#rule 
 
 
 rule trimmomatic_paired:
@@ -172,10 +95,39 @@ rule trimmomatic_paired:
         > {log} 2>&1
         """
 
+rule remove_low_complexity:
+    input:
+        reads=expand(
+            QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz",
+            rp=Pairs,
+        ),
+    output:
+        reads=expand(
+            QC_FP / "cleaned" / "{{sample}}_{rp}.fastq.gz",
+            rp=Pairs,
+        ),
+        counter=QC_FP / "reports" / "03_{sample}_count.txt",
+    params:
+        kmer_size=Cfg["qc"]["kmer_size"],
+        min_kscore=Cfg["qc"]["kz_threshold"],
+    log:
+        LOG_FP / "remove_low_complexity_{sample}.log",
+    benchmark:
+        BENCHMARK_FP / "remove_low_complexity_{sample}.tsv"
+    resources:
+        mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.size_mb),
+        runtime=lambda wc: max(MIN_RUNTIME, 120),
+    conda:
+        "../envs/qc.yml"
+    container:
+        get_docker_str("qc")
+    script:
+        "../scripts/remove_low_complexity.py"
+
 
 rule fastqc:
     input:
-        reads=expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
+        reads=expand(QC_FP / "cleaned" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
         expand(QC_FP / "reports" / "{{sample}}_{rp}_fastqc/fastqc_data.txt", rp=Pairs),
     log:
@@ -215,45 +167,6 @@ rule fastqc_report:
         "../scripts/fastqc_report.py"
 
 
-rule remove_low_complexity:
-    input:
-        reads=expand(
-            QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz",
-            rp=Pairs,
-        ),
-    output:
-        reads=expand(
-            QC_FP / "03_komplexity" / "{{sample}}_{rp}.fastq.gz",
-            rp=Pairs,
-        ),
-        counter=QC_FP / "03_komplexity" / "{sample}_count.txt",
-    params:
-        kmer_size=Cfg["qc"]["kmer_size"],
-        min_kscore=Cfg["qc"]["kz_threshold"],
-    log:
-        LOG_FP / "remove_low_complexity_{sample}.log",
-    benchmark:
-        BENCHMARK_FP / "remove_low_complexity_{sample}.tsv"
-    resources:
-        mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.size_mb),
-        runtime=lambda wc: max(MIN_RUNTIME, 120),
-    conda:
-        "../envs/qc.yml"
-    container:
-        get_docker_str("qc")
-    script:
-        "../scripts/remove_low_complexity.py"
-
-
-rule qc_final:
-    input:
-        QC_FP / "03_komplexity" / "{sample}_{rp}.fastq.gz",
-    output:
-        QC_FP / "cleaned" / "{sample}_{rp}.fastq.gz",
-    shell:
-        """cp {input} {output}"""
-
-
 rule clean_qc:
     input:
         expand(
@@ -265,10 +178,9 @@ rule clean_qc:
         touch(QC_FP / ".qc_cleaned"),
     shell:
         """
-        cleaned_dir=$(dirname {input[0]})
-        qc_dir=$(dirname $cleaned_dir)
+        qc_dir=$(dirname {output[0]})
 
-        rm -r $qc_dir/01_cutadapt || true
+        rm -r $qc_dir/01_adapters || true
         rm -r $qc_dir/02_trimmomatic || true
-        rm -r $qc_dir/03_komplexity || true
+        rm -r $qc_dir/03_complexity || true
         """
