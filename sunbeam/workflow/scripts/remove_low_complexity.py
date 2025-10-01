@@ -1,11 +1,12 @@
+import sys
 import traceback
 
 log_f = snakemake.log[0]  # type: ignore
 
 with open(log_f, "w") as log:
     log.write("Starting low-complexity read removal step...\n")
+    stderr_capture = None
     try:
-        import sys
         from contextlib import redirect_stderr
         from io import StringIO
         from heyfastqlib.command import heyfastq_main
@@ -24,9 +25,9 @@ with open(log_f, "w") as log:
                 [
                     "filter-kscore",
                     "--input",
-                    input_reads,
+                    *input_reads,
                     "--output",
-                    output_reads,
+                    *output_reads,
                     "--kmer-size",
                     str(kmer_size),
                     "--min-kscore",
@@ -39,7 +40,16 @@ with open(log_f, "w") as log:
 
         with open(output_count, "w") as count:
             count.write(captured_stderr)
-    except Exception as e:
+
+        log.write("Low-complexity read removal completed successfully.\n")
+    except BaseException as e:
         log.write(f"Error during low-complexity read removal: {e}\n")
         log.write(traceback.format_exc())
-        sys.exit(1)
+
+        if stderr_capture is not None:
+            captured = stderr_capture.getvalue()
+            if captured:
+                log.write("Captured stderr before failure:\n")
+                log.write(captured)
+
+        raise
