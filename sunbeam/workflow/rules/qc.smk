@@ -32,6 +32,9 @@ rule adapter_removal:
         reads=expand(QC_FP / "01_adapters" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
         fail=QC_FP / "01_adapters" / "{sample}_adapter_removal_failed.fastq.gz",
         json=QC_FP / "reports" / "01_{sample}_adapter_removal.json",
+        # Don't really want the HTML but it's better than having it float around somewhere else
+        # and there doesn't seem to be a way to suppress it
+        html=QC_FP / "reports" / "01_{sample}_adapter_removal.html",
     log:
         LOG_FP / "adapter_removal_{sample}.log",
     benchmark:
@@ -49,56 +52,37 @@ rule adapter_removal:
         "../scripts/adapter_removal.py"
 
 
-#rule 
-
-
-rule trimmomatic_paired:
+rule trim_quality:
     input:
-        r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
-        r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
+        reads=expand(QC_FP / "01_adapters" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
-        pair_r1=QC_FP / "02_trimmomatic" / "{sample}_1.fastq.gz",
-        pair_r2=QC_FP / "02_trimmomatic" / "{sample}_2.fastq.gz",
-        unpair_r1=temp(
-            QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_1_unpaired.fastq.gz"
-        ),
-        unpair_r2=temp(
-            QC_FP / "02_trimmomatic" / "unpaired" / "{sample}_2_unpaired.fastq.gz"
-        ),
+        reads=expand(QC_FP / "02_quality" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
+        counter=QC_FP / "reports" / "02_quality_{sample}_count.txt",
     log:
-        LOG_FP / "trimmomatic_{sample}.log",
+        LOG_FP / "trim_quality_{sample}.log",
     benchmark:
-        BENCHMARK_FP / "trimmomatic_paired_{sample}.tsv"
+        BENCHMARK_FP / "trim_quality_{sample}.tsv"
     params:
-        sw_start=Cfg["qc"]["slidingwindow"][0],
-        sw_end=Cfg["qc"]["slidingwindow"][1],
+        window=Cfg["qc"]["slidingwindow"],
+        start_threshold=Cfg["qc"]["leading"],
+        end_threshold=Cfg["qc"]["trailing"],
+        min_length=Cfg["qc"]["minlen"],
     resources:
         mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 2000) * MIN_MEM_MB),
-        runtime=lambda wc: max(MIN_RUNTIME, 240),
+        runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
     threads: 4
     conda:
         "../envs/qc.yml"
     container:
         get_docker_str("qc")
-    shell:
-        """
-        trimmomatic \
-        PE -threads {threads} -phred33 \
-        {input.r1} {input.r2} \
-        {output.pair_r1} {output.unpair_r1} \
-        {output.pair_r2} {output.unpair_r2} \
-        ILLUMINACLIP:{Cfg[qc][adapter_template]}:2:30:10:8:true \
-        LEADING:{Cfg[qc][leading]} \
-        TRAILING:{Cfg[qc][trailing]} \
-        SLIDINGWINDOW:{params.sw_start}:{params.sw_end} \
-        MINLEN:{Cfg[qc][minlen]} \
-        > {log} 2>&1
-        """
+    script:
+        "../scripts/trim_quality.py"
+
 
 rule remove_low_complexity:
     input:
         reads=expand(
-            QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz",
+            QC_FP / "02_quality" / "{{sample}}_{rp}.fastq.gz",
             rp=Pairs,
         ),
     output:
@@ -106,7 +90,7 @@ rule remove_low_complexity:
             QC_FP / "cleaned" / "{{sample}}_{rp}.fastq.gz",
             rp=Pairs,
         ),
-        counter=QC_FP / "reports" / "03_{sample}_count.txt",
+        counter=QC_FP / "reports" / "03_complexity_{sample}_count.txt",
     params:
         kmer_size=Cfg["qc"]["kmer_size"],
         min_kscore=Cfg["qc"]["kz_threshold"],
@@ -152,13 +136,13 @@ rule fastqc:
 rule fastqc_report:
     """ make fastqc reports """
     input:
-        files=expand(
+        reports=expand(
             QC_FP / "reports" / "{sample}_{rp}_fastqc/fastqc_data.txt",
             sample=Samples.keys(),
             rp=Pairs,
         ),
     output:
-        QC_FP / "reports" / "fastqc_quality.tsv",
+        report=QC_FP / "reports" / "fastqc_quality.tsv",
     log:
         LOG_FP / "fastqc_report.log",
     benchmark:

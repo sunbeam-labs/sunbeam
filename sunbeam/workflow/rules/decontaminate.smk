@@ -101,7 +101,7 @@ rule filter_reads:
         ),
     output:
         reads=QC_FP / "decontam" / "{sample}_{rp}.fastq.gz",
-        log=QC_FP / "log" / "decontam" / "{sample}_{rp}.txt",
+        log=QC_FP / "reports" / "decontam_{sample}_{rp}.txt",
     log:
         LOG_FP / "filter_reads_{sample}_{rp}.log",
     benchmark:
@@ -115,16 +115,17 @@ rule filter_reads:
 
 rule preprocess_report:
     input:
-        trim_files=expand(
-            LOG_FP / "trimmomatic_{sample}.log",
-            sample=sorted(Samples.keys()),
-        ),
-        decontam_files=expand(
-            QC_FP / "log" / "decontam" / "{sample}_1.txt",
+        adapter=expand(QC_FP / "reports" / "01_{sample}_adapter_removal.json", sample=sorted(Samples.keys())),
+        trim=expand(QC_FP / "reports" / "02_quality_{sample}_count.txt", sample=sorted(Samples.keys())),
+        complexity=expand(QC_FP / "reports" / "03_complexity_{sample}_count.txt", sample=sorted(Samples.keys())),
+        decontam=expand(
+            QC_FP / "reports" / "decontam_{sample}_1.txt",
             sample=sorted(Samples.keys()),
         ),
     output:
-        QC_FP / "reports" / "preprocess_summary.tsv",
+        report=QC_FP / "reports" / "preprocess_summary.tsv",
+    params:
+        samples=sorted(Samples.keys()),
     log:
         LOG_FP / "preprocess_report.log",
     benchmark:
