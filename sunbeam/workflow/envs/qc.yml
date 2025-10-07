@@ -2,8 +2,8 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - bwa
   - fastqc
-  - trimmomatic
-  - python =3.12.0
+  - fastp
+  - pip:
+    - heyfastq
 name: qc

@@ -10,8 +10,10 @@ def f(log: TextIO):
     input_reads = snakemake.input.reads  # type: ignore
     output_reads = snakemake.output.reads  # type: ignore
     output_count = snakemake.output.counter  # type: ignore
-    kmer_size = snakemake.params.kmer_size  # type: ignore
-    min_kscore = snakemake.params.min_kscore  # type: ignore
+    window_width, window_threshold = snakemake.params.window  # type: ignore
+    start_threshold = snakemake.params.start_threshold  # type: ignore
+    end_threshold = snakemake.params.end_threshold  # type: ignore
+    min_length = snakemake.params.min_length  # type: ignore
 
     stderr_capture = StringIO()
 
@@ -19,15 +21,21 @@ def f(log: TextIO):
     with redirect_stderr(stderr_capture):
         heyfastq_main(
             [
-                "filter-kscore",
+                "trim-qual",
                 "--input",
                 *input_reads,
                 "--output",
                 *output_reads,
-                "--kmer-size",
-                str(kmer_size),
-                "--min-kscore",
-                str(min_kscore),
+                "--window-width",
+                str(window_width),
+                "--window-threshold",
+                str(window_threshold),
+                "--start-threshold",
+                str(start_threshold),
+                "--end-threshold",
+                str(end_threshold),
+                "--min-length",
+                str(min_length),
             ]
         )
 
