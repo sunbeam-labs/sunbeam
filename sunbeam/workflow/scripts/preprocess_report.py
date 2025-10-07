@@ -41,11 +41,6 @@ def parse_adapter_report(
         "adapter_total_reads_after": 0,
         "adapter_total_bases_after": 0,
         "adapter_passed_filter_reads": 0,
-        "adapter_low_quality_reads": 0,
-        "adapter_too_many_N_reads": 0,
-        "adapter_low_complexity_reads": 0,
-        "adapter_too_short_reads": 0,
-        "adapter_too_long_reads": 0,
         "adapter_duplication_rate": 0.0,
         "adapter_read1_mean_length": 0.0,
         "adapter_read2_mean_length": 0.0,
@@ -78,17 +73,6 @@ def parse_adapter_report(
         totals["adapter_passed_filter_reads"] += filtering_result.get(
             "passed_filter_reads", 0
         )
-        totals["adapter_low_quality_reads"] += filtering_result.get(
-            "low_quality_reads", 0
-        )
-        totals["adapter_too_many_N_reads"] += filtering_result.get(
-            "too_many_N_reads", 0
-        )
-        totals["adapter_low_complexity_reads"] += filtering_result.get(
-            "low_complexity_reads", 0
-        )
-        totals["adapter_too_short_reads"] += filtering_result.get("too_short_reads", 0)
-        totals["adapter_too_long_reads"] += filtering_result.get("too_long_reads", 0)
 
         duplication_rate = duplication.get("rate")
         if duplication_rate is not None:
