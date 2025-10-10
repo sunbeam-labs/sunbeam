@@ -4,6 +4,7 @@
 
 [![Tests](https://github.com/sunbeam-labs/sunbeam/actions/workflows/tests.yml/badge.svg)](https://github.com/sunbeam-labs/sunbeam/actions/workflows/tests.yml)
 [![Documentation Status](https://readthedocs.org/projects/sunbeam/badge/?version=stable)](https://sunbeam.readthedocs.io/en/stable/?badge=stable)
+[![SunbeamGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)](https://chatgpt.com/g/g-68e86d2072908191aa730b02ead5edc6-sunbeam-v5-2-2)
 [![PyPI](https://badge.fury.io/py/sunbeamlib.svg)](https://pypi.org/project/sunbeamlib/)
 [![Bioconda](https://anaconda.org/bioconda/sunbeamlib/badges/downloads.svg)](https://anaconda.org/bioconda/sunbeamlib/)
 [![DockerHub](https://img.shields.io/docker/pulls/sunbeamlabs/sunbeam)](https://hub.docker.com/repository/docker/sunbeamlabs/sunbeam/)
