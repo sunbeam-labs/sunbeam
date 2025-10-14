@@ -12,6 +12,12 @@ def main():
     parser = main_parser()
     args, remaining = parser.parse_known_args()
 
+    # If no subcommand was provided, fall back to displaying the top-level help
+    # when explicitly requested.
+    if args.command is None and any(opt in remaining for opt in ("-h", "--help")):
+        parser.print_help()
+        return
+
     if args.command == "run":
         Run(remaining)
     elif args.command == "init":
@@ -47,11 +53,4 @@ def main_parser():
         action="version",
         version=__version__,
     )
-    parser.add_argument(
-        "-h",
-        "--help",
-        action="help",
-        help="Show this help message and exit.",
-    )
-
     return parser
