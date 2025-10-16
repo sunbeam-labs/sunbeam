@@ -4,6 +4,11 @@ channels:
 dependencies:
   - fastqc
   - fastp
+  # Need to spec pip and python so that the env includes it's own versions
+  # instead of falling back to using the base env's versions
+  # which may not include `heyfastq`
+  - pip
+  - python
   - pip:
     - heyfastq
 name: qc

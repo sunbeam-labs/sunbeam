@@ -30,29 +30,25 @@ You have a dataset on your institutions HPC (which uses slurm to manage jobs) an
     sunbeam init --data_fp /data/ --profile slurm /projects/my_project/
     pip install snakemake-executor-plugin-slurm
 
-Now you're ready to run the project, but you want to be able to put the main node on the cluster as well so you can logoff, so you create a bash script called ``run_sunbeam.sh``:
+There are a number of ways to go about running this. I'll give my preferred in detail, but mention the others here:
+
+1) Submit the main snakemake process to the cluster as well. This is generally frowned upon by HPC admins but can be a nice solution. WARNING: Recent updates to the snakemake slurm executor plugin seem to have partially/totally broken this method.
+2) Use tmux/screen sessions. This is probably the best solution but I don't use it as often. Definitely recommend tmux over screen because it is more modern and handles all the environment patching better.
+3) Use nohup. This is what I usually do because it is simple and works well enough.
+
+Now you're ready to run the project, but you want to be able to logoff during the (possibly long) run, so you create a bash script called ``run_sunbeam.sh``:
 
 .. code-block:: bash
 
     #!/bin/bash
-    #SBATCH --time=72:00:00
-    #SBATCH -n 1
-    #SBATCH --mem=8G
-    #SBATCH --mail-type=END,FAIL
-    #SBATCH --mail-user=your_email@your_institution.edu
-    #SBATCH --no-requeue
-    #SBATCH --output=slurm_%x_%j.out
-
-    # Conda env must be active for this to work
-    set -x
-    set -e
-    sunbeam run --profile /projects/my_project all_assembly
+    
+    nohup sunbeam run --profile /projects/my_project all_assembly > log 2>&1 &
 
 Then you submit the job:
 
 .. code-block:: bash
 
-    sbatch run_sunbeam.sh
+    bash run_sunbeam.sh
 
 Once this run completes, you will have a directory called ``/projects/my_project/sunbeam_output/`` that contains all of the output from the run and ``.snakemake/slurm_logs/rule_*/`` directories wherever you ran the main script from that contain logs for each job. Look in ``/projects/my_project/sunbeam_output/assembly/contigs/`` for the assembled contigs.
 

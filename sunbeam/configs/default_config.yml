@@ -9,19 +9,17 @@ all:
 
 # Quality control
 qc:
-  # Trimmomatic
+  compression: 1
   leading: 3
   trailing: 3
   slidingwindow: [4,15]
   minlen: 36
   adapter_template: ""
-  # Cutadapt
   fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
   cutadapt_opts: "--discard-trimmed"
-  # Komplexity
+  kmer_size: 4
   kz_threshold: 0.55
-  # Decontam
   pct_id: 0.5
   frac: 0.6
   host_fp: ""
