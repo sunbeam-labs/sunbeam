@@ -11,17 +11,18 @@ def f(log: TextIO) -> Optional[sp.CompletedProcess[str]]:
     json = snakemake.output.json  # type: ignore
     html = snakemake.output.html  # type: ignore
     adapter = snakemake.params.adapter  # type: ignore
-    compression = snakemake.Cfg["qc"].get("compression", 1)  # type: ignore
+    compression = snakemake.config["qc"].get("compression", 1)  # type: ignore
     threads = snakemake.threads  # type: ignore
 
-    # TODO: Remove this if testing goes well
     adapter_fp = Path(adapter)
-    assert (
-        adapter_fp.is_file()
-    ), f"Adapter file {adapter} does not exist. Point config to an empty file to skip this step."
-    if adapter_fp.stat().st_size == 0:
+    if adapter_fp.is_file() and adapter_fp.stat().st_size > 0:
+        log.write(f"Using custom adapter file: {adapter_fp}\n")
+        adapter_strs = ["--adapter_fasta", str(adapter_fp)]
+    elif len(input_reads) == 2:
+        adapter_strs = ["--detect_adapter_for_pe"]
+    else:
         log.write(
-            f"Warning: Adapter file {adapter} is empty. No adapter removal will be performed.\n"
+            "WARNING: Adapter detection isn't supported for single-end reads, you must provide an adapter file.\n"
         )
         return None
 
@@ -35,7 +36,6 @@ def f(log: TextIO) -> Optional[sp.CompletedProcess[str]]:
         str(input_reads[0]),
         "-o",
         str(output_reads[0]),
-        "--detect_adapter_for_pe",
         "--failed_out",
         str(failed_reads),
         "--disable_quality_filtering",
@@ -45,7 +45,7 @@ def f(log: TextIO) -> Optional[sp.CompletedProcess[str]]:
         str(json),
         "--html",
         str(html),
-    ]
+    ] + adapter_strs
 
     if len(input_reads) == 2 and len(output_reads) == 2:
         args += ["-I", str(input_reads[1]), "-O", str(output_reads[1])]
