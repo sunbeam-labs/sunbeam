@@ -14,7 +14,6 @@ def f(log: TextIO):
     start_threshold = snakemake.params.start_threshold  # type: ignore
     end_threshold = snakemake.params.end_threshold  # type: ignore
     min_length = snakemake.params.min_length  # type: ignore
-    compression = snakemake.Cfg["qc"].get("compression", 1)  # type: ignore
 
     stderr_capture = StringIO()
 

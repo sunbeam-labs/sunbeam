@@ -33,14 +33,14 @@ dependencies = [
 ]
 [project.optional-dependencies]
 dev = [
-  "black~=24.10",
+  "black>=24.10,<26.0",
   "snakefmt~=0.11",
   "pytest~=8.4",
 ]
 ai = [
   "langchain~=0.2",
   "langgraph>=0.2,<2.0",
-  "langchain-openai~=0.2",
+  "langchain-openai>=0.2,<2.0",
 ]
 
 [project.urls]
