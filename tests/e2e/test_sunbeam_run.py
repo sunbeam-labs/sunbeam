@@ -22,6 +22,7 @@ def test_sunbeam_run(tmp_path, DATA_DIR):
                 str(project_dir),
                 "--exclude",
                 "all",
+                "--show-failed-logs",
             ]
         )
     assert excinfo.value.code == 0
