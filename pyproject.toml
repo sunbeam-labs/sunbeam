@@ -38,7 +38,7 @@ dev = [
   "pytest~=8.4",
 ]
 ai = [
-  "langchain~=0.2",
+  "langchain>=0.2,<2.0",
   "langgraph~=0.2",
   "langchain-openai~=0.2",
 ]
