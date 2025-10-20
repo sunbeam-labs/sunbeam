@@ -39,7 +39,7 @@ dev = [
 ]
 ai = [
   "langchain~=0.2",
-  "langgraph~=0.2",
+  "langgraph>=0.2,<2.0",
   "langchain-openai~=0.2",
 ]
 
