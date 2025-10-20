@@ -1,5 +1,6 @@
 import pytest
 import subprocess as sp
+from sunbeam.scripts.config import main as Config
 from sunbeam.scripts.init import main as Init
 from sunbeam.scripts.run import main as Run
 
@@ -43,6 +44,14 @@ def test_sunbeam_run_with_single_end_reads(tmp_path, DATA_DIR):
         ]
     )
 
+    Config(
+        [
+            "--modify",
+            f"qc: {{adapter_template: {DATA_DIR / 'empty_adapters.fa'}}}",
+            str(project_dir / "sunbeam_config.yml"),
+        ]
+    )
+
     with pytest.raises(SystemExit) as excinfo:
         Run(
             [
@@ -50,6 +59,7 @@ def test_sunbeam_run_with_single_end_reads(tmp_path, DATA_DIR):
                 str(project_dir),
                 "--exclude",
                 "all",
+                "--show-failed-logs",
             ]
         )
     assert excinfo.value.code == 0
