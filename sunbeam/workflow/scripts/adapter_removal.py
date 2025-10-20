@@ -11,7 +11,7 @@ def f(log: TextIO) -> Optional[sp.CompletedProcess[str]]:
     json = snakemake.output.json  # type: ignore
     html = snakemake.output.html  # type: ignore
     adapter = snakemake.params.adapter  # type: ignore
-    compression = snakemake.Cfg["qc"].get("compression", 1)  # type: ignore
+    compression = snakemake.config["qc"].get("compression", 1)  # type: ignore
     threads = snakemake.threads  # type: ignore
 
     # TODO: Remove this if testing goes well
