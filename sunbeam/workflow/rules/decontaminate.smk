@@ -115,9 +115,18 @@ rule filter_reads:
 
 rule preprocess_report:
     input:
-        adapter=expand(QC_FP / "reports" / "01_{sample}_adapter_removal.json", sample=sorted(Samples.keys())),
-        trim=expand(QC_FP / "reports" / "02_quality_{sample}_count.txt", sample=sorted(Samples.keys())),
-        complexity=expand(QC_FP / "reports" / "03_complexity_{sample}_count.txt", sample=sorted(Samples.keys())),
+        adapter=expand(
+            QC_FP / "reports" / "01_{sample}_adapter_removal.json",
+            sample=sorted(Samples.keys()),
+        ),
+        trim=expand(
+            QC_FP / "reports" / "02_quality_{sample}_count.txt",
+            sample=sorted(Samples.keys()),
+        ),
+        complexity=expand(
+            QC_FP / "reports" / "03_complexity_{sample}_count.txt",
+            sample=sorted(Samples.keys()),
+        ),
         decontam=expand(
             QC_FP / "reports" / "decontam_{sample}_1.txt",
             sample=sorted(Samples.keys()),

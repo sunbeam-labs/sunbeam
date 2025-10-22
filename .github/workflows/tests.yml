@@ -52,5 +52,7 @@ jobs:
 
     - name: Run linters
       run: |
+        echo "Black check..."
         black --check --line-length=88 .
+        echo "Snakefmt check..."
         snakefmt --check sunbeam/workflow/Snakefile  sunbeam/workflow/rules/*.smk
