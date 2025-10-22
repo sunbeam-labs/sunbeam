@@ -9,7 +9,8 @@ all:
 
 # Quality control
 qc:
-  compression: 1 # Fast: 1, Small: 9, Balanced: 5
+  compression: 5 # Fast: 1, Small: 9, Balanced: 5
+  threads: 16
   leading: 3
   trailing: 3
   slidingwindow: [4,15]

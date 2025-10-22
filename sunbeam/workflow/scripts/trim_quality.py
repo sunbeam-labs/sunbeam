@@ -1,50 +1,50 @@
 import traceback
-from contextlib import redirect_stderr
-from io import StringIO
 from typing import TextIO
 
 
 def f(log: TextIO):
-    from heyfastqlib.command import heyfastq_main
+    import os
+    import subprocess as sp
 
     input_reads = snakemake.input.reads  # type: ignore
     output_reads = snakemake.output.reads  # type: ignore
-    output_count = snakemake.output.counter  # type: ignore
+    output_report = snakemake.output.report  # type: ignore
     window_width, window_threshold = snakemake.params.window  # type: ignore
     start_threshold = snakemake.params.start_threshold  # type: ignore
     end_threshold = snakemake.params.end_threshold  # type: ignore
     min_length = snakemake.params.min_length  # type: ignore
+    threads = snakemake.threads  # type: ignore
+    compression = snakemake.params.compression  # type: ignore
 
-    stderr_capture = StringIO()
+    args = [
+        "heyfastq",
+        "trim-qual",
+        "--input",
+        *input_reads,
+        "--output",
+        *output_reads,
+        "--report",
+        output_report,
+        "--window-width",
+        str(window_width),
+        "--window-threshold",
+        str(window_threshold),
+        "--start-threshold",
+        str(start_threshold),
+        "--end-threshold",
+        str(end_threshold),
+        "--min-length",
+        str(min_length),
+        "--threads",
+        str(threads),
+    ]
 
-    # Redirect stderr to the buffer and call the function
-    with redirect_stderr(stderr_capture):
-        heyfastq_main(
-            [
-                "trim-qual",
-                "--input",
-                *input_reads,
-                "--output",
-                *output_reads,
-                "--window-width",
-                str(window_width),
-                "--window-threshold",
-                str(window_threshold),
-                "--start-threshold",
-                str(start_threshold),
-                "--end-threshold",
-                str(end_threshold),
-                "--min-length",
-                str(min_length),
-            ]
-        )
-
-    # Retrieve the captured stderr output
-    captured_stderr = stderr_capture.getvalue()
-
-    with open(output_count, "w") as count:
-        log.write(f"Counts: {captured_stderr}\n")
-        count.write(captured_stderr)
+    os.environ["HFQ_GZIP_COMPRESSION"] = str(compression)
+    res = sp.run(args, capture_output=True, text=True)
+    log.write(res.stdout)
+    log.write(res.stderr)
+    if res.returncode != 0:
+        raise RuntimeError(f"heyfastq trim-qual failed with exit code {res.returncode}")
 
 
 log_f = snakemake.log[0]  # type: ignore

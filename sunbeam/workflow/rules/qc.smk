@@ -41,9 +41,10 @@ rule adapter_removal:
         BENCHMARK_FP / "adapter_removal_{sample}.tsv"
     params:
         adapter=Cfg["qc"]["adapter_template"],
+        compression=Cfg["qc"].get("compression", 5),
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
-    threads: 4
+    threads: Cfg["qc"].get("threads", os.cpu_count())
     conda:
         "../envs/qc.yml"
     container:
@@ -57,7 +58,7 @@ rule trim_quality:
         reads=expand(QC_FP / "01_adapters" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
         reads=expand(QC_FP / "02_quality" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
-        counter=QC_FP / "reports" / "02_quality_{sample}_count.txt",
+        report=QC_FP / "reports" / "02_quality_{sample}.json",
     log:
         LOG_FP / "trim_quality_{sample}.log",
     benchmark:
@@ -67,10 +68,11 @@ rule trim_quality:
         start_threshold=Cfg["qc"]["leading"],
         end_threshold=Cfg["qc"]["trailing"],
         min_length=Cfg["qc"]["minlen"],
+        compression=Cfg["qc"].get("compression", 5),
     resources:
         mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 2000) * MIN_MEM_MB),
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
-    threads: 4
+    threads: Cfg["qc"].get("threads", os.cpu_count())
     conda:
         "../envs/qc.yml"
     container:
@@ -90,10 +92,11 @@ rule remove_low_complexity:
             QC_FP / "cleaned" / "{{sample}}_{rp}.fastq.gz",
             rp=Pairs,
         ),
-        counter=QC_FP / "reports" / "03_complexity_{sample}_count.txt",
+        report=QC_FP / "reports" / "03_complexity_{sample}.json",
     params:
         kmer_size=Cfg["qc"]["kmer_size"],
         min_kscore=Cfg["qc"]["kz_threshold"],
+        compression=Cfg["qc"].get("compression", 5),
     log:
         LOG_FP / "remove_low_complexity_{sample}.log",
     benchmark:
@@ -101,6 +104,7 @@ rule remove_low_complexity:
     resources:
         mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.size_mb),
         runtime=lambda wc: max(MIN_RUNTIME, 120),
+    threads: Cfg["qc"].get("threads", os.cpu_count())
     conda:
         "../envs/qc.yml"
     container:

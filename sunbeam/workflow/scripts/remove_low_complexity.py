@@ -1,42 +1,44 @@
 import traceback
-from contextlib import redirect_stderr
-from io import StringIO
 from typing import TextIO
 
 
 def f(log: TextIO):
-    from heyfastqlib.command import heyfastq_main
+    import os
+    import subprocess as sp
 
     input_reads = snakemake.input.reads  # type: ignore
     output_reads = snakemake.output.reads  # type: ignore
-    output_count = snakemake.output.counter  # type: ignore
+    output_report = snakemake.output.report  # type: ignore
     kmer_size = snakemake.params.kmer_size  # type: ignore
     min_kscore = snakemake.params.min_kscore  # type: ignore
+    threads = snakemake.threads  # type: ignore
+    compression = snakemake.params.compression  # type: ignore
 
-    stderr_capture = StringIO()
+    args = [
+        "heyfastq",
+        "filter-kscore",
+        "--input",
+        *input_reads,
+        "--output",
+        *output_reads,
+        "--report",
+        output_report,
+        "--kmer-size",
+        str(kmer_size),
+        "--min-kscore",
+        str(min_kscore),
+        "--threads",
+        str(threads),
+    ]
 
-    # Redirect stderr to the buffer and call the function
-    with redirect_stderr(stderr_capture):
-        heyfastq_main(
-            [
-                "filter-kscore",
-                "--input",
-                *input_reads,
-                "--output",
-                *output_reads,
-                "--kmer-size",
-                str(kmer_size),
-                "--min-kscore",
-                str(min_kscore),
-            ]
+    os.environ["HFQ_GZIP_COMPRESSION"] = str(compression)
+    res = sp.run(args, capture_output=True, text=True)
+    log.write(res.stdout)
+    log.write(res.stderr)
+    if res.returncode != 0:
+        raise RuntimeError(
+            f"heyfastq filter-kscore failed with exit code {res.returncode}"
         )
-
-    # Retrieve the captured stderr output
-    captured_stderr = stderr_capture.getvalue()
-
-    with open(output_count, "w") as count:
-        log.write(f"Counts: {captured_stderr}\n")
-        count.write(captured_stderr)
 
 
 log_f = snakemake.log[0]  # type: ignore
