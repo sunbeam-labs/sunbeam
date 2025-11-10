@@ -35,7 +35,7 @@ dependencies = [
 dev = [
   "black>=24.10,<26.0",
   "snakefmt~=0.11",
-  "pytest~=8.4",
+  "pytest>=8.4,<10.0",
 ]
 ai = [
   "langchain>=0.2,<2.0",
