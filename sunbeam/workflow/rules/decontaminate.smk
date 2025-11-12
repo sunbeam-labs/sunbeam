@@ -120,11 +120,11 @@ rule preprocess_report:
             sample=sorted(Samples.keys()),
         ),
         trim=expand(
-            QC_FP / "reports" / "02_quality_{sample}_count.txt",
+            QC_FP / "reports" / "02_quality_{sample}.json",
             sample=sorted(Samples.keys()),
         ),
         complexity=expand(
-            QC_FP / "reports" / "03_complexity_{sample}_count.txt",
+            QC_FP / "reports" / "03_complexity_{sample}.json",
             sample=sorted(Samples.keys()),
         ),
         decontam=expand(
