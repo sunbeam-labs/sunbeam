@@ -11,6 +11,11 @@ def f(log: TextIO):
 
     quality_list = [parse_fastqc_quality(file) for file in input_reports]
     quality_list = [qr for qr in quality_list if qr is not None]
+    if len(quality_list) == 0:
+        log.write("No per-base sequence quality data found; writing empty report.\n")
+        pandas.DataFrame().to_csv(output_report, sep="\t", index_label="Samples")
+        return
+
     quality_table = pandas.concat(quality_list, axis=1).transpose()
     quality_table.to_csv(output_report, sep="\t", index_label="Samples")
 
