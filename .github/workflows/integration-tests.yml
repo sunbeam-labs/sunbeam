@@ -13,7 +13,7 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -42,7 +42,7 @@ jobs:
               options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - uses: koesterlab/setup-slurm-action@v1
     
             - name: Install Sunbeam
