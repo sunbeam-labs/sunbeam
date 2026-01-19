@@ -33,7 +33,7 @@ dependencies = [
 ]
 [project.optional-dependencies]
 dev = [
-  "black>=24.10,<26.0",
+  "black>=24.10,<27.0",
   "snakefmt~=0.11",
   "pytest>=8.4,<10.0",
 ]
