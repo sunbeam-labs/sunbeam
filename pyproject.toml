@@ -29,7 +29,7 @@ dependencies = [
   "snakemake~=9.11",
   "more-itertools~=10.8",
   "pyyaml~=6.0",
-  "pandas~=2.3",
+  "pandas>=2.3,<4.0",
 ]
 [project.optional-dependencies]
 dev = [
