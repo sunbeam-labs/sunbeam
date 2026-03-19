@@ -1,4 +1,80 @@
+import gzip
+
 from sunbeam.bfx import get_mapped_reads
+from sunbeam.bfx.decontam import (
+    filter_host_reads,
+)
+
+
+filter_host_input_fastq = """\
+@NZ_CP069563.1_58552_59002_1:0:0_1:0:0_0/1
+ACTGTTAAAACAAGTCTTTTGTCTTGAAAGAACAAGTCTTTTAGAAGCAAAAGCTTTGTCCTTTCCATCT
++
+2222222222222222222222222222222222222222222222222222222222222222222222
+@NZ_CP069563.1_898_1404_4:0:0_1:0:0_1/1
+TGCGCCTGTTTCCAATGTTGTGTGCCTTGTCGTTTCTCTCGAAAACGATATATACGTGAGGAGTTATAGT
++
+2222222222222222222222222222222222222222222222222222222222222222222222
+@NZ_CP069563.1_23599_24082_1:0:0_1:0:0_2/1
+GTCATCCGGTGGCCCTGGTTTGTAGCCTCGGTCATCAACTGCCTGGCAGGAGCATGGCTACACCTCCGGC
++
+2222222222222222222222222222222222222222222222222222222222222222222222
+@NZ_CP069563.1_16547_17065_1:0:0_1:0:0_3/1
+TTCTCTCGAAAGCGGTTTGGGACGCTCACGCACCAGGGCAAACAGCTGTCCGGACAACTCTTTAAGCAAT
++
+2222222222222222222222222222222222222222222222222222222222222222222222
+"""
+
+filter_host_input_hostids = """\
+NZ_CP069563.1_58552_59002_1:0:0_1:0:0_0
+NZ_CP069563.1_898_1404_4:0:0_1:0:0_1
+"""
+
+expected_filter_host_output = """\
+@NZ_CP069563.1_23599_24082_1:0:0_1:0:0_2/1
+GTCATCCGGTGGCCCTGGTTTGTAGCCTCGGTCATCAACTGCCTGGCAGGAGCATGGCTACACCTCCGGC
++
+2222222222222222222222222222222222222222222222222222222222222222222222
+@NZ_CP069563.1_16547_17065_1:0:0_1:0:0_3/1
+TTCTCTCGAAAGCGGTTTGGGACGCTCACGCACCAGGGCAAACAGCTGTCCGGACAACTCTTTAAGCAAT
++
+2222222222222222222222222222222222222222222222222222222222222222222222
+"""
+
+expected_filter_host_log = """\
+fakehost	host	nonhost
+2	2	2
+"""
+
+
+def test_filter_host_reads(tmp_path):
+    input_fastq_fp = tmp_path / "input.fastq.gz"
+    with gzip.open(input_fastq_fp, "wt") as f:
+        f.write(filter_host_input_fastq)
+    # column in log file derived from dirname of ID list
+    fakehost_dir = tmp_path / "fakehost"
+    fakehost_dir.mkdir()
+    input_hostids_fp = fakehost_dir / "input.ids"
+    with open(input_hostids_fp, "wt") as f:
+        f.write(filter_host_input_hostids)
+    input_hostreads_fp = input_hostids_fp
+
+    output_fastq_fp = tmp_path / "output.fastq.gz"
+    output_log_fp = tmp_path / "output.log"
+    log_fp = tmp_path / "log.txt"
+    filter_host_reads(
+        [input_hostids_fp],
+        input_hostreads_fp,
+        input_fastq_fp,
+        output_fastq_fp,
+        output_log_fp,
+        log_fp)
+
+    with gzip.open(output_fastq_fp, "rt") as f:
+        assert f.read() == expected_filter_host_output
+
+    with open(output_log_fp) as f:
+        assert f.read() == expected_filter_host_log
 
 
 def test_get_mapped_reads(tmp_path):
