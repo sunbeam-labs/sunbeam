@@ -11,9 +11,12 @@ def f(log: TextIO):
 
     quality_list = [parse_fastqc_quality(file) for file in input_reports]
     quality_list = [qr for qr in quality_list if qr is not None]
-    quality_table = pandas.concat(quality_list, axis=1).transpose()
-    quality_table.to_csv(output_report, sep="\t", index_label="Samples")
-
+    if quality_list:
+        quality_table = pandas.concat(quality_list, axis=1).transpose()
+        quality_table.to_csv(output_report, sep="\t", index_label="Samples")
+    else:
+        with open(output_report, "wt") as f:
+            f.write("#Base\tMean\n")
 
 log_f = snakemake.log[0]  # type: ignore
 with open(log_f, "w") as log:
