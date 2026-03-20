@@ -1,9 +1,3 @@
-import re
-import os
-import sys
-from collections import OrderedDict
-from io import StringIO
-from typing import TextIO
 import pathlib
 
 
@@ -54,58 +48,6 @@ def simple_pivot(triples, id_colname, empty_val):
     # Emit final row if there were any
     if nrow > 0:
         yield list(current_vals.get(k, empty_val) for k in colnames)
-
-
-def parse_trim_summary_paired(f: TextIO) -> OrderedDict[str, str]:
-    for line in f.readlines():
-        if line.startswith("Input Read"):
-            vals = re.findall("\\D+: (\\d+)", line)
-            keys = ("input", "both_kept", "fwd_only", "rev_only", "dropped")
-            return OrderedDict(zip(keys, vals))
-
-
-def parse_trim_summary_single(f: TextIO) -> OrderedDict[str, str]:
-    for line in f:
-        if line.startswith("Input Read"):
-            vals = re.findall("\\D+: (\\d+)", line)
-            keys = ("input", "kept", "dropped")
-            return OrderedDict(zip(keys, vals))
-
-
-def parse_decontam_log(f: TextIO) -> OrderedDict[str, str]:
-    keys = f.readline().rstrip().split("\t")
-    vals = f.readline().rstrip().split("\t")
-    return OrderedDict(zip(keys, vals))
-
-
-def parse_komplexity_log(f: TextIO) -> OrderedDict[str, str]:
-    return OrderedDict([("komplexity", str(len(f.readlines())))])
-
-
-def summarize_qual_decontam(
-    tfile: str, dfile: str, kfile: str, paired_end: bool
-):
-    """Return a dataframe for summary information for trimmomatic and decontam rule"""
-    import pandas
-    tname = os.path.basename(tfile).split(".out")[0]
-    with open(tfile) as tf:
-        with open(dfile) as jf:
-            with open(kfile) as kf:
-                if paired_end:
-                    trim_data = parse_trim_summary_paired(tf)
-                else:
-                    trim_data = parse_trim_summary_single(tf)
-
-                decontam_data = parse_decontam_log(jf)
-
-                komplexity_data = parse_komplexity_log(kf)
-    sys.stderr.write("trim data: {}\n".format(trim_data))
-    sys.stderr.write("decontam data: {}\n".format(decontam_data))
-    sys.stderr.write("komplexity data: {}\n".format(komplexity_data))
-    return pandas.DataFrame(
-        OrderedDict(trim_data, **(decontam_data), **(komplexity_data)),
-        index=[tname.replace("trimmomatic_", "").replace(".log", "")],
-    )
 
 
 def parse_fastqc_quality(f):
