@@ -18,6 +18,7 @@ def f(log: TextIO):
         with open(output_report, "wt") as f:
             f.write("#Base\tMean\n")
 
+
 log_f = snakemake.log[0]  # type: ignore
 with open(log_f, "w") as log:
     log.write("Initialized log and starting script...\n")

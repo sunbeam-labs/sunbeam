@@ -37,8 +37,13 @@ def write_log(f: TextIOWrapper, hostdict: OrderedDict, host: int, nonhost: int):
 
 
 def filter_host_reads(
-        input_hostids_fps, input_hostreads_fp, input_reads_fp, output_reads_fp,
-        output_log_fp, log_fp):
+    input_hostids_fps,
+    input_hostreads_fp,
+    input_reads_fp,
+    output_reads_fp,
+    output_log_fp,
+    log_fp,
+):
     with open(log_fp, "w") as l:
         l.write("In filter_host_reads\n")
         hostdict = OrderedDict()
@@ -62,8 +67,8 @@ def filter_host_reads(
         # Perform filtering if host reads file is not empty
         if not done:
             with (
-                    gzip.open(input_reads_fp, "rt") as f_in,
-                    gzip.open(output_reads_fp, "wt") as f_out,
+                gzip.open(input_reads_fp, "rt") as f_in,
+                gzip.open(output_reads_fp, "wt") as f_out,
             ):
                 for header_str, seq_str, plus_str, quality_str in parse_fastq(f_in):
                     parsed_header = (

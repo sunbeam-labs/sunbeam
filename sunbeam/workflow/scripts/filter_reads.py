@@ -7,4 +7,4 @@ filter_host_reads(
     output_reads_fp=snakemake.output.reads,
     output_log_fp=snakemake.output.log,
     log_fp=snakemake.log[0],
-    )
+)

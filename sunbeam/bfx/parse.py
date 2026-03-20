@@ -2,7 +2,6 @@ from itertools import groupby
 from more_itertools import grouper
 from typing import Dict, Iterator, TextIO, Tuple, Union
 
-
 BLAST6_DEFAULTS = [
     "qseqid",
     "sseqid",

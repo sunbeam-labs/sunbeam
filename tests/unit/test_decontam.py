@@ -5,7 +5,6 @@ from sunbeam.bfx.decontam import (
     filter_host_reads,
 )
 
-
 filter_host_input_fastq = """\
 @NZ_CP069563.1_58552_59002_1:0:0_1:0:0_0/1
 ACTGTTAAAACAAGTCTTTTGTCTTGAAAGAACAAGTCTTTTAGAAGCAAAAGCTTTGTCCTTTCCATCT
@@ -68,7 +67,8 @@ def test_filter_host_reads(tmp_path):
         input_fastq_fp,
         output_fastq_fp,
         output_log_fp,
-        log_fp)
+        log_fp,
+    )
 
     with gzip.open(output_fastq_fp, "rt") as f:
         assert f.read() == expected_filter_host_output

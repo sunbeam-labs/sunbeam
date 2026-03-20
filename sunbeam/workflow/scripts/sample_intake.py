@@ -1,6 +1,5 @@
 import os
 
-
 log_fp = snakemake.log[0]  # type: ignore
 with open(log_fp, "w") as log:
     try:

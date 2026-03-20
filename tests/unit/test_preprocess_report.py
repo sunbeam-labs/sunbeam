@@ -12,7 +12,6 @@ from sunbeam.workflow.scripts.preprocess_report import (
     parse_reports,
 )
 
-
 ADAPTER_EXAMPLE = {
     "summary": {
         "fastp_version": "0.22.0",

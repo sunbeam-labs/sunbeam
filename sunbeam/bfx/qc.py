@@ -12,19 +12,20 @@ from typing import Set, TextIO
 
 import traceback
 
+
 def trim_by_quality(
-        input_reads_fps,
-        output_reads_fps,
-        output_report_fp,
-        log_fp,
-        window_width,
-        window_threshold,
-        start_threshold,
-        end_threshold,
-        min_length,
-        threads,
-        compression,
-        ):
+    input_reads_fps,
+    output_reads_fps,
+    output_report_fp,
+    log_fp,
+    window_width,
+    window_threshold,
+    start_threshold,
+    end_threshold,
+    min_length,
+    threads,
+    compression,
+):
     args = [
         "heyfastq",
         "trim-qual",
@@ -59,7 +60,8 @@ def trim_by_quality(
             log.write(res.stderr)
             if res.returncode != 0:
                 raise RuntimeError(
-                    f"heyfastq trim-qual failed with exit code {res.returncode}")
+                    f"heyfastq trim-qual failed with exit code {res.returncode}"
+                )
         except BaseException as e:
             log.write(f"Error during run: {e}\n")
             log.write(traceback.format_exc())

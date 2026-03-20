@@ -25,6 +25,7 @@ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 
 output2_reads = input2_reads
 
+
 def test_trim_by_quality(tmp_path):
     input1_fp = tmp_path / "input1.fastq.gz"
     with gzip.open(input1_fp, "wt") as f:
@@ -40,8 +41,16 @@ def test_trim_by_quality(tmp_path):
     trim_by_quality(
         [input1_fp, input2_fp],
         [output1_fp, output2_fp],
-        report_fp, log_fp,
-        4, 20, 3, 3, 10, 1, 6)
+        report_fp,
+        log_fp,
+        4,
+        20,
+        3,
+        3,
+        10,
+        1,
+        6,
+    )
 
     with gzip.open(output1_fp, "rt") as f:
         assert f.read() == output1_reads
