@@ -14,10 +14,12 @@ def test_sunbeam_config_update(tmp_path):
     ext_fp = EXTENSIONS_DIR() / "sbx_test"
     ext_fp.mkdir(parents=True, exist_ok=True)
     with open(ext_fp / "config.yml", "w") as f:
-        f.write("""
+        f.write(
+            """
             sbx_test:
                 test: "test"
-            """)
+            """
+        )
 
     Config(
         [
