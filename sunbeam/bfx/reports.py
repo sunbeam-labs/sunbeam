@@ -2,14 +2,14 @@ import pathlib
 
 
 def make_fastqc_report(
-        input_report_fps,
-        output_report_fp,
-        log_fp,
-        ):
+    input_report_fps,
+    output_report_fp,
+    log_fp,
+):
     qual_data_long = []
     for fp in input_report_fps:
         fp = pathlib.Path(fp)
-        sample_id = (fp.resolve().parent.name).split("_fastqc")[0] # Hate this
+        sample_id = (fp.resolve().parent.name).split("_fastqc")[0]  # Hate this
         with open(fp) as f:
             for base_idx, mean_qual in parse_fastqc_quality(f):
                 qual_data_long.append((sample_id, base_idx, mean_qual))
