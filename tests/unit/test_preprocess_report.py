@@ -1,15 +1,13 @@
 import json
 from pathlib import Path
-
-import pandas
 import pytest
 
-from sunbeam.workflow.scripts.preprocess_report import (
+from sunbeam.bfx.reports import (
     parse_adapter_report,
     parse_complexity_report,
     parse_decontam_report,
     parse_quality_report,
-    parse_reports,
+    make_preprocess_report,
 )
 
 ADAPTER_EXAMPLE = {
@@ -114,26 +112,30 @@ def test_parse_decontam_report(tmp_path):
     }
 
 
-def test_parse_reports_integration(tmp_path):
-    adapter = write_json(tmp_path / "adapter.json", ADAPTER_EXAMPLE)
-    quality = write_file(tmp_path / "quality.txt", QUALITY_EXAMPLE)
-    complexity = write_file(tmp_path / "complexity.txt", COMPLEXITY_EXAMPLE)
-    decontam = write_file(tmp_path / "decontam.txt", DECONTAM_EXAMPLE)
+expected_preprocess_report = """\
+sample	adapter_total_reads_before	adapter_total_bases_before	adapter_total_reads_after	adapter_total_bases_after	adapter_passed_filter_reads	adapter_duplication_rate	adapter_read1_mean_length	adapter_read2_mean_length	adapter_gc_content_before	adapter_gc_content_after	quality_input_reads	quality_output_reads	quality_input_average_length	quality_output_average_length	complexity_input_reads	complexity_output_reads	complexity_input_average_length	complexity_output_average_length	decontam_human	decontam_human_copy	decontam_phix174	decontam_host	decontam_nonhost
+sample1	4000	280000	4000	280000	4000	0.0	70.0	70.0	0.48755699999999996	0.48755699999999996	4000	4000	70.0	70.0	4000	3990	70.0	70.0	0	0	0	0	1995
+"""
 
-    df = parse_reports(
-        {
-            "sample1": {
-                "adapter": adapter,
-                "trim": quality,
-                "complexity": complexity,
-                "decontam": decontam,
-            }
-        }
+
+def test_make_preprocess_report(tmp_path):
+    adapter_fp = write_json(tmp_path / "adapter.json", ADAPTER_EXAMPLE)
+    trim_fp = write_file(tmp_path / "quality.txt", QUALITY_EXAMPLE)
+    complexity_fp = write_file(tmp_path / "complexity.txt", COMPLEXITY_EXAMPLE)
+    decontam_fp = write_file(tmp_path / "decontam.txt", DECONTAM_EXAMPLE)
+    output_fp = tmp_path / "output.tsv"
+    samples = ["sample1"]
+    log_fp = tmp_path / "log.txt"
+
+    make_preprocess_report(
+        [adapter_fp],
+        [trim_fp],
+        [complexity_fp],
+        [decontam_fp],
+        output_fp,
+        ["sample1"],
+        log_fp,
     )
 
-    assert isinstance(df, pandas.DataFrame)
-    assert list(df.index) == ["sample1"]
-    assert df.loc["sample1", "adapter_total_reads_before"] == 4000
-    assert df.loc["sample1", "quality_output_reads"] == 4000
-    assert df.loc["sample1", "complexity_output_reads"] == 3990
-    assert df.loc["sample1", "decontam_nonhost"] == 1995
+    with open(output_fp) as f:
+        assert f.read() == expected_preprocess_report
