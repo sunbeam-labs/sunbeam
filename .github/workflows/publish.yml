@@ -83,15 +83,6 @@ jobs:
             tags: sunbeamlabs/sunbeam:${{ github.ref_name }}-slim
             labels: ${{ steps.meta.outputs.labels }}
 
-        - name: Extract cutadapt Docker metadata
-          id: meta-cutadapt
-          uses: docker/metadata-action@v5
-          with:
-            images: sunbeamlabs/cutadapt
-            tags: |
-              sunbeamlabs/cutadapt:${{ github.ref_name }}
-              sunbeamlabs/cutadapt:latest
-
         - name: Build and push cutadapt image
           uses: docker/build-push-action@v6
           with:

@@ -68,14 +68,6 @@ jobs:
         steps:
           - uses: actions/checkout@v5
 
-          - name: Build cutadapt image
-            uses: docker/build-push-action@v6
-            with:
-              context: .
-              file: sunbeam/workflow/envs/cutadapt.Dockerfile
-              load: true
-              tags: sunbeamlabs/cutadapt:test
-
           - name: Build komplexity image
             uses: docker/build-push-action@v6
             with:
