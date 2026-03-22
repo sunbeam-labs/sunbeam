@@ -68,14 +68,6 @@ jobs:
         steps:
           - uses: actions/checkout@v5
 
-          - name: Build komplexity image
-            uses: docker/build-push-action@v6
-            with:
-              context: .
-              file: sunbeam/workflow/envs/komplexity.Dockerfile
-              load: true
-              tags: sunbeamlabs/komplexity:test
-
           - name: Build QC image
             uses: docker/build-push-action@v6
             with:
