@@ -3,7 +3,6 @@
 # remote execution capabilities.
 from pathlib import Path
 
-
 l = snakemake.log[0]  # type: ignore
 o = Path(snakemake.output[0])  # type: ignore
 

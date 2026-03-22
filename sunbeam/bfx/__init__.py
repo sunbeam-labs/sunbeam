@@ -10,10 +10,5 @@ from sunbeam.bfx.parse import (
 )
 from sunbeam.bfx.qc import filter_ids, remove_pair_id
 from sunbeam.bfx.reports import (
-    parse_decontam_log,
     parse_fastqc_quality,
-    parse_komplexity_log,
-    parse_trim_summary_paired,
-    parse_trim_summary_single,
-    summarize_qual_decontam,
 )

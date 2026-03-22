@@ -1,5 +1,62 @@
 import gzip
+from sunbeam.bfx.qc import trim_by_quality
 from sunbeam.bfx import filter_ids, remove_pair_id
+
+input1_reads = """\
+@seq
+ACGTGACTGCATGACTGACTGCATACGTACGAC
++
+IIIIIIIIIIIIIIIIIII++++++++++++++
+"""
+
+output1_reads = """\
+@seq
+ACGTGACTGCATGACTGAC
++
+IIIIIIIIIIIIIIIIIII
+"""
+
+input2_reads = """\
+@seq2
+CAGTACGTCTCAGATCGCAGACTCAGCACGTAG
++
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+"""
+
+output2_reads = input2_reads
+
+
+def test_trim_by_quality(tmp_path):
+    input1_fp = tmp_path / "input1.fastq.gz"
+    with gzip.open(input1_fp, "wt") as f:
+        f.write(input1_reads)
+    input2_fp = tmp_path / "input2.fastq.gz"
+    with gzip.open(input2_fp, "wt") as f:
+        f.write(input2_reads)
+    output1_fp = tmp_path / "output1.fastq.gz"
+    output2_fp = tmp_path / "output2.fastq.gz"
+    report_fp = tmp_path / "report.txt"
+    log_fp = tmp_path / "log.txt"
+
+    trim_by_quality(
+        [input1_fp, input2_fp],
+        [output1_fp, output2_fp],
+        report_fp,
+        log_fp,
+        4,
+        20,
+        3,
+        3,
+        10,
+        1,
+        6,
+    )
+
+    with gzip.open(output1_fp, "rt") as f:
+        assert f.read() == output1_reads
+
+    with gzip.open(output2_fp, "rt") as f:
+        assert f.read() == output2_reads
 
 
 def test_filter_ids(tmp_path):

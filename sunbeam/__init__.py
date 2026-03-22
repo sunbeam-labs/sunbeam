@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 from sunbeam.logging import get_sunbeam_logger
 
-
 __author__ = "Erik Clarke"
 __license__ = "GPL2+"
 logger = get_sunbeam_logger()

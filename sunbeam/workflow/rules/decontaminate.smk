@@ -55,7 +55,7 @@ rule align_to_host:
         get_docker_str("decontam")
     shell:
         """
-        bwa mem -M -t {threads} {input.host} {input.reads} -o {output} > {log} 2>&1
+        bwa mem -M -t {threads} {input.host} {input.reads} > {output} 2> {log}
         """
 
 

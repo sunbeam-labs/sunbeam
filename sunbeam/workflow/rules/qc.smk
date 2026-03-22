@@ -73,10 +73,6 @@ rule trim_quality:
         mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 2000) * MIN_MEM_MB),
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
     threads: Cfg["qc"].get("threads", os.cpu_count())
-    conda:
-        "../envs/qc.yml"
-    container:
-        get_docker_str("qc")
     script:
         "../scripts/trim_quality.py"
 
