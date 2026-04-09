@@ -63,6 +63,8 @@ rule trim_quality:
         LOG_FP / "trim_quality_{sample}.log",
     benchmark:
         BENCHMARK_FP / "trim_quality_{sample}.tsv"
+    conda:
+        "../envs/qc.yml"
     threads: Cfg["qc"].get("threads", os.cpu_count())
     resources:
         mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 2000) * MIN_MEM_MB),
@@ -73,8 +75,19 @@ rule trim_quality:
         end_threshold=Cfg["qc"]["trailing"],
         min_length=Cfg["qc"]["minlen"],
         compression=Cfg["qc"].get("compression", 5),
-    script:
-        "../scripts/trim_quality.py"
+    shell:
+        """
+        heyfastq trim-qual \
+          --input {input.reads} \
+          --output {output.reads} \
+          --report {output.report} \
+          --window-width {params.window[0]} \
+          --window-threshold {params.window[1]} \
+          --start-threshold {params.start_threshold} \
+          --end-threshold {params.end_threshold} \
+          --min-length {params.min_length} \
+          --threads {threads}
+        """
 
 
 rule remove_low_complexity:
