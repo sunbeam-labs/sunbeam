@@ -1,5 +1,4 @@
-from itertools import groupby
-from more_itertools import grouper
+from itertools import groupby, zip_longest
 from typing import Dict, Iterator, TextIO, Tuple, Union
 
 BLAST6_DEFAULTS = [
@@ -37,8 +36,13 @@ def write_fasta(record: Tuple[str, str], f: TextIO) -> None:
     f.write(f"{record[1]}\n")
 
 
+def line_grouper(xs, n):
+    multi_xs = [iter(xs)] * n
+    return zip_longest(*multi_xs, fillvalue="")
+
+
 def parse_fastq(f: TextIO) -> Iterator[Tuple[str, str, str, str]]:
-    for g in grouper(f, 4):
+    for g in line_grouper(f, 4):
         header_str = g[0][1:].strip()
         seq_str = g[1].strip()
         plus_str = g[2].strip()

@@ -27,7 +27,6 @@ classifiers = [
 
 dependencies = [
   "snakemake",
-  "more-itertools",
   "pyyaml",
 ]
 [project.optional-dependencies]
