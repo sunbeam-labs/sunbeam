@@ -25,7 +25,7 @@ jobs:
       - name: Build a binary wheel and a source tarball
         run: python3 -m build
       - name: Store the distribution packages
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: python-package-distributions
           path: dist/
@@ -67,22 +67,6 @@ jobs:
 
         steps:
           - uses: actions/checkout@v6
-
-          - name: Build cutadapt image
-            uses: docker/build-push-action@v6
-            with:
-              context: .
-              file: sunbeam/workflow/envs/cutadapt.Dockerfile
-              load: true
-              tags: sunbeamlabs/cutadapt:test
-
-          - name: Build komplexity image
-            uses: docker/build-push-action@v6
-            with:
-              context: .
-              file: sunbeam/workflow/envs/komplexity.Dockerfile
-              load: true
-              tags: sunbeamlabs/komplexity:test
 
           - name: Build QC image
             uses: docker/build-push-action@v6

@@ -39,16 +39,16 @@ rule adapter_removal:
         LOG_FP / "adapter_removal_{sample}.log",
     benchmark:
         BENCHMARK_FP / "adapter_removal_{sample}.tsv"
-    params:
-        adapter=Cfg["qc"]["adapter_template"],
-        compression=Cfg["qc"].get("compression", 5),
-    resources:
-        runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
-    threads: Cfg["qc"].get("threads", os.cpu_count())
     conda:
         "../envs/qc.yml"
     container:
         get_docker_str("qc")
+    threads: Cfg["qc"].get("threads", os.cpu_count())
+    resources:
+        runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
+    params:
+        adapter=Cfg["qc"]["adapter_template"],
+        compression=Cfg["qc"].get("compression", 5),
     script:
         "../scripts/adapter_removal.py"
 
@@ -63,22 +63,31 @@ rule trim_quality:
         LOG_FP / "trim_quality_{sample}.log",
     benchmark:
         BENCHMARK_FP / "trim_quality_{sample}.tsv"
+    conda:
+        "../envs/qc.yml"
+    threads: Cfg["qc"].get("threads", os.cpu_count())
+    resources:
+        mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 2000) * MIN_MEM_MB),
+        runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
     params:
         window=Cfg["qc"]["slidingwindow"],
         start_threshold=Cfg["qc"]["leading"],
         end_threshold=Cfg["qc"]["trailing"],
         min_length=Cfg["qc"]["minlen"],
         compression=Cfg["qc"].get("compression", 5),
-    resources:
-        mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 2000) * MIN_MEM_MB),
-        runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
-    threads: Cfg["qc"].get("threads", os.cpu_count())
-    conda:
-        "../envs/qc.yml"
-    container:
-        get_docker_str("qc")
-    script:
-        "../scripts/trim_quality.py"
+    shell:
+        """
+        heyfastq trim-qual \
+          --input {input.reads} \
+          --output {output.reads} \
+          --report {output.report} \
+          --window-width {params.window[0]} \
+          --window-threshold {params.window[1]} \
+          --start-threshold {params.start_threshold} \
+          --end-threshold {params.end_threshold} \
+          --min-length {params.min_length} \
+          --threads {threads}
+        """
 
 
 rule remove_low_complexity:
@@ -93,22 +102,22 @@ rule remove_low_complexity:
             rp=Pairs,
         ),
         report=QC_FP / "reports" / "03_complexity_{sample}.json",
-    params:
-        kmer_size=Cfg["qc"]["kmer_size"],
-        min_kscore=Cfg["qc"]["kz_threshold"],
-        compression=Cfg["qc"].get("compression", 5),
     log:
         LOG_FP / "remove_low_complexity_{sample}.log",
     benchmark:
         BENCHMARK_FP / "remove_low_complexity_{sample}.tsv"
-    resources:
-        mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.size_mb),
-        runtime=lambda wc: max(MIN_RUNTIME, 120),
-    threads: Cfg["qc"].get("threads", os.cpu_count())
     conda:
         "../envs/qc.yml"
     container:
         get_docker_str("qc")
+    threads: Cfg["qc"].get("threads", os.cpu_count())
+    resources:
+        mem_mb=lambda wc, input: max(MIN_MEM_MB, 2 * input.size_mb),
+        runtime=lambda wc: max(MIN_RUNTIME, 120),
+    params:
+        kmer_size=Cfg["qc"]["kmer_size"],
+        min_kscore=Cfg["qc"]["kz_threshold"],
+        compression=Cfg["qc"].get("compression", 5),
     script:
         "../scripts/remove_low_complexity.py"
 
@@ -122,12 +131,12 @@ rule fastqc:
         LOG_FP / "fastqc_{sample}.log",
     benchmark:
         BENCHMARK_FP / "fastqc_{sample}.tsv"
-    resources:
-        runtime=lambda wc: max(MIN_RUNTIME, 120),
     conda:
         "../envs/qc.yml"
     container:
         get_docker_str("qc")
+    resources:
+        runtime=lambda wc: max(MIN_RUNTIME, 120),
     shell:
         """
         sample_dir=$(dirname {output[0]})
@@ -138,7 +147,7 @@ rule fastqc:
 
 
 rule fastqc_report:
-    """ make fastqc reports """
+    """make fastqc reports"""
     input:
         reports=expand(
             QC_FP / "reports" / "{sample}_{rp}_fastqc/fastqc_data.txt",

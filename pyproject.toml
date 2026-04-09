@@ -14,7 +14,7 @@ authors = [
   {name = "Kyle Bittinger"},
 ]
 maintainers = [
-  {name = "Charlie Bushman", email = "ctbushman@gmail.com"}
+  {name = "Kyle Bittinger", email = "kylebittinger@gmail.com"}
 ]
 
 classifiers = [
@@ -22,20 +22,19 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: 3 :: Only",
 ]
 
 dependencies = [
-  "snakemake~=9.11",
-  "more-itertools~=10.8",
-  "pyyaml~=6.0",
-  "pandas~=2.3",
+  "snakemake",
+  "pyyaml",
 ]
 [project.optional-dependencies]
 dev = [
-  "black>=24.10,<26.0",
-  "snakefmt~=0.11",
-  "pytest>=8.4,<10.0",
+  "black",
+  "snakefmt",
+  "pytest",
 ]
 ai = [
   "langchain>=0.2,<2.0",

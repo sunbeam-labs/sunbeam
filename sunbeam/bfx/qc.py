@@ -1,7 +1,3 @@
-"""
-Supporting functions for QC rules.
-"""
-
 import gzip
 import sys
 from pathlib import Path
