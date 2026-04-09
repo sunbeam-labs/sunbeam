@@ -1,73 +1,8 @@
-"""
-Supporting functions for QC rules.
-"""
-
 import gzip
 import sys
 from pathlib import Path
-import os
-import subprocess as sp
 from sunbeam.bfx.parse import parse_fastq, write_fastq
 from typing import Set, TextIO
-
-import traceback
-
-
-def trim_by_quality(
-    input_reads_fps,
-    output_reads_fps,
-    output_report_fp,
-    log_fp,
-    window_width,
-    window_threshold,
-    start_threshold,
-    end_threshold,
-    min_length,
-    threads,
-    compression,
-):
-    args = [
-        "heyfastq",
-        "trim-qual",
-        "--input",
-        *input_reads_fps,
-        "--output",
-        *output_reads_fps,
-        "--report",
-        output_report_fp,
-        "--window-width",
-        str(window_width),
-        "--window-threshold",
-        str(window_threshold),
-        "--start-threshold",
-        str(start_threshold),
-        "--end-threshold",
-        str(end_threshold),
-        "--min-length",
-        str(min_length),
-        "--threads",
-        str(threads),
-    ]
-
-    os.environ["HFQ_GZIP_COMPRESSION"] = str(compression)
-
-    with open(log_fp, "w") as log:
-        log.write("Initialized log and starting script...\n")
-        stderr_capture = None
-        try:
-            res = sp.run(args, capture_output=True, text=True)
-            log.write(res.stdout)
-            log.write(res.stderr)
-            if res.returncode != 0:
-                raise RuntimeError(
-                    f"heyfastq trim-qual failed with exit code {res.returncode}"
-                )
-        except BaseException as e:
-            log.write(f"Error during run: {e}\n")
-            log.write(traceback.format_exc())
-            raise
-        else:
-            log.write("Completed successfully.\n")
 
 
 def filter_ids(fp_in: Path, fp_out: Path, ids: Set[str], log: TextIO) -> None:

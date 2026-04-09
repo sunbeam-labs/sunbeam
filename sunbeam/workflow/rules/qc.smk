@@ -75,8 +75,19 @@ rule trim_quality:
         end_threshold=Cfg["qc"]["trailing"],
         min_length=Cfg["qc"]["minlen"],
         compression=Cfg["qc"].get("compression", 5),
-    script:
-        "../scripts/trim_quality.py"
+    shell:
+        """
+        heyfastq trim-qual \
+          --input {input.reads} \
+          --output {output.reads} \
+          --report {output.report} \
+          --window-width {params.window[0]} \
+          --window-threshold {params.window[1]} \
+          --start-threshold {params.start_threshold} \
+          --end-threshold {params.end_threshold} \
+          --min-length {params.min_length} \
+          --threads {threads}
+        """
 
 
 rule remove_low_complexity:
