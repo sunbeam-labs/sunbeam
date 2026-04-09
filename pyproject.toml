@@ -29,7 +29,6 @@ dependencies = [
   "snakemake",
   "more-itertools",
   "pyyaml",
-  "heyfastq~=0.2.3",
 ]
 [project.optional-dependencies]
 dev = [
