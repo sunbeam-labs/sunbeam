@@ -63,6 +63,8 @@ rule trim_quality:
         LOG_FP / "trim_quality_{sample}.log",
     benchmark:
         BENCHMARK_FP / "trim_quality_{sample}.tsv"
+    conda:
+        "../envs/qc.yml"
     threads: Cfg["qc"].get("threads", os.cpu_count())
     resources:
         mem_mb=lambda wc, input: max(MIN_MEM_MB, (input.size_mb / 2000) * MIN_MEM_MB),
