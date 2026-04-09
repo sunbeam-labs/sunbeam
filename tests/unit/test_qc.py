@@ -1,6 +1,7 @@
 import gzip
 from sunbeam.bfx import filter_ids, remove_pair_id
 
+
 def test_filter_ids(tmp_path):
     # Create a temporary input FASTQ file
     input_fastq = tmp_path / "input.fastq.gz"
