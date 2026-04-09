@@ -118,8 +118,16 @@ rule remove_low_complexity:
         kmer_size=Cfg["qc"]["kmer_size"],
         min_kscore=Cfg["qc"]["kz_threshold"],
         compression=Cfg["qc"].get("compression", 5),
-    script:
-        "../scripts/remove_low_complexity.py"
+    shell:
+        """
+	heyfastq filter-kscore \
+	  --input {input.reads} \
+	  --output {output.reads} \
+	  --report {output.report} \
+	  --kmer-size {params.kmer_size} \
+	  --min-kscore {params.min_kscore} \
+	  --threads {threads}
+	"""
 
 
 rule fastqc:
