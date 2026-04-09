@@ -45,14 +45,14 @@ rule align_to_host:
         LOG_FP / "align_to_host_{host}_{sample}.log",
     benchmark:
         BENCHMARK_FP / "align_to_host_{host}_{sample}.tsv"
-    resources:
-        mem_mb=lambda wc: max(MIN_MEM_MB, 16000),
-        runtime=lambda wc: max(MIN_RUNTIME, 240),
-    threads: 4
     conda:
         "../envs/decontam.yml"
     container:
         get_docker_str("decontam")
+    threads: 4
+    resources:
+        mem_mb=lambda wc: max(MIN_MEM_MB, 16000),
+        runtime=lambda wc: max(MIN_RUNTIME, 240),
     shell:
         """
         bwa mem -M -t {threads} {input.host} {input.reads} > {output} 2> {log}
@@ -133,12 +133,12 @@ rule preprocess_report:
         ),
     output:
         report=QC_FP / "reports" / "preprocess_summary.tsv",
-    params:
-        samples=sorted(Samples.keys()),
     log:
         LOG_FP / "preprocess_report.log",
     benchmark:
         BENCHMARK_FP / "preprocess_report.tsv"
+    params:
+        samples=sorted(Samples.keys()),
     script:
         "../scripts/preprocess_report.py"
 

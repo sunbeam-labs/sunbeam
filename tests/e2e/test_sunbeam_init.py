@@ -81,13 +81,11 @@ def test_sunbeam_init_with_template(tmp_path):
     project_dir = tmp_path / "test"
     template_fp = tmp_path / "template_config.yml"
     with open(template_fp, "w") as f:
-        f.write(
-            """
+        f.write("""
             all:
                 root: "{PROJECT_FP}"
                 version: 0.1
-            """
-        )
+            """)
 
     main(
         [
