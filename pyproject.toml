@@ -14,7 +14,7 @@ authors = [
   {name = "Kyle Bittinger"},
 ]
 maintainers = [
-  {name = "Charlie Bushman", email = "ctbushman@gmail.com"}
+  {name = "Kyle Bittinger", email = "kylebittinger@gmail.com"}
 ]
 
 classifiers = [
