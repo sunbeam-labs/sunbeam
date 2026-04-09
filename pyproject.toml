@@ -26,16 +26,16 @@ classifiers = [
 ]
 
 dependencies = [
-  "snakemake~=9.11",
-  "more-itertools~=10.8",
-  "pyyaml~=6.0",
+  "snakemake",
+  "more-itertools",
+  "pyyaml",
   "heyfastq~=0.2.3",
 ]
 [project.optional-dependencies]
 dev = [
-  "black>=24.10,<26.0",
-  "snakefmt~=0.11",
-  "pytest>=8.4,<10.0",
+  "black",
+  "snakefmt",
+  "pytest",
 ]
 ai = [
   "langchain>=0.2,<2.0",
