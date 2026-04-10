@@ -1,15 +1,12 @@
 # -*- mode: Snakemake -*-
-#
-# Illumina quality control rules
+
 localrules:
     all_qc,
     sample_intake,
-    qc_final,
     clean_qc,
 
 
 rule all_qc:
-    """Runs trimmomatic and fastqc on all input files."""
     input:
         TARGET_QC,
 
@@ -26,7 +23,6 @@ rule sample_intake:
 
 
 def fastp_inargs(input_reads):
-    print(input_reads)
     if len(input_reads) > 1:
         return f"--in1 {input_reads[0]} --in2 {input_reads[1]}"
     else:
@@ -34,7 +30,6 @@ def fastp_inargs(input_reads):
 
 
 def fastp_outargs(output_reads):
-    print(output_reads)
     if len(output_reads) > 1:
         return f"--out1 {output_reads[0]} --out2 {output_reads[1]}"
     else:
@@ -179,7 +174,6 @@ rule fastqc:
 
 
 rule fastqc_report:
-    """make fastqc reports"""
     input:
         reports=expand(
             QC_FP / "reports" / "{sample}_{rp}_fastqc/fastqc_data.txt",
