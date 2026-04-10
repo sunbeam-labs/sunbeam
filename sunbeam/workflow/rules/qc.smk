@@ -37,14 +37,6 @@ def fastp_out(wildcards, output):
         return f"--out1 {output.reads[0]}"
 
 
-def fastp_adapter(wildcards):
-    fp = Cfg["qc"].get("adapter_template")
-    if not fp:
-        fp = workflow.source_path("../../configs/default_adapters.fasta")
-        logger.info(f"No adapter_template found, using default at {fp}")
-    return fp
-
-
 rule adapter_removal:
     input:
         reads=expand(QC_FP / "00_samples" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
@@ -66,7 +58,7 @@ rule adapter_removal:
     params:
         inargs=fastp_in,
         outargs=fastp_out,
-        adapter=fastp_adapter,
+        adapter=Cfg["qc"]["adapter_fp"],
         compression=Cfg["qc"].get("compression", 5),
     shell:
         """
