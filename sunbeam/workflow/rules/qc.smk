@@ -59,7 +59,6 @@ rule adapter_removal:
         inargs=fastp_in,
         outargs=fastp_out,
         adapter=Cfg["qc"]["adapter_fp"],
-        compression=Cfg["qc"].get("compression", 5),
     shell:
         """
         fastp {params.inargs} {params.outargs} \
@@ -93,7 +92,6 @@ rule trim_quality:
         start_threshold=Cfg["qc"]["leading"],
         end_threshold=Cfg["qc"]["trailing"],
         min_length=Cfg["qc"]["minlen"],
-        compression=Cfg["qc"].get("compression", 5),
     shell:
         """
         heyfastq trim-qual \
@@ -136,7 +134,6 @@ rule remove_low_complexity:
     params:
         kmer_size=Cfg["qc"]["kmer_size"],
         min_kscore=Cfg["qc"]["kz_threshold"],
-        compression=Cfg["qc"].get("compression", 5),
     shell:
         """
         heyfastq filter-kscore \
