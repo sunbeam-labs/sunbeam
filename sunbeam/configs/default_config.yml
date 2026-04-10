@@ -15,9 +15,7 @@ qc:
   trailing: 3
   slidingwindow: [4,15]
   minlen: 36
-  adapter_template: ""
-  fwd_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
-  rev_adapters: ['GTTTCCCAGTCACGATC', 'GTTTCCCAGTCACGATCNNNNNNNNNGTTTCCCAGTCACGATC']
+  adapter_fp: ""
   kmer_size: 4
   kz_threshold: 0.55
   pct_id: 0.5

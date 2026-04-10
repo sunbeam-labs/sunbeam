@@ -1,15 +1,13 @@
 # -*- mode: Snakemake -*-
-#
-# Illumina quality control rules
+
+
 localrules:
     all_qc,
     sample_intake,
-    qc_final,
     clean_qc,
 
 
 rule all_qc:
-    """Runs trimmomatic and fastqc on all input files."""
     input:
         TARGET_QC,
 
@@ -25,15 +23,26 @@ rule sample_intake:
         "../scripts/sample_intake.py"
 
 
+def fastp_in(wildcards, input):
+    if len(input.reads) > 1:
+        return f"--in1 {input.reads[0]} --in2 {input.reads[1]}"
+    else:
+        return f"--in1 {input.reads[0]}"
+
+
+def fastp_out(wildcards, output):
+    if len(output.reads) > 1:
+        return f"--out1 {output.reads[0]} --out2 {output.reads[1]}"
+    else:
+        return f"--out1 {output.reads[0]}"
+
+
 rule adapter_removal:
     input:
         reads=expand(QC_FP / "00_samples" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
         reads=expand(QC_FP / "01_adapters" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
-        fail=QC_FP / "01_adapters" / "{sample}_adapter_removal_failed.fastq.gz",
         json=QC_FP / "reports" / "01_{sample}_adapter_removal.json",
-        # Don't really want the HTML but it's better than having it float around somewhere else
-        # and there doesn't seem to be a way to suppress it
         html=QC_FP / "reports" / "01_{sample}_adapter_removal.html",
     log:
         LOG_FP / "adapter_removal_{sample}.log",
@@ -47,10 +56,19 @@ rule adapter_removal:
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
     params:
-        adapter=Cfg["qc"]["adapter_template"],
-        compression=Cfg["qc"].get("compression", 5),
-    script:
-        "../scripts/adapter_removal.py"
+        inargs=fastp_in,
+        outargs=fastp_out,
+        adapter=Cfg["qc"]["adapter_fp"],
+    shell:
+        """
+        fastp {params.inargs} {params.outargs} \
+          --adapter_fasta {params.adapter} \
+          --disable_quality_filtering \
+          --disable_length_filtering \
+          --json {output.json} \
+          --html {output.html} \
+          --thread {threads}
+        """
 
 
 rule trim_quality:
@@ -74,7 +92,6 @@ rule trim_quality:
         start_threshold=Cfg["qc"]["leading"],
         end_threshold=Cfg["qc"]["trailing"],
         min_length=Cfg["qc"]["minlen"],
-        compression=Cfg["qc"].get("compression", 5),
     shell:
         """
         heyfastq trim-qual \
@@ -117,9 +134,16 @@ rule remove_low_complexity:
     params:
         kmer_size=Cfg["qc"]["kmer_size"],
         min_kscore=Cfg["qc"]["kz_threshold"],
-        compression=Cfg["qc"].get("compression", 5),
-    script:
-        "../scripts/remove_low_complexity.py"
+    shell:
+        """
+        heyfastq filter-kscore \
+          --input {input.reads} \
+          --output {output.reads} \
+          --report {output.report} \
+          --kmer-size {params.kmer_size} \
+          --min-kscore {params.min_kscore} \
+          --threads {threads}
+        """
 
 
 rule fastqc:
@@ -147,7 +171,6 @@ rule fastqc:
 
 
 rule fastqc_report:
-    """make fastqc reports"""
     input:
         reports=expand(
             QC_FP / "reports" / "{sample}_{rp}_fastqc/fastqc_data.txt",
