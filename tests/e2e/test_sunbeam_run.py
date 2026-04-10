@@ -16,6 +16,14 @@ def test_sunbeam_run(tmp_path, DATA_DIR):
         ]
     )
 
+    Config(
+        [
+            "--modify",
+            f"qc: {{adapter_template: {DATA_DIR / 'empty_adapters.fa'}}}",
+            str(project_dir / "sunbeam_config.yml"),
+        ]
+    )
+
     with pytest.raises(SystemExit) as excinfo:
         Run(
             [
@@ -76,6 +84,14 @@ def test_sunbeam_run_with_dirty_reads(tmp_path, DATA_DIR):
             str(project_dir),
             "--data_fp",
             str(DATA_DIR / "dirty_reads"),
+        ]
+    )
+
+    Config(
+        [
+            "--modify",
+            f"qc: {{adapter_template: {DATA_DIR / 'empty_adapters.fa'}}}",
+            str(project_dir / "sunbeam_config.yml"),
         ]
     )
 

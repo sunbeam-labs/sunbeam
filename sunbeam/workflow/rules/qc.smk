@@ -25,15 +25,28 @@ rule sample_intake:
         "../scripts/sample_intake.py"
 
 
+def fastp_inargs(input_reads):
+    print(input_reads)
+    if len(input_reads) > 1:
+        return f"--in1 {input_reads[0]} --in2 {input_reads[1]}"
+    else:
+        return f"--in1 {input_reads[0]}"
+
+
+def fastp_outargs(output_reads):
+    print(output_reads)
+    if len(output_reads) > 1:
+        return f"--out1 {output_reads[0]} --out2 {output_reads[1]}"
+    else:
+        return f"--out1 {output_reads[0]}"
+
+
 rule adapter_removal:
     input:
         reads=expand(QC_FP / "00_samples" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
         reads=expand(QC_FP / "01_adapters" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
-        fail=QC_FP / "01_adapters" / "{sample}_adapter_removal_failed.fastq.gz",
         json=QC_FP / "reports" / "01_{sample}_adapter_removal.json",
-        # Don't really want the HTML but it's better than having it float around somewhere else
-        # and there doesn't seem to be a way to suppress it
         html=QC_FP / "reports" / "01_{sample}_adapter_removal.html",
     log:
         LOG_FP / "adapter_removal_{sample}.log",
@@ -47,10 +60,21 @@ rule adapter_removal:
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
     params:
+        inargs=lambda wildcards, input: fastp_inargs(input.reads),
+        outargs=lambda wildcards, output: fastp_outargs(output.reads),
+        # Must ensure adapter template is present or we get an error
         adapter=Cfg["qc"]["adapter_template"],
         compression=Cfg["qc"].get("compression", 5),
-    script:
-        "../scripts/adapter_removal.py"
+    shell:
+        """
+        fastp {params.inargs} {params.outargs} \
+          --adapter_fasta {params.adapter} \
+          --disable_quality_filtering \
+          --disable_length_filtering \
+          --json {output.json} \
+          --html {output.html} \
+          --thread {threads}
+	"""
 
 
 rule trim_quality:
