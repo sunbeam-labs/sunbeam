@@ -1,5 +1,6 @@
 # -*- mode: Snakemake -*-
 
+
 localrules:
     all_qc,
     sample_intake,
@@ -76,7 +77,7 @@ rule adapter_removal:
           --json {output.json} \
           --html {output.html} \
           --thread {threads}
-	"""
+        """
 
 
 rule trim_quality:
@@ -146,14 +147,14 @@ rule remove_low_complexity:
         compression=Cfg["qc"].get("compression", 5),
     shell:
         """
-	heyfastq filter-kscore \
-	  --input {input.reads} \
-	  --output {output.reads} \
-	  --report {output.report} \
-	  --kmer-size {params.kmer_size} \
-	  --min-kscore {params.min_kscore} \
-	  --threads {threads}
-	"""
+        heyfastq filter-kscore \
+          --input {input.reads} \
+          --output {output.reads} \
+          --report {output.report} \
+          --kmer-size {params.kmer_size} \
+          --min-kscore {params.min_kscore} \
+          --threads {threads}
+        """
 
 
 rule fastqc:
