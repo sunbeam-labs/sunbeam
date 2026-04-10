@@ -22,18 +22,18 @@ rule sample_intake:
         "../scripts/sample_intake.py"
 
 
-def fastp_inargs(input_reads):
-    if len(input_reads) > 1:
-        return f"--in1 {input_reads[0]} --in2 {input_reads[1]}"
+def fastp_in(widcards, input):
+    if len(input.reads) > 1:
+        return f"--in1 {input.reads[0]} --in2 {input.reads[1]}"
     else:
-        return f"--in1 {input_reads[0]}"
+        return f"--in1 {input.reads[0]}"
 
 
-def fastp_outargs(output_reads):
-    if len(output_reads) > 1:
-        return f"--out1 {output_reads[0]} --out2 {output_reads[1]}"
+def fastp_out(wildcards, output):
+    if len(output.reads) > 1:
+        return f"--out1 {output.reads[0]} --out2 {output.reads[1]}"
     else:
-        return f"--out1 {output_reads[0]}"
+        return f"--out1 {output.reads[0]}"
 
 
 rule adapter_removal:
@@ -55,8 +55,8 @@ rule adapter_removal:
     resources:
         runtime=lambda wc, input: max(MIN_RUNTIME, input.size_mb / 5),
     params:
-        inargs=lambda wildcards, input: fastp_inargs(input.reads),
-        outargs=lambda wildcards, output: fastp_outargs(output.reads),
+        inargs=fastp_in,
+        outargs=fastp_out,
         # Must ensure adapter template is present or we get an error
         adapter=Cfg["qc"]["adapter_template"],
         compression=Cfg["qc"].get("compression", 5),
