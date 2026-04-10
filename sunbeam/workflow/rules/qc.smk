@@ -22,7 +22,7 @@ rule sample_intake:
         "../scripts/sample_intake.py"
 
 
-def fastp_in(widcards, input):
+def fastp_in(wildcards, input):
     if len(input.reads) > 1:
         return f"--in1 {input.reads[0]} --in2 {input.reads[1]}"
     else:
@@ -34,6 +34,14 @@ def fastp_out(wildcards, output):
         return f"--out1 {output.reads[0]} --out2 {output.reads[1]}"
     else:
         return f"--out1 {output.reads[0]}"
+
+
+def fastp_adapter(wildcards):
+    fp = Cfg["qc"].get("adapter_template")
+    if not fp:
+        fp = workflow.source_path("../../configs/default_adapters.fasta")
+        logger.info(f"No adapter_template found, using default at {fp}")
+    return fp
 
 
 rule adapter_removal:
@@ -57,8 +65,7 @@ rule adapter_removal:
     params:
         inargs=fastp_in,
         outargs=fastp_out,
-        # Must ensure adapter template is present or we get an error
-        adapter=Cfg["qc"]["adapter_template"],
+        adapter=fastp_adapter,
         compression=Cfg["qc"].get("compression", 5),
     shell:
         """
