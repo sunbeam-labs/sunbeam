@@ -1,4 +1,4 @@
-sphinx>=7
+sphinx>=9.0.4
 sphinx-argparse>=0.4
 sphinx-tabs>=3
 sphinx_rtd_theme>=1
