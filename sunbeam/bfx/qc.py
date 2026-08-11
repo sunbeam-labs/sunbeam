@@ -67,10 +67,9 @@ def remove_pair_id(id: str, log: TextIO = sys.stdout) -> str:
         str: The ID with the pair identifier removed.
     """
     id = id.strip()
-    if id[-2:] == "/1" or id[-2:] == "/2":
-        return id[:-2]
-
     if " " in id:
         return id.split(" ")[0]
-
-    return id
+    elif id[-2:] == "/1" or id[-2:] == "/2":
+        return id[:-2]
+    else:
+        return id

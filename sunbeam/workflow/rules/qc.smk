@@ -62,8 +62,6 @@ rule adapter_removal_paired:
     output:
         r1=QC_FP / "01_cutadapt" / "{sample}_1.fastq.gz",
         r2=QC_FP / "01_cutadapt" / "{sample}_2.fastq.gz",
-        ngz1=temp(QC_FP / "01_cutadapt" / "{sample}_1.fastq"),
-        ngz2=temp(QC_FP / "01_cutadapt" / "{sample}_2.fastq"),
     log:
         LOG_FP / "adapter_removal_paired_{sample}.log",
     benchmark:
@@ -159,8 +157,7 @@ rule trimmomatic_paired:
         get_docker_str("qc")
     shell:
         """
-        trimmomatic \
-        PE -threads {threads} -phred33 \
+        trimmomatic PE -threads {threads} -phred33 \
         {input.r1} {input.r2} \
         {output.pair_r1} {output.unpair_r1} \
         {output.pair_r2} {output.unpair_r2} \
@@ -219,7 +216,7 @@ rule find_low_complexity:
     input:
         expand(QC_FP / "02_trimmomatic" / "{{sample}}_{rp}.fastq.gz", rp=Pairs),
     output:
-        QC_FP / "log" / "komplexity" / "{sample}.filtered_ids",
+        temp(QC_FP / "log" / "komplexity" / "{sample}.filtered_ids"),
     log:
         LOG_FP / "find_low_complexity_{sample}.log",
     benchmark:
