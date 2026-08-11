@@ -3,7 +3,7 @@ rerun-incomplete: True
 rerun-triggers: "mtime"
 latency-wait: 90
 keep-going: True
-notemp: True
+notemp: False
 printshellcmds: True
 nolock: True
 verbose: True
@@ -13,7 +13,7 @@ software-deployment-method: "conda"
 
 # Cluster configuration
 executor: "slurm"
-jobs: 10
+jobs: 100
 cores: all
 
 # Default resource configuration
