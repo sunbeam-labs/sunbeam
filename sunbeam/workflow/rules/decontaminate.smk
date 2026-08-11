@@ -48,7 +48,7 @@ rule align_to_host:
     resources:
         mem_mb=lambda wc: max(MIN_MEM_MB, 16000),
         runtime=lambda wc: max(MIN_RUNTIME, 240),
-    threads: 4
+    threads: 8
     conda:
         "../envs/qc.yml"
     container:
@@ -63,7 +63,7 @@ rule get_mapped_reads:
     input:
         QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.sam",
     output:
-        ids=QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.ids",
+        ids=temp(QC_FP / "decontam" / "intermediates" / "{host}" / "{sample}.ids"),
     log:
         LOG_FP / "get_mapped_reads_{host}_{sample}.log",
     benchmark:
