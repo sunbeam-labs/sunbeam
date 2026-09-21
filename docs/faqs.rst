@@ -8,7 +8,11 @@ A collection of common questions, issues, or points of confusion.
 
 **I'm getting ``snakemake: error: argument --executor/-e: invalid choice: '_____' (choose from 'local', 'dryrun', 'touch')``. Why can't I use the ``--executor`` option?**
 
-You're using the exectuor option properly, it's just that you haven't installed the executor plugin. Use ``pip`` to install it and you should be good to go (e.g. for Slurm ``pip install snakemake-executor-plugin-slurm``).
+You're using the exectuor option properly, it's just that you haven't installed the executor plugin. Use ``pip`` to install it and you should be good to go (e.g. for Slurm ``pip install snakemake-executor-plugin-slurm``, or ``pip install sunbeamlib[slurm]`` if you're installing from source).
+
+**My Slurm jobs all fail immediately with** ``srun: error: resolve_ctls_from_dns_srv: res_nsearch error: Unknown host``**. What's going on?**
+
+You've likely got ``snakemake-executor-plugin-slurm-jobstep`` version ``0.6.1`` installed. That version strips ``SLURM_CONF`` (and nearly every other ``SLURM_*`` env var) from the environment before launching the ``srun`` step that runs your job, so ``srun`` can't find your cluster's config and falls back to DNS-based discovery, which fails on clusters that don't use configless Slurm. This happens on every job, every node, every retry -- it isn't intermittent. Downgrade with ``pip install snakemake-executor-plugin-slurm-jobstep==0.6.0`` (``sunbeamlib[slurm]`` already pins this for you). Tracked upstream at `snakemake-executor-plugin-slurm-jobstep#54 <https://github.com/snakemake/snakemake-executor-plugin-slurm-jobstep/issues/54>`_.
 
 **I'm trying to use singularity but it keeps failing and complaining about running out of space. I know I have plenty of open disk space. Why is it running out?**
 

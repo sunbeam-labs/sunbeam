@@ -101,8 +101,17 @@ Let's create a new Sunbeam project (we'll call it ``my_project``):
 
       .. code-block:: shell
 
-         pip install snakemake-executor-plugin-slurm
+         pip install sunbeamlib[slurm]  # or: pip install snakemake-executor-plugin-slurm
          sunbeam init my_project --data_fp /sequencing/project/reads --profile slurm
+
+      .. warning::
+         ``sunbeamlib[slurm]`` pins ``snakemake-executor-plugin-slurm-jobstep``
+         to ``0.6.0``. Version ``0.6.1`` strips ``SLURM_CONF`` (and most other
+         ``SLURM_*`` env vars) before launching the ``srun`` step that runs
+         each job, which breaks job execution on any cluster that isn't using
+         SLURM's configless (DNS SRV) discovery mode -- jobs fail immediately
+         with ``srun: error: resolve_ctls_from_dns_srv: ... Unknown host``. If
+         you installed the plugin separately, make sure you're not on 0.6.1.
 
    .. tab:: Apptainer/Singularity
 

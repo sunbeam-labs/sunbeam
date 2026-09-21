@@ -19,6 +19,7 @@ MIN_MEM_MB = int(os.getenv("SUNBEAM_MIN_MEM_MB", 8000))
 MIN_RUNTIME = int(os.getenv("SUNBEAM_MIN_RUNTIME", 15))
 
 sc = SunbeamConfig(config)
+sc.fill_missing()
 Cfg = sc.resolved_paths()
 logger = get_pipeline_logger()
 logger.debug(f"Sunbeam configuration: {Cfg}")

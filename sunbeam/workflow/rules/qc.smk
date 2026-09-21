@@ -58,7 +58,7 @@ rule adapter_removal:
     params:
         inargs=fastp_in,
         outargs=fastp_out,
-        adapter=Cfg["qc"]["adapter_fp"],
+        adapter=Cfg["qc"].get("adapter_fp", os.devnull),
     shell:
         """
         fastp {params.inargs} {params.outargs} \
