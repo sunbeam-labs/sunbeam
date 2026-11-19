@@ -156,7 +156,7 @@ rule _test_shell:
         QC_FP / ".test_shell",
     shell:
         """
-        echo "Test shell rule executed successfully." > {output}
+        echo "Test shell rule executed successfully." >{output}
         """
 
 
@@ -186,7 +186,8 @@ rule samples:
     message:
         "Samples to be processed:"
     run:
-        [logger.info(sample) for sample in sorted(list(Samples.keys()))]
+        for sample in sorted(Samples.keys()):
+            logger.info(sample)
 
 
 localrules:
