@@ -166,7 +166,7 @@ rule fastqc:
         sample_dir=$(dirname {output[0]})
         outdir=$(dirname $sample_dir)
 
-        fastqc -o $outdir {input.reads} -extract >{log} 2>&1
+        fastqc --outdir $outdir --extract {input.reads} >{log} 2>&1
         """
 
 
