@@ -27,7 +27,7 @@ rule build_host_index:
         get_docker_str("decontam")
     shell:
         """
-        bwa index {input} > {log} 2>&1
+        bwa index {input} >{log} 2>&1
         """
 
 
@@ -55,7 +55,7 @@ rule align_to_host:
         runtime=lambda wc: max(MIN_RUNTIME, 240),
     shell:
         """
-        bwa mem -M -t {threads} {input.host} {input.reads} > {output} 2> {log}
+        bwa mem -M -t {threads} {input.host} {input.reads} >{output} 2>{log}
         """
 
 

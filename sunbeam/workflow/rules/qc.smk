@@ -62,12 +62,12 @@ rule adapter_removal:
     shell:
         """
         fastp {params.inargs} {params.outargs} \
-          --adapter_fasta {params.adapter} \
-          --disable_quality_filtering \
-          --disable_length_filtering \
-          --json {output.json} \
-          --html {output.html} \
-          --thread {threads}
+            --adapter_fasta {params.adapter} \
+            --disable_quality_filtering \
+            --disable_length_filtering \
+            --json {output.json} \
+            --html {output.html} \
+            --thread {threads}
         """
 
 
@@ -95,15 +95,15 @@ rule trim_quality:
     shell:
         """
         heyfastq trim-qual \
-          --input {input.reads} \
-          --output {output.reads} \
-          --report {output.report} \
-          --window-width {params.window[0]} \
-          --window-threshold {params.window[1]} \
-          --start-threshold {params.start_threshold} \
-          --end-threshold {params.end_threshold} \
-          --min-length {params.min_length} \
-          --threads {threads}
+            --input {input.reads} \
+            --output {output.reads} \
+            --report {output.report} \
+            --window-width {params.window[0]} \
+            --window-threshold {params.window[1]} \
+            --start-threshold {params.start_threshold} \
+            --end-threshold {params.end_threshold} \
+            --min-length {params.min_length} \
+            --threads {threads}
         """
 
 
@@ -137,12 +137,12 @@ rule remove_low_complexity:
     shell:
         """
         heyfastq filter-kscore \
-          --input {input.reads} \
-          --output {output.reads} \
-          --report {output.report} \
-          --kmer-size {params.kmer_size} \
-          --min-kscore {params.min_kscore} \
-          --threads {threads}
+            --input {input.reads} \
+            --output {output.reads} \
+            --report {output.report} \
+            --kmer-size {params.kmer_size} \
+            --min-kscore {params.min_kscore} \
+            --threads {threads}
         """
 
 
@@ -166,7 +166,7 @@ rule fastqc:
         sample_dir=$(dirname {output[0]})
         outdir=$(dirname $sample_dir)
 
-        fastqc -o $outdir {input.reads} -extract > {log} 2>&1
+        fastqc --outdir $outdir --extract {input.reads} >{log} 2>&1
         """
 
 
