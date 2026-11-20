@@ -9,11 +9,28 @@ from typing import (
     Mapping,
     MutableMapping,
     Optional,
+    Sequence,
     TextIO,
+    Tuple,
     Union,
 )
 
 Number = Union[int, float]
+
+# heyfastq writes one JSON report per command, with a counter for each
+# processing step in the order the steps are applied. For ``trim-qual``:
+#
+#     {"version": "0.2.3", <command-line arguments>,
+#      "trim_avg": {"input_reads": ..., "input_bases": ...,
+#                   "output_reads": ..., "output_bases": ...},
+#      "trim_ends": {...},
+#      "filter_length": {...}}
+#
+# For paired-end input heyfastq counts read pairs (one pair is one read) and
+# counts bases from R1 only, so read counts are in the same units as the
+# decontam host/nonhost counts.
+QUALITY_REPORT_STEPS = ("trim_avg", "trim_ends", "filter_length")
+COMPLEXITY_REPORT_STEPS = ("filter_kscore",)
 
 
 def _ensure_list(value: Union[str, TypingIterable[str]]) -> List[str]:
@@ -137,58 +154,118 @@ def _parse_read_count_line(line: str) -> Optional[Dict[str, Number]]:
     return values if values else None
 
 
-def _aggregate_read_count_reports(
-    report: Union[str, TypingIterable[str]], prefix: str
-) -> Dict[str, Optional[Number]]:
-    totals = {
-        f"{prefix}_input_reads": 0,
-        f"{prefix}_output_reads": 0,
-        f"{prefix}_input_average_length": math.nan,
-        f"{prefix}_output_average_length": math.nan,
-    }
+def _read_counts_from_text(
+    lines: TypingIterable[str],
+) -> Tuple[int, float, int, float]:
+    """Return (input reads, input bases, output reads, output bases) from a
+    legacy plain-text report, e.g.::
 
-    input_bases = 0.0
-    output_bases = 0.0
+        Input reads: total=4000, average_length=70.00
+        Output reads: total=3990, average_length=70.00
+    """
+
+    input_reads = output_reads = 0
+    input_bases = output_bases = 0.0
+    for line in lines:
+        parsed = _parse_read_count_line(line)
+        if not parsed:
+            continue
+        reads = int(parsed.get("total", 0))
+        bases = reads * parsed.get("average_length", 0.0)
+        if line.lstrip().startswith("Input reads"):
+            input_reads += reads
+            input_bases += bases
+        else:
+            output_reads += reads
+            output_bases += bases
+    return input_reads, input_bases, output_reads, output_bases
+
+
+def _read_counts_from_heyfastq(
+    report: Mapping, steps: Sequence[str], path: str
+) -> Tuple[int, int, int, int]:
+    """Return (input reads, input bases, output reads, output bases) from a
+    heyfastq JSON report.
+
+    Input counts come from the first of *steps* present in the report and
+    output counts from the last, so the totals span the whole command.
+    """
+
+    present = [step for step in steps if isinstance(report.get(step), Mapping)]
+    if not present:
+        raise ValueError(
+            f"{path}: not a recognised heyfastq report; expected a "
+            f"{' / '.join(steps)} section but found keys: "
+            f"{', '.join(map(str, report)) or 'none'}"
+        )
+    first = report[present[0]]
+    last = report[present[-1]]
+    return (
+        int(first.get("input_reads", 0)),
+        int(first.get("input_bases", 0)),
+        int(last.get("output_reads", 0)),
+        int(last.get("output_bases", 0)),
+    )
+
+
+def _aggregate_read_count_reports(
+    report: Union[str, TypingIterable[str]], prefix: str, steps: Sequence[str]
+) -> Dict[str, Optional[Number]]:
+    input_reads = output_reads = 0
+    input_bases = output_bases = 0.0
 
     for path in _ensure_list(report):
         with open(path) as fh:
-            for line in fh:
-                parsed = _parse_read_count_line(line)
-                if not parsed:
-                    continue
-                if line.startswith("Input reads"):
-                    totals[f"{prefix}_input_reads"] += int(parsed.get("total", 0))
-                    input_bases += parsed.get("total", 0) * parsed.get(
-                        "average_length", 0.0
-                    )
-                elif line.startswith("Output reads"):
-                    totals[f"{prefix}_output_reads"] += int(parsed.get("total", 0))
-                    output_bases += parsed.get("total", 0) * parsed.get(
-                        "average_length", 0.0
-                    )
+            contents = fh.read()
+        try:
+            data = json.loads(contents)
+        except json.JSONDecodeError:
+            data = None
+        if isinstance(data, Mapping):
+            counts = _read_counts_from_heyfastq(data, steps, path)
+        else:
+            counts = _read_counts_from_text(contents.splitlines())
+        input_reads += counts[0]
+        input_bases += counts[1]
+        output_reads += counts[2]
+        output_bases += counts[3]
 
-    if totals[f"{prefix}_input_reads"]:
-        totals[f"{prefix}_input_average_length"] = (
-            input_bases / totals[f"{prefix}_input_reads"]
-        )
-    if totals[f"{prefix}_output_reads"]:
-        totals[f"{prefix}_output_average_length"] = (
-            output_bases / totals[f"{prefix}_output_reads"]
-        )
-
-    return totals
+    return {
+        f"{prefix}_input_reads": input_reads,
+        f"{prefix}_output_reads": output_reads,
+        f"{prefix}_input_average_length": (
+            input_bases / input_reads if input_reads else math.nan
+        ),
+        f"{prefix}_output_average_length": (
+            output_bases / output_reads if output_reads else math.nan
+        ),
+    }
 
 
 def parse_quality_report(
     report: Union[str, TypingIterable[str]],
 ) -> Dict[str, Optional[Number]]:
-    return _aggregate_read_count_reports(report, "quality")
+    """Summarise ``heyfastq trim-qual`` report(s).
+
+    Input counts are taken before quality trimming (``trim_avg``) and output
+    counts after the minimum-length filter (``filter_length``). For
+    paired-end data, read counts are read pairs and average lengths are for
+    R1. The legacy plain-text report format is also accepted.
+    """
+
+    return _aggregate_read_count_reports(report, "quality", QUALITY_REPORT_STEPS)
 
 
 def parse_complexity_report(
     report: Union[str, TypingIterable[str]],
 ) -> Dict[str, Optional[Number]]:
-    return _aggregate_read_count_reports(report, "complexity")
+    """Summarise ``heyfastq filter-kscore`` report(s).
+
+    For paired-end data, read counts are read pairs and average lengths are
+    for R1. The legacy plain-text report format is also accepted.
+    """
+
+    return _aggregate_read_count_reports(report, "complexity", COMPLEXITY_REPORT_STEPS)
 
 
 def parse_decontam_report(

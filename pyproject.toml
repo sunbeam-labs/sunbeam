@@ -36,6 +36,14 @@ dev = [
   "snakefmt",
   "pytest",
 ]
+slurm = [
+  "snakemake-executor-plugin-slurm",
+  # snakemake-executor-plugin-slurm-jobstep>=0.6.1 strips SLURM_CONF from the
+  # environment before invoking the nested srun that actually runs each job,
+  # which breaks any cluster that isn't using SLURM's configless (DNS SRV)
+  # mode: https://github.com/snakemake/snakemake-executor-plugin-slurm-jobstep
+  "snakemake-executor-plugin-slurm-jobstep==0.6.0",
+]
 ai = [
   "langchain>=0.2,<2.0",
   "langgraph>=0.2,<2.0",
